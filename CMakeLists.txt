@@ -21,6 +21,8 @@ include_directories(NBTestApp/src)
 include_directories(PGCS/src)
 include_directories(PSS/src)
 include_directories(NRNCS/src)
+include_directories(NGAppCommunicator/src)
+include_directories(NGAppPublisher/src)
 
 add_library(Common
         Common/src/rapidjson/error/en.h
@@ -484,4 +486,156 @@ add_executable(NRNCS
         NRNCS/src/NRSubBind01.cpp
         NRNCS/src/NRSubBind01.h)
 
-target_link_libraries(NRNCS LINK_PRIVATE Common)
+target_link_libraries (NRNCS LINK_PRIVATE Common)
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I/usr/include/glib-2.0")
+
+FIND_PACKAGE(PkgConfig REQUIRED)
+PKG_CHECK_MODULES(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
+
+INCLUDE_DIRECTORIES(
+        ${GLIB_INCLUDE_DIRS}
+)
+
+LINK_DIRECTORIES(${GLIB_LIBRARY_DIRS})
+LINK_DIRECTORIES(${GIO_LIBRARY_DIRS})
+
+FILE(GLOB SRC NGAppCommunicator/src/*.cpp)
+
+add_executable(NGAppCommunicator
+        NGAppCommunicator/src/rapidjson/error/en.h
+        NGAppCommunicator/src/rapidjson/error/error.h
+        NGAppCommunicator/src/rapidjson/internal/biginteger.h
+        NGAppCommunicator/src/rapidjson/internal/diyfp.h
+        NGAppCommunicator/src/rapidjson/internal/dtoa.h
+        NGAppCommunicator/src/rapidjson/internal/ieee754.h
+        NGAppCommunicator/src/rapidjson/internal/itoa.h
+        NGAppCommunicator/src/rapidjson/internal/meta.h
+        NGAppCommunicator/src/rapidjson/internal/pow10.h
+        NGAppCommunicator/src/rapidjson/internal/stack.h
+        NGAppCommunicator/src/rapidjson/internal/strfunc.h
+        NGAppCommunicator/src/rapidjson/internal/strtod.h
+        NGAppCommunicator/src/rapidjson/internal/swap.h
+        NGAppCommunicator/src/rapidjson/msinttypes/inttypes.h
+        NGAppCommunicator/src/rapidjson/msinttypes/stdint.h
+        NGAppCommunicator/src/rapidjson/allocators.h
+        NGAppCommunicator/src/rapidjson/document.h
+        NGAppCommunicator/src/rapidjson/encodedstream.h
+        NGAppCommunicator/src/rapidjson/encodings.h
+        NGAppCommunicator/src/rapidjson/filereadstream.h
+        NGAppCommunicator/src/rapidjson/filewritestream.h
+        NGAppCommunicator/src/rapidjson/memorybuffer.h
+        NGAppCommunicator/src/rapidjson/memorystream.h
+        NGAppCommunicator/src/rapidjson/pointer.h
+        NGAppCommunicator/src/rapidjson/prettywriter.h
+        NGAppCommunicator/src/rapidjson/rapidjson.h
+        NGAppCommunicator/src/rapidjson/reader.h
+        NGAppCommunicator/src/rapidjson/stringbuffer.h
+        NGAppCommunicator/src/rapidjson/writer.h
+        NGAppCommunicator/src/App.cpp
+        NGAppCommunicator/src/Core.h
+        NGAppCommunicator/src/CoreNotifyS01.cpp
+        NGAppCommunicator/src/CoreRunEvaluate01.h
+        NGAppCommunicator/src/CoreRunInvite01.cpp
+        NGAppCommunicator/src/CoreRunPhotoPublish01.h
+        NGAppCommunicator/src/CoreRunSubscribe01.cpp
+        NGAppCommunicator/src/CoreSCNSeq01.h
+        NGAppCommunicator/src/NGFilesSubscribed.h
+        NGAppCommunicator/src/Striptags.h
+        NGAppCommunicator/src/App.h
+        NGAppCommunicator/src/CoreInfoPayload01.cpp
+        NGAppCommunicator/src/CoreNotifyS01.h
+        NGAppCommunicator/src/CoreRunExpose01.cpp
+        NGAppCommunicator/src/CoreRunInvite01.h
+        NGAppCommunicator/src/CoreRunPublish01.cpp
+        NGAppCommunicator/src/CoreRunSubscribe01.h
+        NGAppCommunicator/src/CoreStatusS01.cpp
+        NGAppCommunicator/src/NGManager.cpp
+        NGAppCommunicator/src/Core.cpp
+        NGAppCommunicator/src/CoreInfoPayload01.h
+        NGAppCommunicator/src/CoreRunDiscover01.cpp
+        NGAppCommunicator/src/CoreRunExpose01.h
+        NGAppCommunicator/src/CoreRunPeriodic01.cpp
+        NGAppCommunicator/src/CoreRunPublish01.h
+        NGAppCommunicator/src/CoreSCNAck01.cpp
+        NGAppCommunicator/src/CoreStatusS01.h
+        NGAppCommunicator/src/NGManager.h
+        NGAppCommunicator/src/CoreDeliveryBind01.cpp
+        NGAppCommunicator/src/CoreMsgCl01.cpp
+        NGAppCommunicator/src/CoreRunDiscover01.h
+        NGAppCommunicator/src/CoreRunInitialize01.cpp
+        NGAppCommunicator/src/CoreRunPeriodic01.h
+        NGAppCommunicator/src/CoreRunPublish02.cpp
+        NGAppCommunicator/src/CoreSCNAck01.h
+        NGAppCommunicator/src/execApp.cpp
+        NGAppCommunicator/src/CoreDeliveryBind01.h
+        NGAppCommunicator/src/CoreMsgCl01.h
+        NGAppCommunicator/src/CoreRunEvaluate01.cpp
+        NGAppCommunicator/src/CoreRunInitialize01.h
+        NGAppCommunicator/src/CoreRunPhotoPublish01.cpp
+        NGAppCommunicator/src/CoreRunPublish02.h
+        NGAppCommunicator/src/CoreSCNSeq01.cpp
+        NGAppCommunicator/src/NGFilesSubscribed.cpp
+        NGAppCommunicator/src/Striptags.cpp)
+
+target_link_libraries (NGAppCommunicator LINK_PRIVATE Common ${GLIB_LIBRARIES} ${GIO_LIBRARIES})
+
+
+add_executable(NGAppPublisher
+        NGAppPublisher/src/App.cpp
+        NGAppPublisher/src/Core.h
+        NGAppPublisher/src/CoreNotifyS01.cpp
+        NGAppPublisher/src/CoreRunEvaluate01.h
+        NGAppPublisher/src/CoreRunInvite01.cpp
+        NGAppPublisher/src/CoreRunPhotoPublish01.h
+        NGAppPublisher/src/CoreRunSubscribe01.cpp
+        NGAppPublisher/src/CoreSCNSeq01.h
+        NGAppPublisher/src/NGFiles.h
+        NGAppPublisher/src/App.h
+        NGAppPublisher/src/CoreInfoPayload01.cpp
+        NGAppPublisher/src/CoreNotifyS01.h
+        NGAppPublisher/src/CoreRunExpose01.cpp
+        NGAppPublisher/src/CoreRunInvite01.h
+        NGAppPublisher/src/CoreRunPublish01.cpp
+        NGAppPublisher/src/CoreRunSubscribe01.h
+        NGAppPublisher/src/CoreStatusS01.cpp
+        NGAppPublisher/src/NGHelperFiles.cpp
+        NGAppPublisher/src/Core.cpp
+        NGAppPublisher/src/CoreInfoPayload01.h
+        NGAppPublisher/src/CoreRunDiscover01.cpp
+        NGAppPublisher/src/CoreRunExpose01.h
+        NGAppPublisher/src/CoreRunPeriodic01.cpp
+        NGAppPublisher/src/CoreRunPublish01.h
+        NGAppPublisher/src/CoreSCNAck01.cpp
+        NGAppPublisher/src/CoreStatusS01.h
+        NGAppPublisher/src/NGHelperFiles.h
+        NGAppPublisher/src/CoreDeliveryBind01.cpp
+        NGAppPublisher/src/CoreMsgCl01.cpp
+        NGAppPublisher/src/CoreRunDiscover01.h
+        NGAppPublisher/src/CoreRunInitialize01.cpp
+        NGAppPublisher/src/CoreRunPeriodic01.h
+        NGAppPublisher/src/CoreRunPublish02.cpp
+        NGAppPublisher/src/CoreSCNAck01.h
+        NGAppPublisher/src/execApp.cpp
+        NGAppPublisher/src/Striptags.cpp
+        NGAppPublisher/src/CoreDeliveryBind01.h
+        NGAppPublisher/src/CoreMsgCl01.h
+        NGAppPublisher/src/CoreRunEvaluate01.cpp
+        NGAppPublisher/src/CoreRunInitialize01.h
+        NGAppPublisher/src/CoreRunPhotoPublish01.cpp
+        NGAppPublisher/src/CoreRunPublish02.h
+        NGAppPublisher/src/CoreSCNSeq01.cpp
+        NGAppPublisher/src/NGFiles.cpp
+        NGAppPublisher/src/Striptags.h)
+
+target_link_libraries (NGAppPublisher LINK_PRIVATE Common)
+
+add_executable(NGConverter
+        NGConverter/src/File.cpp
+        NGConverter/src/File.h
+        NGConverter/src/MurmurHash3.cpp
+        NGConverter/src/MurmurHash3.h
+        NGConverter/src/NGConverter.cpp)
+
+target_link_libraries (NGConverter LINK_PRIVATE Common)
