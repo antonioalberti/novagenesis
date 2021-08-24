@@ -69,7 +69,7 @@ int CoreMsgCl01::Run(Message *_ReceivedMessage, CommandLine *_PCL, vector<Messag
 							// **********************************************************************************
 
 							// Setting up the process SCN as the space limiter
-							RunLimiters.push_back(PB->PP->GetSelfCertifyingName());
+							RunLimiters.push_back(PB->PP->Intra_Process);
 
 							// Setting up the CLI block SCN as the source SCN
 							RunSources.push_back(PB->GetSelfCertifyingName());

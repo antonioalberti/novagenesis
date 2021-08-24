@@ -77,7 +77,7 @@ int CoreDeliveryBind01::Run(Message *_ReceivedMessage, CommandLine *_PCL, vector
 									// ****************************************************
 
 									// Setting up the process SCN as the space limiter
-									StoreBindingsLimiters.push_back(PB->PP->GetSelfCertifyingName());
+									StoreBindingsLimiters.push_back(PB->PP->Intra_Process);
 
 									// Setting up the CLI block SCN as the source SCN
 									StoreBindingsSources.push_back(PB->GetSelfCertifyingName());

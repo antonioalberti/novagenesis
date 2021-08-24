@@ -58,7 +58,7 @@ int CoreRunInitialize01::Run(Message *_ReceivedMessage, CommandLine *_PCL, vecto
 	// ******************************************************
 
 	// Setting up the process SCN as the space limiter
-	Limiters.push_back(PB->PP->GetSelfCertifyingName());
+  	 Limiters.push_back (PB->PP->Intra_Process);
 
 	// Setting up the CLI block SCN as the source SCN
 	Sources.push_back(PB->GetSelfCertifyingName());
@@ -135,7 +135,7 @@ int CoreRunInitialize01::Run(Message *_ReceivedMessage, CommandLine *_PCL, vecto
 	// ******************************************************
 
 	// Setting up the process SCN as the space limiter
-	Limiters.push_back(PB->PP->GetSelfCertifyingName());
+	Limiters.push_back(PB->PP->Intra_Process);
 
 	// Setting up the CLI block SCN as the source SCN
 	Sources.push_back(PB->GetSelfCertifyingName());

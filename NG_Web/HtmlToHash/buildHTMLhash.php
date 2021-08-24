@@ -1,7 +1,7 @@
 <?php
 
 /* Bin that Get hash from file */
-$ngconvert = "/home/william/newWorkspace/novagenesis/NG_Web/NGConverter/Debug/NGConverter";
+$ngconvert = "/home/william/newWorkspace/novagenesis/cmake-build-debug/NGConverter";
 /* Bin that Get wordlist from file */
 $striptags = "/home/william/newWorkspace/novagenesis/NG_Web/StripTags/strip.php";
 /* Input */

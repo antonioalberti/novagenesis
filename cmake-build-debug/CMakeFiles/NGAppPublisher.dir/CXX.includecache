@@ -274,12 +274,6 @@ unistd.h
 ostream
 -
 
-/home/william/newWorkspace/novagenesis/NGAppPublisher/src/App.cpp
-App.h
-/home/william/newWorkspace/novagenesis/NGAppPublisher/src/App.h
-Core.h
-/home/william/newWorkspace/novagenesis/NGAppPublisher/src/Core.h
-
 /home/william/newWorkspace/novagenesis/NGAppPublisher/src/App.h
 Process.h
 /home/william/newWorkspace/novagenesis/NGAppPublisher/src/Process.h
@@ -300,11 +294,39 @@ Subscription.h
 Publication.h
 /home/william/newWorkspace/novagenesis/NGAppPublisher/src/Publication.h
 
-/home/william/newWorkspace/novagenesis/NGAppPublisher/src/execApp.cpp
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/CoreRunEvaluate01.cpp
+CoreRunEvaluate01.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/CoreRunEvaluate01.h
 App.h
 /home/william/newWorkspace/novagenesis/NGAppPublisher/src/App.h
-time.h
+Core.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/Core.h
+GW.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/GW.h
+NGFiles.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/NGFiles.h
+
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/CoreRunEvaluate01.h
+string
 -
-sys/time.h
+Action.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/Action.h
+Message.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/Message.h
+MessageBuilder.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/MessageBuilder.h
+stdio.h
+-
+sys/types.h
+-
+unistd.h
+-
+Tuple.h
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/Tuple.h
+
+/home/william/newWorkspace/novagenesis/NGAppPublisher/src/NGFiles.h
+string
+-
+vector
 -
 
