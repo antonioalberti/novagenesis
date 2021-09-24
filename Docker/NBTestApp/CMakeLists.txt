@@ -1,0 +1,222 @@
+cmake_minimum_required(VERSION 3.5.1)
+project(novagenesis)
+
+set(CMAKE_CXX_STANDARD 20)
+
+include_directories(Common/src)
+include_directories(Common/src/rapidjson)
+include_directories(Common/src/rapidjson/error)
+include_directories(Common/src/rapidjson/internal)
+include_directories(PGCS/src)
+include_directories(NBTestApp/src)
+
+add_library(Common
+        Common/src/rapidjson/error/en.h
+        Common/src/rapidjson/error/error.h
+        Common/src/rapidjson/internal/biginteger.h
+        Common/src/rapidjson/internal/diyfp.h
+        Common/src/rapidjson/internal/dtoa.h
+        Common/src/rapidjson/internal/ieee754.h
+        Common/src/rapidjson/internal/itoa.h
+        Common/src/rapidjson/internal/meta.h
+        Common/src/rapidjson/internal/pow10.h
+        Common/src/rapidjson/internal/stack.h
+        Common/src/rapidjson/internal/strfunc.h
+        Common/src/rapidjson/internal/strtod.h
+        Common/src/rapidjson/internal/swap.h
+        Common/src/rapidjson/msinttypes/inttypes.h
+        Common/src/rapidjson/msinttypes/stdint.h
+        Common/src/rapidjson/allocators.h
+        Common/src/rapidjson/document.h
+        Common/src/rapidjson/encodedstream.h
+        Common/src/rapidjson/encodings.h
+        Common/src/rapidjson/filereadstream.h
+        Common/src/rapidjson/filewritestream.h
+        Common/src/rapidjson/memorybuffer.h
+        Common/src/rapidjson/memorystream.h
+        Common/src/rapidjson/pointer.h
+        Common/src/rapidjson/prettywriter.h
+        Common/src/rapidjson/rapidjson.h
+        Common/src/rapidjson/reader.h
+        Common/src/rapidjson/stringbuffer.h
+        Common/src/rapidjson/writer.h
+        Common/src/Action.cpp
+        Common/src/Action.h
+        Common/src/Block.cpp
+        Common/src/Block.h
+        Common/src/CLI.cpp
+        Common/src/CLI.h
+        Common/src/CLIRunInitialization01.cpp
+        Common/src/CLIRunInitialization01.h
+        Common/src/CLISCNAck01.cpp
+        Common/src/CLISCNAck01.h
+        Common/src/CommandLine.cpp
+        Common/src/CommandLine.h
+        Common/src/DataStore.h
+        Common/src/fast_mutex.h
+        Common/src/File.cpp
+        Common/src/File.h
+        Common/src/GW.cpp
+        Common/src/GW.h
+        Common/src/GWHelloIPC01.cpp
+        Common/src/GWHelloIPC01.h
+        Common/src/GWMsgCl01.cpp
+        Common/src/GWMsgCl01.h
+        Common/src/GWRunInitialization01.cpp
+        Common/src/GWRunInitialization01.h
+        Common/src/GWSCNAck01.cpp
+        Common/src/GWSCNAck01.h
+        Common/src/GWSCNSeq01.cpp
+        Common/src/GWSCNSeq01.h
+        Common/src/GWStatusS01.cpp
+        Common/src/GWStatusS01.h
+        Common/src/GWStatusSCNS01.cpp
+        Common/src/GWStatusSCNS01.h
+        Common/src/HashMultimaps.h
+        Common/src/HT.cpp
+        Common/src/HT.h
+        Common/src/HTBindReport01.cpp
+        Common/src/HTBindReport01.h
+        Common/src/HTDeliveryBind01.cpp
+        Common/src/HTDeliveryBind01.h
+        Common/src/HTGetBind01.cpp
+        Common/src/HTGetBind01.h
+        Common/src/HTInfoPayload01.cpp
+        Common/src/HTInfoPayload01.h
+        Common/src/HTListBind01.cpp
+        Common/src/HTListBind01.h
+        Common/src/HTMessageSeq01.cpp
+        Common/src/HTMessageSeq01.h
+        Common/src/HTMessageType01.cpp
+        Common/src/HTMessageType01.h
+        Common/src/HTMsgCl01.cpp
+        Common/src/HTMsgCl01.h
+        Common/src/HTRevokeBind01.cpp
+        Common/src/HTRevokeBind01.h
+        Common/src/HTRunInitialization01.cpp
+        Common/src/HTRunInitialization01.h
+        Common/src/HTRunPeriodic01.cpp
+        Common/src/HTRunPeriodic01.h
+        Common/src/HTSCNSeq01.cpp
+        Common/src/HTSCNSeq01.h
+        Common/src/HTStatusS01.cpp
+        Common/src/HTStatusS01.h
+        Common/src/HTStoreBind01.cpp
+        Common/src/HTStoreBind01.h
+        Common/src/Message.cpp
+        Common/src/Message.h
+        Common/src/MessageBuilder.cpp
+        Common/src/MessageBuilder.h
+        Common/src/MessageReceiving.h
+        Common/src/MurmurHash3.cpp
+        Common/src/MurmurHash3.h
+        Common/src/OutputVariable.cpp
+        Common/src/OutputVariable.h
+        Common/src/Process.cpp
+        Common/src/Process.h
+        Common/src/Prompt_iostream.cpp
+        Common/src/Prompt_iostream.h
+        Common/src/Publication.h
+        Common/src/Shm.h
+        Common/src/Subscription.h
+        Common/src/tinythread.cpp
+        Common/src/tinythread.h
+        Common/src/Tuple.h)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -p -pg -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt")
+
+add_executable(PGCS
+    PGCS/src/Core.cpp
+    PGCS/src/Core.h
+    PGCS/src/CoreDeliveryBind01.cpp
+    PGCS/src/CoreDeliveryBind01.h
+    PGCS/src/CoreInfoPayload01.cpp
+    PGCS/src/CoreInfoPayload01.h
+    PGCS/src/CoreMsgCl01.cpp
+    PGCS/src/CoreMsgCl01.h
+    PGCS/src/CoreNotifyS01.cpp
+    PGCS/src/CoreNotifyS01.h
+    PGCS/src/CoreRunDiscover01.cpp
+    PGCS/src/CoreRunDiscover01.h
+    PGCS/src/CoreRunEvaluate01.cpp
+    PGCS/src/CoreRunEvaluate01.h
+    PGCS/src/CoreRunExpose01.cpp
+    PGCS/src/CoreRunExpose01.h
+    PGCS/src/CoreRunInitialize01.cpp
+    PGCS/src/CoreRunInitialize01.h
+    PGCS/src/CoreRunInvite01.cpp
+    PGCS/src/CoreRunInvite01.h
+    PGCS/src/CoreRunPeriodic01.cpp
+    PGCS/src/CoreRunPeriodic01.h
+    PGCS/src/CoreRunPublish01.cpp
+    PGCS/src/CoreRunPublish01.h
+    PGCS/src/CoreRunPublish02.cpp
+    PGCS/src/CoreRunPublish02.h
+    PGCS/src/CoreRunPublish03.cpp
+    PGCS/src/CoreRunPublish03.h
+    PGCS/src/CoreRunSubscribe01.cpp
+    PGCS/src/CoreRunSubscribe01.h
+    PGCS/src/CoreSCNAck01.cpp
+    PGCS/src/CoreSCNAck01.h
+    PGCS/src/CoreSCNSeq01.cpp
+    PGCS/src/CoreSCNSeq01.h
+    PGCS/src/CoreStatusS01.cpp
+    PGCS/src/CoreStatusS01.h
+    PGCS/src/execPGCS.cpp
+    PGCS/src/PG.cpp
+    PGCS/src/PG.h
+    PGCS/src/PGCS.cpp
+    PGCS/src/PGCS.h
+    PGCS/src/PGHelloIHC01.cpp
+    PGCS/src/PGHelloIHC01.h
+    PGCS/src/PGHelloIHC02.cpp
+    PGCS/src/PGHelloIHC02.h
+    PGCS/src/PGHelloIHC03.cpp
+    PGCS/src/PGHelloIHC03.h
+    PGCS/src/PGMsgCl01.cpp
+    PGCS/src/PGMsgCl01.h
+    PGCS/src/PGRunExposition01.cpp
+    PGCS/src/PGRunExposition01.h
+    PGCS/src/PGRunHello01.cpp
+    PGCS/src/PGRunHello01.h
+    PGCS/src/PGRunHello02.cpp
+    PGCS/src/PGRunHello02.h
+    PGCS/src/PGRunHello03.cpp
+    PGCS/src/PGRunHello03.h
+    PGCS/src/PGRunInitialization01.cpp
+    PGCS/src/PGRunInitialization01.h
+    PGCS/src/PGRunPeriodic01.cpp
+    PGCS/src/PGRunPeriodic01.h
+    PGCS/src/PGRunPublishing01.cpp
+    PGCS/src/PGRunPublishing01.h)
+
+target_link_libraries (PGCS LINK_PRIVATE Common)
+
+add_executable(NBTestApp
+        NBTestApp/src/NBTestApp.cpp
+        NBTestApp/src/NBTestApp.h
+        NBTestApp/src/Core.cpp
+        NBTestApp/src/Core.h
+        NBTestApp/src/CoreDeliveryBind01.cpp
+        NBTestApp/src/CoreDeliveryBind01.h
+        NBTestApp/src/CoreMsgCl01.cpp
+        NBTestApp/src/CoreMsgCl01.h
+        NBTestApp/src/CoreRunDiscover01.cpp
+        NBTestApp/src/CoreRunDiscover01.h
+        NBTestApp/src/CoreRunEvaluate01.cpp
+        NBTestApp/src/CoreRunEvaluate01.h
+        NBTestApp/src/CoreRunInitialize01.cpp
+        NBTestApp/src/CoreRunInitialize01.h
+        NBTestApp/src/CoreRunPeriodic01.cpp
+        NBTestApp/src/CoreRunPeriodic01.h
+        NBTestApp/src/CoreRunSubscribe01.cpp
+        NBTestApp/src/CoreRunSubscribe01.h
+        NBTestApp/src/CoreSCNAck01.cpp
+        NBTestApp/src/CoreSCNAck01.h
+        NBTestApp/src/CoreSCNSeq01.cpp
+        NBTestApp/src/CoreSCNSeq01.h
+        NBTestApp/src/CoreStatusS01.cpp
+        NBTestApp/src/CoreStatusS01.h
+        NBTestApp/src/execNBTestApp.cpp)
+
+target_link_libraries (NBTestApp LINK_PRIVATE Common)
