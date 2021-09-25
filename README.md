@@ -20,8 +20,7 @@ Docker - This folder contains the folders and subsequent files required to prepa
 
 EPGS - It is a lightweight version of PGCS aimed to be embedded into IoT devices. EPGS has its own structure and compilation procedures that are not required to run NG in Linux OS. There is a way to run an emulated EPGS in Linux, but it is under development. More details are given here: https://ieeexplore.ieee.org/document/7970111
 
-GIRS - It is a generic indirection resolution service (GIRS), which is nowadays integrated into NRNCS. GIRS selects which hash table service (HTS) will finally stores the name bindings and/or con-
-tents. GIRS selects the HTS service that is serving a certain name (or key) binary range, i.e. a subset of all possible binary numbers according to the number of bits of the key of a content or a name binding. Typically, a local domain can have several PSS, GIRS, and HTS instances. This approach has been replaced in 2021 by NRNCS. However, GIRS is an independent service that could be used together with PSS and HTS to replace the NRNCS in a distributed way. In other words, NRNCS integrates PSS, GIRS and HTS in a unique service. 
+GIRS - It is a generic indirection resolution service (GIRS), which is nowadays integrated into NRNCS. GIRS selects which hash table service (HTS) will finally stores the name bindings and/or contents. GIRS selects the HTS service that is serving a certain name (or key) binary range, i.e. a subset of all possible binary numbers according to the number of bits of the key of a content or a name binding. Typically, a local domain can have several PSS, GIRS, and HTS instances. This approach has been replaced in 2021 by NRNCS. However, GIRS is an independent service that could be used together with PSS and HTS to replace the NRNCS in a distributed way. In other words, NRNCS integrates PSS, GIRS and HTS in a unique service. 
 
 HTS - HTS provides a mechanism to retrieve already published bindings and deliver them directly to an authorized subscriber. Every HTS instance contains a hash table data structure where
 name bindings are stored in a key/value(s) format. GIRS determines to where a certain ID range will be stored by a division remainder.
@@ -30,7 +29,11 @@ IO - This folder is employed to store input files required to run NG services as
 
 IoTTestApp - This application was developed to work as a client of IoT or I4.0 devices. It generates demands for sensors or actuators that embedd EPGS. All the operation is contract-based from embedded EPGS, PGCS and IoTTestApp. Therefore, it is useless to run IoTtestApp without an EPGS instance and a PGCS that represents it in NG core (like a digital twin). The PGCS must be configured in -pc mode for this IoT/I4.0 scenario. For more detail in this application, check https://ieeexplore.ieee.org/document/7970111.
 
-Make - This folder contains some alternative C/C++ compilation scripts. It can used, but it is better to use cmake or clion with the CMakeLists.txt. To directly compile NG service use Compile.sh. Be sure to have GCC/G++ installed. makedirs create the folders to store compiled code inside service source files' folders. Therefore, run it first. 
+Make - This folder contains some alternative C/C++ compilation scripts. It can used, but it is better to use cmake or clion with the CMakeLists.txt. To directly compile NG service use Compile.sh. Be sure to have GCC/G++ installed.
+
+	makedirs create the folders to store compiled code inside service source files' folders. 
+	
+	Therefore, run it first. 
 
 NBTestApp - This application performs a NRNCS (unique process version) or PSS/GIRS/HTS (distributed version) testing by publishing thousands of name bindings and latter subscribing some of them randomly. This application was previously used in the paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. Its previous name was NBSimpleTestApp. Please, configure the App.ini file in the folder Scripts/Docker/Includes-NBTestApp before running to customize default parameters. 
 
@@ -56,7 +59,11 @@ Scripts - This folder stores some new and old bash scripts to run NG. It has:
 
 .idea - Contains clion related files.
 
-CMakeLists - Contains instructions for clion or cmake. To compile NG without clion locally (i.e. you are not going to use Docker images to run) just open a terminal and go to the folder novagenesis. Then, run sudo cmake --build cmake-build-debug --target all           For this approach of running, go to How to run NG in the host OS for further instructions. Or alternativally, create Docker images and run NG inside Docker containers. In this case, see How to run NG with Docker containers. 
+CMakeLists - Contains instructions for clion or cmake. To compile NG without clion locally (i.e. you are not going to use Docker images to run) just open a terminal and go to the folder novagenesis. Then, run:
+
+	sudo cmake --build cmake-build-debug --target all           
+	
+For this approach of running, go to How to run NG in the host OS (Section 4) for further instructions. Or alternativally, create Docker images and run NG inside Docker containers. In this case, see How to run NG with Docker containers (Section 3). 
 
 Dockerfile - This Dockerfile is employed to create a ng-generic:latest container image. It includes and compiles all the NG services. Therefore, it is a generic approach without an specific running objective. This image has a larger overhead. If you don't need it for developing purposes, just comment the docker -build line in the make-all-images.sh script bellow. Otherwise, this image will be generated by default.
 
