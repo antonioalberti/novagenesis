@@ -2,8 +2,7 @@ Thank you for your interest in NovaGenesis.
 
 # 1. What is NovaGenesis (NG)?
 
-NG is a convergent information processing, storage and exchanging architecture. Its design started in 2008, when Prof. Antônio Marcos Alberti selected project requirements, design principles, guidelines and main foundations. Alberti also did its first specification in 2011 and coded this prototype in C/C++ in 2012-2013. The key idea of NovaGenesis can be summarized in the 306
-following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is no guarantee of any kind. NG is a registered software.
+NG is a convergent information processing, storage and exchanging architecture. Its design started in 2008, when Prof. Antônio Marcos Alberti selected project requirements, design principles, guidelines and main foundations. Alberti also did its first specification in 2011 and coded this prototype in C/C++ in 2012-2013. The key idea of NovaGenesis can be summarized in the following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is no guarantee of any kind. NG is a registered software.
 
 More details about NG design can be found in the following paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. 
 
@@ -79,7 +78,7 @@ remove-all-docker-images.sh - Remove all NG Docker images created.
 
 First of all, you need to generate the NG images. For this purpose, just run:
 
-sudo sh make-all-docker-images.sh
+	sudo sh make-all-docker-images.sh
 
 Observe that you do not need to compile NG in the host OS to compile NovaGenesis inside the containers. 
 
@@ -87,21 +86,21 @@ These are separeted things. If you want to run NovaGenesis in your local host, w
 
 After running this scripts, you can check the created images with:
 
-sudo docker images
+	sudo docker images
 
 The following images will be available:
 
-ng-generic:latest - This is a complete image if all services, but not prepared to run any demostration.
+	ng-generic:latest - This is a complete image if all services, but not prepared to run any demostration.
 
-ng-nrncs:latest - This is a NovaGenesis core image. It includes two services: PGCS and a NRNCS. Since NRNCS is important to store evey name binding and content available in a Domain, you should run this image in all NG demonstration/example scenarios.
+	ng-nrncs:latest - This is a NovaGenesis core image. It includes two services: PGCS and a NRNCS. Since NRNCS is important to store evey name binding and content available in a Domain, you should run this image in all NG demonstration/example scenarios.
 
-ng-contentapp:latest - This image has the named-content distribution application for NG demo.
+	ng-contentapp:latest - This image has the named-content distribution application for NG demo.
 
-ng-nbtestapp:latest - This image has the name bindings testing applicatio for NG demo.
+	ng-nbtestapp:latest - This image has the name bindings testing applicatio for NG demo.
 
 If you want to remove the NovaGenesis images, trun:
 
-sudo sh remove-all-docker-images.sh
+	sudo sh remove-all-docker-images.sh
 
 Be sure to have stopped all running containers before doing this action.
 
@@ -115,11 +114,11 @@ In this NG running option, NG programs run inside containers and use containers 
 
 Go to the running folder:
 
-cd /Scripts/Docker
+	cd /Scripts/Docker
 
 Run the script:
 
-sudo sh run-multiple-content-distribution-applications.sh $1 $2 $3 $4 $5
+	sudo sh run-multiple-content-distribution-applications.sh $1 $2 $3 $4 $5
 
 $1 is the number of content repository apps
 $2 is the number of content source apps
@@ -129,7 +128,7 @@ $5 paramenter is the height of the photos to be created in a Source
 
 For instance, type:
 
-sudo sh run-multiple-content-distribution-applications.sh 2 2 100 50 50
+	sudo sh run-multiple-content-distribution-applications.sh 2 2 100 50 50
 
 This call creates two sources that will publish 100 .jpg photos with size 50 x 50 pixels to the two photo repositories. 
 
@@ -137,7 +136,7 @@ This demonstrates NG content distributed approach with NRNCS.
 
 If you want to collect what happened inside the containers just type:
 
-sudo sh  log-multiple-content-distribution-applications.sh $1 $2
+	sudo sh  log-multiple-content-distribution-applications.sh $1 $2
 
 $1 is the number of content repository apps
 $2 is the number of content source apps
@@ -150,14 +149,14 @@ It is also possible to check the logs of the programs in each container, the amo
 
 To stop the containers, type:
 
-sudo sh stop-multiple-content-distribution-applications.sh $1 $2
+	sudo sh stop-multiple-content-distribution-applications.sh $1 $2
 
 You can also use Wireshark tool to check NovaGenesis packets using the docker0 (Docker Bridge) interface. Select eth.type == 0x1234 filter to reduce the log exclusively to NG packets. After contract establishment, you can se the photos frames passing in the Wireshark.
 
 If you want to test NG transferring other files, for instance, video data chunks, just copy them to the container as indicated bellow: 
 
-#Copy files to a source container instance named Source$1
-docker cp/Downloads/. Source$1:/home/ng/workspace/novagenesis/IO/Source$1/
+	#Copy files to a source container instance named Source$1
+	docker cp/Downloads/. Source$1:/home/ng/workspace/novagenesis/IO/Source$1/
 
 The Source$1 will detect the new files in its folder and start transferring to the existent Repository container(s).
  
@@ -168,21 +167,21 @@ In this demonstration a large amount of name bindings is published by NBTestApp 
 
 Go to the running folder:
 
-cd /Scripts/Docker
+	cd /Scripts/Docker
 
 Run the script:
 
-sudo sh run-name-binding-resolution-application.sh
+	sudo sh run-name-binding-resolution-application.sh
 
 To access the results in the demonastration, type:
 
-sudo sh log-name-binding-resolution-application.sh
+	sudo sh log-name-binding-resolution-application.sh
 
 You can use this latter script every time you want to check what is going one in the containers. Novel results and log files versions are copied to this folder.
 
 To stop the containers, type:
 
-sudo sh stop-name-binding-application.sh
+	sudo sh stop-name-binding-application.sh
 
 You can also use Wireshark tool to check NovaGenesis packets using the docker0 (Docker Bridge) interface. Select eth.type == 0x1234 filter to reduce the log exclusively to NG packets. You can see NBs publishing in the beginning of the demo. After the publication phase finishes, subscription starts. 
 
@@ -195,23 +194,23 @@ In this option, NG programs run locally using host OS shared memory for Interpro
 
 Go to the running folder:
 
-/Scripts/Simple
+	/Scripts/Simple
 
 # 4.1. Content Distribution
 
 Just run the script:
 
-sudo sh clean.sh
+	sudo sh clean.sh
 
 It is required to clean the POSIX semaphores from previous NG runnings.
 
 Now, run the NG services locally:
 
-sudo sh Intra_OS_Content_Test_NRNCS.sh
+	sudo sh Intra_OS_Content_Test_NRNCS.sh
 
 Be sure to have compiled the NG services before running this latter script. If you haven't compiled, just go to /novagenesis folder and type:
 
-sudo cmake --build cmake-build-debug --target all
+	sudo cmake --build cmake-build-debug --target all
 
 In this case, results will be placed locally in the /IO folder for each program.
 
@@ -225,13 +224,13 @@ This test never ends, so you need to close the programs when photos/files finish
 
 Just run the script:
 
-sudo sh clean.sh
+	sudo sh clean.sh
 
 It is required to clean the POSIX semaphores from previous NG runnings.
 
 Now, run the NG services locally:
 
-sudo sh Intra_OS_NBTest.sh
+	sudo sh Intra_OS_NBTest.sh
 
 In this case, results will be placed locally in the /IO/NBTestApp folder.
 
