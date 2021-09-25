@@ -1,13 +1,15 @@
 Thank you for your interest in NovaGenesis. 
 
-1. What is NovaGenesis (NG)?
+# 1. What is NovaGenesis (NG)?
 
 NG is a convergent information processing, storage and exchanging architecture. Its design started in 2008, when Prof. Antônio Marcos Alberti selected project requirements, design principles, guidelines and main foundations. Alberti also did its first specification in 2011 and coded this prototype in C/C++ in 2012-2013. The key idea of NovaGenesis can be summarized in the 306
-following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is not guarantee of any kind. More details about NG design can be found in the following paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. All the papers regarding NG are acessible here: https://www.researchgate.net/profile/Antonio-Alberti-2. NG is a registered software.
+following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is no guarantee of any kind. NG is a registered software.
 
+More details about NG design can be found in the following paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. 
 
+All the papers regarding NG are accessible here: https://www.researchgate.net/profile/Antonio-Alberti-2. 
 
-2. NovaGenesis folder structure
+# 2. NovaGenesis folder structure
 
 c-make-building - It is where the executable program appear after compilation with cmake or clion. We prepared a project in clion for compiling all the source code using a CMakeLists.txt file in NG root folder. 
 
@@ -36,6 +38,8 @@ NBTestApp - This application performs a NRNCS (unique process version) or PSS/GI
 NRNCS - It is 2021 service that integrates PSS, GIRS and HTS in a unique service. NRNCS offers a publish/subscribe API for NG services. It also implements a Hash Table data structure to store domain level name bindings and employs Linux file system to store associated content files (e.g. .jpg photos). Every NG domain must have at least one NRNCS instance, or alternatively, one PSS, GIRS and HTS.
 
 Plots - Contais a script for plotting NG output files in GNU Plot. Some NG services generate statistics of their operations that can be plotted by a script like this. 
+
+PGCS - It is aimed at message forwarding and routing over link layer. It provides: message  encapsulation  over  already  established  networking technologies,  such  as Ethernet, Wi-Fi, LoRa  or  Bluetooth;  a  proxy  service  to represent other NG services inside an OS; and bootstrapping functionalities  to  initialize  a  domain.  PGCS  enables  PSS,GIRS  and  HTS  discovery  during  initialization.  Since  an  address is a name that denotes the position to where an existence can inhabit or be attached, PGCS relays on HTS to store name-bindings among already established address formats (e.g. a physical world  or  an  emulated  MAC  Ethernet)  and/or  NG  addresses. PGCS also has an internal hash table in which it copies/locally stores  discovered  NBs.  Independently  of  the  address  formatused to connect PGCSes, inside NG all the communication is ID-oriented. Additionally to the gateway functionality, PGCS publishes  NBs  about  NG  services  inside  an  OS  to  other PGCSes in the same domain. PGCS can also represent physical things, acting as a digital twin. See more here: (PDF) Advancing NovaGenesis Architecture Towards Future Internet of Things. Available from: https://www.researchgate.net/publication/318279437_Advancing_NovaGenesis_Architecture_Towards_Future_Internet_of_Things [accessed Sep 25 2021].
 
 PSS - By using PSS, other NG services or applications can expose its NBs to other services or discover how published names are related one another. Eventually, services can successively subscribe NBs to identify and locate other existences, storing these NBs in their local hash tables (every NG service also has a hash table), and routing/forwarding information based on them. The NB/content subscription model also employs transfer of digitally signed hash table keys. In 2021, PSS was integrated into NRNCS process.
 
@@ -69,7 +73,7 @@ remove-all-docker-images.sh - Remove all NG Docker images created.
 
 
 
-3. How to run NG with Docker containers
+# 3. How to run NG with Docker containers
 
 
 
@@ -107,7 +111,7 @@ In this NG running option, NG programs run inside containers and use containers 
 
 
 
-3.1. Content Distribution
+# 3.1. Content Distribution
 
 Go to the running folder:
 
@@ -158,7 +162,7 @@ docker cp/Downloads/. Source$1:/home/ng/workspace/novagenesis/IO/Source$1/
 The Source$1 will detect the new files in its folder and start transferring to the existent Repository container(s).
  
 
-3.2. Name Binding Resolution
+# 3.2. Name Binding Resolution
 
 In this demonstration a large amount of name bindings is published by NBTestApp to the NRNCS. Name bindings are published in thousands per message. After some time, the cache is full of name bindings. Then, the application starts to subscribe one of them randomly. The demo finishes after 1440 subscriptions, closing the NBTestApp. 
 
@@ -185,7 +189,7 @@ You can also use Wireshark tool to check NovaGenesis packets using the docker0 (
 
 
 
-4. How to run NG in the host OS
+# 4. How to run NG in the host OS
 
 In this option, NG programs run locally using host OS shared memory for Interprocess communication. No socker is required. 
 
@@ -193,8 +197,7 @@ Go to the running folder:
 
 /Scripts/Simple
 
-
-4.1. Content Distribution
+# 4.1. Content Distribution
 
 Just run the script:
 
@@ -218,7 +221,7 @@ This test never ends, so you need to close the programs when photos/files finish
 
 
 
-4.2. Name Binding Resolution
+# 4.2. Name Binding Resolution
 
 Just run the script:
 
@@ -233,8 +236,3 @@ sudo sh Intra_OS_NBTest.sh
 In this case, results will be placed locally in the /IO/NBTestApp folder.
 
 When the test finishes, the NBTestApp stops runnig by itself.
-
-
-
-
-
