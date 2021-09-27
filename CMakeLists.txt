@@ -8,6 +8,12 @@ include_directories(Common/src)
 include_directories(Common/src/rapidjson)
 include_directories(Common/src/rapidjson/error)
 include_directories(Common/src/rapidjson/internal)
+include_directories(EPGS/Actions)
+include_directories(EPGS/Common)
+include_directories(EPGS/Controller)
+include_directories(EPGS/DataStructures)
+include_directories(EPGS/Network)
+include_directories(EPGS/ng_util)
 include_directories(GIRS/src)
 include_directories(HTS/src)
 include_directories(IoTTestApp/src)
@@ -174,114 +180,155 @@ add_executable(ContentApp
         ContentApp/src/CoreStatusS01.h
         ContentApp/src/execContentApp.cpp)
 
-target_link_libraries (ContentApp LINK_PRIVATE Common)
+target_link_libraries(ContentApp LINK_PRIVATE Common)
+
+add_executable(EPGS
+        EPGS/Actions/epgs_exposition.c
+        EPGS/Actions/epgs_exposition.h
+        EPGS/Actions/epgs_hello.c
+        EPGS/Actions/epgs_hello.h
+        EPGS/Actions/epgs_pubNotify.c
+        EPGS/Actions/epgs_pubNotify.h
+        EPGS/Actions/epgs_subServiceAcceptance.c
+        EPGS/Actions/epgs_subServiceAcceptance.h
+        EPGS/Common/MurmurHash3.c
+        EPGS/Common/MurmurHash3.h
+        EPGS/Common/ng_command.c
+        EPGS/Common/ng_command.h
+        EPGS/Common/ng_epgs_hash.c
+        EPGS/Common/ng_epgs_hash.h
+        EPGS/Common/ng_hash_table.c
+        EPGS/Common/ng_hash_table.h
+        EPGS/Common/ng_message.c
+        EPGS/Common/ng_message.h
+        EPGS/Controller/epgs_controller.c
+        EPGS/Controller/epgs_controller.h
+        EPGS/DataStructures/epgs_structures.c
+        EPGS/DataStructures/epgs_structures.h
+        EPGS/epgs.c
+        EPGS/epgs_defines.h
+        EPGS/epgs_ethernet.c
+        EPGS/epgs_ethernet.h
+        EPGS/epgs.h
+        EPGS/EPGS_Simulation.c
+        EPGS/epgs_wrapper.c
+        EPGS/epgs_wrapper.h
+        EPGS/Network/PG.c
+        EPGS/Network/PG.h
+        EPGS/ng_util/ng_json.c
+        EPGS/ng_util/ng_json.h
+        EPGS/ng_util/ng_util.c
+        EPGS/ng_util/ng_util.h
+        EPGS/UnitTest.c)
+
+target_link_libraries(EPGS LINK_PRIVATE Common)
 
 add_executable(GIRS
-    GIRS/src/execGIRS.cpp
-    GIRS/src/GIRS.cpp
-    GIRS/src/GIRS.h
-    GIRS/src/IR.cpp
-    GIRS/src/IR.h
-    GIRS/src/IRDeliveryBind01.cpp
-    GIRS/src/IRDeliveryBind01.h
-    GIRS/src/IRGetBind01.cpp
-    GIRS/src/IRGetBind01.h
-    GIRS/src/IRGetBind02.cpp
-    GIRS/src/IRGetBind02.h
-    GIRS/src/IRInfoPayload01.cpp
-    GIRS/src/IRInfoPayload01.h
-    GIRS/src/IRInfoPayload02.cpp
-    GIRS/src/IRInfoPayload02.h
-    GIRS/src/IRMessageSeq01.cpp
-    GIRS/src/IRMessageSeq01.h
-    GIRS/src/IRMessageType01.cpp
-    GIRS/src/IRMessageType01.h
-    GIRS/src/IRMessageType02.cpp
-    GIRS/src/IRMessageType02.h
-    GIRS/src/IRMsgCl01.cpp
-    GIRS/src/IRMsgCl01.h
-    GIRS/src/IRMsgCl02.cpp
-    GIRS/src/IRMsgCl02.h
-    GIRS/src/IRRevokeBind01.cpp
-    GIRS/src/IRRevokeBind01.h
-    GIRS/src/IRRunInitialization01.cpp
-    GIRS/src/IRRunInitialization01.h
-    GIRS/src/IRRunPeriodic01.cpp
-    GIRS/src/IRRunPeriodic01.h
-    GIRS/src/IRSCNAck01.cpp
-    GIRS/src/IRSCNAck01.h
-    GIRS/src/IRSCNSeq01.cpp
-    GIRS/src/IRSCNSeq01.h
-    GIRS/src/IRSCNSeq02.cpp
-    GIRS/src/IRSCNSeq02.h
-    GIRS/src/IRStatusS01.cpp
-    GIRS/src/IRStatusS01.h
-    GIRS/src/IRStoreBind01.cpp
-    GIRS/src/IRStoreBind01.h
-    GIRS/src/IRStoreBind02.cpp
-    GIRS/src/IRStoreBind02.h)
+        GIRS/src/execGIRS.cpp
+        GIRS/src/GIRS.cpp
+        GIRS/src/GIRS.h
+        GIRS/src/IR.cpp
+        GIRS/src/IR.h
+        GIRS/src/IRDeliveryBind01.cpp
+        GIRS/src/IRDeliveryBind01.h
+        GIRS/src/IRGetBind01.cpp
+        GIRS/src/IRGetBind01.h
+        GIRS/src/IRGetBind02.cpp
+        GIRS/src/IRGetBind02.h
+        GIRS/src/IRInfoPayload01.cpp
+        GIRS/src/IRInfoPayload01.h
+        GIRS/src/IRInfoPayload02.cpp
+        GIRS/src/IRInfoPayload02.h
+        GIRS/src/IRMessageSeq01.cpp
+        GIRS/src/IRMessageSeq01.h
+        GIRS/src/IRMessageType01.cpp
+        GIRS/src/IRMessageType01.h
+        GIRS/src/IRMessageType02.cpp
+        GIRS/src/IRMessageType02.h
+        GIRS/src/IRMsgCl01.cpp
+        GIRS/src/IRMsgCl01.h
+        GIRS/src/IRMsgCl02.cpp
+        GIRS/src/IRMsgCl02.h
+        GIRS/src/IRRevokeBind01.cpp
+        GIRS/src/IRRevokeBind01.h
+        GIRS/src/IRRunInitialization01.cpp
+        GIRS/src/IRRunInitialization01.h
+        GIRS/src/IRRunPeriodic01.cpp
+        GIRS/src/IRRunPeriodic01.h
+        GIRS/src/IRSCNAck01.cpp
+        GIRS/src/IRSCNAck01.h
+        GIRS/src/IRSCNSeq01.cpp
+        GIRS/src/IRSCNSeq01.h
+        GIRS/src/IRSCNSeq02.cpp
+        GIRS/src/IRSCNSeq02.h
+        GIRS/src/IRStatusS01.cpp
+        GIRS/src/IRStatusS01.h
+        GIRS/src/IRStoreBind01.cpp
+        GIRS/src/IRStoreBind01.h
+        GIRS/src/IRStoreBind02.cpp
+        GIRS/src/IRStoreBind02.h)
 
-target_link_libraries (GIRS LINK_PRIVATE Common)
+target_link_libraries(GIRS LINK_PRIVATE Common)
 
 add_executable(HTS
-    HTS/src/DHT.cpp
-    HTS/src/DHT.h
-    HTS/src/DHTDeliveryBind01.cpp
-    HTS/src/DHTDeliveryBind01.h
-    HTS/src/DHTMsgCl01.cpp
-    HTS/src/DHTMsgCl01.h
-    HTS/src/DHTRunInitialization01.cpp
-    HTS/src/DHTRunInitialization01.h
-    HTS/src/DHTRunPeriodic01.cpp
-    HTS/src/DHTRunPeriodic01.h
-    HTS/src/execHTS.cpp
-    HTS/src/HTS.cpp
-    HTS/src/HTS.h)
+        HTS/src/DHT.cpp
+        HTS/src/DHT.h
+        HTS/src/DHTDeliveryBind01.cpp
+        HTS/src/DHTDeliveryBind01.h
+        HTS/src/DHTMsgCl01.cpp
+        HTS/src/DHTMsgCl01.h
+        HTS/src/DHTRunInitialization01.cpp
+        HTS/src/DHTRunInitialization01.h
+        HTS/src/DHTRunPeriodic01.cpp
+        HTS/src/DHTRunPeriodic01.h
+        HTS/src/execHTS.cpp
+        HTS/src/HTS.cpp
+        HTS/src/HTS.h)
 
-target_link_libraries (HTS LINK_PRIVATE Common)
+target_link_libraries(HTS LINK_PRIVATE Common)
 
 add_executable(IoTTestApp
-    IoTTestApp/src/Core.cpp
-    IoTTestApp/src/Core.h
-    IoTTestApp/src/CoreDeliveryBind01.cpp
-    IoTTestApp/src/CoreDeliveryBind01.h
-    IoTTestApp/src/CoreInfoPayload01.cpp
-    IoTTestApp/src/CoreInfoPayload01.h
-    IoTTestApp/src/CoreMsgCl01.cpp
-    IoTTestApp/src/CoreMsgCl01.h
-    IoTTestApp/src/CoreNotifyS01.cpp
-    IoTTestApp/src/CoreNotifyS01.h
-    IoTTestApp/src/CoreRunDiscover01.cpp
-    IoTTestApp/src/CoreRunDiscover01.h
-    IoTTestApp/src/CoreRunEvaluate01.cpp
-    IoTTestApp/src/CoreRunEvaluate01.h
-    IoTTestApp/src/CoreRunExpose01.cpp
-    IoTTestApp/src/CoreRunExpose01.h
-    IoTTestApp/src/CoreRunInitialize01.cpp
-    IoTTestApp/src/CoreRunInitialize01.h
-    IoTTestApp/src/CoreRunInvite01.cpp
-    IoTTestApp/src/CoreRunInvite01.h
-    IoTTestApp/src/CoreRunPeriodic01.cpp
-    IoTTestApp/src/CoreRunPeriodic01.h
-    IoTTestApp/src/CoreRunPublish01.cpp
-    IoTTestApp/src/CoreRunPublish01.h
-    IoTTestApp/src/CoreRunPublish02.cpp
-    IoTTestApp/src/CoreRunPublish02.h
-    IoTTestApp/src/CoreRunPublish03.cpp
-    IoTTestApp/src/CoreRunPublish03.h
-    IoTTestApp/src/CoreRunSubscribe01.cpp
-    IoTTestApp/src/CoreRunSubscribe01.h
-    IoTTestApp/src/CoreSCNAck01.cpp
-    IoTTestApp/src/CoreSCNAck01.h
-    IoTTestApp/src/CoreSCNSeq01.cpp
-    IoTTestApp/src/CoreSCNSeq01.h
-    IoTTestApp/src/CoreStatusS01.cpp
-    IoTTestApp/src/CoreStatusS01.h
-    IoTTestApp/src/execIoTTestApp.cpp
-    IoTTestApp/src/IoTTestApp.cpp
-    IoTTestApp/src/IoTTestApp.h)
+        IoTTestApp/src/Core.cpp
+        IoTTestApp/src/Core.h
+        IoTTestApp/src/CoreDeliveryBind01.cpp
+        IoTTestApp/src/CoreDeliveryBind01.h
+        IoTTestApp/src/CoreInfoPayload01.cpp
+        IoTTestApp/src/CoreInfoPayload01.h
+        IoTTestApp/src/CoreMsgCl01.cpp
+        IoTTestApp/src/CoreMsgCl01.h
+        IoTTestApp/src/CoreNotifyS01.cpp
+        IoTTestApp/src/CoreNotifyS01.h
+        IoTTestApp/src/CoreRunDiscover01.cpp
+        IoTTestApp/src/CoreRunDiscover01.h
+        IoTTestApp/src/CoreRunEvaluate01.cpp
+        IoTTestApp/src/CoreRunEvaluate01.h
+        IoTTestApp/src/CoreRunExpose01.cpp
+        IoTTestApp/src/CoreRunExpose01.h
+        IoTTestApp/src/CoreRunInitialize01.cpp
+        IoTTestApp/src/CoreRunInitialize01.h
+        IoTTestApp/src/CoreRunInvite01.cpp
+        IoTTestApp/src/CoreRunInvite01.h
+        IoTTestApp/src/CoreRunPeriodic01.cpp
+        IoTTestApp/src/CoreRunPeriodic01.h
+        IoTTestApp/src/CoreRunPublish01.cpp
+        IoTTestApp/src/CoreRunPublish01.h
+        IoTTestApp/src/CoreRunPublish02.cpp
+        IoTTestApp/src/CoreRunPublish02.h
+        IoTTestApp/src/CoreRunPublish03.cpp
+        IoTTestApp/src/CoreRunPublish03.h
+        IoTTestApp/src/CoreRunSubscribe01.cpp
+        IoTTestApp/src/CoreRunSubscribe01.h
+        IoTTestApp/src/CoreSCNAck01.cpp
+        IoTTestApp/src/CoreSCNAck01.h
+        IoTTestApp/src/CoreSCNSeq01.cpp
+        IoTTestApp/src/CoreSCNSeq01.h
+        IoTTestApp/src/CoreStatusS01.cpp
+        IoTTestApp/src/CoreStatusS01.h
+        IoTTestApp/src/execIoTTestApp.cpp
+        IoTTestApp/src/IoTTestApp.cpp
+        IoTTestApp/src/IoTTestApp.h)
 
-target_link_libraries (IoTTestApp LINK_PRIVATE Common)
+target_link_libraries(IoTTestApp LINK_PRIVATE Common)
 
 add_executable(NBTestApp
         NBTestApp/src/NBTestApp.cpp
@@ -310,111 +357,111 @@ add_executable(NBTestApp
         NBTestApp/src/CoreStatusS01.h
         NBTestApp/src/execNBTestApp.cpp)
 
-target_link_libraries (NBTestApp LINK_PRIVATE Common)
+target_link_libraries(NBTestApp LINK_PRIVATE Common)
 
 add_executable(PGCS
-    PGCS/src/Core.cpp
-    PGCS/src/Core.h
-    PGCS/src/CoreDeliveryBind01.cpp
-    PGCS/src/CoreDeliveryBind01.h
-    PGCS/src/CoreInfoPayload01.cpp
-    PGCS/src/CoreInfoPayload01.h
-    PGCS/src/CoreMsgCl01.cpp
-    PGCS/src/CoreMsgCl01.h
-    PGCS/src/CoreNotifyS01.cpp
-    PGCS/src/CoreNotifyS01.h
-    PGCS/src/CoreRunDiscover01.cpp
-    PGCS/src/CoreRunDiscover01.h
-    PGCS/src/CoreRunEvaluate01.cpp
-    PGCS/src/CoreRunEvaluate01.h
-    PGCS/src/CoreRunExpose01.cpp
-    PGCS/src/CoreRunExpose01.h
-    PGCS/src/CoreRunInitialize01.cpp
-    PGCS/src/CoreRunInitialize01.h
-    PGCS/src/CoreRunInvite01.cpp
-    PGCS/src/CoreRunInvite01.h
-    PGCS/src/CoreRunPeriodic01.cpp
-    PGCS/src/CoreRunPeriodic01.h
-    PGCS/src/CoreRunPublish01.cpp
-    PGCS/src/CoreRunPublish01.h
-    PGCS/src/CoreRunPublish02.cpp
-    PGCS/src/CoreRunPublish02.h
-    PGCS/src/CoreRunPublish03.cpp
-    PGCS/src/CoreRunPublish03.h
-    PGCS/src/CoreRunSubscribe01.cpp
-    PGCS/src/CoreRunSubscribe01.h
-    PGCS/src/CoreSCNAck01.cpp
-    PGCS/src/CoreSCNAck01.h
-    PGCS/src/CoreSCNSeq01.cpp
-    PGCS/src/CoreSCNSeq01.h
-    PGCS/src/CoreStatusS01.cpp
-    PGCS/src/CoreStatusS01.h
-    PGCS/src/execPGCS.cpp
-    PGCS/src/PG.cpp
-    PGCS/src/PG.h
-    PGCS/src/PGCS.cpp
-    PGCS/src/PGCS.h
-    PGCS/src/PGHelloIHC01.cpp
-    PGCS/src/PGHelloIHC01.h
-    PGCS/src/PGHelloIHC02.cpp
-    PGCS/src/PGHelloIHC02.h
-    PGCS/src/PGHelloIHC03.cpp
-    PGCS/src/PGHelloIHC03.h
-    PGCS/src/PGMsgCl01.cpp
-    PGCS/src/PGMsgCl01.h
-    PGCS/src/PGRunExposition01.cpp
-    PGCS/src/PGRunExposition01.h
-    PGCS/src/PGRunHello01.cpp
-    PGCS/src/PGRunHello01.h
-    PGCS/src/PGRunHello02.cpp
-    PGCS/src/PGRunHello02.h
-    PGCS/src/PGRunHello03.cpp
-    PGCS/src/PGRunHello03.h
-    PGCS/src/PGRunInitialization01.cpp
-    PGCS/src/PGRunInitialization01.h
-    PGCS/src/PGRunPeriodic01.cpp
-    PGCS/src/PGRunPeriodic01.h
-    PGCS/src/PGRunPublishing01.cpp
-    PGCS/src/PGRunPublishing01.h)
+        PGCS/src/Core.cpp
+        PGCS/src/Core.h
+        PGCS/src/CoreDeliveryBind01.cpp
+        PGCS/src/CoreDeliveryBind01.h
+        PGCS/src/CoreInfoPayload01.cpp
+        PGCS/src/CoreInfoPayload01.h
+        PGCS/src/CoreMsgCl01.cpp
+        PGCS/src/CoreMsgCl01.h
+        PGCS/src/CoreNotifyS01.cpp
+        PGCS/src/CoreNotifyS01.h
+        PGCS/src/CoreRunDiscover01.cpp
+        PGCS/src/CoreRunDiscover01.h
+        PGCS/src/CoreRunEvaluate01.cpp
+        PGCS/src/CoreRunEvaluate01.h
+        PGCS/src/CoreRunExpose01.cpp
+        PGCS/src/CoreRunExpose01.h
+        PGCS/src/CoreRunInitialize01.cpp
+        PGCS/src/CoreRunInitialize01.h
+        PGCS/src/CoreRunInvite01.cpp
+        PGCS/src/CoreRunInvite01.h
+        PGCS/src/CoreRunPeriodic01.cpp
+        PGCS/src/CoreRunPeriodic01.h
+        PGCS/src/CoreRunPublish01.cpp
+        PGCS/src/CoreRunPublish01.h
+        PGCS/src/CoreRunPublish02.cpp
+        PGCS/src/CoreRunPublish02.h
+        PGCS/src/CoreRunPublish03.cpp
+        PGCS/src/CoreRunPublish03.h
+        PGCS/src/CoreRunSubscribe01.cpp
+        PGCS/src/CoreRunSubscribe01.h
+        PGCS/src/CoreSCNAck01.cpp
+        PGCS/src/CoreSCNAck01.h
+        PGCS/src/CoreSCNSeq01.cpp
+        PGCS/src/CoreSCNSeq01.h
+        PGCS/src/CoreStatusS01.cpp
+        PGCS/src/CoreStatusS01.h
+        PGCS/src/execPGCS.cpp
+        PGCS/src/PG.cpp
+        PGCS/src/PG.h
+        PGCS/src/PGCS.cpp
+        PGCS/src/PGCS.h
+        PGCS/src/PGHelloIHC01.cpp
+        PGCS/src/PGHelloIHC01.h
+        PGCS/src/PGHelloIHC02.cpp
+        PGCS/src/PGHelloIHC02.h
+        PGCS/src/PGHelloIHC03.cpp
+        PGCS/src/PGHelloIHC03.h
+        PGCS/src/PGMsgCl01.cpp
+        PGCS/src/PGMsgCl01.h
+        PGCS/src/PGRunExposition01.cpp
+        PGCS/src/PGRunExposition01.h
+        PGCS/src/PGRunHello01.cpp
+        PGCS/src/PGRunHello01.h
+        PGCS/src/PGRunHello02.cpp
+        PGCS/src/PGRunHello02.h
+        PGCS/src/PGRunHello03.cpp
+        PGCS/src/PGRunHello03.h
+        PGCS/src/PGRunInitialization01.cpp
+        PGCS/src/PGRunInitialization01.h
+        PGCS/src/PGRunPeriodic01.cpp
+        PGCS/src/PGRunPeriodic01.h
+        PGCS/src/PGRunPublishing01.cpp
+        PGCS/src/PGRunPublishing01.h)
 
-target_link_libraries (PGCS LINK_PRIVATE Common)
+target_link_libraries(PGCS LINK_PRIVATE Common)
 
 add_executable(PSS
-    PSS/src/execPSS.cpp
-    PSS/src/PS.cpp
-    PSS/src/PS.h
-    PSS/src/PSDeliveryBind01.cpp
-    PSS/src/PSDeliveryBind01.h
-    PSS/src/PSInfoPayload01.cpp
-    PSS/src/PSInfoPayload01.h
-    PSS/src/PSMessageSeq01.cpp
-    PSS/src/PSMessageSeq01.h
-    PSS/src/PSMessageType01.cpp
-    PSS/src/PSMessageType01.h
-    PSS/src/PSMsgCl01.cpp
-    PSS/src/PSMsgCl01.h
-    PSS/src/PSPubBind01.cpp
-    PSS/src/PSPubBind01.h
-    PSS/src/PSPubNotify01.cpp
-    PSS/src/PSPubNotify01.h
-    PSS/src/PSRevokeBind01.cpp
-    PSS/src/PSRevokeBind01.h
-    PSS/src/PSRunInitialization01.cpp
-    PSS/src/PSRunInitialization01.h
-    PSS/src/PSRunPeriodic01.cpp
-    PSS/src/PSRunPeriodic01.h
-    PSS/src/PSS.cpp
-    PSS/src/PSS.h
-    PSS/src/PSSCNAck01.cpp
-    PSS/src/PSSCNAck01.h
-    PSS/src/PSSCNSeq01.cpp
-    PSS/src/PSSCNSeq01.h
-    PSS/src/PSStatusS01.cpp
-    PSS/src/PSStatusS01.h
-    PSS/src/PSSubBind01.cpp
-    PSS/src/PSSubBind01.h)
+        PSS/src/execPSS.cpp
+        PSS/src/PS.cpp
+        PSS/src/PS.h
+        PSS/src/PSDeliveryBind01.cpp
+        PSS/src/PSDeliveryBind01.h
+        PSS/src/PSInfoPayload01.cpp
+        PSS/src/PSInfoPayload01.h
+        PSS/src/PSMessageSeq01.cpp
+        PSS/src/PSMessageSeq01.h
+        PSS/src/PSMessageType01.cpp
+        PSS/src/PSMessageType01.h
+        PSS/src/PSMsgCl01.cpp
+        PSS/src/PSMsgCl01.h
+        PSS/src/PSPubBind01.cpp
+        PSS/src/PSPubBind01.h
+        PSS/src/PSPubNotify01.cpp
+        PSS/src/PSPubNotify01.h
+        PSS/src/PSRevokeBind01.cpp
+        PSS/src/PSRevokeBind01.h
+        PSS/src/PSRunInitialization01.cpp
+        PSS/src/PSRunInitialization01.h
+        PSS/src/PSRunPeriodic01.cpp
+        PSS/src/PSRunPeriodic01.h
+        PSS/src/PSS.cpp
+        PSS/src/PSS.h
+        PSS/src/PSSCNAck01.cpp
+        PSS/src/PSSCNAck01.h
+        PSS/src/PSSCNSeq01.cpp
+        PSS/src/PSSCNSeq01.h
+        PSS/src/PSStatusS01.cpp
+        PSS/src/PSStatusS01.h
+        PSS/src/PSSubBind01.cpp
+        PSS/src/PSSubBind01.h)
 
-target_link_libraries (PSS LINK_PRIVATE Common)
+target_link_libraries(PSS LINK_PRIVATE Common)
 
 add_executable(NRNCS
         NRNCS/src/execNRNCS.cpp
@@ -447,4 +494,4 @@ add_executable(NRNCS
         NRNCS/src/NRSubBind01.cpp
         NRNCS/src/NRSubBind01.h)
 
-target_link_libraries (NRNCS LINK_PRIVATE Common)
+target_link_libraries(NRNCS LINK_PRIVATE Common)
