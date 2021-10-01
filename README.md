@@ -199,7 +199,7 @@ You can also use Wireshark tool to check NovaGenesis packets using the docker0 (
 
 # 4. How to run NG in the host OS
 
-In this option, NG programs run locally using host OS shared memory for Interprocess communication. No socker is required. 
+In this option, NG programs run locally using host OS shared memory for Interprocess communication. No socket is required. 
 
 Go to the running folder:
 
