@@ -74,8 +74,8 @@ int main (int argc, char *argv[])
 	  // ************************** Adaptation Layer **************************
 
 	  // Bellow, are the possible alternatives for ./PGCS execution. Repair on the number of arguments and their meaning.
-	  // Its recommend to map any technology to a set of one registry in each of the vectors above.
-	  // Therefore, a new interface for a certain technology should details, respectively, the type of stack, the role of this PGCS in the domain, the interface used for this stack at
+	  // It is recommended to map any technology to a set of one registry in each of the vectors above.
+	  // Therefore, a new interface for a certain technology should detail, respectively, the type of stack, the role of this PGCS in the domain, the interface used for this stack at
 	  // OS, the identifier (address) of the peer PGCS on other machines, and the size of the MTU on the network.
 
 
@@ -242,7 +242,9 @@ int main (int argc, char *argv[])
 		  Roles.push_back ("Intra_Domain");
 		  Interfaces.push_back (Temp10);
 		  Identifiers.push_back ("FF:FF:FF:FF:FF:FF");
-		  Sizes.push_back (1200);
+
+		  //TODO: FIXP/Update - Increased MTU to improve throughput
+		  Sizes.push_back (1480);
 
 		  // Set the shm key
 		  key_t Key = 11;
@@ -272,6 +274,30 @@ int main (int argc, char *argv[])
 
 		  // Create a process instance
 		  PGCS execPGS ("PGCS", Key, "No_Core", Port, Role, &Stacks, &Roles, &Interfaces, &Identifiers, &Sizes, Path);
+		}
+
+		// TODO FIXP/Update - Created a novel format to start PGCS with core and support peer discovery at the same time
+	  if (Alternative == "-dec") // Discover peers doing broadcast at informed interface and start Core block for contract negotiation with things
+		{
+		  cout << "(The I/O path is " << Path << ")" << endl;
+
+		  string Temp10 = argv[5];     // Interface
+
+		  cout << "(The PGCS will try to discover peers using the Interface " << Temp10 << ".)" << endl;
+
+		  Stacks.push_back ("Ethernet");
+		  Roles.push_back ("Intra_Domain");
+		  Interfaces.push_back (Temp10);
+		  Identifiers.push_back ("FF:FF:FF:FF:FF:FF");
+
+		  //TODO: FIXP/Update - Increased MTU to improve throughput
+		  Sizes.push_back (1480);
+
+		  // Set the shm key
+		  key_t Key = 11;
+
+		  // Create a process instance
+		  PGCS execPGS ("PGCS", Key, "Create_Core", Port, Role, &Stacks, &Roles, &Interfaces, &Identifiers, &Sizes, Path);
 		}
 
 	  if (Alternative == "-l") // Run PGCS locally without core Block
