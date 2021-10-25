@@ -12,3 +12,5 @@ sudo docker rmi ng-iottestapp
 
 sudo docker rmi ng-nbtestapp
 
+sudo docker rmi ng-epgs
+
