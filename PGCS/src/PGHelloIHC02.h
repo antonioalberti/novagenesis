@@ -63,7 +63,8 @@ class PGHelloIHC02 : public Action {
   Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
 
   // Original scheduling of hello name bindings
-  int ScheduleStoreBindings (vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack);
+  //TODO: FIXP/Oct2021 - This function has been modified to support self-discovered EPGS
+  int ScheduleStoreBindings ( string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack);
 };
 
 #endif

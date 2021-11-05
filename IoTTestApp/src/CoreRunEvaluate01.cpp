@@ -41,7 +41,7 @@
 #include "GW.h"
 #endif
 
-//#define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -807,6 +807,10 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
   string Temp;
 
   string Sample;
+
+  F1 >> Temp;
+
+  F1 >> Temp;
 
   F1 >> Temp;
 

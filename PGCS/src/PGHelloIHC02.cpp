@@ -37,7 +37,7 @@
 #include "PGCS.h"
 #endif
 
-////#define DEBUG
+#define DEBUG
 
 PGHelloIHC02::PGHelloIHC02 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -67,8 +67,8 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
   string PeerIdentifier;    // The peer address
   string Peer;
   PGCS *PPGCS = 0;
-  bool StoreNewPGS1 = true;
-  bool StoreNewPGS2 = false;
+  bool StoreNewPGCS1 = true; //TODO: FIXP/Oct2021 - Changed these two variable names.
+  bool StoreNewPGCS2 = true;
   //vector<string>	Limiters;
   //vector<string>	Sources;
   //vector<string>	Destinations;
@@ -156,13 +156,13 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 						{
 						  if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
 							{
-							  StoreNewPGS1 = false;
+							  StoreNewPGCS1 = false;
 
 							  break;
 							}
 						}
 
-					  if (StoreNewPGS1 == true
+					  if (StoreNewPGCS1 == true
 						  && ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
 						{
 						  PB->S << Offset << "(A new peer PGCS was registered via point to point: "
@@ -184,11 +184,68 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 						  // Store the peer PGCS tuple for future use
 						  PPGB->PGCSTuples.push_back (PeerPGCS);
 
-						  StoreNewPGS1 = false;
+						  StoreNewPGCS1 = false;
 
-						  ScheduleStoreBindings (ReceivedElements, PeerIdentifier, PeerStack);
+						  // TODO: FIXP/Oct2021- This call has been modified
+						  ScheduleStoreBindings ("-p", ReceivedElements, PeerIdentifier, PeerStack);
 						}
 					}
+				else // TODO: FIXP/Oct2021- This case is required to register EPGS on this PGCS
+				  {
+
+					// ****************************************************************************************
+					// Added in April 22th, 2016; Updated in 26th August 2021
+					// ****************************************************************************************
+
+					// ******************************************************
+					// Record the new peer data
+					// ******************************************************
+
+					for (unsigned int j = 0; j < PPGB->PGCSTuples.size (); j++)
+					  {
+						if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
+						  {
+							StoreNewPGCS2 = false;
+
+							break;
+						  }
+					  }
+
+#ifdef DEBUG
+					PB->S << Offset << "Trying to store the discovered peer = " <<StoreNewPGCS2<< endl;
+#endif
+
+					if (StoreNewPGCS2 == true
+						&& ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
+					  {
+						PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
+							  << ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")"
+							  << endl;
+
+						Tuple *PeerPGS = new Tuple;
+
+						PeerPGS->Values.push_back (ReceivedElements.at (0));
+						PeerPGS->Values.push_back (ReceivedElements.at (1));
+						PeerPGS->Values.push_back (ReceivedElements.at (2));
+						PeerPGS->Values.push_back (ReceivedElements.at (3));
+
+						PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
+						PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
+						PB->S << Offset << "(PID = " << ReceivedElements.at (2) << ")" << endl;
+						PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
+
+						// Store the peer PGCS tuple for future use
+						PPGB->PGCSTuples.push_back (PeerPGS);
+
+						ScheduleStoreBindings ("-de", ReceivedElements, PeerIdentifier, PeerStack);
+					  }
+					else
+					  {
+						//PB->S << Offset << "(Warning: Peer already registered or it is this PGCS itself)"<<endl;
+
+						StoreNewPGCS2 = true;
+					  }
+				  }
 				}
 			}
 
@@ -207,7 +264,7 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
   return Status;
 }
 
-int PGHelloIHC02::ScheduleStoreBindings (vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack)
+int PGHelloIHC02::ScheduleStoreBindings (string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack)
 {
   int Status = OK;
 
@@ -464,6 +521,19 @@ int PGHelloIHC02::ScheduleStoreBindings (vector<string> &_ReceivedElements, stri
 
   PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, _ReceivedElements
 	  .at (0), _PeerStack, StoreBind01Msg, StoreBind01);
+
+  // TODO: FIXP/Oct2021 - Added to deal with the PGCS -de initialization in October 27th, 2021
+
+  if (_Case == "-de" && PPGCS->CSIDs->size () > 0)
+	{
+	  PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at (0)
+			<< " for the peer PGCS with MAC "
+			<< _PeerIdentifier << ")" << endl;
+
+	  // Binding Ethernet address to CSID
+	  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", _PeerIdentifier, PPGCS->CSIDs
+		  ->at (0), StoreBind01Msg, StoreBind01);
+	}
 
   // ******************************************************
   // Setting up the SCN command line

@@ -201,7 +201,7 @@ int main (int argc, char *argv[])
 
 	  while (true)
 		{
-		  int dataPSize = 19;
+		  int dataPSize = 50;
 
 		  char *dataP = (char *)malloc (sizeof (char) * dataPSize);
 
@@ -211,13 +211,19 @@ int main (int argc, char *argv[])
 
 		  sprintf (TempChar, "%d", Temperature);
 
-		  char X[19] = "";
+		  char X[50] = "";
 
-		  strcat (X, "{ Temperature: ");
+		  char charValue[10];
+
+		  sprintf(charValue, "%d", Count);
+
+		  strcat (X, "{ Count: "); // 9
+		  strcat (X,  charValue);
+		  strcat (X, ", Temperature: ");
 		  strcat (X, TempChar);
 		  strcat (X, " }");
 
-		  //printf("X = %s",X);
+		  printf("\n Data = %s",X);
 
 		  strcpy (dataP, X);
 
@@ -234,17 +240,23 @@ int main (int argc, char *argv[])
 
 		  sprintf (Temp3, "_%d", Count);
 
-		  //printf("\nTemp3=%s",Temp3);
-
 		  char Temp4[] = ".json";
 
-		  char *A = strcat (Temp1, Temp2);
+		  char Name[sizeof (Temp1)+sizeof (Temp2)+sizeof (Temp3)+sizeof (Temp4)];
 
-		  char *B = strcat (Temp3, Temp4);
+		  char A[sizeof (Temp1)+sizeof (Temp2)];
 
-		  char *Name = strcat (A, B);
+		  char B[sizeof (Temp3)+sizeof (Temp4)];
 
-		  //printf("\nName=%s",Name);
+		  sprintf(&A, "%s%s", Temp1, Temp2);
+
+		  sprintf(&B, "%s%s", Temp3, Temp4);
+
+		  sprintf(&Name, "%s%s", A, B);
+
+		  printf("\n File = %s",Name);
+
+		  printf("\n");
 
 		  setDataToPub (&ngInfo, Name, dataP, dataPSize);
 

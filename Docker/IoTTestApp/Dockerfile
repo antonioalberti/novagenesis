@@ -17,6 +17,7 @@ RUN cd /home && mkdir ng && cd ng && mkdir workspace && cd workspace && mkdir no
 
 # Copy NovaGenesis folders to the container
 COPY /Common /home/ng/workspace/novagenesis/Common
+COPY /NRNCS /home/ng/workspace/novagenesis/NRNCS
 COPY /IoTTestApp /home/ng/workspace/novagenesis/IoTTestApp
 COPY /PGCS /home/ng/workspace/novagenesis/PGCS
 COPY /Scripts /home/ng/workspace/novagenesis/Scripts

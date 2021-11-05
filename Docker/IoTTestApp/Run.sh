@@ -11,11 +11,11 @@ ipcmk -M 1024
 # Diplay a shm report before running. NovaGenesis employs shm for inter container communication
 ipcs -m
 
-echo Starting PGCS 
+echo Starting PGCS and NRNCS
 
 echo Starting IoTTestApp with parameters:
 
 sh -c "echo $PATH"
 
-# Run the PGCS and IoTTestApp
+# Run the PGCS, NRNCS and IoTTestApp
 /usr/bin/supervisord -c /home/ng/workspace/novagenesis/supervisord.conf

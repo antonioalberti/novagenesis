@@ -17,18 +17,15 @@
 
 docker container prune -f
 
-echo "Creating NRNCS container, which stands for Name Resolution and Network Cache Service" 
+echo "Creating three processes:"
+echo "An IoT testing application"
+echo "A PGCS with enabled Core block for contract establishment"
+echo "A NRNCS for temporary IoT data caching in the network" 
 
-sh run-PGCS-NRNCS.sh 0
-
-echo "Creating IoT testing application and a PGCS with enabled Core block for contract establishment" 
-
-sh run-PGCS-IoTTestApp.sh $1 $2 $3 $4
+sh run-PGCS-NRNCS-IoTTestApp.sh $1 $2 $3 $4
 
 if [ "$1" = "-dec" ];
 then
-  sleep 60
-
   echo "Creating EPGS" 
 
   sh run-EPGS.sh
