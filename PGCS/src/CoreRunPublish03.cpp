@@ -85,8 +85,8 @@ CoreRunPublish03::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mess
 
 		  if (PeerData.size () == 2)
 			{
-			  //PT=PCore->PeerAppTuples[PB->StringToInt(PeerData.at(1))];
-			  //Descobrir qual o indice em PeerAppTuples do NL
+			  //PT=PCore->PeerTuples[PB->StringToInt(PeerData.at(1))];
+			  //Descobrir qual o indice em PeerTuples do NL
 
 
 			  PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;

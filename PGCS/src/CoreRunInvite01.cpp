@@ -84,7 +84,7 @@ CoreRunInvite01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
 		  if (PeerData.size () > 0)
 			{
-			  PT = PCore->PeerAppTuples[PB->StringToInt (PeerData.at (1))];
+			  PT = PCore->PeerTuples[PB->StringToInt (PeerData.at (1))];
 
 			  PB->S << Offset << "(The peer is " << PeerData.at (0) << " " << PeerData.at (1) << ")" << endl;
 			  PB->S << Offset << "(Its HID is = " << PT->Values[0] << ")" << endl;
@@ -95,13 +95,13 @@ CoreRunInvite01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 			  // Setting up the OSID as the space limiter
 			  Limiters.push_back (PB->PP->Intra_Domain);
 
-			  // Setting up the this OS as the 1st source SCN
+			  // Setting up this OS as the 1st source SCN
 			  Sources.push_back (PB->PP->GetHostSelfCertifyingName ());
 
-			  // Setting up the this OS as the 2nd source SCN
+			  // Setting up this OS as the 2nd source SCN
 			  Sources.push_back (PB->PP->GetOperatingSystemSelfCertifyingName ());
 
-			  // Setting up the this process as the 3rd source SCN
+			  // Setting up this process as the 3rd source SCN
 			  Sources.push_back (PB->PP->GetSelfCertifyingName ());
 
 			  // Setting up the PS block SCN as the 4th source SCN

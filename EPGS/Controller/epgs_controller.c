@@ -681,7 +681,15 @@ int ParseReceivedMessage2 (NgEPGS **ngEPGS)
 				  // Expoe os recursos para o par!
 				  RunExposition ((*ngEPGS));
 
+				  printf ("EXPOSITION: Waiting for PGCS...");
+
+				  usleep (20000000);
+
 				  RunPubServiceOffer ((*ngEPGS));
+
+				  printf ("SERVICE OFFER: Waiting for PGCS...");
+
+				  usleep (20000000);
 
 				  (*ngEPGS)->ngState = WAIT_SERVICE_ACCEPTANCE_NOTIFY;
 				}
@@ -726,86 +734,126 @@ int ParseReceivedMessage2 (NgEPGS **ngEPGS)
 			}
 		}
 
-	  else if (ng_strcmp ("-d", CL->Name) == 0
-			   && ng_strcmp ("--b", CL->Alternative) == 0)
+	  else if (ng_strcmp ("-d", CL->Name) == 0 && ng_strcmp ("--b", CL->Alternative) == 0)
 		{
-
 		  if (CL->NoA == 3)
 			{
-			  unsigned int nEle;
-			  GetNumberofArgumentElements (CL, 1, &nEle);
+			  //TODO: Added to avoid interpreting .json file as .txt. Modifications from this point to the end pof the function.
+			  unsigned int nEle0;
+			  GetNumberofArgumentElements (CL, 0, &nEle0);
 
-			  if (nEle == 1)
+			  unsigned int nEle1;
+			  GetNumberofArgumentElements (CL, 1, &nEle1);
+
+			  unsigned int nEle2;
+			  GetNumberofArgumentElements (CL, 2, &nEle2);
+
+			  if (nEle0 == 1 && nEle1 == 1 && nEle2 == 1)
 				{
+				  char *category;
+				  GetArgumentElement (CL, 0, 0, &category);
+
 				  char *key;
 				  GetArgumentElement (CL, 1, 0, &key);
 
-				  if (ng_strcmp ((*ngEPGS)->key, key) == 0)
+				  char *file_name;
+				  GetArgumentElement (CL, 2, 0, &file_name);
+
+				  ng_printf ("\nCategory: %s\n",category);
+				  ng_printf ("Key: %s\n",key);
+				  ng_printf ("Filename: %s\n",file_name);
+
+				  if (strcmp(category, "18") == 0)
 					{
-					  if ((*ngEPGS)->APPScnIDInfo)
+					  if (ng_strcmp ((*ngEPGS)->key, key) == 0)
 						{
-						  destroy_NgScnIDInfo (&(*ngEPGS)->APPScnIDInfo);
-						}
-					  (*ngEPGS)->APPScnIDInfo = (NgScnIDInfo *)ng_malloc (
-						  sizeof (NgScnIDInfo) * 1);
+						  char *extension = NULL;
 
-					  char *end_str = NULL;
-					  char *auxStr = (char *)ng_calloc (sizeof (char) * 1,
-														(ngMessage->PayloadSize + 1));
-					  ng_memcpy (auxStr, ngMessage->Payload,
-								 ngMessage->PayloadSize);
+						  char *remaining = strtok_r (file_name, ".", &extension);
 
-					  char *token = strtok_r (auxStr, " ", &end_str);
+						  ng_printf ("Extension: %s\n",extension );
+						  ng_printf ("Remaining: %s\n",remaining);
 
-					  if (token)
-						{
-						  ng_strcpy ((*ngEPGS)->APPScnIDInfo->HID, token);
-						  token = strtok_r (NULL, " ", &end_str);
-						}
-					  else
-						{
-						  result = NG_ERROR;
+						  if (strcmp(extension, "txt") == 0)
+							{
+							  ng_printf ("Processing the TXT file received\n");
+
+							  if ((*ngEPGS)->APPScnIDInfo)
+								{
+								  destroy_NgScnIDInfo (&(*ngEPGS)->APPScnIDInfo);
+								}
+							  (*ngEPGS)->APPScnIDInfo = (NgScnIDInfo *)ng_malloc (
+								  sizeof (NgScnIDInfo) * 1);
+
+							  char *end_str = NULL;
+							  char *auxStr = (char *)ng_calloc (sizeof (char) * 1,
+																(ngMessage->PayloadSize + 1));
+							  ng_memcpy (auxStr, ngMessage->Payload,
+										 ngMessage->PayloadSize);
+
+							  char *token = strtok_r (auxStr, " ", &end_str);
+
+							  if (token)
+								{
+								  ng_strcpy ((*ngEPGS)->APPScnIDInfo->HID, token);
+								  token = strtok_r (NULL, " ", &end_str);
+								}
+							  else
+								{
+								  result = NG_ERROR;
+								}
+
+							  if (token)
+								{
+								  ng_strcpy ((*ngEPGS)->APPScnIDInfo->OSID, token);
+								  token = strtok_r (NULL, " ", &end_str);
+								}
+							  else
+								{
+								  result = NG_ERROR;
+								}
+
+							  if (token)
+								{
+								  ng_strcpy ((*ngEPGS)->APPScnIDInfo->PID, token);
+								  token = strtok_r (NULL, " ", &end_str);
+								}
+							  else
+								{
+								  result = NG_ERROR;
+								}
+
+							  if (token)
+								{
+								  ng_strcpy ((*ngEPGS)->APPScnIDInfo->BID, token);
+								  //	ng_free(token);
+								}
+							  else
+								{
+								  result = NG_ERROR;
+								}
+
+							  ng_printf ("HID: %s\n",(*ngEPGS)->APPScnIDInfo->HID);
+							  ng_printf ("OSID: %s\n",(*ngEPGS)->APPScnIDInfo->OSID);
+							  ng_printf ("PID: %s\n",(*ngEPGS)->APPScnIDInfo->PID);
+							  ng_printf ("BID: %s\n",(*ngEPGS)->APPScnIDInfo->BID);
+
+							  if (result == NG_OK)
+								{
+								  (*ngEPGS)->ngState = PUB_DATA;
+								}
+							}
+						  else if (strcmp(extension, "json") == 0)
+							{
+							  // TODO: Add here the code to treat a json file.
+							  ng_printf ("Processing the JSON file received\n");
+							}
 						}
 
-					  if (token)
-						{
-						  ng_strcpy ((*ngEPGS)->APPScnIDInfo->OSID, token);
-						  token = strtok_r (NULL, " ", &end_str);
-						}
-					  else
-						{
-						  result = NG_ERROR;
-						}
+					  ng_free (key);
 
-					  if (token)
-						{
-						  ng_strcpy ((*ngEPGS)->APPScnIDInfo->PID, token);
-						  token = strtok_r (NULL, " ", &end_str);
-						}
-					  else
-						{
-						  result = NG_ERROR;
-						}
-
-					  if (token)
-						{
-						  ng_strcpy ((*ngEPGS)->APPScnIDInfo->BID, token);
-						  //	ng_free(token);
-						}
-					  else
-						{
-						  result = NG_ERROR;
-						}
-
-					  if (result == NG_OK)
-						{
-						  (*ngEPGS)->ngState = PUB_DATA;
-						}
+					  (*ngEPGS)->ngState = PUB_DATA;
 					}
-
-				  ng_free (key);
-
-				  (*ngEPGS)->ngState = PUB_DATA;
 				}
 			  else
 				{

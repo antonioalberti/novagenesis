@@ -196,10 +196,10 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 									  bool StoreFlag = true;
 
 									  // Loop over the already stored peer tuples
-									  for (unsigned int h = 0; h < PCore->PeerAppTuples.size (); h++)
+									  for (unsigned int h = 0; h < PCore->PeerTuples.size (); h++)
 										{
 										  // Is the server already stored?
-										  if (Candidates->at (i) == PCore->PeerAppTuples[h]->Values[2])
+										  if (Candidates->at (i) == PCore->PeerTuples[h]->Values[2])
 											{
 											  StoreFlag = false;
 											}
@@ -212,22 +212,22 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 									  if (StoreFlag == true)
 										{
 										  // Store the learned tuple on the peer server app tuples
-										  PCore->PeerAppTuples.push_back (Apps[k]);
+										  PCore->PeerTuples.push_back (Apps[k]);
 
-										  unsigned int _I = PCore->PeerAppTuples.size () - 1;
+										  unsigned int _I = PCore->PeerTuples.size () - 1;
 
 										  PB->S << Offset1 << "(Discovered an IoT Test application)" << endl;
 
-										  PCore->PeerAppTuples[_I]->LN = "IoTTestApp";
-										  PCore->PeerAppTuples[_I]->ULN = PB->IntToString (_I);
+										  PCore->PeerTuples[_I]->LN = "IoTTestApp";
+										  PCore->PeerTuples[_I]->ULN = PB->IntToString (_I);
 
-										  PB->S << Offset1 << "(HID = " << PCore->PeerAppTuples[_I]->Values[0] << ")"
+										  PB->S << Offset1 << "(HID = " << PCore->PeerTuples[_I]->Values[0] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(OSID = " << PCore->PeerAppTuples[_I]->Values[1] << ")"
+										  PB->S << Offset1 << "(OSID = " << PCore->PeerTuples[_I]->Values[1] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(PID = " << PCore->PeerAppTuples[_I]->Values[2] << ")"
+										  PB->S << Offset1 << "(PID = " << PCore->PeerTuples[_I]->Values[2] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(BID = " << PCore->PeerAppTuples[_I]->Values[3] << ")"
+										  PB->S << Offset1 << "(BID = " << PCore->PeerTuples[_I]->Values[3] << ")"
 												<< endl;
 
 										  PCore->DelayBeforeRunPeriodic = 60;
@@ -285,10 +285,10 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 									  bool StoreFlag = true;
 
 									  // Loop over the already stored peer tuples
-									  for (unsigned int h = 0; h < PCore->PeerAppTuples.size (); h++)
+									  for (unsigned int h = 0; h < PCore->PeerTuples.size (); h++)
 										{
 										  // Is the server already stored?
-										  if (Candidates->at (i) == PCore->PeerAppTuples[h]->Values[2])
+										  if (Candidates->at (i) == PCore->PeerTuples[h]->Values[2])
 											{
 											  StoreFlag = false;
 											}
@@ -301,22 +301,22 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 									  if (StoreFlag == true)
 										{
 										  // Store the learned tuple on the peer server app tuples
-										  PCore->PeerAppTuples.push_back (Apps[k]);
+										  PCore->PeerTuples.push_back (Apps[k]);
 
-										  unsigned int _I = PCore->PeerAppTuples.size () - 1;
+										  unsigned int _I = PCore->PeerTuples.size () - 1;
 
 										  PB->S << Offset1 << "(Discovered a RMS application)" << endl;
 
-										  PCore->PeerAppTuples[_I]->LN = "RMS";
-										  PCore->PeerAppTuples[_I]->ULN = PB->IntToString (_I);
+										  PCore->PeerTuples[_I]->LN = "RMS";
+										  PCore->PeerTuples[_I]->ULN = PB->IntToString (_I);
 
-										  PB->S << Offset1 << "(HID = " << PCore->PeerAppTuples[_I]->Values[0] << ")"
+										  PB->S << Offset1 << "(HID = " << PCore->PeerTuples[_I]->Values[0] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(OSID = " << PCore->PeerAppTuples[_I]->Values[1] << ")"
+										  PB->S << Offset1 << "(OSID = " << PCore->PeerTuples[_I]->Values[1] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(PID = " << PCore->PeerAppTuples[_I]->Values[2] << ")"
+										  PB->S << Offset1 << "(PID = " << PCore->PeerTuples[_I]->Values[2] << ")"
 												<< endl;
-										  PB->S << Offset1 << "(BID = " << PCore->PeerAppTuples[_I]->Values[3] << ")"
+										  PB->S << Offset1 << "(BID = " << PCore->PeerTuples[_I]->Values[3] << ")"
 												<< endl;
 
 										  PCore->DelayBeforeRunPeriodic = 60;
@@ -379,18 +379,18 @@ int CoreRunEvaluate01::ShowTheDiscoveredPeers ()
   // *************************************************************
   // Show the discovered server App(s)
   // *************************************************************
-  if (PCore->PeerAppTuples.size () > 0)
+  if (PCore->PeerTuples.size () > 0)
 	{
-	  for (unsigned int i = 0; i < PCore->PeerAppTuples.size (); i++)
+	  for (unsigned int i = 0; i < PCore->PeerTuples.size (); i++)
 		{
 		  PB->S << Offset1 << "(Aware of the Application " << i << " )" << endl;
 
-		  PB->S << Offset1 << "(LN = " << PCore->PeerAppTuples[i]->LN << ")" << endl;
-		  PB->S << Offset1 << "(ULN = " << PCore->PeerAppTuples[i]->ULN << ")" << endl;
-		  PB->S << Offset1 << "(HID = " << PCore->PeerAppTuples[i]->Values[0] << ")" << endl;
-		  PB->S << Offset1 << "(OSID = " << PCore->PeerAppTuples[i]->Values[1] << ")" << endl;
-		  PB->S << Offset1 << "(PID = " << PCore->PeerAppTuples[i]->Values[2] << ")" << endl;
-		  PB->S << Offset1 << "(BID = " << PCore->PeerAppTuples[i]->Values[3] << ")" << endl;
+		  PB->S << Offset1 << "(LN = " << PCore->PeerTuples[i]->LN << ")" << endl;
+		  PB->S << Offset1 << "(ULN = " << PCore->PeerTuples[i]->ULN << ")" << endl;
+		  PB->S << Offset1 << "(HID = " << PCore->PeerTuples[i]->Values[0] << ")" << endl;
+		  PB->S << Offset1 << "(OSID = " << PCore->PeerTuples[i]->Values[1] << ")" << endl;
+		  PB->S << Offset1 << "(PID = " << PCore->PeerTuples[i]->Values[2] << ")" << endl;
+		  PB->S << Offset1 << "(BID = " << PCore->PeerTuples[i]->Values[3] << ")" << endl;
 		}
 	}
   else
@@ -416,6 +416,10 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 
   PPGCS = (PGCS *)PB->PP;
 
+  PG *PPGB = 0;
+
+  PPGB = (PG *)PB;
+
   PB->S << Offset << "(4. Check subscriptions)" << endl;
 
   // *************************************************************
@@ -428,9 +432,9 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 		{
 		  PS = PCore->Subscriptions[i];
 
-		  //PB->S << Offset1 << "(Testing subscription " << i << ")" << endl;
+		  PB->S << Offset1 << "(Testing subscription " << i << ")" << endl;
 
-		  //PB->S << Offset1 << "(Subscription status is " << PS->Status << ")" << endl;
+		  PB->S << Offset1 << "(Subscription status is " << PS->Status << ")" << endl;
 
 		  if (PCore->GetPeerAppTupleIndex (PS->Publisher.Values[2], Index) != OK)
 			{
@@ -446,16 +450,16 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 			  bool StoreFlag = true;
 
 			  // Loop over the already stored peer tuples
-			  for (unsigned int h = 0; h < PCore->PeerAppTuples.size (); h++)
+			  for (unsigned int h = 0; h < PPGB->PGCSTuples.size (); h++)
 				{
-				  // Is the application already stored?
-				  if (PS->Publisher.Values.at (2) == PCore->PeerAppTuples[h]->Values[2])
+				  // Is the EPGS already stored?
+				  if (PS->Publisher.Values.at (2) == PPGB->PGCSTuples[h]->Values[2])
 					{
 					  StoreFlag = false;
 					}
 				  else
 					{
-					  PB->S << Offset << "(The candidate peer is already stored)" << endl;
+					  PB->S << Offset << "(The candidate EPGS is already stored)" << endl;
 					}
 				}
 
@@ -469,40 +473,35 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 				  PPeer->Values.push_back (PS->Publisher.Values.at (3));
 
 				  // Store the learned tuple on the peer app tuples
-				  PCore->PeerAppTuples.push_back (PPeer);
+				  PCore->PeerTuples.push_back (PPeer);
 
-				  int _I = PCore->PeerAppTuples.size () - 1;
+				  PPeer->LN = "EPGS";
 
-				  PB->S << Offset << "(Discovered a candidate peer application)" << endl;
+				  Index = PCore->PeerTuples.size()-1;
 
-				  PCore->PeerAppTuples[_I]->LN = "EPGS";
-
-				  PCore->PeerAppTuples[_I]->ULN = PB->IntToString (_I);
+				  PPeer->ULN = PB->IntToString (Index);
 
 				  PCore->DelayBeforeRunPeriodic = 60;
 
 				  PCore->RunExpose = false;
+
+				  // TODO: Here, SLA clause verification should be added in future
+				  PB->S << Offset << "(Registered the EPGS application as a peer with index "<<Index<<", since a contract was received.)" << endl;
 				}
 			  else
 				{
-				  PB->S << Offset << "(The PGCS is already aware of this candidate)" << endl;
+				  PB->S << Offset << "(The PGCS is already aware of this peer)" << endl;
 				}
 			}
 
-		  PS->LN = PCore->PeerAppTuples[Index]->LN;
-		  PS->ULN = PCore->PeerAppTuples[Index]->ULN;
+		  PS->LN = PCore->PeerTuples[Index]->LN;
+		  PS->ULN = PCore->PeerTuples[Index]->ULN;
 
-		  //PB->S << Offset1 << "(The publisher is a " << PS->LN << " and have the index " << Index << ")" << endl;
-		  //PB->S << Offset1 << "(HID = " << PS->Publisher.Values[0] << ")" << endl;
-		  //PB->S << Offset1 << "(OSID = " << PS->Publisher.Values[1] << ")" << endl;
-		  //PB->S << Offset1 << "(PID = " << PS->Publisher.Values[2] << ")" << endl;
-		  //PB->S << Offset1 << "(BID = " << PS->Publisher.Values[3] << ")" << endl;
-
-		  // Subscription requiring a scheduling
-		  if (PS->Status == "Scheduling required")
-			{
-			  ScheduleASubscripion (PS, _ScheduledMessages, _ClearScheduledMessage);
-			}
+		  PB->S << endl << Offset1 << "(The publisher is a " << PS->LN << " and have the index " << Index << ")" << endl;
+		  PB->S << Offset1 << "(HID = " << PS->Publisher.Values[0] << ")" << endl;
+		  PB->S << Offset1 << "(OSID = " << PS->Publisher.Values[1] << ")" << endl;
+		  PB->S << Offset1 << "(PID = " << PS->Publisher.Values[2] << ")" << endl;
+		  PB->S << Offset1 << "(BID = " << PS->Publisher.Values[3] << ")" << endl;
 
 		  // Subscription requiring processing of a delivered content
 		  if (PS->Status == "Processing required")
@@ -528,7 +527,7 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 }
 
 int
-CoreRunEvaluate01::ScheduleASubscripion (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage)
+CoreRunEvaluate01::ScheduleASubscription (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage)
 {
   Message *Run = 0;
   CommandLine *PCL = 0;
@@ -697,16 +696,16 @@ int CoreRunEvaluate01::ProcessTXTFile (string _Publisher_LN, unsigned int _Index
 	  if (_Publisher_LN == "EPGS")
 		{
 		  // Loop over the peer stored tuples
-		  for (unsigned int h = 0; h < PCore->PeerAppTuples.size (); h++)
+		  for (unsigned int h = 0; h < PCore->PeerTuples.size (); h++)
 			{
 			  // Is the server already stored?
-			  if (PCore->PeerAppTuples[h]->LN == "IoTTestApp")
+			  if (PCore->PeerTuples[h]->LN == "IoTTestApp")
 				{
 				  // Set the service offer payload
-				  AcceptedPayload = PCore->PeerAppTuples[h]->Values.at (0) + " " +
-									PCore->PeerAppTuples[h]->Values.at (1) + " " +
-									PCore->PeerAppTuples[h]->Values.at (2) + " " +
-									PCore->PeerAppTuples[h]->Values.at (3);
+				  AcceptedPayload = PCore->PeerTuples[h]->Values.at (0) + " " +
+									PCore->PeerTuples[h]->Values.at (1) + " " +
+									PCore->PeerTuples[h]->Values.at (2) + " " +
+									PCore->PeerTuples[h]->Values.at (3);
 				}
 			}
 

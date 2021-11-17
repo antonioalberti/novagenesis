@@ -86,7 +86,7 @@ class Core : public Block {
   vector<Tuple *> PSTuples;
 
   // Auxiliary peer tuples container
-  vector<Tuple *> PeerAppTuples;
+  vector<Tuple *> PeerTuples;
 
   // Store the hash of available content
   vector<string> Content;
@@ -102,6 +102,9 @@ class Core : public Block {
 
   // Stores the ng -scn --seq and a timestamp for publishing messages
   vector<Publication *> Publications;
+
+  // Stores the Keys successfully subscribed. Added during Carnival 2017
+  vector<string> KeysOfReceivedPayloads;
 
   // Unique legible name
   string ULN;
@@ -230,6 +233,7 @@ class Core : public Block {
   friend class CoreDeliveryBind01;
   friend class CoreRunPeriodic01;
   friend class PGRunHello02;
+  friend class CoreNotifyS01;
 };
 
 #endif

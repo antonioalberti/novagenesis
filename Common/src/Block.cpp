@@ -37,7 +37,7 @@
 #include "Process.h"
 #endif
 
-////#define DEBUG // To follow message processing
+//#define DEBUG // To follow message processing
 
 Block::Block(string _LN, Process *_PP, unsigned int _Index, string _Path)
 {

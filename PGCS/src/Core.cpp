@@ -206,7 +206,7 @@ Core::~Core ()
 
   vector<Tuple *>::iterator it2;
 
-  for (it2 = PeerAppTuples.begin (); it2 != PeerAppTuples.end (); it2++)
+  for (it2 = PeerTuples.begin (); it2 != PeerTuples.end (); it2++)
 	{
 	  Temp = *it2;
 
@@ -731,9 +731,9 @@ int Core::GetPeerAppTupleIndex (string PID, unsigned int &_Index)
 
   _Index = 0;
 
-  for (unsigned int k = 0; k < PeerAppTuples.size (); k++)
+  for (unsigned int k = 0; k < PeerTuples.size (); k++)
 	{
-	  Tuple *PT = PeerAppTuples[k];
+	  Tuple *PT = PeerTuples[k];
 
 	  if (PT->Values[2] == PID)
 		{

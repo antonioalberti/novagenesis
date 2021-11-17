@@ -63,7 +63,7 @@
 
 
 //#define STATISTICS
-#define DEBUG // To follow message processing
+//#define DEBUG // To follow message processing
 //#define DEBUG1  // To follow shared memory access
 //#define DEBUG2  // More on shm access
 //#define DEBUG3 // Even more on shm access
@@ -342,8 +342,12 @@ void GW::PushToInputQueue (Message *M)
 
 #ifdef DEBUG
 
-  S << "[1]       (Pushing a message to the InputQueue. Size = " << InputQueue.size ()
+  //TODO: FIXP/Oct 2021. Improving debug
+
+  S << "[1]       (Pushing a message the following message to InputQueue. Size = " << InputQueue.size ()
 	<< ". Message instantiation number is " << M->InstantiationNumber << ")" << endl;
+
+  S << "(" << endl << *M << ")" << endl;
 
 #endif
 

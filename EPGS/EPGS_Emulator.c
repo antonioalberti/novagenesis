@@ -108,8 +108,7 @@ int main (int argc, char *argv[])
 
 		  SelectInterface (&NG_INTERFACE_NAME);
 		}
-	  else if (Alternative[1]
-			   == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
+	  else if (Alternative[1] == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
 		{
 		  if (argc == 3)
 			{
@@ -141,6 +140,7 @@ int main (int argc, char *argv[])
 
 	  printf ("\nSelected Interface: %-8s\n", NG_INTERFACE_NAME);
 
+
 	  if (GetHostRawAddress (NG_INTERFACE_NAME, &Address) == 1)
 		{
 		  printf ("EGPS initialization error! Error getting MAC address.\n");
@@ -156,7 +156,6 @@ int main (int argc, char *argv[])
 	  char sPid[8];
 	  int iPid = getpid ();
 	  sprintf (sPid, "%d", iPid);
-
 
 	  // Set the interface to be used
 	  ngInfo->Interface = NG_INTERFACE_NAME;
@@ -199,9 +198,13 @@ int main (int argc, char *argv[])
 
 	  int Count = 0;
 
+	  printf ("Waiting for PGCS response...");
+
+	  usleep (100000000);
+
 	  while (true)
 		{
-		  int dataPSize = 50;
+		  int dataPSize = 30;
 
 		  char *dataP = (char *)malloc (sizeof (char) * dataPSize);
 

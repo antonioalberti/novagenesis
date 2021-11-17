@@ -37,7 +37,7 @@
 #include "PGCS.h"
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 PGHelloIHC02::PGHelloIHC02 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -218,16 +218,16 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 					if (StoreNewPGCS2 == true
 						&& ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
 					  {
-						PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
+						PB->S << endl << endl << Offset << "(A new peer EPGS was discovered without previous knowledge: "
 							  << ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")"
-							  << endl;
+							  << endl << endl << endl ;
 
-						Tuple *PeerPGS = new Tuple;
+						Tuple *PeerPGCS = new Tuple;
 
-						PeerPGS->Values.push_back (ReceivedElements.at (0));
-						PeerPGS->Values.push_back (ReceivedElements.at (1));
-						PeerPGS->Values.push_back (ReceivedElements.at (2));
-						PeerPGS->Values.push_back (ReceivedElements.at (3));
+						PeerPGCS->Values.push_back (ReceivedElements.at (0));
+						PeerPGCS->Values.push_back (ReceivedElements.at (1));
+						PeerPGCS->Values.push_back (ReceivedElements.at (2));
+						PeerPGCS->Values.push_back (ReceivedElements.at (3));
 
 						PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
 						PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
@@ -235,7 +235,7 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 						PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
 
 						// Store the peer PGCS tuple for future use
-						PPGB->PGCSTuples.push_back (PeerPGS);
+						PPGB->PGCSTuples.push_back (PeerPGCS);
 
 						ScheduleStoreBindings ("-de", ReceivedElements, PeerIdentifier, PeerStack);
 					  }
@@ -253,7 +253,7 @@ PGHelloIHC02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 		}
 	  else
 		{
-		  PB->S << Offset << "(ERROR: wrong number of arguments)" << endl;
+		  PB->S << Offset << "(Warning: wrong number of arguments. Waiting for a hello with 1 argument.)" << endl;
 		}
 	}
 
