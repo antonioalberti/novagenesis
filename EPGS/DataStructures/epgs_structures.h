@@ -164,7 +164,7 @@ struct _ng_epgs {
   char *pubData;
   int pubDataSize;
 
-  // This Interface was added in June 2018 to avoid a static declaration in EPGS_Simulation
+  // This Interface was added in June 2018 to avoid a static declaration in EPGS_Emulator
   // It avoids the usage of NG_INTERFACE_NAME[]
   char *Interface;
 };

@@ -41,7 +41,7 @@
 #include "GW.h"
 #endif
 
-//#define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -219,7 +219,7 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 					{
 					  StoreFlag = false;
 
-					  PB->S << Offset1 << "(The IoTTestApp is already aware of this PSS/NRNCS)" << endl;
+					  PB->S << Offset1 << "(The IoTTestApp is already aware of a PSS/NRNCS)" << endl;
 					}
 				}
 
@@ -506,12 +506,6 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 			  PB->S << Offset1 << "(Warning: The publisher is unknown)" << endl;
 			}
 
-		  // Subscription requiring a scheduling
-		  if (PS->Status == "Scheduling required")
-			{
-			  ScheduleASubscripion (PS, _ScheduledMessages, _ClearScheduledMessage);
-			}
-
 		  // Subscription requiring processing of a delivered content
 		  if (PS->Status == "Processing required")
 			{
@@ -580,14 +574,14 @@ int CoreRunEvaluate01::PublishData ()
 	  bool R2=(bool)rand()%1;
 	  bool R3=(bool)rand()%1;
 
-	  F1 << R1<< " "<< R2<< " "<< R3 << " "<<endl; // Put here what do you want to send to the I 4.0 PLC
+	  F1 <<"{ Q0.0: " <<R1<< ", Q0.1: "<< R2<< ", Q0.2:  "<< R3 << " }"<<endl; // Put here what do you want to send to the I4.0 PLC
 
 	  F1.CloseFile ();
 
 	  // Setting up the OSID as the space limiter
 	  Limiters.push_back (PB->PP->Intra_Process);
 
-	  // Setting up the this process as the first source SCN
+	  // Setting up this process as the first source SCN
 	  Sources.push_back (PB->GetSelfCertifyingName ());
 
 	  Destinations.push_back (PB->GetSelfCertifyingName ()); //BID
@@ -641,7 +635,7 @@ int CoreRunEvaluate01::PublishData ()
 }
 
 int
-CoreRunEvaluate01::ScheduleASubscripion (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage)
+CoreRunEvaluate01::ScheduleASubscription (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage)
 {
   Message *Run = 0;
   CommandLine *PCL = 0;
@@ -807,6 +801,10 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
   string Temp;
 
   string Sample;
+
+  F1 >> Temp;
+
+  F1 >> Temp;
 
   F1 >> Temp;
 

@@ -103,6 +103,9 @@ class Core : public Block {
   // Stores the ng -scn --seq and a timestamp for publishing messages
   vector<Publication *> Publications;
 
+  // Stores the Keys successfully subscribed. Added during Carnival 2017
+  vector<string> KeysOfReceivedPayloads;
+
   // Unique legible name
   string ULN;
 
@@ -231,6 +234,7 @@ class Core : public Block {
   friend class CoreRunPublishSSData01;
   friend class CoreRunGetInfo01;
   friend class CoreRunSetConfig01;
+  friend class CoreNotifyS01;
 };
 
 #endif

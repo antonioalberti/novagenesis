@@ -85,7 +85,7 @@ CoreRunPublish01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mess
 
 		  if (PeerData.size () == 3)
 			{
-			  PT = PCore->PeerAppTuples[PB->StringToInt (PeerData.at (1))];
+			  PT = PCore->PeerTuples[PB->StringToInt (PeerData.at (1))];
 
 			  PB->S << Offset << "(LN = " << PeerData.at (0) << ")" << endl;
 			  PB->S << Offset << "(ULN = " << PeerData.at (1) << ")" << endl;

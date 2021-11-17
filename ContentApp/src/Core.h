@@ -90,7 +90,7 @@ class Core : public Block {
   // Stores the ng -scn --seq and a timestamp for publishing messages
   vector<Publication *> Publications;
 
-  // Stores the Keys successfully subscribed. Added during Carnaval 2017
+  // Stores the Keys successfully subscribed. Added during Carnival 2017
   vector<string> KeysOfReceivedPayloads;
 
   // Auxiliary flags

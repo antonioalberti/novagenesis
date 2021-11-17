@@ -349,7 +349,6 @@ int PGRunPeriodic01::HelloScheduling ()
 
 #endif
 
-
 	  // Creating a new message
 	  PB->PP->NewMessage (GetTime (), 1, false, RunHello02);
 

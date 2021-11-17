@@ -210,7 +210,7 @@ add_executable(EPGS
         EPGS/epgs_ethernet.c
         EPGS/epgs_ethernet.h
         EPGS/epgs.h
-        EPGS/EPGS_Simulation.c
+        EPGS/EPGS_Emulator.c
         EPGS/epgs_wrapper.c
         EPGS/epgs_wrapper.h
         EPGS/Network/PG.c

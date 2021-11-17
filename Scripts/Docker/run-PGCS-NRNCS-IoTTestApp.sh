@@ -10,7 +10,7 @@
 #
 # Usage:
 #
-# sh rrun-PGCS-IoTTestApp.sh ALTERNATIVE STACK INTERFACE IDENTIFIER
+# sh run-PGCS-IoTTestApp.sh ALTERNATIVE STACK INTERFACE IDENTIFIER
 # 
 # Example for physical experiment with NXP 1588 or ESP32 
 # sh run-PGCS-IoTTestApp.sh -pc Wi-Fi wlp7s0 00:23:a7:23:06:b2
@@ -18,7 +18,13 @@
 # Example for emulated experiment with EPGS container(s)
 # sh run-PGCS-IoTTestApp.sh -dec Ethernet eth0 FF:FF:FF:FF:FF:FF
 
-docker run -itd --privileged -e CA_PATH="/home/ng/workspace/novagenesis/IO/IoTTestApp/" -e ALTERNATIVE=$1 -e STACK=$2 -e ROLE="Intra_Domain" -e INTERFACE=$3 -e IDENTIFIER=$4 -e SIZE="1200" --name Client ng-iottestapp:latest
+docker run -itd --privileged -e CA_PATH="/home/ng/workspace/novagenesis/IO/IoTTestApp/" -e ALTERNATIVE="$1" -e STACK="$2" -e ROLE="Intra_Domain" -e INTERFACE="$3" -e IDENTIFIER="$4" -e SIZE="1200" --name Client ng-iottestapp:latest
+
+echo "PGCS parameters are:"
+echo "ALTERNATIVE = $1"
+echo "STACK = $2"
+echo "INTERFACE = $3"
+echo "IDENTIFIER = $4"
 
 echo "Creating IoTTestApp Input/Output folder"
 

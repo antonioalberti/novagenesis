@@ -108,8 +108,7 @@ int main (int argc, char *argv[])
 
 		  SelectInterface (&NG_INTERFACE_NAME);
 		}
-	  else if (Alternative[1]
-			   == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
+	  else if (Alternative[1] == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
 		{
 		  if (argc == 3)
 			{
@@ -141,6 +140,7 @@ int main (int argc, char *argv[])
 
 	  printf ("\nSelected Interface: %-8s\n", NG_INTERFACE_NAME);
 
+
 	  if (GetHostRawAddress (NG_INTERFACE_NAME, &Address) == 1)
 		{
 		  printf ("EGPS initialization error! Error getting MAC address.\n");
@@ -156,7 +156,6 @@ int main (int argc, char *argv[])
 	  char sPid[8];
 	  int iPid = getpid ();
 	  sprintf (sPid, "%d", iPid);
-
 
 	  // Set the interface to be used
 	  ngInfo->Interface = NG_INTERFACE_NAME;
@@ -199,9 +198,13 @@ int main (int argc, char *argv[])
 
 	  int Count = 0;
 
+	  printf ("Waiting for PGCS response...");
+
+	  usleep (100000000);
+
 	  while (true)
 		{
-		  int dataPSize = 19;
+		  int dataPSize = 30;
 
 		  char *dataP = (char *)malloc (sizeof (char) * dataPSize);
 
@@ -211,13 +214,19 @@ int main (int argc, char *argv[])
 
 		  sprintf (TempChar, "%d", Temperature);
 
-		  char X[19] = "";
+		  char X[50] = "";
 
-		  strcat (X, "{ Temperature: ");
+		  char charValue[10];
+
+		  sprintf(charValue, "%d", Count);
+
+		  strcat (X, "{ Count: "); // 9
+		  strcat (X,  charValue);
+		  strcat (X, ", Temperature: ");
 		  strcat (X, TempChar);
 		  strcat (X, " }");
 
-		  //printf("X = %s",X);
+		  printf("\n Data = %s",X);
 
 		  strcpy (dataP, X);
 
@@ -234,17 +243,23 @@ int main (int argc, char *argv[])
 
 		  sprintf (Temp3, "_%d", Count);
 
-		  //printf("\nTemp3=%s",Temp3);
-
 		  char Temp4[] = ".json";
 
-		  char *A = strcat (Temp1, Temp2);
+		  char Name[sizeof (Temp1)+sizeof (Temp2)+sizeof (Temp3)+sizeof (Temp4)];
 
-		  char *B = strcat (Temp3, Temp4);
+		  char A[sizeof (Temp1)+sizeof (Temp2)];
 
-		  char *Name = strcat (A, B);
+		  char B[sizeof (Temp3)+sizeof (Temp4)];
 
-		  //printf("\nName=%s",Name);
+		  sprintf(&A, "%s%s", Temp1, Temp2);
+
+		  sprintf(&B, "%s%s", Temp3, Temp4);
+
+		  sprintf(&Name, "%s%s", A, B);
+
+		  printf("\n File = %s",Name);
+
+		  printf("\n");
 
 		  setDataToPub (&ngInfo, Name, dataP, dataPSize);
 

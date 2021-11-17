@@ -281,7 +281,7 @@ int main (int argc, char *argv[])
 		{
 		  cout << "(The I/O path is " << Path << ")" << endl;
 
-		  string Temp10 = argv[5];     // Interface
+		  string Temp10 = argv[7];     // Interface
 
 		  cout << "(The PGCS will try to discover peers using the Interface " << Temp10 << ".)" << endl;
 

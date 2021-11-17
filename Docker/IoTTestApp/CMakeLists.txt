@@ -8,6 +8,7 @@ include_directories(Common/src/rapidjson)
 include_directories(Common/src/rapidjson/error)
 include_directories(Common/src/rapidjson/internal)
 include_directories(PGCS/src)
+include_directories(NRNCS/src)
 include_directories(IoTTestApp/src)
 
 add_library(Common
@@ -191,6 +192,39 @@ add_executable(PGCS
     PGCS/src/PGRunPublishing01.h)
 
 target_link_libraries (PGCS LINK_PRIVATE Common)
+
+add_executable(NRNCS
+        NRNCS/src/execNRNCS.cpp
+        NRNCS/src/NR.cpp
+        NRNCS/src/NR.h
+        NRNCS/src/NRDeliveryBind01.cpp
+        NRNCS/src/NRDeliveryBind01.h
+        NRNCS/src/NRInfoPayload01.cpp
+        NRNCS/src/NRInfoPayload01.h
+        NRNCS/src/NRMessageSeq01.cpp
+        NRNCS/src/NRMessageSeq01.h
+        NRNCS/src/NRMessageType01.cpp
+        NRNCS/src/NRMessageType01.h
+        NRNCS/src/NRMsgCl01.cpp
+        NRNCS/src/NRMsgCl01.h
+        NRNCS/src/NRPubBind01.cpp
+        NRNCS/src/NRPubBind01.h
+        NRNCS/src/NRPubNotify01.cpp
+        NRNCS/src/NRPubNotify01.h
+        NRNCS/src/NRRevokeBind01.cpp
+        NRNCS/src/NRRevokeBind01.h
+        NRNCS/src/NRRunInitialization01.cpp
+        NRNCS/src/NRRunInitialization01.h
+        NRNCS/src/NRRunPeriodic01.cpp
+        NRNCS/src/NRRunPeriodic01.h
+        NRNCS/src/NRNCS.cpp
+        NRNCS/src/NRNCS.h
+        NRNCS/src/NRSCNSeq01.cpp
+        NRNCS/src/NRSCNSeq01.h
+        NRNCS/src/NRSubBind01.cpp
+        NRNCS/src/NRSubBind01.h)
+
+target_link_libraries (NRNCS LINK_PRIVATE Common)
 
 add_executable(IoTTestApp
     IoTTestApp/src/Core.cpp

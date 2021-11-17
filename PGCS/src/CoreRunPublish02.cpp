@@ -83,7 +83,7 @@ CoreRunPublish02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mess
 			  PB->S << Offset << "(File = " << FileName[0] << ")" << endl;
 			  //PB->S << Offset << "(Path = " << PB->GetPath() << ")" << endl;
 
-			  for (unsigned int i = 0; i < PCore->PeerAppTuples.size (); i++)
+			  for (unsigned int i = 0; i < PCore->PeerTuples.size (); i++)
 				{
 				  Tuple *ExtendedPeerAppTuple = new Tuple;
 
@@ -91,7 +91,7 @@ CoreRunPublish02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mess
 				  ExtendedPeerAppTuple->Values.push_back ("pub");
 
 				  // Copy the related Tuple pointer
-				  PT = PCore->PeerAppTuples[i];
+				  PT = PCore->PeerTuples[i];
 
 				  PB->S << Offset << "(Peer index " << i << ")" << endl;
 				  PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;

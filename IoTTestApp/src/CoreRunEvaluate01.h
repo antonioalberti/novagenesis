@@ -95,7 +95,7 @@ class CoreRunEvaluate01 : public Action {
 
   int CheckSubscriptions (vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
 
-  int ScheduleASubscripion (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
+  int ScheduleASubscription (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
 
   int PublishData ();
 

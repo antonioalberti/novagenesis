@@ -42,7 +42,7 @@
 #endif
 
 // TODO: FIXP/Update - Added this debug control
-//#define DEBUG
+#define DEBUG
 
 NRPubNotify01::NRPubNotify01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -197,6 +197,10 @@ NRPubNotify01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 						  Sources.clear ();
 						  Destinations.clear ();
 						}
+					}
+				  else // TODO: FIXP/Oct - Added a warning to inform when NRNCS is not operational
+					{
+					  PB->S << Offset << "(Warning: NRNCS is not operational)" << endl;
 					}
 				}
 			  else
