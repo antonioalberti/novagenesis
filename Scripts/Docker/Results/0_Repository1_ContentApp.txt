@@ -1,0 +1,903 @@
+*******************************************************************
+*                                                                 *
+*  NovaGenesis(NG) Content Distribution Application v0.2          *
+*  Copyright Antonio Marcos Alberti - Inatel - April 2021         *
+*                                                                 *
+*                                                                 *
+*******************************************************************
+
+(The I/O path is /home/ng/workspace/novagenesis/IO/Repository1/)
+(This is a Repository process.)
+(The process legible name is ContentApp)
+(The hash of process legible name is B70AE44A)
+(The process self-certifying name is E8479192)
+(The process shared memory key is = 56703121)
+(The operating system legible name is Linux 5.11.0-41-generic #45~20.04.1-Ubuntu SMP Wed Nov 10 10:20:10 UTC 2021 c38290d12efd)
+(The host legible name is c38290d12efd x86_64)
+(The operating system self-certifying name is = 4E15224F)
+(The host self-certifying name is = 9877BF29)
+(Intra_Process = B7052C8F)
+(Intra_OS = D6C727CF)
+(Intra_Node = EAA4FCF0)
+(Intra_Domain = 15B239D1)
+(Inter_Domain = 99D35751)
+          (HT block has the SCN = EAB97C0D)
+                    (Hash"HT" = A7DA4B80)
+                    (HT is moving to operational state)
+                    (Done)
+
+
+          (GW block has the SCN = F6EB44A5)
+          (Core block has the SCN = E5F9FF0F)
+                    (Loading customized parameters (if available) at /home/ng/workspace/novagenesis/IO/Repository1/App.ini)
+                    DelayBeforePublishingServiceOffer is 30
+                    DelayBeforeDiscovery is 3
+                    DelayBeforeRunPeriodic is 10
+                    DelayBeforeANewPeerEvaluation is 5
+                    DelayBeforeANewPhotoPublish is 10
+                    ContentBurstSize is 200
+
+          (t = 5398.670047)
+[1]       (IQ Size = 4)
+          (Messages in memory = 6)
+          (Created an input shared memory segment with key = 56703121 and identifier = 7)
+          (Created an input shared memory segment with key = 56703122 and identifier = 8)
+          (Created an input shared memory segment with key = 56703123 and identifier = 9)
+          (Created an input shared memory segment with key = 56703124 and identifier = 10)
+          (Created an input shared memory segment with key = 56703125 and identifier = 11)
+          (Created an input shared memory segment with key = 56703126 and identifier = 12)
+
+          (Moving to hello state)
+
+          (The PGCS IPC Key is 11)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 7
+                    Cat [3] = 7
+                    Cat [5] = 4
+                    Cat [6] = 1
+                    Cat [7] = 1
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 1
+                    (Looping over existent Subscriptions at this Content App)
+                    (Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)
+                    (Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)
+          (Storing the shared memory ID (shmid) = 2 on HT. The related key is 12)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                                        (Warning: The GetHTBinding function returned warning status.)
+                    (Looping over existent Subscriptions at this Content App)
+                    (Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)
+                    (Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 16
+                    Cat [3] = 10
+                    Cat [5] = 13
+                    Cat [6] = 5
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    (Discovered a PSS/NRNCS!)
+                    (Looping over existent Subscriptions at this Content App)
+          (ERROR: Unable to get the forwarding binding from destination block)
+          (ERROR: Unable to access the scheduled message index at Run Action interface)
+                    (Generating a message to publish in the domain scope some App bindings )
+                    (Looping over existent Subscriptions at this Content App)
+                    (Looping over existent Subscriptions at this Content App)
+                    (Looping over existent Subscriptions at this Content App)
+                              (Discovered a Source --------------------------------------------------------------------------------------------------)
+                    (Looping over existent Subscriptions at this Content App)
+          (Storing the shared memory ID (shmid) = 3 on HT. The related key is 13)
+                              (Discovered a Source --------------------------------------------------------------------------------------------------)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 10
+                    Cat [5] = 19
+                    Cat [6] = 5
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 3
+
+                    (RTT from NRNCS was 0.1641648 seconds for the key F23E988E.)
+                              (Discovered a Source --------------------------------------------------------------------------------------------------)
+                    -run --publish 0.1
+                    (File = Service_Accepted_1861254387.txt)
+
+                    (The payload hash is C2C248BD)
+                    (Done)
+
+
+                    (RTT to NRNCS was 0.145284811)
+
+                    (RTT from NRNCS was 0.090366401 seconds for the key 2081978E.)
+                    -run --publish 0.1
+                    (File = Service_Accepted_731347254.txt)
+
+                    (The payload hash is 38AFD2B7)
+                    (Done)
+
+
+                    (RTT to NRNCS was 0.188856143)
+
+                    (RTT from NRNCS was 1.414669276 seconds for the key 2E4D455E.)
+
+                    (RTT from NRNCS was 1.484405176 seconds for the key 5BC8EE2A.)
+
+                    (RTT from NRNCS was 1.907990101 seconds for the key 6B649116.)
+
+                    (RTT from NRNCS was 2.23913299 seconds for the key F85C18A2.)
+
+                    (RTT from NRNCS was 2.699311722 seconds for the key DC7429E1.)
+
+                    (RTT from NRNCS was 3.591100637 seconds for the key 281B9848.)
+
+                    (RTT from NRNCS was 5.451790818 seconds for the key A9AE6A85.)
+
+                    (RTT from NRNCS was 5.826867787 seconds for the key E01C7CDD.)
+
+                    (RTT from NRNCS was 6.351115283 seconds for the key 98878532.)
+
+                    (RTT from NRNCS was 6.821132927 seconds for the key C8FBF281.)
+
+                    (RTT from NRNCS was 6.923715985 seconds for the key C49ACE1A.)
+
+                    (RTT from NRNCS was 7.088614842 seconds for the key C52B2D2F.)
+
+                    (RTT from NRNCS was 7.234593565 seconds for the key 4B08E742.)
+          (Storing the shared memory ID (shmid) = 4 on HT. The related key is 14)
+          (Storing the shared memory ID (shmid) = 5 on HT. The related key is 15)
+
+                    (RTT from NRNCS was 9.866433906 seconds for the key CA75791D.)
+
+                    (RTT from NRNCS was 12.5116429 seconds for the key 661CEE17.)
+
+                    (RTT from NRNCS was 12.15082832 seconds for the key 7B33D8CA.)
+
+                    (RTT from NRNCS was 13.99678176 seconds for the key C63D5E80.)
+
+                    (RTT from NRNCS was 11.29266553 seconds for the key 9464FDC6.)
+
+                    (RTT from NRNCS was 11.52497727 seconds for the key 7881C69C.)
+
+                    (RTT from NRNCS was 11.22204765 seconds for the key 7CCEF0B8.)
+
+                    (RTT from NRNCS was 11.04225835 seconds for the key 26BD9F88.)
+
+                    (RTT from NRNCS was 11.06753533 seconds for the key EEAA6596.)
+
+                    (RTT from NRNCS was 11.15383024 seconds for the key E84F308A.)
+
+                    (RTT from NRNCS was 11.09255821 seconds for the key E401BDB9.)
+
+                    (RTT from NRNCS was 11.14711156 seconds for the key 17B32824.)
+
+                    (RTT from NRNCS was 10.96802995 seconds for the key 099DA9A8.)
+
+                    (RTT from NRNCS was 11.09542366 seconds for the key CAD7E940.)
+
+                    (RTT from NRNCS was 10.95267198 seconds for the key C2C811CD.)
+
+                    (RTT from NRNCS was 10.96806496 seconds for the key 41AAEDFD.)
+
+                    (RTT from NRNCS was 10.93898222 seconds for the key 22D6A640.)
+
+                    (RTT from NRNCS was 10.96119981 seconds for the key 260A6B8F.)
+
+                    (RTT from NRNCS was 10.95613866 seconds for the key CB5F9023.)
+
+                    (RTT from NRNCS was 10.84732011 seconds for the key 577E7140.)
+
+                    (RTT from NRNCS was 10.79913586 seconds for the key 8112F975.)
+
+                    (RTT from NRNCS was 10.80729498 seconds for the key 8CABA172.)
+
+                    (RTT from NRNCS was 10.79350009 seconds for the key 84DAFF02.)
+
+                    (RTT from NRNCS was 10.61314265 seconds for the key C99B4980.)
+
+                    (RTT from NRNCS was 10.55005321 seconds for the key 6A8F0F10.)
+
+                    (RTT from NRNCS was 10.51108317 seconds for the key 8B85D12E.)
+
+                    (RTT from NRNCS was 10.38032099 seconds for the key E3894334.)
+
+                    (RTT from NRNCS was 10.28868985 seconds for the key DE5DA754.)
+
+                    (RTT from NRNCS was 10.23970208 seconds for the key 83689181.)
+
+                    (RTT from NRNCS was 10.18539914 seconds for the key 127AD38F.)
+
+                    (RTT from NRNCS was 9.791941539 seconds for the key 1742AE9A.)
+
+                    (RTT from NRNCS was 9.734929352 seconds for the key 44480F0E.)
+
+                    (RTT from NRNCS was 9.726287265 seconds for the key 109C0CA1.)
+
+                    (RTT from NRNCS was 9.703428339 seconds for the key 8C99FC26.)
+
+                    (RTT from NRNCS was 9.922431894 seconds for the key A5BF62B4.)
+
+                    (RTT from NRNCS was 9.94326863 seconds for the key 36F952EE.)
+
+                    (RTT from NRNCS was 9.954966549 seconds for the key E4779B22.)
+
+                    (RTT from NRNCS was 10.21104665 seconds for the key C9C75234.)
+
+                    (RTT from NRNCS was 10.22790617 seconds for the key C1B79411.)
+
+                    (RTT from NRNCS was 10.0722507 seconds for the key CE91307C.)
+
+                    (RTT from NRNCS was 9.978737986 seconds for the key BA86B559.)
+
+                    (RTT from NRNCS was 10.34019969 seconds for the key 14A5EF9A.)
+
+                    (RTT from NRNCS was 9.910037228 seconds for the key 2FB47FFC.)
+
+                    (RTT from NRNCS was 10.31737055 seconds for the key F256EAE6.)
+
+                    (RTT from NRNCS was 10.66389685 seconds for the key A82F6550.)
+
+                    (RTT from NRNCS was 10.52616313 seconds for the key 696A455B.)
+
+                    (RTT from NRNCS was 10.3050785 seconds for the key 300921C9.)
+
+                    (RTT from NRNCS was 10.23678611 seconds for the key A43CC636.)
+
+                    (RTT from NRNCS was 10.63451131 seconds for the key 5E091CEA.)
+
+                    (RTT from NRNCS was 10.4946475 seconds for the key 7767D7CB.)
+
+                    (RTT from NRNCS was 10.90154146 seconds for the key 52890F7D.)
+
+                    (RTT from NRNCS was 10.38234541 seconds for the key DE3F5603.)
+
+                    (RTT from NRNCS was 10.50018157 seconds for the key 80DF0DE8.)
+
+                    (RTT from NRNCS was 10.53608885 seconds for the key 0C70B261.)
+
+                    (RTT from NRNCS was 10.47866783 seconds for the key 844F2AE7.)
+
+                    (RTT from NRNCS was 11.10504516 seconds for the key 8DB5FCC2.)
+
+                    (RTT from NRNCS was 10.62212702 seconds for the key 13AA3653.)
+
+                    (RTT from NRNCS was 10.58360013 seconds for the key 5C9FCA09.)
+
+                    (RTT from NRNCS was 10.59562043 seconds for the key 2C99C118.)
+
+                    (RTT from NRNCS was 10.55571289 seconds for the key CC43B532.)
+
+                    (RTT from NRNCS was 10.61013929 seconds for the key 60DE3349.)
+
+                    (RTT from NRNCS was 10.5842716 seconds for the key 2F76B9D9.)
+
+                    (RTT from NRNCS was 10.55749311 seconds for the key 965B4D31.)
+
+                    (RTT from NRNCS was 10.62165256 seconds for the key 2CC7088D.)
+
+                    (RTT from NRNCS was 10.58659951 seconds for the key 8CDB35CE.)
+
+                    (RTT from NRNCS was 10.49511376 seconds for the key 109FC5AB.)
+
+                    (RTT from NRNCS was 10.49674539 seconds for the key 4B4BA84E.)
+
+                    (RTT from NRNCS was 10.50470895 seconds for the key 1AD5E88E.)
+
+                    (RTT from NRNCS was 10.41193651 seconds for the key E4E3299C.)
+
+                    (RTT from NRNCS was 10.36715304 seconds for the key 94050222.)
+
+                    (RTT from NRNCS was 10.36307238 seconds for the key A6362CF1.)
+
+                    (RTT from NRNCS was 10.2639775 seconds for the key FAD8DEC5.)
+
+                    (RTT from NRNCS was 10.37893497 seconds for the key E6657C0D.)
+
+                    (RTT from NRNCS was 10.42296103 seconds for the key 93194E58.)
+
+                    (RTT from NRNCS was 10.40389481 seconds for the key 2C97DAF9.)
+
+                    (RTT from NRNCS was 10.3586377 seconds for the key 0CC39F4D.)
+
+                    (RTT from NRNCS was 10.33539878 seconds for the key C5CC70E4.)
+
+                    (RTT from NRNCS was 10.39545639 seconds for the key D8A8BB08.)
+
+                    (RTT from NRNCS was 10.19046812 seconds for the key 0B5C7AB6.)
+
+                    (RTT from NRNCS was 10.17118611 seconds for the key 2AA64EF8.)
+
+                    (RTT from NRNCS was 10.16334145 seconds for the key 7EF513F9.)
+
+                    (RTT from NRNCS was 9.853428996 seconds for the key 9EFDAE55.)
+
+                    (RTT from NRNCS was 9.878897081 seconds for the key 3B816372.)
+
+                    (RTT from NRNCS was 9.863956053 seconds for the key 81646B8E.)
+
+                    (RTT from NRNCS was 9.839763384 seconds for the key 9A3CEB7F.)
+
+                    (RTT from NRNCS was 9.859286273 seconds for the key 823FD95D.)
+
+                    (RTT from NRNCS was 9.827878968 seconds for the key FEBF2640.)
+
+                    (RTT from NRNCS was 9.841846548 seconds for the key DD872FB3.)
+
+                    (RTT from NRNCS was 9.81557991 seconds for the key 0BCF3E1A.)
+
+                    (RTT from NRNCS was 9.880162682 seconds for the key 8FE0ECC5.)
+
+                    (RTT from NRNCS was 9.938265386 seconds for the key 543E161C.)
+
+                    (RTT from NRNCS was 10.00294412 seconds for the key EAF47841.)
+
+                    (RTT from NRNCS was 10.09240046 seconds for the key 9743814A.)
+
+                    (RTT from NRNCS was 9.991802912 seconds for the key 2B63FC80.)
+
+                    (RTT from NRNCS was 10.00366745 seconds for the key E30821FA.)
+
+                    (RTT from NRNCS was 9.973121287 seconds for the key 575A218C.)
+
+                    (RTT from NRNCS was 9.983718319 seconds for the key 49A785F5.)
+
+                    (RTT from NRNCS was 9.692756015 seconds for the key BBB45EBF.)
+
+                    (RTT from NRNCS was 9.647126485 seconds for the key 84820F75.)
+
+                    (RTT from NRNCS was 9.62466137 seconds for the key E4662E01.)
+
+                    (RTT from NRNCS was 9.79436768 seconds for the key 21BEAB70.)
+
+                    (RTT from NRNCS was 9.701105172 seconds for the key FA4AFD0D.)
+
+                    (RTT from NRNCS was 9.72843229 seconds for the key 4A87D98D.)
+
+                    (RTT from NRNCS was 9.647401204 seconds for the key 49A0D3F1.)
+
+                    (RTT from NRNCS was 9.814033049 seconds for the key F9B5840C.)
+
+                    (RTT from NRNCS was 9.711987864 seconds for the key 172D15F6.)
+
+                    (RTT from NRNCS was 9.71202063 seconds for the key B1236316.)
+
+                    (RTT from NRNCS was 9.726835402 seconds for the key C620A842.)
+
+                    (RTT from NRNCS was 9.673538638 seconds for the key 70D0B78B.)
+
+                    (RTT from NRNCS was 9.724225252 seconds for the key 45FEB567.)
+
+                    (RTT from NRNCS was 9.705285821 seconds for the key B942E196.)
+
+                    (RTT from NRNCS was 9.708167605 seconds for the key 23859F23.)
+
+                    (RTT from NRNCS was 9.788818216 seconds for the key 15A92DC9.)
+
+                    (RTT from NRNCS was 9.779089009 seconds for the key 57157CAC.)
+
+                    (RTT from NRNCS was 9.814141484 seconds for the key CDD77A61.)
+
+                    (RTT from NRNCS was 9.797077 seconds for the key 3185760B.)
+                    (Looping over existent Subscriptions at this Content App)
+                    (Subscription 0 has Status Processing required, Key = 57157CAC, HasContent = 1, Time from subscription = 9.970611003)
+                    (Subscription 1 has Status Waiting delivery, Key = 314C20CE, HasContent = 0, Time from subscription = 9.922588213)
+                    (Subscription 2 has Status Waiting delivery, Key = 0473C87B, HasContent = 0, Time from subscription = 9.914379627)
+                    (Subscription 3 has Status Waiting delivery, Key = 5587F444, HasContent = 0, Time from subscription = 9.863337886)
+                    (Subscription 4 has Status Waiting delivery, Key = CFBF5F5E, HasContent = 0, Time from subscription = 9.845958784)
+                    (Subscription 5 has Status Waiting delivery, Key = EE5FC0AB, HasContent = 0, Time from subscription = 9.800158563)
+                    (Subscription 6 has Status Waiting delivery, Key = B2E7E9B2, HasContent = 0, Time from subscription = 9.665109676)
+                    (Subscription 7 has Status Waiting delivery, Key = AC362208, HasContent = 0, Time from subscription = 9.159822126)
+                    (Subscription 8 has Status Waiting delivery, Key = F68A9FD1, HasContent = 0, Time from subscription = 9.120316224)
+                    (Subscription 9 has Status Waiting delivery, Key = A82904FC, HasContent = 0, Time from subscription = 9.112155058)
+                    (Subscription 10 has Status Waiting delivery, Key = 090C1524, HasContent = 0, Time from subscription = 9.111518225)
+                    (Subscription 11 has Status Waiting delivery, Key = C8DCF952, HasContent = 0, Time from subscription = 9.031236068)
+                    (Subscription 12 has Status Waiting delivery, Key = 08C88289, HasContent = 0, Time from subscription = 9.000628504)
+                    (Subscription 13 has Status Waiting delivery, Key = 3CB28BF3, HasContent = 0, Time from subscription = 8.996510849)
+                    (Subscription 14 has Status Waiting delivery, Key = DE9DCBB9, HasContent = 0, Time from subscription = 8.992652671)
+                    (Subscription 15 has Status Waiting delivery, Key = CDCF1BC0, HasContent = 0, Time from subscription = 8.991650933)
+                    (Subscription 16 has Status Waiting delivery, Key = C7B7AC4B, HasContent = 0, Time from subscription = 8.932663073)
+                    (Subscription 17 has Status Waiting delivery, Key = A11B774F, HasContent = 0, Time from subscription = 8.863938201)
+                    (Subscription 18 has Status Waiting delivery, Key = 5B0085AF, HasContent = 0, Time from subscription = 8.77443137)
+                    (Subscription 19 has Status Waiting delivery, Key = B9F089C7, HasContent = 0, Time from subscription = 8.602098252)
+                    (Subscription 20 has Status Waiting delivery, Key = D4BBB7B5, HasContent = 0, Time from subscription = 8.556851935)
+                    (Subscription 21 has Status Waiting delivery, Key = 954BA99A, HasContent = 0, Time from subscription = 8.527143453)
+                    (Subscription 22 has Status Waiting delivery, Key = 36A5C647, HasContent = 0, Time from subscription = 8.505201605)
+                    (Subscription 23 has Status Waiting delivery, Key = F4052A80, HasContent = 0, Time from subscription = 8.471924225)
+                    (Subscription 24 has Status Waiting delivery, Key = E85B6A8C, HasContent = 0, Time from subscription = 8.451762518)
+                    (Subscription 25 has Status Waiting delivery, Key = 4048F44C, HasContent = 0, Time from subscription = 8.3979965)
+                    (Subscription 26 has Status Waiting delivery, Key = 90A17880, HasContent = 0, Time from subscription = 8.377213995)
+                    (Subscription 27 has Status Waiting delivery, Key = AF7A093C, HasContent = 0, Time from subscription = 8.334867022)
+                    (Subscription 28 has Status Waiting delivery, Key = 6BC7C164, HasContent = 0, Time from subscription = 8.304371776)
+                    (Subscription 29 has Status Waiting delivery, Key = FB6934AC, HasContent = 0, Time from subscription = 8.229643649)
+                    (Subscription 30 has Status Waiting delivery, Key = 2E10348D, HasContent = 0, Time from subscription = 8.188605081)
+                    (Subscription 31 has Status Waiting delivery, Key = 8FCB4BC8, HasContent = 0, Time from subscription = 8.158076556)
+                    (Subscription 32 has Status Waiting delivery, Key = 30834E5B, HasContent = 0, Time from subscription = 8.145679659)
+                    (Subscription 33 has Status Waiting delivery, Key = 2E076C8E, HasContent = 0, Time from subscription = 8.123315341)
+                    (Subscription 34 has Status Waiting delivery, Key = A9B4D5CA, HasContent = 0, Time from subscription = 8.100223934)
+                    (Subscription 35 has Status Waiting delivery, Key = C7A91FC5, HasContent = 0, Time from subscription = 8.081496911)
+                    (Subscription 36 has Status Waiting delivery, Key = C017B8BE, HasContent = 0, Time from subscription = 8.058265141)
+                    (Subscription 37 has Status Waiting delivery, Key = 3C9C952E, HasContent = 0, Time from subscription = 8.053428147)
+                    (Subscription 38 has Status Waiting delivery, Key = C681EF22, HasContent = 0, Time from subscription = 8.038970013)
+                    (Subscription 39 has Status Waiting delivery, Key = 35B553F8, HasContent = 0, Time from subscription = 7.998457658)
+                    (Subscription 40 has Status Waiting delivery, Key = BAB2FB0D, HasContent = 0, Time from subscription = 7.981118514)
+                    (Subscription 41 has Status Waiting delivery, Key = 12195E0C, HasContent = 0, Time from subscription = 7.968646795)
+                    (Subscription 42 has Status Waiting delivery, Key = D03D45E9, HasContent = 0, Time from subscription = 7.886540201)
+                    (Subscription 43 has Status Waiting delivery, Key = 1C58A0B2, HasContent = 0, Time from subscription = 7.870824277)
+                    (Subscription 44 has Status Waiting delivery, Key = 3F6D3224, HasContent = 0, Time from subscription = 7.83192639)
+                    (Subscription 45 has Status Waiting delivery, Key = 1A1EC2B3, HasContent = 0, Time from subscription = 7.8088892)
+                    (Subscription 46 has Status Waiting delivery, Key = 08A9B4AA, HasContent = 0, Time from subscription = 7.715417764)
+                    (Subscription 47 has Status Waiting delivery, Key = 66AAFB77, HasContent = 0, Time from subscription = 7.712465108)
+                    (Subscription 48 has Status Waiting delivery, Key = 90E93A1F, HasContent = 0, Time from subscription = 7.706985494)
+                    (Subscription 49 has Status Waiting delivery, Key = 1C86C203, HasContent = 0, Time from subscription = 7.703380319)
+                    (Subscription 50 has Status Waiting delivery, Key = 838589AB, HasContent = 0, Time from subscription = 7.673150527)
+                    (Subscription 51 has Status Waiting delivery, Key = 443ECCC3, HasContent = 0, Time from subscription = 7.661012269)
+                    (Subscription 52 has Status Waiting delivery, Key = A3630FDE, HasContent = 0, Time from subscription = 7.604569134)
+                    (Subscription 53 has Status Waiting delivery, Key = DCF87EC4, HasContent = 0, Time from subscription = 7.572588932)
+                    (Subscription 54 has Status Waiting delivery, Key = BFA0D199, HasContent = 0, Time from subscription = 7.533741502)
+                    (Subscription 55 has Status Waiting delivery, Key = ED0BCB9E, HasContent = 0, Time from subscription = 7.532490358)
+                    (Subscription 56 has Status Waiting delivery, Key = CDF65F30, HasContent = 0, Time from subscription = 7.531628872)
+                    (Subscription 57 has Status Waiting delivery, Key = 8BB5880E, HasContent = 0, Time from subscription = 7.506095204)
+                    (Subscription 58 has Status Waiting delivery, Key = 9F80FDA7, HasContent = 0, Time from subscription = 7.491873633)
+                    (Subscription 59 has Status Waiting delivery, Key = 1AF6BF03, HasContent = 0, Time from subscription = 7.425073545)
+                    (Subscription 60 has Status Waiting delivery, Key = 491661C8, HasContent = 0, Time from subscription = 7.359652034)
+                    (Subscription 61 has Status Waiting delivery, Key = 0B91BE10, HasContent = 0, Time from subscription = 7.342601899)
+                    (Subscription 62 has Status Waiting delivery, Key = 9E1CDE35, HasContent = 0, Time from subscription = 7.313085843)
+                    (Subscription 63 has Status Waiting delivery, Key = 38DB818F, HasContent = 0, Time from subscription = 7.251229174)
+                    (Subscription 64 has Status Waiting delivery, Key = B05350B4, HasContent = 0, Time from subscription = 7.211495222)
+                    (Subscription 65 has Status Waiting delivery, Key = 7DAD3A46, HasContent = 0, Time from subscription = 7.198604874)
+                    (Subscription 66 has Status Waiting delivery, Key = A182FBF5, HasContent = 0, Time from subscription = 7.197167664)
+                    (Subscription 67 has Status Waiting delivery, Key = 0AA74091, HasContent = 0, Time from subscription = 7.183461264)
+                    (Subscription 68 has Status Waiting delivery, Key = AE46F7DF, HasContent = 0, Time from subscription = 7.180829003)
+                    (Subscription 69 has Status Waiting delivery, Key = 5E08DE26, HasContent = 0, Time from subscription = 7.109659746)
+                    (Subscription 70 has Status Waiting delivery, Key = 5B41E118, HasContent = 0, Time from subscription = 6.991983443)
+                    (Subscription 71 has Status Waiting delivery, Key = 0E8923AB, HasContent = 0, Time from subscription = 6.835672723)
+                    (Subscription 72 has Status Waiting delivery, Key = 287BACBD, HasContent = 0, Time from subscription = 6.828186108)
+
+                    (RTT from NRNCS was 9.914889106 seconds for the key 5587F444.)
+
+                    (RTT from NRNCS was 10.00967311 seconds for the key 314C20CE.)
+
+                    (RTT from NRNCS was 9.95221322 seconds for the key CFBF5F5E.)
+
+                    (RTT from NRNCS was 10.06615611 seconds for the key 0473C87B.)
+
+                    (RTT from NRNCS was 9.975704496 seconds for the key EE5FC0AB.)
+
+                    (RTT from NRNCS was 9.876822094 seconds for the key B2E7E9B2.)
+
+                    (RTT from NRNCS was 9.403310776 seconds for the key AC362208.)
+
+                    (RTT from NRNCS was 9.368033423 seconds for the key F68A9FD1.)
+
+                    (RTT from NRNCS was 9.375020431 seconds for the key 090C1524.)
+
+                    (RTT from NRNCS was 9.379779206 seconds for the key A82904FC.)
+
+                    (RTT from NRNCS was 9.310790555 seconds for the key C8DCF952.)
+
+                    (RTT from NRNCS was 9.300117257 seconds for the key 08C88289.)
+
+                    (RTT from NRNCS was 9.307042449 seconds for the key 3CB28BF3.)
+
+                    (RTT from NRNCS was 9.343086699 seconds for the key CDCF1BC0.)
+
+                    (RTT from NRNCS was 9.388096818 seconds for the key DE9DCBB9.)
+
+                    (RTT from NRNCS was 9.34018685 seconds for the key C7B7AC4B.)
+
+                    (RTT from NRNCS was 9.205751629 seconds for the key 5B0085AF.)
+
+                    (RTT from NRNCS was 9.351149581 seconds for the key A11B774F.)
+
+                    (RTT from NRNCS was 9.098653211 seconds for the key B9F089C7.)
+
+                    (RTT from NRNCS was 9.093877978 seconds for the key D4BBB7B5.)
+
+                    (RTT from NRNCS was 9.148280075 seconds for the key 954BA99A.)
+
+                    (RTT from NRNCS was 9.099094276 seconds for the key F4052A80.)
+
+                    (RTT from NRNCS was 9.164698614 seconds for the key 36A5C647.)
+
+                    (RTT from NRNCS was 9.122998318 seconds for the key E85B6A8C.)
+
+                    (RTT from NRNCS was 9.092804356 seconds for the key 4048F44C.)
+
+                    (RTT from NRNCS was 9.112453991 seconds for the key 90A17880.)
+
+                    (RTT from NRNCS was 9.088308958 seconds for the key AF7A093C.)
+
+                    (RTT from NRNCS was 9.066016808 seconds for the key 6BC7C164.)
+
+                    (RTT from NRNCS was 9.029008189 seconds for the key FB6934AC.)
+
+          (t = 5560.182693)
+[1]       (IQ Size = 7)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 40)
+
+                    (RTT from NRNCS was 9.177493761 seconds for the key 2E10348D.)
+
+                    (RTT from NRNCS was 9.234644453 seconds for the key 8FCB4BC8.)
+
+                    (RTT from NRNCS was 9.26345244 seconds for the key 30834E5B.)
+
+                    (RTT from NRNCS was 9.258463216 seconds for the key 2E076C8E.)
+
+                    (RTT from NRNCS was 9.262241936 seconds for the key A9B4D5CA.)
+
+          (t = 5560.52061)
+[1]       (IQ Size = 8)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 47)
+
+                    (RTT from NRNCS was 9.419857137 seconds for the key C7A91FC5.)
+
+                    (RTT from NRNCS was 9.487876116 seconds for the key C017B8BE.)
+
+                    (RTT from NRNCS was 9.549866562 seconds for the key 3C9C952E.)
+
+                    (RTT from NRNCS was 9.539108523 seconds for the key 35B553F8.)
+
+                    (RTT from NRNCS was 9.617957824 seconds for the key C681EF22.)
+
+                    (RTT from NRNCS was 9.564697196 seconds for the key 12195E0C.)
+
+                    (RTT from NRNCS was 9.514124019 seconds for the key 1C58A0B2.)
+
+                    (RTT from NRNCS was 9.561535111 seconds for the key D03D45E9.)
+
+                    (RTT from NRNCS was 9.680181805 seconds for the key BAB2FB0D.)
+
+                    (RTT from NRNCS was 9.520295943 seconds for the key 1A1EC2B3.)
+
+                    (RTT from NRNCS was 9.560012699 seconds for the key 3F6D3224.)
+
+                    (RTT from NRNCS was 9.449671532 seconds for the key 90E93A1F.)
+
+                    (RTT from NRNCS was 9.478764521 seconds for the key 08A9B4AA.)
+
+                    (RTT from NRNCS was 9.49132201 seconds for the key 66AAFB77.)
+
+                    (RTT from NRNCS was 9.554154743 seconds for the key 1C86C203.)
+                    -run --publish 0.1
+                    (File = Service_Accepted_1789262107.txt)
+
+                    (The payload hash is 0FDDBF56)
+                    (Done)
+
+
+
+                    (RTT from NRNCS was 9.652634579 seconds for the key 838589AB.)
+
+                    (RTT from NRNCS was 9.705379557 seconds for the key 443ECCC3.)
+
+                    (RTT from NRNCS was 9.745057285 seconds for the key A3630FDE.)
+
+                    (RTT from NRNCS was 9.919470121 seconds for the key DCF87EC4.)
+
+                    (RTT from NRNCS was 10.19747438 seconds for the key BFA0D199.)
+
+                    (RTT from NRNCS was 10.45078676 seconds for the key ED0BCB9E.)
+
+                    (RTT from NRNCS was 10.77049238 seconds for the key CDF65F30.)
+
+                    (RTT from NRNCS was 11.0541041 seconds for the key 8BB5880E.)
+
+                    (RTT from NRNCS was 11.13057626 seconds for the key 1AF6BF03.)
+
+                    (RTT from NRNCS was 11.26288608 seconds for the key 9F80FDA7.)
+
+                    (RTT from NRNCS was 11.18065086 seconds for the key 491661C8.)
+
+                    (RTT from NRNCS was 11.25529682 seconds for the key 0B91BE10.)
+
+                    (RTT from NRNCS was 11.28160921 seconds for the key 9E1CDE35.)
+
+                    (RTT from NRNCS was 11.27172001 seconds for the key 38DB818F.)
+
+                    (RTT from NRNCS was 11.30360028 seconds for the key B05350B4.)
+
+                    (RTT from NRNCS was 11.28678077 seconds for the key 0AA74091.)
+
+                    (RTT from NRNCS was 11.30343704 seconds for the key A182FBF5.)
+
+                    (RTT from NRNCS was 11.45947458 seconds for the key AE46F7DF.)
+
+          (t = 5563.661048)
+[1]       (IQ Size = 11)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 84)
+
+                    (RTT from NRNCS was 11.43364085 seconds for the key 5E08DE26.)
+
+                    (RTT from NRNCS was 11.33500305 seconds for the key 5B41E118.)
+
+                    (RTT from NRNCS was 11.54345771 seconds for the key 7DAD3A46.)
+
+                    (RTT from NRNCS was 11.20641605 seconds for the key 287BACBD.)
+
+                    (RTT from NRNCS was 11.32309644 seconds for the key 0E8923AB.)
+
+          (t = 5564.569572)
+[1]       (IQ Size = 6)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 87)
+                    (RTT to NRNCS was 3.350476114)
+
+                    (RTT from NRNCS was 0.682824307 seconds for the key 58756AF7.)
+
+                    (RTT from NRNCS was 0.758739948 seconds for the key 7E223362.)
+
+                    (RTT from NRNCS was 1.215687196 seconds for the key A3EB64D5.)
+
+                    (RTT from NRNCS was 1.531434092 seconds for the key 507E0851.)
+
+                    (RTT from NRNCS was 1.933357732 seconds for the key 5C33B45C.)
+
+                    (RTT from NRNCS was 1.91766816 seconds for the key 760A6748.)
+
+                    (RTT from NRNCS was 2.051271761 seconds for the key 0B37A82A.)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 10
+                    Cat [5] = 19
+                    Cat [6] = 5
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 5
+                    Cat [18] = 210
+
+                    (RTT from NRNCS was 2.152393246 seconds for the key 14E0340B.)
+
+                    (RTT from NRNCS was 2.164822103 seconds for the key 945D4108.)
+
+                    (RTT from NRNCS was 2.659593169 seconds for the key CEEFF566.)
+
+                    (RTT from NRNCS was 3.372612925 seconds for the key 74B3A7E9.)
+
+                    (RTT from NRNCS was 3.418132475 seconds for the key B3E531E5.)
+
+                    (RTT from NRNCS was 3.423062075 seconds for the key 190548AD.)
+
+                    (RTT from NRNCS was 3.658697737 seconds for the key 6F3E16B1.)
+
+                    (RTT from NRNCS was 3.542770106 seconds for the key 41FC2EEA.)
+
+                    (RTT from NRNCS was 3.554700653 seconds for the key E2EF4967.)
+
+                    (RTT from NRNCS was 3.547215671 seconds for the key 2F84DF6C.)
+
+                    (RTT from NRNCS was 3.545390786 seconds for the key 926917FE.)
+
+                    (RTT from NRNCS was 3.642994439 seconds for the key 27822C6C.)
+
+                    (RTT from NRNCS was 3.75193405 seconds for the key 527B81DF.)
+
+                    (RTT from NRNCS was 3.772079406 seconds for the key 09BF0506.)
+
+                    (RTT from NRNCS was 3.797417273 seconds for the key 3918EF11.)
+
+                    (RTT from NRNCS was 3.814161683 seconds for the key 86155C44.)
+
+                    (RTT from NRNCS was 4.112677541 seconds for the key D375CC79.)
+
+                    (RTT from NRNCS was 4.285458027 seconds for the key 76F97610.)
+
+                    (RTT from NRNCS was 4.23613347 seconds for the key 1E764FDF.)
+
+                    (RTT from NRNCS was 4.353869005 seconds for the key 46168329.)
+
+                    (RTT from NRNCS was 4.233765553 seconds for the key 57D15154.)
+
+                    (RTT from NRNCS was 4.263912157 seconds for the key 7F0FD1F4.)
+
+                    (RTT from NRNCS was 4.259576801 seconds for the key 49FF6D3B.)
+
+                    (RTT from NRNCS was 4.207959294 seconds for the key 74EB4938.)
+
+                    (RTT from NRNCS was 4.215058214 seconds for the key 105CD165.)
+
+                    (RTT from NRNCS was 4.225245686 seconds for the key 39F72024.)
+
+                    (RTT from NRNCS was 4.293814834 seconds for the key 2DDB07E8.)
+
+                    (RTT from NRNCS was 4.246449667 seconds for the key F2164640.)
+
+                    (RTT from NRNCS was 4.261135684 seconds for the key 8C085855.)
+
+                    (RTT from NRNCS was 4.38319191 seconds for the key 47795096.)
+
+                    (RTT from NRNCS was 4.214361406 seconds for the key F64ADEFF.)
+
+          (t = 5584.135084)
+[1]       (IQ Size = 3)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 126)
+
+                    (RTT from NRNCS was 4.283930127 seconds for the key 0B966AEF.)
+
+                    (RTT from NRNCS was 4.269859504 seconds for the key 717F270D.)
+
+                    (RTT from NRNCS was 4.244389492 seconds for the key 064280E5.)
+
+                    (RTT from NRNCS was 4.198420452 seconds for the key A69FAB45.)
+
+                    (RTT from NRNCS was 4.313375716 seconds for the key 6BD67347.)
+
+                    (RTT from NRNCS was 4.528499311 seconds for the key 4EAE3240.)
+
+                    (RTT from NRNCS was 4.510878632 seconds for the key AED5330C.)
+
+                    (RTT from NRNCS was 4.51066228 seconds for the key 936C0657.)
+
+                    (RTT from NRNCS was 4.267143847 seconds for the key 7AD38915.)
+
+                    (RTT from NRNCS was 4.243591179 seconds for the key 13964EE6.)
+
+                    (RTT from NRNCS was 4.721559506 seconds for the key 60E7BFE7.)
+
+                    (RTT from NRNCS was 4.308985303 seconds for the key BBC6C0A5.)
+
+                    (RTT from NRNCS was 4.297503884 seconds for the key 6BF927CF.)
+
+                    (RTT from NRNCS was 4.12970038 seconds for the key 904F507B.)
+
+                    (RTT from NRNCS was 4.116687987 seconds for the key 7B8486C9.)
+
+                    (RTT from NRNCS was 4.108877391 seconds for the key B6C81D8E.)
+
+                    (RTT from NRNCS was 4.131544317 seconds for the key 496A8AB8.)
+
+                    (RTT from NRNCS was 4.125289878 seconds for the key 5C3DE44F.)
+
+                    (RTT from NRNCS was 3.93986949 seconds for the key C5E04CAB.)
+
+                    (RTT from NRNCS was 3.871857538 seconds for the key E06E0FB3.)
+
+                    (RTT from NRNCS was 3.847966775 seconds for the key 106726D2.)
+
+                    (RTT from NRNCS was 3.829641194 seconds for the key C4F12166.)
+
+                    (RTT from NRNCS was 3.651480953 seconds for the key D80DDC39.)
+
+                    (RTT from NRNCS was 3.711338172 seconds for the key 29CD068D.)
+
+                    (RTT from NRNCS was 3.404183045 seconds for the key 6C2135B4.)
+
+                    (RTT from NRNCS was 3.45061367 seconds for the key 223FB372.)
+
+                    (RTT from NRNCS was 2.955300133 seconds for the key 893EE099.)
+
+                    (RTT from NRNCS was 2.767985781 seconds for the key 839CAF4E.)
+
+                    (RTT from NRNCS was 2.783725769 seconds for the key F2C1E6C5.)
+
+                    (RTT from NRNCS was 2.803510478 seconds for the key 7F29D227.)
+
+                    (RTT from NRNCS was 2.909863022 seconds for the key B82A68AE.)
+
+                    (RTT from NRNCS was 2.913030098 seconds for the key BB3FEA56.)
+
+                    (RTT from NRNCS was 2.877980052 seconds for the key 0031E332.)
+
+                    (RTT from NRNCS was 2.939110767 seconds for the key 6C2A3928.)
+
+                    (RTT from NRNCS was 3.037818848 seconds for the key 41B922C3.)
+
+                    (RTT from NRNCS was 3.183367774 seconds for the key C29F031B.)
+
+                    (RTT from NRNCS was 3.191878037 seconds for the key 6F4E8784.)
+
+                    (RTT from NRNCS was 3.170903772 seconds for the key 56FD5202.)
+
+                    (RTT from NRNCS was 3.184698867 seconds for the key 93D457F7.)
+
+                    (RTT from NRNCS was 3.117806356 seconds for the key AB7EB6A0.)
+
+                    (RTT from NRNCS was 3.188495453 seconds for the key 6929A821.)
+
+                    (RTT from NRNCS was 3.222996294 seconds for the key 91FACBE6.)
+
+                    (RTT from NRNCS was 3.123550811 seconds for the key 5E9F332D.)
+
+                    (RTT from NRNCS was 3.212690805 seconds for the key 1BB8241E.)
+
+                    (RTT from NRNCS was 3.140181116 seconds for the key 695D39F9.)
+
+                    (RTT from NRNCS was 3.143622953 seconds for the key 05993AFD.)
+
+                    (RTT from NRNCS was 3.105641274 seconds for the key C468AFF5.)
+
+                    (RTT from NRNCS was 3.176802191 seconds for the key 4E60B131.)
+
+                    (RTT from NRNCS was 3.1476045 seconds for the key 25CA7A82.)
+
+                    (RTT from NRNCS was 3.179531913 seconds for the key 6B2A0B04.)
+
+                    (RTT from NRNCS was 3.17160946 seconds for the key D8508A00.)
+
+                    (RTT from NRNCS was 3.162553022 seconds for the key 0C2E7BFF.)
+
+                    (RTT from NRNCS was 3.166373868 seconds for the key A372EC57.)
+
+                    (RTT from NRNCS was 3.143907121 seconds for the key 6DFCFFAC.)
+
+                    (RTT from NRNCS was 3.146976483 seconds for the key 8283B052.)
+
+                    (RTT from NRNCS was 3.143877462 seconds for the key 74136E50.)
+
+                    (RTT from NRNCS was 3.076329193 seconds for the key 79B5D8D2.)
+
+                    (RTT from NRNCS was 3.172132178 seconds for the key E429DE96.)
+
+                    (RTT from NRNCS was 3.227469367 seconds for the key F1A8B4F0.)
+
+                    (RTT from NRNCS was 3.433828111 seconds for the key 8CEBEE2C.)
+
+                    (RTT from NRNCS was 3.259765446 seconds for the key FC6EFFB0.)
+
+                    (RTT from NRNCS was 3.356760113 seconds for the key 3BFCF157.)
+                    (Looping over existent Subscriptions at this Content App)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 10
+                    Cat [5] = 19
+                    Cat [6] = 5
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 5
+                    Cat [18] = 303
+                    (Looping over existent Subscriptions at this Content App)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 10
+                    Cat [5] = 19
+                    Cat [6] = 5
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 5
+                    Cat [18] = 303
+                    (Looping over existent Subscriptions at this Content App)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 10
+                    Cat [5] = 19
+                    Cat [6] = 5
+                    Cat

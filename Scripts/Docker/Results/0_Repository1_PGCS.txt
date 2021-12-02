@@ -1,0 +1,223 @@
+*******************************************************************
+*                                                                 *
+*  NovaGenesis(NG) Proxy/Gateway/Controller Service v0.5          *
+*  Copyright Antonio Marcos Alberti - Inatel - April 2021         *
+*                                                                 *
+*                                                                 *
+*******************************************************************
+
+(The I/O path is /home/ng/workspace/novagenesis/IO/PGCS/)
+(The PGCS will try to discover peers using the Interface eth0.)
+(The process legible name is PGCS)
+(The hash of process legible name is 18A4AAFB)
+(The process self-certifying name is F2D92089)
+(The process shared memory key is = 11)
+(The operating system legible name is Linux 5.11.0-41-generic #45~20.04.1-Ubuntu SMP Wed Nov 10 10:20:10 UTC 2021 c38290d12efd)
+(The host legible name is c38290d12efd x86_64)
+(The operating system self-certifying name is = 4E15224F)
+(The host self-certifying name is = 9877BF29)
+(Intra_Process = B7052C8F)
+(Intra_OS = D6C727CF)
+(Intra_Node = EAA4FCF0)
+(Intra_Domain = 15B239D1)
+(Inter_Domain = 99D35751)
+          (HT block has the SCN = 9CAD0502)
+                    (Hash"HT" = A7DA4B80)
+                    (HT is moving to operational state)
+                    (Done)
+
+
+          (GW block has the SCN = 59DEF9E3)
+          (PG block has the SCN = 22032048)
+                    (Loading customized parameters (if available) at /home/ng/workspace/novagenesis/IO/PGCS/PGCS.ini)
+                    (DelayBeforeRunPeriodic is 5)
+                    (DelayBetweenMessageEmissions is 20)
+                    (My stack is Ethernet)
+                    MyMACAddress = 02:42:ac:11:00:03
+                    Interface = eth0
+                    (Created the client socket with CSID 3 for the peer PGCS with MAC FF:FF:FF:FF:FF:FF)
+                    (Created the server socket with SSID 4 at my MAC address 02:42:ac:11:00:03)
+                    (Created a socket dispatcher thread to read messages from socket with SSID 4)
+                    (Created thread number 0 to serve the dispatcher)
+                    (Created thread number 1 to serve the dispatcher)
+                    (Created thread number 2 to serve the dispatcher)
+                    (Created thread number 3 to serve the dispatcher)
+                    (Created thread number 4 to serve the dispatcher)
+                    (Created thread number 5 to serve the dispatcher)
+
+          (t = 5369.136715)
+[1]       (IQ Size = 4)
+          (Messages in memory = 6)
+          (Created an input shared memory segment with key = 11 and identifier = 1)
+          (Created an input shared memory segment with key = 12 and identifier = 2)
+          (Created an input shared memory segment with key = 13 and identifier = 3)
+          (Created an input shared memory segment with key = 14 and identifier = 4)
+          (Created an input shared memory segment with key = 15 and identifier = 5)
+          (Created an input shared memory segment with key = 16 and identifier = 6)
+
+          (Moving to hello state)
+
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 7
+                    Cat [3] = 7
+                    Cat [5] = 4
+                    Cat [6] = 1
+                    Cat [7] = 1
+                    Cat [8] = 1
+                    Cat [9] = 1
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    (A new peer PGCS was discovered without previous knowledge: AAFEF9CC at the node identified by 02:42:ac:11:00:02)
+                    (HID = 33E8FEDF)
+                    (OSID = 96437229)
+                    (PID = AAFEF9CC)
+                    (BID = 310FD324)
+                    (Associating the client socket with CSID 3 for the peer PGCS with MAC 02:42:ac:11:00:02)
+
+                    (Already sent 0 messages to other peers.)
+                    (A new peer PGCS was discovered without previous knowledge: DF6C1879 at the node identified by 02:42:ac:11:00:04)
+                    (HID = F13E4790)
+                    (OSID = F823AB6E)
+                    (PID = DF6C1879)
+                    (BID = A64EE5F0)
+                    (Associating the client socket with CSID 3 for the peer PGCS with MAC 02:42:ac:11:00:04)
+                    (A new peer PGCS was discovered without previous knowledge: 9ACF3BB8 at the node identified by 02:42:ac:11:00:05)
+                    (HID = 1C8664A8)
+                    (OSID = 6109E36C)
+                    (PID = 9ACF3BB8)
+                    (BID = 2A3F63B1)
+                    (Associating the client socket with CSID 3 for the peer PGCS with MAC 02:42:ac:11:00:05)
+          (Storing the shared memory ID (shmid) = 7 on HT. The related key is 56703121)
+          (Initialized the shared memory with key 56703121 regarding the r/w control flag)
+                    (A new peer PGCS was discovered without previous knowledge: 44EA582E at the node identified by 02:42:ac:11:00:06)
+                    (HID = 9BA84613)
+                    (OSID = 3A67EA32)
+                    (PID = 44EA582E)
+                    (BID = 69B464F8)
+                    (Associating the client socket with CSID 3 for the peer PGCS with MAC 02:42:ac:11:00:06)
+                    (Everything ok!)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 30
+                    Cat [5] = 23
+                    Cat [6] = 5
+                    Cat [7] = 9
+                    Cat [8] = 9
+                    Cat [9] = 6
+                    Cat [13] = 5
+                    Cat [14] = 2
+                    Cat [15] = 4
+                    Cat [16] = 4
+                    Cat [17] = 7
+
+                    (Already sent 100 messages to other peers.)
+          (Storing the shared memory ID (shmid) = 8 on HT. The related key is 56703122)
+          (Initialized the shared memory with key 56703122 regarding the r/w control flag)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 30
+                    Cat [5] = 23
+                    Cat [6] = 5
+                    Cat [7] = 9
+                    Cat [8] = 9
+                    Cat [9] = 6
+                    Cat [13] = 5
+                    Cat [14] = 2
+                    Cat [15] = 4
+                    Cat [16] = 4
+                    Cat [17] = 8
+
+          (t = 5500.191295)
+[1]       (IQ Size = 4)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 7)
+
+                    (Already sent 200 messages to other peers.)
+
+                    (Already sent 300 messages to other peers.)
+          (Storing the shared memory ID (shmid) = 9 on HT. The related key is 56703123)
+          (Initialized the shared memory with key 56703123 regarding the r/w control flag)
+
+          (t = 5548.805706)
+[1]       (IQ Size = 4)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 7)
+
+                    (Already sent 400 messages to other peers.)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 30
+                    Cat [5] = 23
+                    Cat [6] = 5
+                    Cat [7] = 9
+                    Cat [8] = 9
+                    Cat [9] = 6
+                    Cat [13] = 5
+                    Cat [14] = 2
+                    Cat [15] = 4
+                    Cat [16] = 4
+                    Cat [17] = 9
+          (Storing the shared memory ID (shmid) = 10 on HT. The related key is 56703124)
+          (Initialized the shared memory with key 56703124 regarding the r/w control flag)
+
+          (t = 5550.846362)
+[1]       (IQ Size = 3)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 7)
+          (Storing the shared memory ID (shmid) = 11 on HT. The related key is 56703125)
+          (Initialized the shared memory with key 56703125 regarding the r/w control flag)
+          (Storing the shared memory ID (shmid) = 12 on HT. The related key is 56703126)
+          (Initialized the shared memory with key 56703126 regarding the r/w control flag)
+
+                    (Already sent 500 messages to other peers.)
+
+                    (Already sent 600 messages to other peers.)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 30
+                    Cat [5] = 23
+                    Cat [6] = 5
+                    Cat [7] = 9
+                    Cat [8] = 9
+                    Cat [9] = 6
+                    Cat [13] = 5
+                    Cat [14] = 2
+                    Cat [15] = 4
+                    Cat [16] = 4
+                    Cat [17] = 12
+
+                    (Already sent 700 messages to other peers.)
+
+                    (Already sent 800 messages to other peers.)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 9
+                    Cat [2] = 30
+                    Cat [3] = 30
+                    Cat [5] = 23
+                    Cat [6] = 5
+                    Cat [7] = 9
+                    Cat [8] = 9
+                    Cat [9] = 6
+                    Cat [13] = 5
+                    Cat [14] = 2
+                    Cat [15] = 4
+                    Cat [16] = 4
+  
