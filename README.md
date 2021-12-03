@@ -201,25 +201,35 @@ You can also use Wireshark tool to check NovaGenesis packets using the docker0 (
 
 In this option, NG programs run locally using host OS shared memory for Interprocess communication. No socket is required. 
 
+Before running, you should compile the code. First, create the directory:
+
 Go to the running folder:
 
-	/Scripts/Simple
+	cd workspace/novagenesis/
 
-# 4.1. Content Distribution
-
-Just run the script:
-
-	sudo sh clean.sh
-
-It is required to clean the POSIX semaphores from previous NG runnings.
-
-Now, run the NG services locally:
-
-	sudo sh Intra_OS_Content_Test_NRNCS.sh
+	sudo mkdir cmake-build-debug
+	
+Then, generate the required cmake files. Please, verify you have cmake installed in your OS. 
+	
+	sudo cmake -B cmake-build-debug 
 
 Be sure to have compiled the NG services before running this latter script. If you haven't compiled, just go to /novagenesis folder and type:
 
 	sudo cmake --build cmake-build-debug --target all
+	
+Now, go to the running folder and prepare to run NovaGenesis:
+
+	/Scripts/Simple
+
+	sudo sh clean.sh
+
+This script is required to clean the POSIX semaphores from previous NG runnings.
+
+# 4.1. Content Distribution
+
+Now, run the NG services locally:
+
+	sudo sh Intra_OS_Content_Test_NRNCS.sh
 
 In this case, results will be placed locally in the /IO folder for each program.
 
@@ -228,14 +238,7 @@ Another important thing in this running option, is that you will need to copy so
 This test never ends, so you need to close the programs when photos/files finished transferring from Source1 to Repository1.
 
 
-
 # 4.2. Name Binding Resolution
-
-Just run the script:
-
-	sudo sh clean.sh
-
-It is required to clean the POSIX semaphores from previous NG runnings.
 
 Now, run the NG services locally:
 
