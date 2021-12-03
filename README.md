@@ -213,7 +213,7 @@ Then, generate the required cmake files. Please, verify you have cmake installed
 	
 	sudo cmake -B cmake-build-debug 
 
-Be sure to have compiled the NG services before running this latter script. If you haven't compiled, just go to /novagenesis folder and type:
+Following, just go to /novagenesis folder and type the command bellow to compile NovaGenesis services:
 
 	sudo cmake --build cmake-build-debug --target all
 	
