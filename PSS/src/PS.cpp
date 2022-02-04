@@ -73,10 +73,6 @@
 #include "PSPubNotify01.h"
 #endif
 
-#ifndef _PSMESSAGETYPE01_H
-#include "PSMessageType01.h"
-#endif
-
 #ifndef _PSRUNPERIODIC01_H
 #include "PSRunPeriodic01.h"
 #endif
@@ -239,13 +235,6 @@ void PS::NewAction (const string _LN, Action *&_PA)
   if (_LN == "-p --notify 0.1")
 	{
 	  PSPubNotify01 *P = new PSPubNotify01 (_LN, this, PP->PMB);
-
-	  Actions.push_back ((Action *)P);
-	}
-
-  if (_LN == "-message --type 0.1")
-	{
-	  PSMessageType01 *P = new PSMessageType01 (_LN, this, PP->PMB);
 
 	  Actions.push_back ((Action *)P);
 	}

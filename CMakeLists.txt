@@ -99,8 +99,6 @@ add_library(Common
         Common/src/HTListBind01.h
         Common/src/HTMessageSeq01.cpp
         Common/src/HTMessageSeq01.h
-        Common/src/HTMessageType01.cpp
-        Common/src/HTMessageType01.h
         Common/src/HTMsgCl01.cpp
         Common/src/HTMsgCl01.h
         Common/src/HTRevokeBind01.cpp
@@ -241,10 +239,6 @@ add_executable(GIRS
         GIRS/src/IRInfoPayload02.h
         GIRS/src/IRMessageSeq01.cpp
         GIRS/src/IRMessageSeq01.h
-        GIRS/src/IRMessageType01.cpp
-        GIRS/src/IRMessageType01.h
-        GIRS/src/IRMessageType02.cpp
-        GIRS/src/IRMessageType02.h
         GIRS/src/IRMsgCl01.cpp
         GIRS/src/IRMsgCl01.h
         GIRS/src/IRMsgCl02.cpp
@@ -436,8 +430,6 @@ add_executable(PSS
         PSS/src/PSInfoPayload01.h
         PSS/src/PSMessageSeq01.cpp
         PSS/src/PSMessageSeq01.h
-        PSS/src/PSMessageType01.cpp
-        PSS/src/PSMessageType01.h
         PSS/src/PSMsgCl01.cpp
         PSS/src/PSMsgCl01.h
         PSS/src/PSPubBind01.cpp
@@ -473,8 +465,6 @@ add_executable(NRNCS
         NRNCS/src/NRInfoPayload01.h
         NRNCS/src/NRMessageSeq01.cpp
         NRNCS/src/NRMessageSeq01.h
-        NRNCS/src/NRMessageType01.cpp
-        NRNCS/src/NRMessageType01.h
         NRNCS/src/NRMsgCl01.cpp
         NRNCS/src/NRMsgCl01.h
         NRNCS/src/NRPubBind01.cpp
