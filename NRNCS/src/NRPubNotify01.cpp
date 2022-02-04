@@ -124,13 +124,13 @@ NRPubNotify01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 								  // Setting up the DID as the space limiter
 								  Limiters.push_back (PB->PP->Intra_Domain);
 
-								  // Setting up the this OS as the 1st source SCN
+								  // Setting up this OS as the 1st source SCN
 								  Sources.push_back (PB->PP->GetHostSelfCertifyingName ());
 
-								  // Setting up the this OS as the 2nd source SCN
+								  // Setting up this OS as the 2nd source SCN
 								  Sources.push_back (PB->PP->GetOperatingSystemSelfCertifyingName ());
 
-								  // Setting up the this process as the 3rd source SCN
+								  // Setting up this process as the 3rd source SCN
 								  Sources.push_back (PB->PP->GetSelfCertifyingName ());
 
 								  // Setting up the NR block SCN as the 4th source SCN

@@ -55,7 +55,7 @@ NRMessageType01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
   // Copy the received command line to the InlineResponseMessage
   InlineResponseMessage->NewCommandLine (_PCL, PTemp);
 
-  // Change to 0.2 version
+  // Employ 0.1 version
   PTemp->Version = "0.1";
 
   //PB->S << Offset <<  "(Done)" << endl << endl << endl;

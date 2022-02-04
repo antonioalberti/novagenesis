@@ -71,7 +71,8 @@ class PGRunPeriodic01 : public Action {
   virtual ~PGRunPeriodic01 ();
 
   // TODO: Added in Feb. 2022 to deal with hellos frequency
-  unsigned int Counter;
+  unsigned int HelloCounter;
+  unsigned int ExpositionCounter;
 
   // Run the actions behind a received message
   virtual int

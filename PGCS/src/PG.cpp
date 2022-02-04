@@ -143,6 +143,7 @@ PG::PG (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, strin
   DelayBetweenMessageEmissions = 10;
   DelayBetweenHellos01=1;
   DelayBetweenHellos02=1;
+  DelayBetweenExpositions=1;
 
   // Set auxiliary variables
   AwareOfAPS = false;

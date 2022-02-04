@@ -299,6 +299,7 @@ class PG : public Block {
   double DelayBetweenMessageEmissions;
   double DelayBetweenHellos01; //TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
   double DelayBetweenHellos02;
+  double DelayBetweenExpositions;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Statistic variables and functions

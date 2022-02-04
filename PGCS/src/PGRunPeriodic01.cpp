@@ -45,7 +45,8 @@
 
 PGRunPeriodic01::PGRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
-  Counter = 0;
+  HelloCounter = 0;
+  ExpositionCounter=0;
 }
 
 PGRunPeriodic01::~PGRunPeriodic01 ()
@@ -324,7 +325,7 @@ int PGRunPeriodic01::HelloScheduling ()
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
-  if (Counter % (int)PPG->DelayBetweenHellos01 == 0)
+  if (HelloCounter % (int)PPG->DelayBetweenHellos01 == 0)
 	{
 
 #ifdef DEBUG
@@ -354,7 +355,7 @@ int PGRunPeriodic01::HelloScheduling ()
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
-  if (PPGCS->HasCore == true && Counter % (int)PPG->DelayBetweenHellos02 == 0)
+  if (PPGCS->HasCore == true && HelloCounter % (int)PPG->DelayBetweenHellos02 == 0)
 	{
 	  // ******************************************************
 	  // Schedule a message to run hello 0.2 for NG EPGSs
@@ -420,7 +421,7 @@ int PGRunPeriodic01::HelloScheduling ()
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
-  Counter++;
+  HelloCounter++;
 
   return Status;
 }
@@ -446,36 +447,42 @@ int PGRunPeriodic01::ExpositionScheduling ()
 
 #endif
 
-  // ******************************************************
-  // Schedule a message to run exposition
-  // ******************************************************
+  if (ExpositionCounter % (int)PPG->DelayBetweenExpositions == 0)
+	{
 
-  // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+	  // ******************************************************
+	  // Schedule a message to run exposition
+	  // ******************************************************
 
-  // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+	  // Setting up the process SCN as the space limiter
+	  Limiters.push_back (PB->PP->Intra_Process);
 
-  // Setting up the block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+	  // Setting up the block SCN as the source SCN
+	  Sources.push_back (PB->GetSelfCertifyingName ());
 
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 1, false, RunExposition);
+	  // Setting up the block SCN as the destination SCN
+	  Destinations.push_back (PB->GetSelfCertifyingName ());
 
-  // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
+	  // Creating a new message
+	  PB->PP->NewMessage (GetTime (), 1, false, RunExposition);
 
-  // Adding a ng -run --periodic command line
-  RunExposition->NewCommandLine ("-run", "--exposition", "0.1", PCL);
+	  // Creating the ng -cl -m command line
+	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
 
-  // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunExposition, SCN);
+	  // Adding a ng -run --periodic command line
+	  RunExposition->NewCommandLine ("-run", "--exposition", "0.1", PCL);
 
-  // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunExposition, PCL);
+	  // Generate the SCN
+	  PB->GenerateSCNFromMessageBinaryPatterns (RunExposition, SCN);
 
-  // Push the message to the GW input queue
-  PPG->PGW->PushToInputQueue (RunExposition);
+	  // Creating the ng -scn --s command line
+	  PMB->NewSCNCommandLine ("0.1", SCN, RunExposition, PCL);
+
+	  // Push the message to the GW input queue
+	  PPG->PGW->PushToInputQueue (RunExposition);
+	}
+
+	ExpositionCounter++;
 
   return Status;
 }

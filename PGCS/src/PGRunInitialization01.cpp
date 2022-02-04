@@ -157,6 +157,18 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 
 			  PB->S << Offset << "(DelayBetweenHellos02 is " << Temp << ")" << endl;
 			}
+		}
+
+	  if (Parameter == "DelayBetweenExpositions")
+		{
+		  Temp = PB->StringToDouble (Value);
+
+		  if (Temp > 0)
+			{
+			  PPG->DelayBetweenExpositions = Temp;
+
+			  PB->S << Offset << "(DelayBetweenExpositions is " << Temp << ")" << endl;
+			}
 
 		  break;
 		}
