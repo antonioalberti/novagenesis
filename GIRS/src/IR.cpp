@@ -89,14 +89,6 @@
 #include "IRInfoPayload02.h"
 #endif
 
-#ifndef _IRMESSAGETYPE01_H
-#include "IRMessageType01.h"
-#endif
-
-#ifndef _IRMESSAGETYPE02_H
-#include "IRMessageType02.h"
-#endif
-
 #ifndef _IRRUNPERIODIC01_H
 #include "IRRunPeriodic01.h"
 #endif
@@ -305,20 +297,6 @@ void IR::NewAction (const string _LN, Action *&_PA)
   if (_LN == "-info --payload 0.2")
 	{
 	  IRInfoPayload02 *P = new IRInfoPayload02 (_LN, this, PP->PMB);
-
-	  Actions.push_back ((Action *)P);
-	}
-
-  if (_LN == "-message --type 0.1")
-	{
-	  IRMessageType01 *P = new IRMessageType01 (_LN, this, PP->PMB);
-
-	  Actions.push_back ((Action *)P);
-	}
-
-  if (_LN == "-message --type 0.2")
-	{
-	  IRMessageType02 *P = new IRMessageType02 (_LN, this, PP->PMB);
 
 	  Actions.push_back ((Action *)P);
 	}

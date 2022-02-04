@@ -87,8 +87,6 @@ add_library(Common
         Common/src/HTListBind01.h
         Common/src/HTMessageSeq01.cpp
         Common/src/HTMessageSeq01.h
-        Common/src/HTMessageType01.cpp
-        Common/src/HTMessageType01.h
         Common/src/HTMsgCl01.cpp
         Common/src/HTMsgCl01.h
         Common/src/HTRevokeBind01.cpp
@@ -202,8 +200,6 @@ add_executable(NRNCS
         NRNCS/src/NRInfoPayload01.h
         NRNCS/src/NRMessageSeq01.cpp
         NRNCS/src/NRMessageSeq01.h
-        NRNCS/src/NRMessageType01.cpp
-        NRNCS/src/NRMessageType01.h
         NRNCS/src/NRMsgCl01.cpp
         NRNCS/src/NRMsgCl01.h
         NRNCS/src/NRPubBind01.cpp

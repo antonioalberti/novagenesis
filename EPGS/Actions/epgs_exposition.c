@@ -148,6 +148,7 @@ int actionExpostion (NgEPGS *ngEPGS, NgMessage **expositionMessage)
   NewCommandLine (message, bindingOS);
 
   char number[20];
+  //TODO: Remove this command line. It is deprecated
   NgCommand *msgTypeCL = ng_create_command ("-message", "--type", "0.1");
   NewArgument (msgTypeCL, 1);
   ng_sprintf (number, "%d", message->Type);

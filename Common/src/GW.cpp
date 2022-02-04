@@ -964,24 +964,6 @@ int GW::ReadFromSharedMemory3 ()
 								  S << "(" << endl << *PM << endl << ")" << endl;
 #endif
 
-								  CommandLine *PCL = 0;
-
-								  // The special case of message's object type
-								  PM->GetCommandLine ("-message", "--type", PCL);
-
-								  if (PCL != 0)
-									{
-									  string MessageType;
-
-									  // Set the new message field properly
-									  if (PCL->GetArgumentElement (0, 0, MessageType) == OK)
-										{
-										  PM->SetType (StringToInt (MessageType));
-
-										  //S << Offset <<"(The message is from type = "<<MessageType<<")"<< endl;
-										}
-									}
-
 								  // Pushing message to the queue
 								  PushToInputQueue (PM);
 

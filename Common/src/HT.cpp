@@ -73,10 +73,6 @@
 #include "HTInfoPayload01.h"
 #endif
 
-#ifndef _HTMESSAGETYPE01_H
-#include "HTMessageType01.h"
-#endif
-
 #ifndef _HTMESSAGESEQ01_H
 #include "HTMessageSeq01.h"
 #endif
@@ -440,13 +436,6 @@ void HT::NewAction (const string _LN, Action *&_PA)
   if (_LN == "-info --payload 0.1")
 	{
 	  HTInfoPayload01 *P = new HTInfoPayload01 (_LN, this, PP->PMB);
-
-	  Actions.push_back ((Action *)P);
-	}
-
-  if (_LN == "-message --type 0.1")
-	{
-	  HTMessageType01 *P = new HTMessageType01 (_LN, this, PP->PMB);
 
 	  Actions.push_back ((Action *)P);
 	}

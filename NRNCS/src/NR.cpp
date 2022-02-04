@@ -65,10 +65,6 @@
 #include "NRPubNotify01.h"
 #endif
 
-#ifndef _NRMESSAGETYPE01_H
-#include "NRMessageType01.h"
-#endif
-
 #ifndef _NRRUNPERIODIC01_H
 #include "NRRunPeriodic01.h"
 #endif
@@ -201,13 +197,6 @@ void NR::NewAction (const string _LN, Action *&_PA)
   if (_LN == "-p --notify 0.1")
 	{
 	  NRPubNotify01 *P = new NRPubNotify01 (_LN, this, PP->PMB);
-
-	  Actions.push_back ((Action *)P);
-	}
-
-  if (_LN == "-message --type 0.1")
-	{
-	  NRMessageType01 *P = new NRMessageType01 (_LN, this, PP->PMB);
 
 	  Actions.push_back ((Action *)P);
 	}

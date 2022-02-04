@@ -87,8 +87,6 @@ add_library(Common
         Common/src/HTListBind01.h
         Common/src/HTMessageSeq01.cpp
         Common/src/HTMessageSeq01.h
-        Common/src/HTMessageType01.cpp
-        Common/src/HTMessageType01.h
         Common/src/HTMsgCl01.cpp
         Common/src/HTMsgCl01.h
         Common/src/HTRevokeBind01.cpp
