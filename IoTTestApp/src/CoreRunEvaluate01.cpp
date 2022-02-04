@@ -89,7 +89,8 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
   CheckSubscriptions (ScheduledMessages, ClearScheduledMessage);
 
-  PublishData ();
+  //TODO: Uncomment the following line to enable IoTTestApp to send periodic random control to PLC in Industry 4.0 scenario.
+  //PublishData ();
 
   if (ClearScheduledMessage == true)
 	{

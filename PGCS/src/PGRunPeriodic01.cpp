@@ -45,6 +45,7 @@
 
 PGRunPeriodic01::PGRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
+  Counter = 0;
 }
 
 PGRunPeriodic01::~PGRunPeriodic01 ()
@@ -298,15 +299,18 @@ int PGRunPeriodic01::HelloScheduling ()
   PPG = (PG *)PB;
   PPGCS = (PGCS *)PB->PP;
 
+  // TODO: Added in Feb. 2022 to deal with the frequency of hellos
+
+#ifdef DEBUG
+  PB->S << Offset1 << "(Counter = " << Counter << " )" << endl;
+  PB->S << Offset1 << "(Counter % (int)PPG->DelayBetweenHellos01 = " << Counter % (int)PPG->DelayBetweenHellos01 << " )" << endl;
+  PB->S << Offset1 << "(Counter % (int)PPG->DelayBetweenHellos02 = " << Counter % (int)PPG->DelayBetweenHellos02 << " )" << endl;
+#endif
+
   // ******************************************************
   // Schedule a message to run hello 0.1 for other NG PGCSs
   // ******************************************************
 
-#ifdef DEBUG
-
-  PB->S << Offset << "(2. Scheduling a hello 0.1 message to the peer PGCS(s).)" << endl;
-
-#endif
 
 
   // Setting up the process SCN as the space limiter
@@ -318,26 +322,39 @@ int PGRunPeriodic01::HelloScheduling ()
   // Setting up the block SCN as the destination SCN
   Destinations.push_back (PB->GetSelfCertifyingName ());
 
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 1, false, RunHello01);
+  // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
-  // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunHello01, PCL);
+  if (Counter % (int)PPG->DelayBetweenHellos01 == 0)
+	{
 
-  // Adding a ng -run --periodic command line
-  RunHello01->NewCommandLine ("-run", "--hello", "0.1", PCL);
+#ifdef DEBUG
 
-  // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunHello01, SCN);
+	  PB->S << Offset << "(2. Scheduling a hello 0.1 message to the peer PGCS(s).)" << endl;
 
-  // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunHello01, PCL);
+#endif
 
+	  // Creating a new message
+	  PB->PP->NewMessage (GetTime (), 1, false, RunHello01);
 
-  // Push the message to the GW input queue
-  PPG->PGW->PushToInputQueue (RunHello01);
+	  // Creating the ng -cl -m command line
+	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunHello01, PCL);
 
-  if (PPGCS->HasCore == true)
+	  // Adding a ng -run --periodic command line
+	  RunHello01->NewCommandLine ("-run", "--hello", "0.1", PCL);
+
+	  // Generate the SCN
+	  PB->GenerateSCNFromMessageBinaryPatterns (RunHello01, SCN);
+
+	  // Creating the ng -scn --s command line
+	  PMB->NewSCNCommandLine ("0.1", SCN, RunHello01, PCL);
+
+	  // Push the message to the GW input queue
+	  PPG->PGW->PushToInputQueue (RunHello01);
+	}
+
+  // TODO: Added in Feb. 2022 to deal with the frequency of hellos
+
+  if (PPGCS->HasCore == true && Counter % (int)PPG->DelayBetweenHellos02 == 0)
 	{
 	  // ******************************************************
 	  // Schedule a message to run hello 0.2 for NG EPGSs
@@ -400,6 +417,10 @@ int PGRunPeriodic01::HelloScheduling ()
 	  PPG->PGW->PushToInputQueue (RunHello03);
 
 	}
+
+  // TODO: Added in Feb. 2022 to deal with the frequency of hellos
+
+  Counter++;
 
   return Status;
 }

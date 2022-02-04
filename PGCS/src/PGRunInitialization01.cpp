@@ -129,6 +129,35 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 			  PB->S << Offset << "(DelayBetweenMessageEmissions is " << Temp << ")" << endl;
 			}
 
+		}
+
+	  //TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
+	  // E.g. DelayBetweenHellos01 = 10 means a new hello 0.1 after 10 x DelayBeforeRunPeriodic value. I.e. time between hello 0.1 is multiplied by 10 times
+
+	  if (Parameter == "DelayBetweenHellos01")
+		{
+		  Temp = PB->StringToDouble (Value);
+
+		  if (Temp > 0)
+			{
+			  PPG->DelayBetweenHellos01 = Temp;
+
+			  PB->S << Offset << "(DelayBetweenHellos01 is " << Temp << ")" << endl;
+			}
+
+		}
+
+	  if (Parameter == "DelayBetweenHellos02")
+		{
+		  Temp = PB->StringToDouble (Value);
+
+		  if (Temp > 0)
+			{
+			  PPG->DelayBetweenHellos02 = Temp;
+
+			  PB->S << Offset << "(DelayBetweenHellos02 is " << Temp << ")" << endl;
+			}
+
 		  break;
 		}
 	}

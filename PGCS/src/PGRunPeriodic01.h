@@ -70,6 +70,9 @@ class PGRunPeriodic01 : public Action {
   // Destructor
   virtual ~PGRunPeriodic01 ();
 
+  // TODO: Added in Feb. 2022 to deal with hellos frequency
+  unsigned int Counter;
+
   // Run the actions behind a received message
   virtual int
   Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);

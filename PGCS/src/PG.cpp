@@ -141,6 +141,8 @@ PG::PG (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, strin
   // Set the delays
   DelayBeforeRunPeriodic = 5;
   DelayBetweenMessageEmissions = 10;
+  DelayBetweenHellos01=1;
+  DelayBetweenHellos02=1;
 
   // Set auxiliary variables
   AwareOfAPS = false;
