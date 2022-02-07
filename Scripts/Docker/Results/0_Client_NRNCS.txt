@@ -1,0 +1,1768 @@
+*******************************************************************
+*                                                                 *
+*  NovaGenesis(NG) Name Resolution and Network Cache Service v0.1 *
+*  Copyright Antonio Marcos Alberti - Inatel - April 2021         *
+*                                                                 *
+*                                                                 *
+*******************************************************************
+
+(The I/O path is /home/ng/workspace/novagenesis/IO/NRNCS/)
+(The process legible name is NRNCS)
+(The hash of process legible name is 8963F7A7)
+(The process self-certifying name is 76D0BA6E)
+(The process shared memory key is = 1513576333)
+(The operating system legible name is Linux 5.13.0-28-generic #31~20.04.1-Ubuntu SMP Wed Jan 19 14:08:10 UTC 2022 466def31ee7a)
+(The host legible name is 466def31ee7a x86_64)
+(The operating system self-certifying name is = 3E987BE9)
+(The host self-certifying name is = 2B843412)
+(Intra_Process = B7052C8F)
+(Intra_OS = D6C727CF)
+(Intra_Node = EAA4FCF0)
+(Intra_Domain = 15B239D1)
+(Inter_Domain = 99D35751)
+          (HT block has the SCN = 27EC92A7)
+                    (Hash"HT" = A7DA4B80)
+                    (HT is moving to operational state)
+                    (Done)
+
+
+          (GW block has the SCN = 83A236E3)
+          (NR block has the SCN = 4E9BD8BB)
+                    (Loading customized parameters (if available) at /home/ng/workspace/novagenesis/IO/NRNCS/NRNCS.ini)
+                    DelayBeforeRunInitiatilization is 3
+                    DelayBeforeGIRSDiscovery is 30
+                    DelayBeforePIDPublishing is 20
+                    DelayBeforeRunExposition is 5
+                    DelayBeforeSendingToGIRS is 1e-06
+                    DelayBeforeSendingANotification is 0.0001
+                    DelayBeforeRunPeriodic is 5
+                    (--------------------------------------------------------------------------OPERATIONAL: Everything ok!)
+
+          (t = 5106.534871)
+[1]       (IQ Size = 4)
+          (Messages in memory = 6)
+          (Created an input shared memory segment with key = 1513576333 and identifier = 7)
+          (Created an input shared memory segment with key = 1513576334 and identifier = 8)
+          (Created an input shared memory segment with key = 1513576335 and identifier = 9)
+          (Created an input shared memory segment with key = 1513576336 and identifier = 10)
+          (Created an input shared memory segment with key = 1513576337 and identifier = 11)
+          (Created an input shared memory segment with key = 1513576338 and identifier = 12)
+
+          (Moving to hello state)
+
+          (The PGCS IPC Key is 11)
+          (Initialized the shared memory with key 11 regarding the r/w control flag)
+
+                    (Hash Tables Size)
+                    Cat [0] = 4
+                    Cat [1] = 5
+                    Cat [2] = 5
+                    Cat [3] = 5
+                    Cat [5] = 2
+                    Cat [13] = 3
+                    Cat [14] = 1
+                    Cat [17] = 1
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 16
+                    Cat [2] = 19
+                    Cat [3] = 10
+                    Cat [5] = 8
+                    Cat [6] = 1
+                    Cat [7] = 1
+                    Cat [9] = 1
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 1
+          (Storing the shared memory ID (shmid) = 2 on HT. The related key is 12)
+
+          (t = 5220.609696)
+[1]       (IQ Size = 3)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 8)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 21
+                    Cat [2] = 27
+                    Cat [3] = 10
+                    Cat [5] = 10
+                    Cat [6] = 1
+                    Cat [7] = 1
+                    Cat [9] = 1
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 BF1E6AC6 299EE093 > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7012F9C3 > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -scn --seq 0.1 [ < 1 s 7497C8C8 > ]
+)
+
+                    (Received Service_Offer_2060457146.txt)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A895E6DA > < 4 s 2B843412 3E987BE9 BF1E6AC6 299EE093 > ]
+ng -scn --seq 0.1 [ < 1 s 94B80121 > ]
+)
+
+                    (Received Service_Accepted_1657974513.txt)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 21
+                    Cat [2] = 33
+                    Cat [3] = 10
+                    Cat [5] = 10
+                    Cat [6] = 1
+                    Cat [7] = 1
+                    Cat [9] = 3
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 2
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 BF1E6AC6 299EE093 > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s EA0B2B4E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 961C38BE > ]
+)
+
+                    (Received Service_Offer.txt)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A615A86C > < 4 s 2B843412 3E987BE9 BF1E6AC6 299EE093 > ]
+ng -scn --seq 0.1 [ < 1 s AA084E20 > ]
+)
+
+                    (Received Service_Accepted_711140048.txt)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 4
+
+          (t = 5361.603954)
+[1]       (IQ Size = 3)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 6C30652B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E1EB183C > ]
+)
+
+                    (Received Temperature_F9125FD2_0.json)
+                    (Revoking a binding with Cat = 18, Key = 6C30652B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 740CA890 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 157D62A9 > ]
+)
+
+                    (Received Temperature_F9125FD2_1.json)
+                    (Revoking a binding with Cat = 18, Key = 740CA890)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s FEC3DC27 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 5714AE89 > ]
+)
+
+                    (Received Temperature_F9125FD2_2.json)
+                    (Revoking a binding with Cat = 18, Key = FEC3DC27)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s ACF385A3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 667DAAB8 > ]
+)
+
+                    (Received Temperature_F9125FD2_3.json)
+                    (Revoking a binding with Cat = 18, Key = ACF385A3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 6EAC43E5 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 72963CED > ]
+)
+
+                    (Received Temperature_F9125FD2_4.json)
+                    (Revoking a binding with Cat = 18, Key = 6EAC43E5)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 3A2F5D3D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 1B7E3451 > ]
+)
+
+                    (Received Temperature_F9125FD2_5.json)
+                    (Revoking a binding with Cat = 18, Key = 3A2F5D3D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A4922224 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 8FE4C9F4 > ]
+)
+
+                    (Received Temperature_F9125FD2_6.json)
+                    (Revoking a binding with Cat = 18, Key = A4922224)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A387C650 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s AC3BAB5D > ]
+)
+
+                    (Received Temperature_F9125FD2_7.json)
+                    (Revoking a binding with Cat = 18, Key = A387C650)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 17305A87 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s BB10CBF1 > ]
+)
+
+                    (Received Temperature_F9125FD2_8.json)
+                    (Revoking a binding with Cat = 18, Key = 17305A87)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B4FA7B2E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 1F9D704D > ]
+)
+
+                    (Received Temperature_F9125FD2_9.json)
+                    (Revoking a binding with Cat = 18, Key = B4FA7B2E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s C932529C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 11034F9B > ]
+)
+
+                    (Received Temperature_F9125FD2_10.json)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 5
+                    (Revoking a binding with Cat = 18, Key = C932529C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 89F24D75 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 644393CE > ]
+)
+
+                    (Received Temperature_F9125FD2_11.json)
+                    (Revoking a binding with Cat = 18, Key = 89F24D75)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7740FFF7 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3EF87696 > ]
+)
+
+                    (Received Temperature_F9125FD2_12.json)
+                    (Revoking a binding with Cat = 18, Key = 7740FFF7)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7284F973 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 4BDC45F8 > ]
+)
+
+                    (Received Temperature_F9125FD2_13.json)
+                    (Revoking a binding with Cat = 18, Key = 7284F973)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E7EADC1B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 49C8EA15 > ]
+)
+
+                    (Received Temperature_F9125FD2_14.json)
+                    (Revoking a binding with Cat = 18, Key = E7EADC1B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s AB85711D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 6E8671FB > ]
+)
+
+                    (Received Temperature_F9125FD2_15.json)
+                    (Revoking a binding with Cat = 18, Key = AB85711D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s FE61D096 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E282F4C5 > ]
+)
+
+                    (Received Temperature_F9125FD2_16.json)
+                    (Revoking a binding with Cat = 18, Key = FE61D096)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A6F986DF > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 87DEC1FE > ]
+)
+
+                    (Received Temperature_F9125FD2_17.json)
+                    (Revoking a binding with Cat = 18, Key = A6F986DF)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 56D647A5 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 612AC68D > ]
+)
+
+                    (Received Temperature_F9125FD2_18.json)
+                    (Revoking a binding with Cat = 18, Key = 56D647A5)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 754A9575 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 2162E870 > ]
+)
+
+                    (Received Temperature_F9125FD2_19.json)
+                    (Revoking a binding with Cat = 18, Key = 754A9575)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 0B56B8A1 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 2BC300CE > ]
+)
+
+                    (Received Temperature_F9125FD2_20.json)
+                    (Revoking a binding with Cat = 18, Key = 0B56B8A1)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E17A42C9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 1620BF56 > ]
+)
+
+                    (Received Temperature_F9125FD2_21.json)
+                    (Revoking a binding with Cat = 18, Key = E17A42C9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 849E62DF > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 2B3CE317 > ]
+)
+
+                    (Received Temperature_F9125FD2_22.json)
+                    (Revoking a binding with Cat = 18, Key = 849E62DF)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2EDF562F > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A2257FF8 > ]
+)
+
+                    (Received Temperature_F9125FD2_23.json)
+                    (Revoking a binding with Cat = 18, Key = 2EDF562F)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9293CCEB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 255DDDCD > ]
+)
+
+                    (Received Temperature_F9125FD2_24.json)
+                    (Revoking a binding with Cat = 18, Key = 9293CCEB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s CDA2722A > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 95995700 > ]
+)
+
+                    (Received Temperature_F9125FD2_25.json)
+                    (Revoking a binding with Cat = 18, Key = CDA2722A)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s D1A81D66 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0A2A6377 > ]
+)
+
+                    (Received Temperature_F9125FD2_26.json)
+                    (Revoking a binding with Cat = 18, Key = D1A81D66)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 26E86DFC > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C27BCAC0 > ]
+)
+
+                    (Received Temperature_F9125FD2_27.json)
+                    (Revoking a binding with Cat = 18, Key = 26E86DFC)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 27E27BD6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 284D5094 > ]
+)
+
+                    (Received Temperature_F9125FD2_28.json)
+                    (Revoking a binding with Cat = 18, Key = 27E27BD6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 5338D00E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D5D6CCB0 > ]
+)
+
+                    (Received Temperature_F9125FD2_29.json)
+                    (Revoking a binding with Cat = 18, Key = 5338D00E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 3E741CF6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 9CFD7FAD > ]
+)
+
+                    (Received Temperature_F9125FD2_30.json)
+                    (Revoking a binding with Cat = 18, Key = 3E741CF6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 1FC178E4 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C2D77FA3 > ]
+)
+
+                    (Received Temperature_F9125FD2_31.json)
+                    (Revoking a binding with Cat = 18, Key = 1FC178E4)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2383AFEB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C9D68241 > ]
+)
+
+                    (Received Temperature_F9125FD2_32.json)
+                    (Revoking a binding with Cat = 18, Key = 2383AFEB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 0296DBFE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 4A9815C0 > ]
+)
+
+                    (Received Temperature_F9125FD2_33.json)
+                    (Revoking a binding with Cat = 18, Key = 0296DBFE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 37DB4984 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0EAF24EF > ]
+)
+
+                    (Received Temperature_F9125FD2_34.json)
+                    (Revoking a binding with Cat = 18, Key = 37DB4984)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E6761613 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s BD266010 > ]
+)
+
+                    (Received Temperature_F9125FD2_35.json)
+                    (Revoking a binding with Cat = 18, Key = E6761613)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E8BD1A8E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s BB7911E2 > ]
+)
+
+                    (Received Temperature_F9125FD2_36.json)
+                    (Revoking a binding with Cat = 18, Key = E8BD1A8E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7B825FCB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 5AB55ADE > ]
+)
+
+                    (Received Temperature_F9125FD2_37.json)
+                    (Revoking a binding with Cat = 18, Key = 7B825FCB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7D89609B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 03C85E10 > ]
+)
+
+                    (Received Temperature_F9125FD2_38.json)
+                    (Revoking a binding with Cat = 18, Key = 7D89609B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9AB68A64 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 01E33CDD > ]
+)
+
+                    (Received Temperature_F9125FD2_39.json)
+                    (Revoking a binding with Cat = 18, Key = 9AB68A64)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 4
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s BD2F5880 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 50EE78D4 > ]
+)
+
+                    (Received Temperature_F9125FD2_40.json)
+                    (Revoking a binding with Cat = 18, Key = BD2F5880)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 79957763 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 222FDC6A > ]
+)
+
+                    (Received Temperature_F9125FD2_41.json)
+                    (Revoking a binding with Cat = 18, Key = 79957763)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F78FD24E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s FAA695F0 > ]
+)
+
+                    (Received Temperature_F9125FD2_42.json)
+                    (Revoking a binding with Cat = 18, Key = F78FD24E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s CE580C15 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A57E7B0D > ]
+)
+
+                    (Received Temperature_F9125FD2_43.json)
+                    (Revoking a binding with Cat = 18, Key = CE580C15)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 15646351 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A14707A1 > ]
+)
+
+                    (Received Temperature_F9125FD2_44.json)
+                    (Revoking a binding with Cat = 18, Key = 15646351)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s D33D8F4B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3E6A91D5 > ]
+)
+
+                    (Received Temperature_F9125FD2_45.json)
+                    (Revoking a binding with Cat = 18, Key = D33D8F4B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s ACE65CA6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 15356570 > ]
+)
+
+                    (Received Temperature_F9125FD2_46.json)
+                    (Revoking a binding with Cat = 18, Key = ACE65CA6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B08FF9B3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s CC84CA52 > ]
+)
+
+                    (Received Temperature_F9125FD2_47.json)
+                    (Revoking a binding with Cat = 18, Key = B08FF9B3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2A54CA7C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 8375F58F > ]
+)
+
+                    (Received Temperature_F9125FD2_48.json)
+                    (Revoking a binding with Cat = 18, Key = 2A54CA7C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F196E79C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0129C6D6 > ]
+)
+
+                    (Received Temperature_F9125FD2_49.json)
+                    (Revoking a binding with Cat = 18, Key = F196E79C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 438EDBB3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D4F4406D > ]
+)
+
+                    (Received Temperature_F9125FD2_50.json)
+                    (Revoking a binding with Cat = 18, Key = 438EDBB3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 0B27DB19 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E79E7DD5 > ]
+)
+
+                    (Received Temperature_F9125FD2_51.json)
+                    (Revoking a binding with Cat = 18, Key = 0B27DB19)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s C961C6A7 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3E4BB1C1 > ]
+)
+
+                    (Received Temperature_F9125FD2_52.json)
+                    (Revoking a binding with Cat = 18, Key = C961C6A7)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 5CFB82A9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 858FEA4C > ]
+)
+
+                    (Received Temperature_F9125FD2_53.json)
+                    (Revoking a binding with Cat = 18, Key = 5CFB82A9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 6D0A8B10 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 47D4964C > ]
+)
+
+                    (Received Temperature_F9125FD2_54.json)
+                    (Revoking a binding with Cat = 18, Key = 6D0A8B10)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s C774CFA9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 52B1BBB0 > ]
+)
+
+                    (Received Temperature_F9125FD2_55.json)
+                    (Revoking a binding with Cat = 18, Key = C774CFA9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F21773C9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 78896204 > ]
+)
+
+                    (Received Temperature_F9125FD2_56.json)
+                    (Revoking a binding with Cat = 18, Key = F21773C9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A6E52845 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 478C0D4B > ]
+)
+
+                    (Received Temperature_F9125FD2_57.json)
+                    (Revoking a binding with Cat = 18, Key = A6E52845)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B3D2E2D6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F1CE8665 > ]
+)
+
+                    (Received Temperature_F9125FD2_58.json)
+                    (Revoking a binding with Cat = 18, Key = B3D2E2D6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 32B1110F > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 52E36A00 > ]
+)
+
+                    (Received Temperature_F9125FD2_59.json)
+                    (Revoking a binding with Cat = 18, Key = 32B1110F)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 733BF155 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E48C5485 > ]
+)
+
+                    (Received Temperature_F9125FD2_60.json)
+                    (Revoking a binding with Cat = 18, Key = 733BF155)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 413A3E4D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D08C53FC > ]
+)
+
+                    (Received Temperature_F9125FD2_61.json)
+                    (Revoking a binding with Cat = 18, Key = 413A3E4D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s CC0F1E76 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C4596931 > ]
+)
+
+                    (Received Temperature_F9125FD2_62.json)
+                    (Revoking a binding with Cat = 18, Key = CC0F1E76)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 80A2137D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A7CF3520 > ]
+)
+
+                    (Received Temperature_F9125FD2_63.json)
+                    (Revoking a binding with Cat = 18, Key = 80A2137D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 47EE81AC > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s EF2A64B2 > ]
+)
+
+                    (Received Temperature_F9125FD2_64.json)
+                    (Revoking a binding with Cat = 18, Key = 47EE81AC)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B71FB03E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3144854C > ]
+)
+
+                    (Received Temperature_F9125FD2_65.json)
+                    (Revoking a binding with Cat = 18, Key = B71FB03E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 1DA25E1E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 8BE497B3 > ]
+)
+
+                    (Received Temperature_F9125FD2_66.json)
+                    (Revoking a binding with Cat = 18, Key = 1DA25E1E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s D1827161 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 70081852 > ]
+)
+
+                    (Received Temperature_F9125FD2_67.json)
+                    (Revoking a binding with Cat = 18, Key = D1827161)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s D873BFE0 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 1160B34C > ]
+)
+
+                    (Received Temperature_F9125FD2_68.json)
+                    (Revoking a binding with Cat = 18, Key = D873BFE0)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 608E2537 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F78557AE > ]
+)
+
+                    (Received Temperature_F9125FD2_69.json)
+                    (Revoking a binding with Cat = 18, Key = 608E2537)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 4
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 701B01FD > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A5C361C9 > ]
+)
+
+                    (Received Temperature_F9125FD2_70.json)
+                    (Revoking a binding with Cat = 18, Key = 701B01FD)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 669B6516 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 270133BA > ]
+)
+
+                    (Received Temperature_F9125FD2_71.json)
+                    (Revoking a binding with Cat = 18, Key = 669B6516)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F3D23677 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s B84D01E6 > ]
+)
+
+                    (Received Temperature_F9125FD2_72.json)
+                    (Revoking a binding with Cat = 18, Key = F3D23677)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B2E991C5 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F97D30EA > ]
+)
+
+                    (Received Temperature_F9125FD2_73.json)
+                    (Revoking a binding with Cat = 18, Key = B2E991C5)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B5DE4F7C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 81EEF1D7 > ]
+)
+
+                    (Received Temperature_F9125FD2_74.json)
+                    (Revoking a binding with Cat = 18, Key = B5DE4F7C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 3DEB71C4 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C14CDFFB > ]
+)
+
+                    (Received Temperature_F9125FD2_75.json)
+                    (Revoking a binding with Cat = 18, Key = 3DEB71C4)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 164A8FA3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0B5F737C > ]
+)
+
+                    (Received Temperature_F9125FD2_76.json)
+                    (Revoking a binding with Cat = 18, Key = 164A8FA3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 1DCB8912 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D6B72F85 > ]
+)
+
+                    (Received Temperature_F9125FD2_77.json)
+                    (Revoking a binding with Cat = 18, Key = 1DCB8912)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 4F8FC6A1 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D0AEAD88 > ]
+)
+
+                    (Received Temperature_F9125FD2_78.json)
+                    (Revoking a binding with Cat = 18, Key = 4F8FC6A1)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 4E0E0198 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 06108B6B > ]
+)
+
+                    (Received Temperature_F9125FD2_79.json)
+                    (Revoking a binding with Cat = 18, Key = 4E0E0198)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E62AB3B9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C73AE151 > ]
+)
+
+                    (Received Temperature_F9125FD2_80.json)
+                    (Revoking a binding with Cat = 18, Key = E62AB3B9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s FBFC2FE1 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 14E82EF2 > ]
+)
+
+                    (Received Temperature_F9125FD2_81.json)
+                    (Revoking a binding with Cat = 18, Key = FBFC2FE1)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s FDD39258 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s D830C2FF > ]
+)
+
+                    (Received Temperature_F9125FD2_82.json)
+                    (Revoking a binding with Cat = 18, Key = FDD39258)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E813A65A > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 483222F3 > ]
+)
+
+                    (Received Temperature_F9125FD2_83.json)
+                    (Revoking a binding with Cat = 18, Key = E813A65A)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 426669F3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 29366F6D > ]
+)
+
+                    (Received Temperature_F9125FD2_84.json)
+                    (Revoking a binding with Cat = 18, Key = 426669F3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A0357E60 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 8E2B8DD1 > ]
+)
+
+                    (Received Temperature_F9125FD2_85.json)
+                    (Revoking a binding with Cat = 18, Key = A0357E60)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9C45C574 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 9BB156D2 > ]
+)
+
+                    (Received Temperature_F9125FD2_86.json)
+                    (Revoking a binding with Cat = 18, Key = 9C45C574)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 318F40C2 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 77A1C199 > ]
+)
+
+                    (Received Temperature_F9125FD2_87.json)
+                    (Revoking a binding with Cat = 18, Key = 318F40C2)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s EC845B2C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A3C52C07 > ]
+)
+
+                    (Received Temperature_F9125FD2_88.json)
+                    (Revoking a binding with Cat = 18, Key = EC845B2C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 739D2AC9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s B464A790 > ]
+)
+
+                    (Received Temperature_F9125FD2_89.json)
+                    (Revoking a binding with Cat = 18, Key = 739D2AC9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9B72A75B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 28F93A13 > ]
+)
+
+                    (Received Temperature_F9125FD2_90.json)
+                    (Revoking a binding with Cat = 18, Key = 9B72A75B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 5C61EE5E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 7F7ECFDB > ]
+)
+
+                    (Received Temperature_F9125FD2_91.json)
+                    (Revoking a binding with Cat = 18, Key = 5C61EE5E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B5F73F20 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s FF353837 > ]
+)
+
+                    (Received Temperature_F9125FD2_92.json)
+                    (Revoking a binding with Cat = 18, Key = B5F73F20)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 29830AD2 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 4A1AA248 > ]
+)
+
+                    (Received Temperature_F9125FD2_93.json)
+                    (Revoking a binding with Cat = 18, Key = 29830AD2)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 24F13576 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 015784B5 > ]
+)
+
+                    (Received Temperature_F9125FD2_94.json)
+                    (Revoking a binding with Cat = 18, Key = 24F13576)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7613DA8A > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C46A3431 > ]
+)
+
+                    (Received Temperature_F9125FD2_95.json)
+                    (Revoking a binding with Cat = 18, Key = 7613DA8A)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s D3FE5119 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 56D3F1DB > ]
+)
+
+                    (Received Temperature_F9125FD2_96.json)
+                    (Revoking a binding with Cat = 18, Key = D3FE5119)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2C55ADE6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 8C25FD78 > ]
+)
+
+                    (Received Temperature_F9125FD2_97.json)
+                    (Revoking a binding with Cat = 18, Key = 2C55ADE6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 8077EF34 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 97BB3026 > ]
+)
+
+                    (Received Temperature_F9125FD2_98.json)
+                    (Revoking a binding with Cat = 18, Key = 8077EF34)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 94FFDA6A > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s B6D0915F > ]
+)
+
+                    (Received Temperature_F9125FD2_99.json)
+                    (Revoking a binding with Cat = 18, Key = 94FFDA6A)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 2
+                    Cat [18] = 4
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 81501F2E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 13A9A0EC > ]
+)
+
+                    (Received Temperature_F9125FD2_100.json.json)
+                    (Revoking a binding with Cat = 18, Key = 81501F2E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F6CA9E09 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F3A3813F > ]
+)
+
+                    (Received Temperature_F9125FD2_101.json.json)
+                    (Revoking a binding with Cat = 18, Key = F6CA9E09)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 4DDBA849 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A975E31D > ]
+)
+
+                    (Received Temperature_F9125FD2_102.json.json)
+                    (Revoking a binding with Cat = 18, Key = 4DDBA849)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 65A2B32D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 9AC31298 > ]
+)
+
+                    (Received Temperature_F9125FD2_103.json.json)
+                    (Revoking a binding with Cat = 18, Key = 65A2B32D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 7213E5AB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 552FBED5 > ]
+)
+
+                    (Received Temperature_F9125FD2_104.json.json)
+                    (Revoking a binding with Cat = 18, Key = 7213E5AB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 41E4F7CE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 7B42F847 > ]
+)
+
+                    (Received Temperature_F9125FD2_105.json.json)
+                    (Revoking a binding with Cat = 18, Key = 41E4F7CE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 03E109BE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 1115C076 > ]
+)
+
+                    (Received Temperature_F9125FD2_106.json.json)
+                    (Revoking a binding with Cat = 18, Key = 03E109BE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 79489D4A > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 09FDFF65 > ]
+)
+
+                    (Received Temperature_F9125FD2_107.json.json)
+                    (Revoking a binding with Cat = 18, Key = 79489D4A)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2713C3FB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 4C57715F > ]
+)
+
+                    (Received Temperature_F9125FD2_108.json.json)
+                    (Revoking a binding with Cat = 18, Key = 2713C3FB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 0A306C6E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 05AF24A8 > ]
+)
+
+                    (Received Temperature_F9125FD2_109.json.json)
+                    (Revoking a binding with Cat = 18, Key = 0A306C6E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 97C4AED2 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 93CE3F0C > ]
+)
+
+                    (Received Temperature_F9125FD2_110.json.json)
+                    (Revoking a binding with Cat = 18, Key = 97C4AED2)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s DBDB56CA > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 289E3430 > ]
+)
+
+                    (Received Temperature_F9125FD2_111.json.json)
+                    (Revoking a binding with Cat = 18, Key = DBDB56CA)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 80AACD9B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 924AC0EB > ]
+)
+
+                    (Received Temperature_F9125FD2_112.json.json)
+                    (Revoking a binding with Cat = 18, Key = 80AACD9B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B6137E0D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s B15D59FC > ]
+)
+
+                    (Received Temperature_F9125FD2_113.json.json)
+                    (Revoking a binding with Cat = 18, Key = B6137E0D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 4B183447 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s B9343EC6 > ]
+)
+
+                    (Received Temperature_F9125FD2_114.json.json)
+                    (Revoking a binding with Cat = 18, Key = 4B183447)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 37DC4603 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 45FFB621 > ]
+)
+
+                    (Received Temperature_F9125FD2_115.json.json)
+                    (Revoking a binding with Cat = 18, Key = 37DC4603)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 630026AD > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 520A37D7 > ]
+)
+
+                    (Received Temperature_F9125FD2_116.json.json)
+                    (Revoking a binding with Cat = 18, Key = 630026AD)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 68CD4EBA > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 9DCE6178 > ]
+)
+
+                    (Received Temperature_F9125FD2_117.json.json)
+                    (Revoking a binding with Cat = 18, Key = 68CD4EBA)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 8368549C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 6E1FFB81 > ]
+)
+
+                    (Received Temperature_F9125FD2_118.json.json)
+                    (Revoking a binding with Cat = 18, Key = 8368549C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B4B23BC7 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A53EBC11 > ]
+)
+
+                    (Received Temperature_F9125FD2_119.json.json)
+                    (Revoking a binding with Cat = 18, Key = B4B23BC7)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 72E17F75 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0A548A05 > ]
+)
+
+                    (Received Temperature_F9125FD2_120.json.json)
+                    (Revoking a binding with Cat = 18, Key = 72E17F75)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F52489BA > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F47D5FEC > ]
+)
+
+                    (Received Temperature_F9125FD2_121.json.json)
+          (Storing the shared memory ID (shmid) = 3 on HT. The related key is 13)
+                    (Revoking a binding with Cat = 18, Key = F52489BA)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s BDAA9F06 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 679F4D38 > ]
+)
+
+                    (Received Temperature_F9125FD2_122.json.json)
+                    (Revoking a binding with Cat = 18, Key = BDAA9F06)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 46C53B87 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 31EBE1E1 > ]
+)
+
+                    (Received Temperature_F9125FD2_123.json.json)
+                    (Revoking a binding with Cat = 18, Key = 46C53B87)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 617D696D > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 51DE5196 > ]
+)
+
+                    (Received Temperature_F9125FD2_124.json.json)
+                    (Revoking a binding with Cat = 18, Key = 617D696D)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 4BEAF8E1 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E22C0D8F > ]
+)
+
+                    (Received Temperature_F9125FD2_125.json.json)
+                    (Revoking a binding with Cat = 18, Key = 4BEAF8E1)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s EA6AEF02 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E05EA757 > ]
+)
+
+                    (Received Temperature_F9125FD2_126.json.json)
+                    (Revoking a binding with Cat = 18, Key = EA6AEF02)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 8C1BAC88 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 7FA3F137 > ]
+)
+
+                    (Received Temperature_F9125FD2_127.json.json)
+                    (Revoking a binding with Cat = 18, Key = 8C1BAC88)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F0C6F4F4 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s FA9A9D6C > ]
+)
+
+                    (Received Temperature_F9125FD2_128.json.json)
+                    (Revoking a binding with Cat = 18, Key = F0C6F4F4)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 3
+                    Cat [18] = 4
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 95F5F1B8 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3C86700A > ]
+)
+
+                    (Received Temperature_F9125FD2_129.json.json)
+                    (Revoking a binding with Cat = 18, Key = 95F5F1B8)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E75789F4 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s FC19E3AE > ]
+)
+
+                    (Received Temperature_F9125FD2_130.json.json)
+                    (Revoking a binding with Cat = 18, Key = E75789F4)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B417DDD3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C5D88D70 > ]
+)
+
+                    (Received Temperature_F9125FD2_131.json.json)
+                    (Revoking a binding with Cat = 18, Key = B417DDD3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 70A0E3CB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 08286ABB > ]
+)
+
+                    (Received Temperature_F9125FD2_132.json.json)
+                    (Revoking a binding with Cat = 18, Key = 70A0E3CB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s C5EF69AC > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 36A6E0C3 > ]
+)
+
+                    (Received Temperature_F9125FD2_133.json.json)
+                    (Revoking a binding with Cat = 18, Key = C5EF69AC)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A66F185E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 31E1D273 > ]
+)
+
+                    (Received Temperature_F9125FD2_134.json.json)
+                    (Revoking a binding with Cat = 18, Key = A66F185E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9B4623C5 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 70B11406 > ]
+)
+
+                    (Received Temperature_F9125FD2_135.json.json)
+                    (Revoking a binding with Cat = 18, Key = 9B4623C5)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 093DFA76 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 30206447 > ]
+)
+
+                    (Received Temperature_F9125FD2_136.json.json)
+                    (Revoking a binding with Cat = 18, Key = 093DFA76)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 5E7B65B1 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 7D40C5BA > ]
+)
+
+                    (Received Temperature_F9125FD2_137.json.json)
+                    (Revoking a binding with Cat = 18, Key = 5E7B65B1)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 6773FC86 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F17E6E2A > ]
+)
+
+                    (Received Temperature_F9125FD2_138.json.json)
+                    (Revoking a binding with Cat = 18, Key = 6773FC86)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s DFD219D9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s EE67F04F > ]
+)
+
+                    (Received Temperature_F9125FD2_139.json.json)
+                    (Revoking a binding with Cat = 18, Key = DFD219D9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 2BDDE1C9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s F3DE3A0F > ]
+)
+
+                    (Received Temperature_F9125FD2_140.json.json)
+                    (Revoking a binding with Cat = 18, Key = 2BDDE1C9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s E0122412 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 25DAADBB > ]
+)
+
+                    (Received Temperature_F9125FD2_141.json.json)
+                    (Revoking a binding with Cat = 18, Key = E0122412)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 38DBAB77 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 243E7354 > ]
+)
+
+                    (Received Temperature_F9125FD2_142.json.json)
+                    (Revoking a binding with Cat = 18, Key = 38DBAB77)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 766F8526 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A63DD261 > ]
+)
+
+                    (Received Temperature_F9125FD2_143.json.json)
+                    (Revoking a binding with Cat = 18, Key = 766F8526)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 51B8F7FB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 6FA9D06C > ]
+)
+
+                    (Received Temperature_F9125FD2_144.json.json)
+                    (Revoking a binding with Cat = 18, Key = 51B8F7FB)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s CBC96834 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 0D7091ED > ]
+)
+
+                    (Received Temperature_F9125FD2_145.json.json)
+                    (Revoking a binding with Cat = 18, Key = CBC96834)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 9D93ACD9 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s DFE11CD4 > ]
+)
+
+                    (Received Temperature_F9125FD2_146.json.json)
+                    (Revoking a binding with Cat = 18, Key = 9D93ACD9)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 8B54D8D8 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s DF6A5705 > ]
+)
+
+                    (Received Temperature_F9125FD2_147.json.json)
+                    (Revoking a binding with Cat = 18, Key = 8B54D8D8)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A2CE8AEA > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 913A4352 > ]
+)
+
+                    (Received Temperature_F9125FD2_148.json.json)
+                    (Revoking a binding with Cat = 18, Key = A2CE8AEA)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 65A2E0FE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 7799C839 > ]
+)
+
+                    (Received Temperature_F9125FD2_149.json.json)
+                    (Revoking a binding with Cat = 18, Key = 65A2E0FE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s F758A2FD > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 08A2B445 > ]
+)
+
+                    (Received Temperature_F9125FD2_150.json.json)
+                    (Revoking a binding with Cat = 18, Key = F758A2FD)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s BFE21FCE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 81A364C3 > ]
+)
+
+                    (Received Temperature_F9125FD2_151.json.json)
+                    (Revoking a binding with Cat = 18, Key = BFE21FCE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 137DDED3 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 5076C7BE > ]
+)
+
+                    (Received Temperature_F9125FD2_152.json.json)
+                    (Revoking a binding with Cat = 18, Key = 137DDED3)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 762ECA77 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 86E146D8 > ]
+)
+
+                    (Received Temperature_F9125FD2_153.json.json)
+                    (Revoking a binding with Cat = 18, Key = 762ECA77)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s CFDF835C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 064D23CB > ]
+)
+
+                    (Received Temperature_F9125FD2_154.json.json)
+                    (Revoking a binding with Cat = 18, Key = CFDF835C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 12FD0194 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 2FD66DAE > ]
+)
+
+                    (Received Temperature_F9125FD2_155.json.json)
+                    (Revoking a binding with Cat = 18, Key = 12FD0194)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 8A78086F > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 2DD18647 > ]
+)
+
+                    (Received Temperature_F9125FD2_156.json.json)
+                    (Revoking a binding with Cat = 18, Key = 8A78086F)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 380C92AE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E761E11A > ]
+)
+
+                    (Received Temperature_F9125FD2_157.json.json)
+                    (Revoking a binding with Cat = 18, Key = 380C92AE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 67D89EDB > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 5142DAD1 > ]
+)
+
+                    (Received Temperature_F9125FD2_158.json.json)
+
+          (t = 5705.335793)
+[1]       (IQ Size = 3)
+[6]       (OQ[1] Size = 0)
+          (Messages in memory = 9)
+                    (Revoking a binding with Cat = 18, Key = 67D89EDB)
+
+                    (Hash Tables Size)
+                    Cat [0] = 7
+                    Cat [1] = 24
+                    Cat [2] = 40
+                    Cat [3] = 10
+                    Cat [5] = 11
+                    Cat [6] = 2
+                    Cat [7] = 1
+                    Cat [9] = 5
+                    Cat [13] = 4
+                    Cat [14] = 2
+                    Cat [17] = 3
+                    Cat [18] = 4
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 57F0075B > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s E78BAF70 > ]
+)
+
+                    (Received Temperature_F9125FD2_159.json.json)
+                    (Revoking a binding with Cat = 18, Key = 57F0075B)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s A57AE3C0 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A07BF615 > ]
+)
+
+                    (Received Temperature_F9125FD2_160.json.json)
+                    (Revoking a binding with Cat = 18, Key = A57AE3C0)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 53D62BA6 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 82F72FFA > ]
+)
+
+                    (Received Temperature_F9125FD2_161.json.json)
+                    (Revoking a binding with Cat = 18, Key = 53D62BA6)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 30CE2576 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 6FD9B088 > ]
+)
+
+                    (Received Temperature_F9125FD2_162.json.json)
+                    (Revoking a binding with Cat = 18, Key = 30CE2576)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s EBE42B33 > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s A42899DC > ]
+)
+
+                    (Received Temperature_F9125FD2_163.json.json)
+                    (Revoking a binding with Cat = 18, Key = EBE42B33)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s B4EA52CF > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s C4D1FC35 > ]
+)
+
+                    (Received Temperature_F9125FD2_164.json.json)
+                    (Revoking a binding with Cat = 18, Key = B4EA52CF)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 78AB391C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s DA281228 > ]
+)
+
+                    (Received Temperature_F9125FD2_165.json.json)
+                    (Revoking a binding with Cat = 18, Key = 78AB391C)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s BB30F2EE > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 3032D5DC > ]
+)
+
+                    (Received Temperature_F9125FD2_166.json.json)
+                    (Revoking a binding with Cat = 18, Key = BB30F2EE)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 3E7B0A3E > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1 [ < 1 s 671BDF62 > ]
+)
+
+                    (Received Temperature_F9125FD2_167.json.json)
+                    (Revoking a binding with Cat = 18, Key = 3E7B0A3E)
+                    (The following message was published to the peer)
+(
+ng -m --cl 0.1 [ < 1 s 15B239D1 > < 4 s 2B843412 3E987BE9 76D0BA6E 4E9BD8BB > < 4 s 2B843412 3E987BE9 F036EB4B 0794A78C > ]
+ng -notify --s 0.1 [ < 1 s 18 > < 1 s 3196571C > < 4 s 1DCC0AD0 D4E00DC2 F9125FD2 NULL > ]
+ng -scn --seq 0.1

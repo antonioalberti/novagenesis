@@ -801,19 +801,23 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
 
   string Temp;
 
+  string Count;
+
   string Sample;
 
   F1 >> Temp;
 
   F1 >> Temp;
 
-  F1 >> Temp;
+  F1 >> Count;
+
+  Count.erase (Count.end()-1);
 
   F1 >> Temp;
 
   F1 >> Sample;
 
-  F2 << setprecision (10) << GetTime () << " " << Sample << endl;
+  F2 << setprecision (10) << GetTime () << " " << Count << " " << Sample << endl;
 
   F2.CloseFile ();
 
@@ -841,13 +845,13 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
 	  // Setting up the OSID as the space limiter
 	  Limiters.push_back (PB->PP->Intra_Domain);
 
-	  // Setting up the this OS as the 1st source SCN
+	  // Setting up this OS as the 1st source SCN
 	  Sources.push_back (PB->PP->GetHostSelfCertifyingName ());
 
-	  // Setting up the this OS as the 2nd source SCN
+	  // Setting up this OS as the 2nd source SCN
 	  Sources.push_back (PB->PP->GetOperatingSystemSelfCertifyingName ());
 
-	  // Setting up the this process as the 3rd source SCN
+	  // Setting up this process as the 3rd source SCN
 	  Sources.push_back (PB->PP->GetSelfCertifyingName ());
 
 	  // Setting up the PS block SCN as the 4th source SCN
