@@ -1,5 +1,0 @@
-    PID TTY          TIME CMD
-     25 pts/0    00:00:00 supervisord
-     27 pts/0    00:06:16 IoTTestApp
-     28 pts/0    00:06:21 NRNCS
-     29 pts/0    00:20:16 PGCS

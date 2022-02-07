@@ -1,6 +1,0 @@
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s EPGS_Sensor > < 5 s sensorType sensorRangeMin sensorRangeMax sensorResolution sensorAccuracy > ]
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s sensorType > < 1 s Temperature > ]
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s sensorRangeMin > < 1 s -20 > ]
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s sensorRangeMax > < 1 s 100 > ]
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s sensorResolution > < 1 s 0.1 > ]
-ng -sr --b 0.1 [ < 1 s 17 > < 1 s sensorAccuracy > < 1 s 0.2 > ]

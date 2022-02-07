@@ -1,5 +1,0 @@
-NRNCS.ini
-Service_Accepted_1657974513.txt
-Service_Accepted_711140048.txt
-Service_Offer.txt
-Service_Offer_2060457146.txt
