@@ -93,9 +93,9 @@ CoreInfoPayload01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 						{
 						  Subscription *PS = PCore->Subscriptions[i];
 
-						  PB->S << Offset << "(Testing subscription " << i << ")" << endl;
+						  //PB->S << Offset << "(Testing subscription " << i << ")" << endl;
 
-						  PB->S << Offset << "(Subscription status is " << PS->Status << ")" << endl;
+						  //PB->S << Offset << "(Subscription status is " << PS->Status << ")" << endl;
 
 						  if (PS->Status == "Waiting delivery" && PS->HasContent == true)
 							{

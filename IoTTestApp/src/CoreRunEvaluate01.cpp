@@ -41,7 +41,7 @@
 #include "GW.h"
 #endif
 
-#define DEBUG // To follow message processing
+//#define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -79,7 +79,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
   PB->S << endl << Offset << "(Time = " << Time << ")" << endl;
 
-  PB->S << Offset << "(NextPeerEvaluationTime = " << PCore->NextPeerEvaluationTime << ")" << endl;
+  //PB->S << Offset << "(NextPeerEvaluationTime = " << PCore->NextPeerEvaluationTime << ")" << endl;
 
   CheckForPSAwareness (ScheduledMessages, ClearScheduledMessage);
 
@@ -297,7 +297,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 			  // Check for new servers
 			  for (unsigned int i = 0; i < Candidates->size (); i++)
 				{
-				  PB->S << Offset1 << "(Testing the candidate = " << Candidates->at (i) << ")" << endl;
+				  //PB->S << Offset1 << "(Testing the candidate = " << Candidates->at (i) << ")" << endl;
 
 				  // Is the server different than this process
 				  if (Candidates->at (i) != PB->PP->GetSelfCertifyingName ())
@@ -326,7 +326,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 											}
 										  else
 											{
-											  PB->S << Offset1 << "(The candidate peer is already stored)" << endl;
+											  //PB->S << Offset1 << "(The candidate peer is already stored)" << endl;
 											}
 										}
 
@@ -355,9 +355,9 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 
 										  if (_ScheduledMessages.size () > 0)
 											{
-											  PB->S << Offset1
-													<< "(There is a scheduled message with a ng -invite command line)"
-													<< endl;
+											  //PB->S << Offset1
+											  //		<< "(There is a scheduled message with a ng -invite command line)"
+											  //		<< endl;
 
 											  Run = _ScheduledMessages.at (0);
 
@@ -380,8 +380,8 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 										}
 									  else
 										{
-										  PB->S << Offset1 << "(The IoTTestApp is already aware of this candidate)"
-												<< endl;
+										  // PB->S << Offset1 << "(The IoTTestApp is already aware of this candidate)"
+										  //	<< endl;
 										}
 									}
 								}
@@ -390,7 +390,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 					}
 				  else
 					{
-					  PB->S << Offset1 << "(The candidate is the own process)" << endl;
+					  //PB->S << Offset1 << "(The candidate is the own process)" << endl;
 					}
 				}
 			}
@@ -403,7 +403,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 		}
 	  else
 		{
-		  PB->S << Offset1 << "(Too early for that. Wait next ng -run --evaluate)" << endl;
+		  //PB->S << Offset1 << "(Too early for that. Wait next ng -run --evaluate)" << endl;
 		}
 	}
   else
@@ -441,11 +441,11 @@ int CoreRunEvaluate01::ShowTheDiscoveredPeers ()
 		{
 		  PB->S << Offset1 << "(Aware of the Application " << i << " )" << endl;
 
-		  PB->S << Offset1 << "(LN = " << PCore->PeerTuples[i]->LN << ")" << endl;
-		  PB->S << Offset1 << "(HID = " << PCore->PeerTuples[i]->Values[0] << ")" << endl;
-		  PB->S << Offset1 << "(OSID = " << PCore->PeerTuples[i]->Values[1] << ")" << endl;
+		  //PB->S << Offset1 << "(LN = " << PCore->PeerTuples[i]->LN << ")" << endl;
+		  //PB->S << Offset1 << "(HID = " << PCore->PeerTuples[i]->Values[0] << ")" << endl;
+		  //PB->S << Offset1 << "(OSID = " << PCore->PeerTuples[i]->Values[1] << ")" << endl;
 		  PB->S << Offset1 << "(PID = " << PCore->PeerTuples[i]->Values[2] << ")" << endl;
-		  PB->S << Offset1 << "(BID = " << PCore->PeerTuples[i]->Values[3] << ")" << endl;
+		  //PB->S << Offset1 << "(BID = " << PCore->PeerTuples[i]->Values[3] << ")" << endl;
 		}
 	}
   else
@@ -483,9 +483,9 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 		{
 		  PS = PCore->Subscriptions[i];
 
-		  PB->S << Offset1 << "(Testing subscription " << i << ")" << endl;
+		  //PB->S << Offset1 << "(Testing subscription " << i << ")" << endl;
 
-		  PB->S << Offset1 << "(Subscription status is " << PS->Status << ")" << endl;
+		  //PB->S << Offset1 << "(Subscription status is " << PS->Status << ")" << endl;
 
 		  string Publisher_LN = "Unknown";
 
@@ -494,13 +494,13 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 			{
 			  Publisher_LN = PCore->PeerTuples[Index]->LN;
 
-			  PB->S << Offset1 << "(The publisher is a " << Publisher_LN << " and have the index " << Index << ")"
-					<< endl;
+			  //PB->S << Offset1 << "(The publisher is a " << Publisher_LN << " and have the index " << Index << ")"
+					//<< endl;
 
-			  PB->S << Offset1 << "(HID = " << PS->Publisher.Values[0] << ")" << endl;
-			  PB->S << Offset1 << "(OSID = " << PS->Publisher.Values[1] << ")" << endl;
-			  PB->S << Offset1 << "(PID = " << PS->Publisher.Values[2] << ")" << endl;
-			  PB->S << Offset1 << "(BID = " << PS->Publisher.Values[3] << ")" << endl;
+			  //PB->S << Offset1 << "(HID = " << PS->Publisher.Values[0] << ")" << endl;
+			  //PB->S << Offset1 << "(OSID = " << PS->Publisher.Values[1] << ")" << endl;
+			  //PB->S << Offset1 << "(PID = " << PS->Publisher.Values[2] << ")" << endl;
+			  //PB->S << Offset1 << "(BID = " << PS->Publisher.Values[3] << ")" << endl;
 			}
 		  else
 			{
@@ -516,7 +516,7 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 		  // Deleting finished subscriptions
 		  if (PS->Status == "Delete")
 			{
-			  PB->S << Offset1 << "(Deleting the subscription with index = " << i << ")" << endl;
+			  //PB->S << Offset1 << "(Deleting the subscription with index = " << i << ")" << endl;
 
 			  PCore->DeleteSubscription (PS);
 			}
@@ -571,11 +571,12 @@ int CoreRunEvaluate01::PublishData ()
 
 	  F1.seekg (0);
 
-	  bool R1=(bool)rand()%1;
-	  bool R2=(bool)rand()%1;
-	  bool R3=(bool)rand()%1;
+	  bool R1 = (bool)rand () % 1;
+	  bool R2 = (bool)rand () % 1;
+	  bool R3 = (bool)rand () % 1;
 
-	  F1 <<"{ Q0.0: " <<R1<< ", Q0.1: "<< R2<< ", Q0.2:  "<< R3 << " }"<<endl; // Put here what do you want to send to the I4.0 PLC
+	  F1 << "{ Q0.0: " << R1 << ", Q0.1: " << R2 << ", Q0.2:  " << R3 << " }"
+		 << endl; // Put here what do you want to send to the I4.0 PLC
 
 	  F1.CloseFile ();
 
@@ -707,7 +708,7 @@ CoreRunEvaluate01::ProcessASubscribedPayload (string _Publisher_LN, Subscription
 
   PCore = (Core *)PB;
 
-  PB->S << Offset1 << "(Checking the file received from the peer with name " << _PS->FileName << ")" << endl;
+  //PB->S << Offset1 << "(Checking the file received from the peer with name " << _PS->FileName << ")" << endl;
 
   Pos = _PS->FileName.rfind ('.');
 
@@ -716,7 +717,7 @@ CoreRunEvaluate01::ProcessASubscribedPayload (string _Publisher_LN, Subscription
 	  Extension = _PS->FileName.substr (Pos + 1);
 	}
 
-  PB->S << Offset1 << "(File extension = " << Extension << ")" << endl;
+  //PB->S << Offset1 << "(File extension = " << Extension << ")" << endl;
 
   if (Extension == "txt")
 	{
@@ -811,7 +812,7 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
 
   F1 >> Count;
 
-  Count.erase (Count.end()-1);
+  Count.erase (Count.end () - 1);
 
   F1 >> Temp;
 
@@ -833,7 +834,7 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
   // Added in May 25th, 2016. Revoke HTS/NRNCS file after receiving data
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  PB->S << Offset << "(Generating message(s) to revoke the sample file key at domain level)" << endl;
+  //PB->S << Offset << "(Generating message(s) to revoke the sample file key at domain level)" << endl;
 
   for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
 	{
@@ -900,11 +901,11 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
 	  // Creating the ng -scn --s command line
 	  PMB->NewSCNCommandLine ("0.1", SCN, Revoke, PCL);
 
-	  PB->S << Offset
-			<< "(The following message contains a revoke binding message to the PSS/GIRS/HTS or NRNCS instance)"
-			<< endl;
+	  //PB->S << Offset
+	  //		<< "(The following message contains a revoke binding message to the PSS/GIRS/HTS or NRNCS instance)"
+	  //		<< endl;
 
-	  PB->S << "(" << endl << *Revoke << ")" << endl;
+	  //PB->S << "(" << endl << *Revoke << ")" << endl;
 
 	  // ******************************************************
 	  // Finish
