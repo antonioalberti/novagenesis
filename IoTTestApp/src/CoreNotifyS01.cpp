@@ -37,8 +37,8 @@
 #include "GW.h"
 #endif
 
-#define DEBUG // To follow message processing
-#define DEBUG1 // To follow message processing for flow control
+//#define DEBUG // To follow message processing
+//#define DEBUG1 // To follow message processing for flow control
 
 CoreNotifyS01::CoreNotifyS01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -147,7 +147,7 @@ CoreNotifyS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 							{
 							  PS->Publisher.Values.push_back (ReceivedPublisher.at (j));
 
-							  PB->S << Offset << "(Publisher ID [" << j << "] = " << PS->Publisher.Values[j] << ")" << endl;
+							  //PB->S << Offset << "(Publisher ID [" << j << "] = " << PS->Publisher.Values[j] << ")" << endl;
 							}
 
 						  // Added in May 7th, 2021 to enable direct publishing to EPGS in IoT
@@ -315,9 +315,9 @@ CoreNotifyS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 					  // Creating the ng -scn --s command line
 					  PMB->NewSCNCommandLine ("0.1", SCN, SubscriptionM, PCL);
 
-					  PB->S << Offset << "(The following message contains a subscription to the peer)" << endl;
+					  //PB->S << Offset << "(The following message contains a subscription to the peer)" << endl;
 
-					  PB->S << "(" << endl << *SubscriptionM << ")" << endl;
+					  //PB->S << "(" << endl << *SubscriptionM << ")" << endl;
 
 					  // ******************************************************
 					  // Finish

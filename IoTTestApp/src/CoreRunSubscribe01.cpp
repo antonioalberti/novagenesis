@@ -80,7 +80,7 @@ CoreRunSubscribe01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Me
 		  // Pairs=_PCL->Arguments.at(1);
 		  if (Category.size () > 0 && Keys.size ())
 			{
-			  PB->S << Offset << "(Generating a message to subscribe some keys at domain level)" << endl;
+			  //PB->S << Offset << "(Generating a message to subscribe some keys at domain level)" << endl;
 
 			  // Setting up the OSID as the space limiter
 			  Limiters.push_back (PB->PP->Intra_Domain);
@@ -157,9 +157,9 @@ CoreRunSubscribe01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Me
 			  // Creating the ng -scn --s command line
 			  PMB->NewSCNCommandLine ("0.1", SCN, Subcription, PCL);
 
-			  PB->S << Offset << "(The following message contains a subscription to the peer)" << endl;
+			  //PB->S << Offset << "(The following message contains a subscription to the peer)" << endl;
 
-			  PB->S << "(" << endl << *Subcription << ")" << endl;
+			  //PB->S << "(" << endl << *Subcription << ")" << endl;
 
 			  // ******************************************************
 			  // Finish
