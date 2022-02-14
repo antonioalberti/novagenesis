@@ -119,6 +119,9 @@ class Core : public Block {
   // Auxiliary counter
   unsigned int Counter;
 
+  // Auxiliary counter for number of peer EPGSes
+  int NoEPGSes;
+
   // Auxiliary timer
   double NextPeerEvaluationTime;
 

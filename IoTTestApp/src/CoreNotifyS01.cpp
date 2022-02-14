@@ -178,7 +178,9 @@ CoreNotifyS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 								  PT->Values.push_back(ReceivedPublisher.at (w));
 								}
 
-							  PT->LN = "EPGS";
+							  PT->LN = "EPGS_"+PB->IntToString (PCore->NoEPGSes);
+
+							  PCore->NoEPGSes++;
 							}
 #ifdef DEBUG
 						  PCore->Debug.OpenOutputFile ();

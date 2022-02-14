@@ -131,6 +131,9 @@ Core::Core (string _LN, string _ULN, Process *_PP, unsigned int _Index, GW *_PGW
   // Auxiliary counter
   Counter = 0;
 
+  // Auxiliary counter for number of peer EPGSes
+  NoEPGSes=0;
+
   // Auxiliary timer
   NextPeerEvaluationTime = 0;
 
