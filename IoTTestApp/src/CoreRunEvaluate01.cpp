@@ -818,7 +818,7 @@ int CoreRunEvaluate01::ProcessJsonFile (string _Publisher_LN, string _FileName, 
 
   F1 >> Sample;
 
-  F2 << setprecision (10) << GetTime () << " " << Count << " " << Sample << endl;
+  F2 << setprecision (10) << GetTime () << " " << _Publisher_LN << " " << Count << " " << Sample << endl;
 
   F2.CloseFile ();
 
