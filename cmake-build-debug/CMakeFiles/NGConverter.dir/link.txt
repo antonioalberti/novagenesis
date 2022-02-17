@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -g3 -p -pg -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -std=c++11 -I/usr/include/glib-2.0 -g CMakeFiles/NGConverter.dir/NGConverter/src/File.cpp.o CMakeFiles/NGConverter.dir/NGConverter/src/MurmurHash3.cpp.o CMakeFiles/NGConverter.dir/NGConverter/src/NGConverter.cpp.o -o NGConverter  libCommon.a 
