@@ -234,8 +234,6 @@ class Block {
 
   // Friends
   friend class Process;
-
-  void DeleteFirst10MarkedMessagesAfter60Created();
 };
 
 #endif

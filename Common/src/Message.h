@@ -81,10 +81,12 @@
 using namespace tthread;
 
 class Message {
- public:
+ private:
 
   // Tag to allow deleting
   bool Delete;
+
+ public:
 
   // ******************************************************
   // Attributes
