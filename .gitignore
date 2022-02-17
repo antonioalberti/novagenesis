@@ -116,3 +116,4 @@ Thumbs.db
 *.jpeg
 *.jpg
 *.dat
+/cmake-build-debug

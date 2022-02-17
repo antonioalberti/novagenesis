@@ -1,0 +1,1 @@
+grep -m1 -Po '<title>\K.*?(?=</title>)' index.html

@@ -1,9 +1,9 @@
 #!/bin/bash
-cp -i /home/alberti/NovaGenesis/App/Debug/App /home/alberti/NovaGenesis/bin/
-cp -i /home/alberti/NovaGenesis/Common/Debug/libCommon.a /home/alberti/NovaGenesis/bin/
-cp -i /home/alberti/NovaGenesis/HTS/Debug/HTS /home/alberti/NovaGenesis/bin/
-cp -i /home/alberti/NovaGenesis/PSS/Debug/PSS /home/alberti/NovaGenesis/bin/
-cp -i /home/alberti/NovaGenesis/PGS/Debug/PGS /home/alberti/NovaGenesis/bin/
-cp -i /home/alberti/NovaGenesis/GIRS/Debug/GIRS /home/alberti/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/App/Debug/App /home/william/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/Common/Debug/libCommon.a /home/william/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/HTS/Debug/HTS /home/william/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/PSS/Debug/PSS /home/william/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/PGS/Debug/PGS /home/william/NovaGenesis/bin/
+cp -i /home/william/NovaGenesis/GIRS/Debug/GIRS /home/william/NovaGenesis/bin/
 
 

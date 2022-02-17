@@ -417,9 +417,9 @@ int Process::GetBlock(string _LN, Block *&_PB)
 				{
 					_PB=PB;
 
-					break;
+				Status=OK;
+				break;
 
-					Status=OK;
 				}
 		}
 
@@ -929,6 +929,54 @@ void Process::DeleteMarkedMessages()
 #endif
 		}
 
+}
+
+// Delete the first 10 messages marked to be deleted after 60 messages processed
+void Process::DeleteFirst10MarkedMessagesAfter60Created()
+{
+  for (unsigned int i=0; i<MAX_MESSAGES_IN_MEMORY; i++)
+	{
+	  if (Controls[i] == BUSY)
+		{
+		  Message *Temp=Messages[i];
+
+		  if (Temp->GetDeleteFlag() == true)
+			{
+
+#ifdef DEBUG
+			  cout << "(The following message with index "<<i<<" will be deleted.)"<< endl;
+
+							cout << "(" << endl << *Messages[i] << ")"<< endl << endl;
+
+#endif
+
+			  delete Temp;
+
+			  Messages[i]=NULL;
+
+			  Controls[i]=FREE; // Frees the position
+
+			  NoM--;
+			}
+#ifdef DEBUG
+		  else
+						{
+
+							cout <<i<<" busy, but not marked to be deleted."<<endl;
+
+							cout << "(" << endl << *Messages[i] << ")"<< endl << endl;
+
+
+						}
+#endif
+		}
+#ifdef DEBUG
+	  else
+				{
+					cout <<i<<" is free to new messages."<<endl;
+				}
+#endif
+	}
 }
 
 void Process::MarkUnmarkedMessagesPerTime(double _Threshold)

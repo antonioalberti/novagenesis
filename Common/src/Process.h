@@ -314,6 +314,9 @@ class Process {
   // Delete the messages marked to be deleted
   void DeleteMarkedMessages ();
 
+  // Delete the first 10 messages marked to be deleted after 60 messages processed
+  void DeleteFirst10MarkedMessagesAfter60Created();
+
   // Mark unmarked messages to delete
   void MarkUnmarkedMessagesPerTime (double _Threshold);
 
