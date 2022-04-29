@@ -3,6 +3,22 @@ project(novagenesis)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I/usr/include/glib-2.0")
+
+FIND_PACKAGE(PkgConfig REQUIRED)
+PKG_CHECK_MODULES(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
+
+INCLUDE_DIRECTORIES(
+        ${GLIB_INCLUDE_DIRS}
+)
+
+LINK_DIRECTORIES(${GLIB_LIBRARY_DIRS})
+
+PKG_CHECK_MODULES(GIO REQUIRED gio-unix-2.0)  # just reference the entire GTK if this causes issues
+
+INCLUDE_DIRECTORIES(${GIO_INCLUDE_DIRS})
+LINK_DIRECTORIES(${GIO_LIBRARY_DIRS})
+
 include_directories(ContentApp/src)
 include_directories(Common/src)
 include_directories(Common/src/rapidjson)
@@ -487,19 +503,6 @@ add_executable(NRNCS
         NRNCS/src/NRSubBind01.h)
 
 target_link_libraries (NRNCS LINK_PRIVATE Common)
-
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -I/usr/include/glib-2.0")
-
-FIND_PACKAGE(PkgConfig REQUIRED)
-PKG_CHECK_MODULES(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
-
-INCLUDE_DIRECTORIES(
-        ${GLIB_INCLUDE_DIRS}
-)
-
-LINK_DIRECTORIES(${GLIB_LIBRARY_DIRS})
-LINK_DIRECTORIES(${GIO_LIBRARY_DIRS})
 
 FILE(GLOB SRC NGAppCommunicator/src/*.cpp)
 

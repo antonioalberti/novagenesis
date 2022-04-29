@@ -1,4 +1,8 @@
-/home/william/clion-2021.1.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/william/newWorkspace/novagenesis
+/home/aa/clion-2021.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/aa/workspace/novagenesis
+-- Checking for module 'glib-2.0'
+--   Found glib-2.0, version 2.64.6
+-- Checking for module 'gio-unix-2.0'
+--   Found gio-unix-2.0, version 2.64.6
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/william/newWorkspace/novagenesis/cmake-build-debug
+-- Build files have been written to: /home/aa/workspace/novagenesis/cmake-build-debug

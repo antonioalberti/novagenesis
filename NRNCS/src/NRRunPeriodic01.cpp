@@ -70,6 +70,8 @@ NRRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
   PNR = (NR *)PB;
 
+
+
 #ifdef DEBUG
 
   PB->S << Offset << this->GetLegibleName () << endl;

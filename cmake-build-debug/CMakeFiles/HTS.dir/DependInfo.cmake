@@ -1,42 +1,25 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/william/newWorkspace/novagenesis/HTS/src/DHT.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/DHT.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/DHTDeliveryBind01.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/DHTDeliveryBind01.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/DHTMsgCl01.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/DHTMsgCl01.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/DHTRunInitialization01.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/DHTRunInitialization01.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/DHTRunPeriodic01.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/DHTRunPeriodic01.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/HTS.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/HTS.cpp.o"
-  "/home/william/newWorkspace/novagenesis/HTS/src/execHTS.cpp" "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/HTS.dir/HTS/src/execHTS.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../App/src"
-  "../Common/src"
-  "../Common/src/rapidjson"
-  "../Common/src/rapidjson/error"
-  "../Common/src/rapidjson/internal"
-  "../GIRS/src"
-  "../HTS/src"
-  "../IoTTestApp/src"
-  "../NBTestApp/src"
-  "../PGCS/src"
-  "../PSS/src"
-  "../NRNCS/src"
-  "../NGAppCommunicator/src"
-  "../NGAppPublisher/src"
-  "/usr/include/glib-2.0"
-  "/usr/lib64/glib-2.0/include"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/aa/workspace/novagenesis/HTS/src/DHT.cpp" "CMakeFiles/HTS.dir/HTS/src/DHT.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/DHT.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/DHTDeliveryBind01.cpp" "CMakeFiles/HTS.dir/HTS/src/DHTDeliveryBind01.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/DHTDeliveryBind01.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/DHTMsgCl01.cpp" "CMakeFiles/HTS.dir/HTS/src/DHTMsgCl01.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/DHTMsgCl01.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/DHTRunInitialization01.cpp" "CMakeFiles/HTS.dir/HTS/src/DHTRunInitialization01.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/DHTRunInitialization01.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/DHTRunPeriodic01.cpp" "CMakeFiles/HTS.dir/HTS/src/DHTRunPeriodic01.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/DHTRunPeriodic01.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/HTS.cpp" "CMakeFiles/HTS.dir/HTS/src/HTS.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/HTS.cpp.o.d"
+  "/home/aa/workspace/novagenesis/HTS/src/execHTS.cpp" "CMakeFiles/HTS.dir/HTS/src/execHTS.cpp.o" "gcc" "CMakeFiles/HTS.dir/HTS/src/execHTS.cpp.o.d"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/william/newWorkspace/novagenesis/cmake-build-debug/CMakeFiles/Common.dir/DependInfo.cmake"
+  "/home/aa/workspace/novagenesis/cmake-build-debug/CMakeFiles/Common.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

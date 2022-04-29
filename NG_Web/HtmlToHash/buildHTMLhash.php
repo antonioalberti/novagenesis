@@ -1,13 +1,13 @@
 <?php
 
 /* Bin that Get hash from file */
-$ngconvert = "/home/william/newWorkspace/novagenesis/cmake-build-debug/NGConverter";
+$ngconvert = "/home/aa/workspace/novagenesis/cmake-build-debug/NGConverter";
 /* Bin that Get wordlist from file */
-$striptags = "/home/william/newWorkspace/novagenesis/NG_Web/StripTags/strip.php";
+$striptags = "/home/aa/workspace/novagenesis/NG_Web/StripTags/strip.php";
 /* Input */
-$htmlpath = "/home/william/newWorkspace/novagenesis/NG_Web/HtmlToHash/SiteFiles/HTMLFiles";
+$htmlpath = "/home/aa/workspace/novagenesis/NG_Web/HtmlToHash/SiteFiles/HTMLFiles";
 /* Output */
-$hashpath = "/home/william/newWorkspace/novagenesis/NG_Web/HtmlToHash/SiteFiles/NGFiles";
+$hashpath = "/home/aa/workspace/novagenesis/NG_Web/HtmlToHash/SiteFiles/NGFiles";
 
 function isHtml($folder,$file){
 	return (strrpos("$folder/$file",".html") === (strlen("$folder/$file")-5));
