@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
 
 # Create NovaGenesis folders
-RUN cd /home && mkdir ng && cd ng && mkdir workspace && cd workspace && mkdir novagenesis && cd novagenesis
+RUN cd /home && mkdir ng && cd ng && mkdir workspace && cd workspace && mkdir novagenesis && cd novagenesis && mkdir Scripts && cd Scripts && mkdir Docker && cd Docker && mkdir Results
 
 # Copy NovaGenesis folders to the container
 COPY /Common /home/ng/workspace/novagenesis/Common
