@@ -267,7 +267,7 @@ int main (int argc, char *argv[])
 		  Identifiers.push_back ("FF:FF:FF:FF:FF:FF");
 
 		  //TODO: FIXP/Update - Increased MTU to improve throughput
-		  Sizes.push_back (1480);
+		  Sizes.push_back (1200);
 
 		  // Set the shm key
 		  key_t Key = 11;
