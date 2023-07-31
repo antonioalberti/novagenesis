@@ -105,6 +105,10 @@ GWHelloIPC01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 			{
 			  GWMsgCl01->GetArgument (1, ReceivedMessageSources);
 
+        PB->S <<endl;
+
+        PB->S << Offset <<  "(Discovered the peer service = "<<PeerData.at (1)<<" via shared memory. IPC is working properly.)"<<endl;
+
 			  PB->GenerateSCNFromCharArrayBinaryPatterns (PeerData.at (1), HashLegiblePeerProcessName);
 
 			  // Creating a new message
@@ -252,8 +256,6 @@ GWHelloIPC01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 
 				  Status = OK;
 
-				  //PB->S << Offset <<  "(Moving to operational state)"<<endl;
-
 				  PB->State = "operational";
 				}
 			  else
@@ -273,4 +275,3 @@ GWHelloIPC01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 
   return Status;
 }
-

@@ -114,7 +114,7 @@
 #define MAX_MESSAGES_IN_MEMORY 30000    		/* This is maximum number of messages that can be accommodated on the memory of a process. If you require more messages in memory increase this size */
 #define MAX_MESSAGE_SIZE 33554532        		/* The maximum size of a message. Also, configures the maximum size at shared memory. There is no relation to the sockets MTU */
 #define NUMBER_OF_PARALLEL_SHARED_MEMORIES 6    /* Regulates how many parallel shared memories are employed in a process to receive messages at IPC */
-#define NUMBER_OF_THREADS_AT_SOCKET_DISPATCHER 6 /* This is the number of simultaneous threads that are employed at a certain socket to treat received protocol data units of all technologies */
+#define NUMBER_OF_THREADS_AT_SOCKET_DISPATCHER 8 /* This is the number of simultaneous threads that are employed at a certain socket to treat received protocol data units of all technologies */
 #define MAX_NUMBER_OF_THREADS 1000
 #define PORT "9034"   // port we're listening on, just in case we need TCP/IP for some reason!!
 #define TIMEOUT 60 // TODO - FIXP/Update - This timeout (in seconds) can be used to limit some excessive delays in message transmission and reception
