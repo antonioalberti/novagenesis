@@ -1947,12 +1947,14 @@ void Process::GenerateSCNFromProcessBinaryPatterns(Process *_PP, string &_SCN)
 int Process::GenerateSCNFromCharArrayBinaryPatterns(char *_Input, long long _Size, string &_SCN)
 {
 	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_Size,_SCN);
+	return 0;
 }
 
 // Generate a self-certified name from a char array
 int Process::GenerateSCNFromCharArrayBinaryPatterns(string _Input, string &_SCN)
 {
 	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_SCN);
+	return 0;
 }
 
 // Set a value behind a key
