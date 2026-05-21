@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/ng/workspace/novagenesis/cmake-build-debug
+cd /home/ng/workspace/novagenesis/Build
 
 # Required to avoid permission issues
 chmod -R 777 /home/ng/workspace/novagenesis
