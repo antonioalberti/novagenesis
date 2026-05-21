@@ -20,7 +20,7 @@ fi
 
 for i in $SERVICES; do
   echo "Compiling $i..."
-  if g++ -std=c++20 -O0 -g3 -p -pg -Wall -fmessage-length=0 -pthread -Wno-deprecated \
+  if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
     -o "$BUILD_DIR/$i" "$i/src/"*.cpp Common/src/*.cpp \
     -I Common/src/ -lpthread -lrt; then
     echo "✓ $i compiled successfully"

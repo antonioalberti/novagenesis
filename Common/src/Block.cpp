@@ -1343,7 +1343,7 @@ void Block::GenerateSCNFromBlockBinaryPatterns(Block *_PB, string &_SCN)
 // Generate a self-certified name from a char array
 int Block::GenerateSCNFromCharArrayBinaryPatterns(const char *_Input, long long _Size, string &_SCN)
 {
-	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_Size,_SCN);
+	return GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_Size,_SCN);
 
 	//cout<<"(SCN = "<<_SCN<<")"<<endl;
 }
@@ -1351,7 +1351,7 @@ int Block::GenerateSCNFromCharArrayBinaryPatterns(const char *_Input, long long 
 // Generate a self-certified name from a char array
 int Block::GenerateSCNFromCharArrayBinaryPatterns(string _Input, string &_SCN)
 {
-	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_SCN);
+	return GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_SCN);
 
 	//cout<<"(SCN = "<<_SCN<<")"<<endl;
 }
@@ -1359,7 +1359,7 @@ int Block::GenerateSCNFromCharArrayBinaryPatterns(string _Input, string &_SCN)
 // Generate a self-certified name from a message object ostream
 int Block::GenerateSCNFromMessageBinaryPatterns(Message *_M, string &_SCN)
 {
-	GenerateSCNFromMessageBinaryPatterns4Bytes(_M,_SCN);
+	return GenerateSCNFromMessageBinaryPatterns4Bytes(_M,_SCN);
 
 	//cout<<"(SCN = "<<_SCN<<")"<<endl;
 }

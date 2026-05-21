@@ -2034,12 +2034,12 @@ int MessageBuilder::GenerateSCNFromCharArrayBinaryPatterns16Bytes(string _Input,
 // Generate a self-certified name from a char array
 int MessageBuilder::GenerateSCNFromCharArrayBinaryPatterns(const char *_Input, long long _Size, string &_SCN)
 {
-	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_Size,_SCN);
+	return GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_Size,_SCN);
 }
 
 // Generate a self-certified name from a char array
 int MessageBuilder::GenerateSCNFromCharArrayBinaryPatterns(string _Input, string &_SCN)
 {
-	GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_SCN);
+	return GenerateSCNFromCharArrayBinaryPatterns4Bytes(_Input,_SCN);
 }
 
