@@ -541,7 +541,8 @@ void GW::ReadFromOutputQueue ()
       // Wait for output messages or stop flag (condition variable replaces busy-wait)
       {
         std::unique_lock<std::mutex> lock(OutputQueueMutex);
-        OutputQueueCV.wait(lock, [this](){ return NewOutputMessage || StopGateway; });
+        OutputQueueCV.wait_for(lock, std::chrono::milliseconds(1),
+                               [this](){ return NewOutputMessage || StopGateway; });
         if (StopGateway) break;
         NewOutputMessage = false;
       }
@@ -631,7 +632,8 @@ void GW::Gateway ()
       // Wait for input queue or stop flag (condition variable replaces busy-wait)
       {
         std::unique_lock<std::mutex> lock(InputQueueMutex);
-        InputQueueCV.wait(lock, [this](){ return !InputQueue.empty() || StopGateway; });
+        InputQueueCV.wait_for(lock, std::chrono::milliseconds(1),
+                              [this](){ return !InputQueue.empty() || StopGateway; });
         if (StopGateway) break;
       }
 
