@@ -1204,7 +1204,7 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 			}
 		}
 
-	  if (shmid > 0)
+	  if (shmid != -1)
 		{
 		  mutex = sem_open (_oqs.c_str (), O_CREAT, 0666, 1);
 

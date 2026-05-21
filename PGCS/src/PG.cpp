@@ -2261,7 +2261,7 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 	    PGW->ReturnIPCSHMID((key_t)_shm_key, shmid_z);
 	  }
 
-	  if (shmid_z > 0)
+	  if (shmid_z != -1)
 	  {
 
 #ifdef DEBUG3
