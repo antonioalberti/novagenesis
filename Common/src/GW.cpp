@@ -87,6 +87,16 @@ GW::GW (string _LN, Process *_PP, unsigned int _Index, string _Path) : Block (_L
   // Setting the delays
   DelayBeforeStatusIPC = 2;
 
+  // Initialize output message notification flag
+  NewOutputMessage = false;
+
+  // Cache Output_Queue semaphore to avoid repeated sem_open
+  sem_t* out_sem = sem_open("Output_Queue", O_CREAT, 0666, 1);
+  if (out_sem != SEM_FAILED)
+    {
+      CachedSemaphores["Output_Queue"] = out_sem;
+    }
+
   Action *PA = 0;
   CommandLine *PCL = 0;
   Block *PHTB = 0;
@@ -369,11 +379,17 @@ void GW::PushToInputQueue (Message *M)
 
 #endif
 
-			  // Push the message to the queue
-			  InputQueue.push (M);
+		  // Push the message to the queue
+		  InputQueue.push (M);
 
-			  // Increases the tag counter
-			  InputQueueTag++;
+		  // Increases the tag counter
+		  InputQueueTag++;
+
+		  // Notify Gateway thread that new input is available
+		  {
+		    std::lock_guard<std::mutex> lock(InputQueueMutex);
+		    InputQueueCV.notify_one();
+		  }
 			}
 		  else
 			{
@@ -452,15 +468,22 @@ void GW::PushToOutputQueue (std::string OQS, Message *M)
 
 					  //S << "          (The size of the OutputQueue is = "<<OutputQueue.size()<<")"<<endl;
 
-					  // Increases the tag counter
-					  OutputQueueTag++;
+				  // Increases the tag counter
+				  OutputQueueTag++;
 
-					}
-				  else
-					{
-					  S << "          (ERROR: The message has less than 3 command lines at output queue)" << endl;
+				  // Notify output thread that new messages are available
+				  {
+				    std::lock_guard<std::mutex> lock(OutputQueueMutex);
+				    NewOutputMessage = true;
+				    OutputQueueCV.notify_one();
+				  }
 
-					  // Mark to delete the message
+				}
+			  else
+				{
+				  S << "          (ERROR: The message has less than 3 command lines at output queue)" << endl;
+
+				  // Mark to delete the message
 					  M->MarkToDelete ();
 					}
 				}
@@ -513,9 +536,17 @@ void GW::ReadFromOutputQueue ()
   // Set the semaphore name
   string SemaphoreName = "Output_Queue";
 
-  while (1)
-	{
-	  mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+  while (StopGateway == false)
+    {
+      // Wait for output messages or stop flag (condition variable replaces busy-wait)
+      {
+        std::unique_lock<std::mutex> lock(OutputQueueMutex);
+        OutputQueueCV.wait(lock, [this](){ return NewOutputMessage || StopGateway; });
+        if (StopGateway) break;
+        NewOutputMessage = false;
+      }
+
+      mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
 
 	  // Check for error on semaphore open
 	  if (mutex != SEM_FAILED)
@@ -593,19 +624,23 @@ void GW::Gateway ()
   long long int MessageSize = 0;
 
   // Added in April 11th, 2021 to provide a separated thread for output queues serving
-  tthread::thread *T = new thread (&GW::ReadFromOutputQueueThreadWrapper, this);
+  tthread::thread *T = new tthread::thread (&GW::ReadFromOutputQueueThreadWrapper, this);
 
   while (StopGateway == false) // If true, the gateway will exit
-	{
-	  // ****************************************************************************
-	  // Step 1 : Read InputQueue
-	  // ****************************************************************************
+    {
+      // Wait for input queue or stop flag (condition variable replaces busy-wait)
+      {
+        std::unique_lock<std::mutex> lock(InputQueueMutex);
+        InputQueueCV.wait(lock, [this](){ return !InputQueue.empty() || StopGateway; });
+        if (StopGateway) break;
+      }
 
-	  // Verify if there is a message on the queue
-	  if (!InputQueue.empty ())
-		{
-		  // Check the message in the input queue
-		  PM1 = InputQueue.top ();
+      // ****************************************************************************
+      // Step 1 : Read InputQueue
+      // ****************************************************************************
+
+      // Check the message in the input queue
+      PM1 = InputQueue.top ();
 
 		  // Get the message time
 		  ScheduledTime = PM1->GetTime ();
@@ -727,16 +762,15 @@ void GW::Gateway ()
 
 #endif
 
-			  // Make the pointer null
-			  PM1 = NULL;
+		  // Make the pointer null
+		  PM1 = NULL;
 
-			  RunFlag = false;
-			}
+		  RunFlag = false;
 		}
 
-	  // ****************************************************************************
-	  // Step 4 : Read OS IPC
-	  // ****************************************************************************
+      // ****************************************************************************
+      // Step 4 : Read OS IPC
+      // ****************************************************************************
 
 	  // Read from shared memory
 	  ReadFromSharedMemory3 ();

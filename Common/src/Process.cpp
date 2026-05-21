@@ -1025,7 +1025,7 @@ void Process::RunPrompt()
 	CLI *PCLI=(CLI*)PCLIB;
 
 	// Create a CLI prompt thread
-	thread t1(&CLI::PromptThreadWrapper,PCLI);
+	tthread::thread t1(&CLI::PromptThreadWrapper,PCLI);
 
 	// Wait for the threads to finish
 	t1.join();

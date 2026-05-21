@@ -112,6 +112,14 @@
 #include <map>
 #endif
 
+#ifndef _CONDITION_VARIABLE
+#include <condition_variable>
+#endif
+
+#ifndef _MUTEX
+#include <mutex>
+#endif
+
 #ifndef _TINYTHREAD_H
 #include "tinythread.h"
 #endif
@@ -164,6 +172,20 @@ class GW : public Block {
   // Stop gateway flag
   bool StopGateway;
 
+  // Mutex and condition variable for input queue synchronization
+  std::mutex InputQueueMutex;
+  std::condition_variable InputQueueCV;
+
+  // Mutex and condition variable for output queue synchronization
+  std::mutex OutputQueueMutex;
+  std::condition_variable OutputQueueCV;
+
+  // Flag to notify output thread of new messages
+  bool NewOutputMessage;
+
+  // Cached semaphores for shared memory IPC
+  std::map<std::string, sem_t*> CachedSemaphores;
+
   // Pointer to the HT block
   HT *PHT;
 
@@ -176,9 +198,6 @@ class GW : public Block {
   // Write to the shared memory
   int WriteToSharedMemory3 (std::string OQS, Message *M);
 
-  // First attachment to learned shared memory
-  int ReturnIPCSHMID (key_t _Key, int &_shmid);
-
   // Sent messages counter
   unsigned long MessagesSent;
 
@@ -186,6 +205,9 @@ class GW : public Block {
   unsigned long MessagesReceived;
 
  public:
+
+  // First attachment to learned shared memory (public for PG access)
+  int ReturnIPCSHMID (key_t _Key, int &_shmid);
 
   // Define the maximum segment size on shared memory
   size_t MaxSegmentSize;
