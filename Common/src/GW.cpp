@@ -1124,7 +1124,7 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 	  long long TotalSize = 0;        // The total size of the message being transferred
 	  unsigned int NoCL = 0;
 	  unsigned char *data;            // Manipulate the content on shared memory
-	  int shmid;                    // Shared memory ID on OS for a certain key_t
+	  int shmid = -1;                    // Shared memory ID on OS for a certain key_t (init to -1 for safety)
 	  void *shm_address;            // The shared memory segment address
 	  string Offset = "          ";
 	  sem_t *mutex;
@@ -1416,7 +1416,10 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 // First attachment to learned shared memory
 int GW::ReturnIPCSHMID (key_t _Key, int &_shmid)
 {
-  //GW			*PGW=0;
+  // Initialize to error value to prevent undefined behavior (AMD vs Intel divergence)
+  _shmid = -1;
+  
+  //GW		*PGW=0;
   string Offset = "          ";
   string SemaphoreName;
   sem_t *mutex;

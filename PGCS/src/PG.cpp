@@ -2241,7 +2241,7 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
   int Status = ERROR;
   string Offset = "          ";
 
-  for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
+	for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
 	   z++) // Modified in 9th April 2021 to deal with parallel shared memories.
 	{
 	  long long TotalSize = 0;    // The total size of the message being transferred
@@ -2251,13 +2251,22 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 	  sem_t *mutex;
 	  vector<string> *Values = new vector<string>;
 
-	  if (PP->shmid[z] > 0)
-		{
-		  int _shm_key = 11 + z;
+	  // Get the correct shmid for PGCS's shared memory (key = 11 + z)
+	  // PP->shmid[z] is the process's own shmid for key PP->Key + z, not PGCS's shmid
+	  int shmid_z = -1;
+	  int _shm_key = 11 + z;
+  
+	  if (PGW != 0)
+	  {
+	    PGW->ReturnIPCSHMID((key_t)_shm_key, shmid_z);
+	  }
+
+	  if (shmid_z > 0)
+	  {
 
 #ifdef DEBUG3
 
-		  *_PF << "Writing to shared memory with key "<< _shm_key<<" and id = " << PP->shmid[z] << " at PG)" << endl;
+	*_PF << "Writing to shared memory with key "<< _shm_key<<" and id = " << shmid_z << " at PG)" << endl;
 
 #endif
 
@@ -2278,7 +2287,7 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 			  *_PF << Offset << "(Opened the semaphore " << SemaphoreName << ")" << endl;
 #endif
 
-			  if ((shm_address = shmat (PP->shmid[z], NULL, 0)) != NULL)
+			  if ((shm_address = shmat (shmid_z, NULL, 0)) != NULL)
 				{
 
 				  if (sem_trywait (mutex) == 0)
@@ -2314,7 +2323,7 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 
 #ifdef DEBUG2
 						  *_PF << "[5]       (Writing a message to the shared memory segment with key "<<_shm_key<<" identified by "
-							   << PP->shmid[z] << ")" << endl;
+		  << shmid_z << ")" << endl;
 #endif
 
 						  TotalSize = _MessageSize + 8;
