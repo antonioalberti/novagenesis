@@ -641,8 +641,12 @@ void GW::Gateway ()
       // Step 1 : Read InputQueue
       // ****************************************************************************
 
-      // Check the message in the input queue
-      PM1 = InputQueue.top ();
+      // Skip processing if queue empty (wait_for can time out without predicate satisfaction)
+      if (!InputQueue.empty())
+        {
+
+          // Check the message in the input queue
+          PM1 = InputQueue.top ();
 
 		  // Get the message time
 		  ScheduledTime = PM1->GetTime ();
@@ -767,8 +771,9 @@ void GW::Gateway ()
 		  // Make the pointer null
 		  PM1 = NULL;
 
-		  RunFlag = false;
-		}
+	  RunFlag = false;
+	}
+	}  // End of input queue processing block
 
       // ****************************************************************************
       // Step 4 : Read OS IPC
