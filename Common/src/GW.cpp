@@ -64,7 +64,7 @@
 
 //#define STATISTICS
 #define DEBUG // To follow message processing
-#define DEBUG1  // To follow shared memory access
+//#define DEBUG1  // To follow shared memory access
 //#define DEBUG2  // More on shm access
 //#define DEBUG3 // Even more on shm access
 
