@@ -107,9 +107,9 @@
 #include <fstream>
 #endif
 
-//#define DEBUG
-//#define DEBUG2
-//#define DEBUG1
+#define DEBUG
+#define DEBUG2
+#define DEBUG1
 //#define DEBUG3  // DEBUG6 or 3 are mutually exclusive
 //#define DEBUG5  // Details of each segment sent
 //#define DEBUG6 // TODO - FIXP/Update - Created a new debug only for child thread transfer
@@ -785,7 +785,7 @@ int PG::SendToARawSocket (string _Interface, string _Identifier, unsigned int _S
 
 #ifdef DEBUG
 
-						  S << Offset << "(Adding a delay of " << ProportionalDelay << " milliseconds to allow message processing on receiver)" << endl;
+						  S << Offset << "(Adding a delay of " << DelayBetweenMessageEmissions << " microseconds to allow message processing on receiver)" << endl;
 #endif
 
 						  if (Status == OK)
