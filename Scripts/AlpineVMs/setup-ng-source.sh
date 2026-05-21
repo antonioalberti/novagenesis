@@ -1,0 +1,61 @@
+#!/bin/ash
+# NovaGenesis Source VM Setup Script
+# Run as root on alpine-ng-source (192.168.0.36)
+
+set -e
+
+echo "=== NovaGenesis Source VM Setup ==="
+
+# Update and install dependencies
+apk update
+apk add build-base cmake git linux-headers libstdc++-dev
+
+# Create workspace
+mkdir -p /root/workspace
+cd /root/workspace
+
+# Clone NovaGenesis repository
+if [ ! -d "novagenesis" ]; then
+    git clone https://github.com/antonioalberti/novagenesis.git
+fi
+
+cd novagenesis
+
+# Build the project
+mkdir -p cmake-build-debug
+cd cmake-build-debug
+cmake ..
+make -j$(nproc)
+
+# Create IO directories
+mkdir -p /root/workspace/novagenesis/IO/Source1
+mkdir -p /root/workspace/novagenesis/IO/logs
+
+# Create startup script for Source VM
+cat > /root/start-ng-source.sh <<'EOF'
+#!/bin/ash
+cd /root/workspace/novagenesis/cmake-build-debug
+./PGCS &
+./NRNCS &
+./ContentApp &
+echo "NovaGenesis Source processes started"
+EOF
+chmod +x /root/start-ng-source.sh
+
+# Make network interface persistent - STATIC IP
+cat > /etc/network/interfaces <<'EOF'
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+    address 192.168.0.36
+    netmask 255.255.255.0
+    gateway 192.168.0.1
+EOF
+
+# Enable networking on boot
+rc-update add networking boot
+
+echo "=== Setup complete ==="
+echo "To start NovaGenesis: /root/start-ng-source.sh"
