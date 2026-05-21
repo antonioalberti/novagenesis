@@ -104,6 +104,7 @@
 
 #ifndef _UNISTD_H
 #include <unistd.h>
+#include <fstream>
 #endif
 
 //#define DEBUG
@@ -351,31 +352,55 @@ void PG::GetHostIPAddress (string _Stack, string _Interface, string &_Address)
 void PG::GetHostRawAddress (string _Interface, string &_Address)
 {
   int Size = 13;
-  char *ret = new char[Size];
+  char *ret = new char[Size]();
   struct ifreq s;
 
+  _Address = "";
+
+  // Try sysfs first (works without root, more reliable in containers/VMs)
+  string sysfs_path = "/sys/class/net/" + _Interface + "/address";
+  ifstream sysfs_file(sysfs_path.c_str());
+  if (sysfs_file.is_open())
+    {
+      string mac_str;
+      getline(sysfs_file, mac_str);
+      sysfs_file.close();
+
+      // Remove whitespace and validate length (17 chars = "xx:xx:xx:xx:xx:xx")
+      mac_str.erase(0, mac_str.find_first_not_of(" \t\n\r\f\v"));
+      mac_str.erase(mac_str.find_last_not_of(" \t\n\r\f\v") + 1);
+
+      if (mac_str.length() >= 17)
+        {
+          _Address = mac_str;
+          delete[] ret;
+          return;
+        }
+    }
+
+  // Fallback to ioctl
   int fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
   strcpy (s.ifr_name, _Interface.c_str ());
 
   if (fd >= 0 && ret && 0 == ioctl (fd, SIOCGIFHWADDR, &s))
-	{
-	  int i;
-	  for (i = 0; i < 6; ++i)
-		snprintf (ret + i * 2, static_cast<size_t>(Size - i * 2), "%02x", (unsigned char)s.ifr_addr.sa_data[i]);
-	}
+    {
+      int i;
+      for (i = 0; i < 6; ++i)
+        snprintf (ret + i * 2, static_cast<size_t>(Size - i * 2), "%02x", (unsigned char)s.ifr_addr.sa_data[i]);
 
-  for (int k = 0; k < 12; k = k + 2)
-	{
-	  if (k == 10)
-		{
-		  _Address = _Address + ret[k] + ret[k + 1];
-		}
-	  else
-		{
-		  _Address = _Address + ret[k] + ret[k + 1] + ":";
-		}
-	}
+      for (int k = 0; k < 12; k = k + 2)
+        {
+          if (k == 10)
+            {
+              _Address = _Address + ret[k] + ret[k + 1];
+            }
+          else
+            {
+              _Address = _Address + ret[k] + ret[k + 1] + ":";
+            }
+        }
+    }
 
   close (fd);
 

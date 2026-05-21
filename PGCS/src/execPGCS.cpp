@@ -253,21 +253,26 @@ int main (int argc, char *argv[])
 		  PGCS execPGS ("PGCS", Key, "No_Core", Port, Role, &Stacks, &Roles, &Interfaces, &Identifiers, &Sizes, Path);
 		}
 
-	  if (Alternative == "-de") // Discover peers doing broadcast at informed interface
-		{
-		  cout << "(The I/O path is " << Path << ")" << endl;
+  if (Alternative == "-de") // Discover peers doing broadcast at informed interface
+    {
+      cout << "(The I/O path is " << Path << ")" << endl;
 
-		  string Temp10 = argv[5];     // Interface
+      string Temp10 = argv[6];     // Interface (argv[5] is stack type, e.g. "Ethernet")
 
-		  cout << "(The PGCS will try to discover peers using the Interface " << Temp10 << ".)" << endl;
+      cout << "(The PGCS will try to discover peers using the Interface " << Temp10 << ".)" << endl;
 
-		  Stacks.push_back ("Ethernet");
-		  Roles.push_back ("Intra_Domain");
-		  Interfaces.push_back (Temp10);
-		  Identifiers.push_back ("FF:FF:FF:FF:FF:FF");
+      Stacks.push_back ("Ethernet");
+      Roles.push_back ("Intra_Domain");
+      Interfaces.push_back (Temp10);
+      Identifiers.push_back ("FF:FF:FF:FF:FF:FF");
 
-		  //TODO: FIXP/Update - Increased MTU to improve throughput
-		  Sizes.push_back (1200);
+      // Use MTU from command line if provided, else default 1200
+      unsigned int MTU = 1200;
+      if (argc > 7)
+        {
+          MTU = static_cast<unsigned int>(stoi(argv[7]));
+        }
+      Sizes.push_back (MTU);
 
 		  // Set the shm key
 		  key_t Key = 11;
