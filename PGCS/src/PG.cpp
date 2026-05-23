@@ -1308,11 +1308,14 @@ void PG::SocketDispatcher3 ()
 											  else
 												{
 #ifdef DEBUG6
-												  F1 << Offset << "(The semaphore "<<EthernetWiFiSemaphoreName[v]<<" is closed)" << endl;
+								  F1 << Offset << "(The semaphore "<<EthernetWiFiSemaphoreName[v]<<" is closed)" << endl;
 #endif
 
-												}
-											}
+									}
+
+								  // All threads busy — backoff before retrying
+								  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+								}
 										}
 									}
 									else
@@ -1369,54 +1372,56 @@ void PG::FinishReceivingThread (unsigned int Index)
 
   string SemaphoreName = "EthernetWiFi_" + IntToString (Index);
 
+  // Cache the semaphore with a LOCAL variable to avoid corruption:
+  // WriteToSharedMemory3() overwrites the member 'mutex' with shared-memory
+  // semaphores. A local pointer is immune to this.
+  sem_t *cached_mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+
+  if (cached_mutex == SEM_FAILED)
+	{
+	  perror ("Reading Ethernet/Wi-Fi Socket : unable to create/open semaphore");
+	  sem_unlink (SemaphoreName.c_str ());
+	  return;
+	}
+
   tthread::this_thread::sleep_for (tthread::chrono::seconds (1));
 
   while (1)
 	{
-	  mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
-
 	  T.clear (); // Clear the vector of received frames
 
-	  // Check for error on semaphore open
-	  if (mutex != SEM_FAILED)
+	  // Try-lock the semaphore (mutex pattern). If lock fails, sleep before retry.
+	  if (sem_trywait (cached_mutex) == 0)
 		{
-		  if (sem_trywait (mutex) == 0)
+		  // ******************************************************************************
+		  // Here is what will be done when the semaphore is open for this thread
+		  // ******************************************************************************
+
+		  unsigned int VS = TemporaryBuffers1[SemaphoreName].size ();
+
+		  if (VS > 0)
 			{
-			  // ******************************************************************************
-			  // Here is what will be done when the semaphore is open for this thread
-			  // ******************************************************************************
-
-			  unsigned int VS = TemporaryBuffers1[SemaphoreName].size ();
-
-			  if (VS > 0)
+			  for (unsigned x = 0; x < TemporaryBuffers1[SemaphoreName].size (); x++)
 				{
-				  for (unsigned x = 0; x < TemporaryBuffers1[SemaphoreName].size (); x++)
-					{
-					  T.push_back (TemporaryBuffers1[SemaphoreName].at (x));
-					}
+				  T.push_back (TemporaryBuffers1[SemaphoreName].at (x));
+				}
 
-				  TemporaryBuffers1[SemaphoreName].clear ();
+			  TemporaryBuffers1[SemaphoreName].clear ();
 #ifdef DEBUG3
-				  F1 << endl << endl << Offset << "(Copied frames to temporary vector)" << endl;
+			  F1 << endl << endl << Offset << "(Copied frames to temporary vector)" << endl;
 #endif
-				}
-
-			  if (sem_post (mutex) != 0) // Successfully locked the semaphore, so unlock it
-				{
-				  perror ("Reading Ethernet/Wi-Fi Socket : sem_post");
-				}
 			}
 
-		  if (sem_close (mutex) != 0)
+		  if (sem_post (cached_mutex) != 0)
 			{
-			  perror ("Reading Ethernet/Wi-Fi Socket : sem_close");
+			  perror ("Reading Ethernet/Wi-Fi Socket : sem_post");
 			}
 		}
-	  else
-		{
-		  perror ("Reading Ethernet/Wi-Fi Socket : unable to create/open semaphore");
 
-		  sem_unlink (SemaphoreName.c_str ());
+	  // Avoid CPU spin: sleep if no data was received this iteration
+	  if (T.empty ())
+		{
+		  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
 		}
 
 	  for (unsigned int y = 0; y < T.size (); y++) // Loop over all received messages
@@ -2287,14 +2292,21 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 			  *_PF << Offset << "(Opened the semaphore " << SemaphoreName << ")" << endl;
 #endif
 
-			  if ((shm_address = shmat (shmid_z, NULL, 0)) != NULL)
+if ((shm_address = shmat (shmid_z, NULL, 0)) != NULL)
+			{
+
+			  // Retry sem_trywait with backoff to avoid CPU spin
+			  int LockAttempts = 0;
+			  while (sem_trywait (mutex) != 0 && LockAttempts < 100)
+				{
+				  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+				  LockAttempts++;
+				}
+			  if (LockAttempts < 100)
 				{
 
-				  if (sem_trywait (mutex) == 0)
-					{
-
 #ifdef DEBUG2
-					  *_PF << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
+				  *_PF << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
 #endif
 
 					  data = (unsigned char *)shm_address;
@@ -2446,13 +2458,14 @@ int PG::WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _Mes
 						  perror ("writing SHM : sem_post");
 						}
 
-					} // (sem_trywait(mutex) != 0) means UNABLE TO LOCK. If someone locked, it is normal to get this condition
-				  else
-					{
+			} // (LockAttempts < 100) successfully locked
+		  else
+			{
+			  // Failed to lock after 100 attempts (10ms)
 #ifdef DEBUG1
-					  //perror("writing SHM : unable to lock the semaphore");
+			  //perror("writing SHM : unable to lock the semaphore");
 #endif
-					}
+			}
 
 				  // Sleep while wait for shared memory semaphore
 				  tthread::this_thread::sleep_for (tthread::chrono::microseconds (5));
