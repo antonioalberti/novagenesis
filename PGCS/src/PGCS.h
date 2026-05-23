@@ -36,6 +36,10 @@
 #include "Core.h"
 #endif
 
+#ifndef _STRESSTEST_H
+#include "StressTest.h"
+#endif
+
 #ifndef _PROCESS_H
 #include "Process.h"
 #endif
@@ -119,6 +123,7 @@ class PGCS : public Process {
   friend class PGMsgCl01;
   friend class PG;
   friend class Core;
+  friend class StressTest;
 };
 
 #endif

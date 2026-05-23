@@ -67,6 +67,8 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   PG *PPG = 0;
   string Offset = "                    ";
   PGCS *PPGCS = 0;
+  Block *PStressTestB = 0;
+  StressTest *PST = 0;
   string PeerPGSHID;
   string Parameter;
   string Value;
@@ -171,6 +173,27 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 			}
 
 		  break;
+		}
+
+	  if (Parameter == "StressTest")
+		{
+		  PB->PP->GetBlock ("StressTest", PStressTestB);
+
+		  if (PStressTestB != 0)
+			{
+			  PST = (StressTest *)PStressTestB;
+
+			  if (Value == "1")
+				{
+				  PST->Enabled = true;
+				  PB->S << Offset << "(StressTest is ENABLED)" << endl;
+				}
+			  else
+				{
+				  PST->Enabled = false;
+				  PB->S << Offset << "(StressTest is DISABLED)" << endl;
+				}
+			}
 		}
 	}
 
