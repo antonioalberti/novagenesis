@@ -551,10 +551,17 @@ void GW::ReadFromOutputQueue ()
 
 	  // Check for error on semaphore open
 	  if (mutex != SEM_FAILED)
+	{
+	  // Retry sem_trywait with backoff to avoid CPU spin
+	  int LockAttempts = 0;
+	  while (sem_trywait (mutex) != 0 && LockAttempts < 100)
 		{
-		  if (sem_trywait (mutex) == 0)
-			{
-			  map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
+		  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+		  LockAttempts++;
+		}
+	  if (LockAttempts < 100)
+		{
+		  map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
 
 			  for (it = OutputQueues.begin (); it != OutputQueues.end (); it++)
 				{
@@ -850,10 +857,17 @@ int GW::ReadFromSharedMemory3 ()
 			  if ((shm_address = shmat (PP->shmid[z], NULL, 0)) != NULL)
 				{
 
-				  if (sem_trywait (mutex) == 0)
-					{
+			  // Retry sem_trywait with backoff to avoid CPU spin
+			  int LockAttempts = 0;
+			  while (sem_trywait (mutex) != 0 && LockAttempts < 100)
+				{
+				  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+				  LockAttempts++;
+				}
+			  if (LockAttempts < 100)
+				{
 #ifdef DEBUG3
-					  S << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
+				  S << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
 #endif
 
 					  // *****************************
@@ -1114,9 +1128,9 @@ int GW::ReadFromSharedMemory3 ()
 						  perror ("reading SHM : sem_post");
 						}
 
-					} // (sem_trywait(mutex) != 0) means that the SHM is not free to lock
+				} // (LockAttempts < 100) successfully locked
 
-				  // Detach from shared memory
+			  // Detach from shared memory
 				  if (shmdt (shm_address) == -1)
 					{
 					  perror ("reading SHM : shmdt");
@@ -1223,11 +1237,18 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 			  if ((shm_address = shmat (shmid, NULL, 0)) != NULL)
 				{
 
-				  if (sem_trywait (mutex) == 0)
-					{
+// Retry sem_trywait with backoff to avoid CPU spin
+			  int LockAttempts = 0;
+			  while (sem_trywait (mutex) != 0 && LockAttempts < 100)
+				{
+				  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+				  LockAttempts++;
+				}
+			  if (LockAttempts < 100)
+				{
 
 #ifdef DEBUG3
-					  S << Offset << "(Locked the semaphore " << _oqs << ")" << endl;
+				  S << Offset << "(Locked the semaphore " << _oqs << ")" << endl;
 #endif
 
 					  data = (unsigned char *)shm_address;
@@ -1393,13 +1414,14 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 						  perror ("writing SHM : sem_post");
 						}
 
-					} // (sem_trywait(mutex) != 0) means UNABLE TO LOCK. If someone locked, it is normal to get this condition
-				  else
-					{
+} // (LockAttempts < 100) successfully locked
+			  else
+				{
+				  // Failed to lock after 100 attempts (10ms)
 #ifdef DEBUG1
-					  perror ("writing SHM : unable to lock the semaphore");
+				  perror ("writing SHM : unable to lock the semaphore");
 #endif
-					}
+				}
 
 				  // Sleep while wait for shared memory semaphore
 				  tthread::this_thread::sleep_for (tthread::chrono::microseconds (5));
