@@ -1,5 +1,14 @@
 #!/bin/bash
-# PGCS - Start this first (broadcast discovery mode)
+#
+# run_PGCS.sh — Start PGCS in deterministic (-p) or discovery (-de) mode
+#
+# Usage:
+#   Discovery mode:  bash run_PGCS.sh
+#   Deterministic:   bash run_PGCS.sh <peer_mac>
+#
+# Examples:
+#   bash run_PGCS.sh                              # -de (broadcast discovery)
+#   bash run_PGCS.sh 02:42:ac:14:00:0b            # -p (peer MAC)
 
 BASE=/home/gandalf/workspace/novagenesis
 
@@ -14,5 +23,14 @@ fi
 echo "Using interface: $IFACE"
 
 cd $BASE/cmake-build-debug
-# Usage: ./PGCS Path Port Role -de Ethernet Interface MTU
-./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -de Ethernet "$IFACE" 1200
+
+if [ $# -ge 1 ]; then
+    # Deterministic mode: -p with peer MAC
+    PEER_MAC="$1"
+    echo "Deterministic mode: peer MAC = ${PEER_MAC}"
+    sudo ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -p Ethernet Intra_Domain "$IFACE" "$PEER_MAC" 1200
+else
+    # Broadcast discovery mode
+    echo "Discovery mode (-de)"
+    sudo ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -de Ethernet "$IFACE" 1200
+fi
