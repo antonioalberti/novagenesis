@@ -310,6 +310,10 @@ class PG : public Block {
   unsigned long long StressSent;
   unsigned long long StressReceived;
   unsigned long long StressDropped;
+  double StressDelaySum;
+  double StressDelayMin;
+  double StressDelayMax;
+  int    StressDelayCount;
   File StressStats;
 
   // ------------------------------------------------------------------------------------------------------------------------------

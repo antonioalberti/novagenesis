@@ -2,10 +2,11 @@ FROM ubuntu:latest
 
 MAINTAINER Antonio Marcos Alberti "antonioalberti@gmail.com"
 
-# Minimal install — just compiler + cmake + network tools
+# Minimal install — compiler + cmake + debug tools + network tools
 RUN apt-get update -y && \
     apt-get install gcc g++ -y && \
     apt-get install cmake -y && \
+    apt-get install gdb valgrind strace -y && \
     apt-get install net-tools -y && \
     rm -rf /var/lib/apt/lists/*
 

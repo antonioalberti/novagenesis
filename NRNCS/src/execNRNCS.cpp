@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
 		  cout << "*******************************************************************" << endl;
 		  cout << "*                                                                 *" << endl;
 		  cout << "*  NovaGenesis(NG) Name Resolution and Network Cache Service v0.1 *" << endl;
-		  cout << "*  Copyright Antonio Marcos Alberti - Inatel - April 2021         *" << endl;
+		  cout << "*  Copyright Antonio Marcos Alberti - April 2021         *" << endl;
 		  cout << "*                                                                 *" << endl;
 		  cout << "*                                                                 *" << endl;
 		  cout << "*******************************************************************" << endl << endl;

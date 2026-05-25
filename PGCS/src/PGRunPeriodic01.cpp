@@ -589,40 +589,54 @@ int PGRunPeriodic01::StresstestScheduling ()
       return Status;
     }
 
-  if (StressCounter % (int)PPG->StressInterval == 0)
+  if (PPG->StressInterval > 0.0)
     {
+      int MessagesPerPeriod = (int)(PPG->DelayBeforeRunPeriodic / PPG->StressInterval);
+
+      if (MessagesPerPeriod < 1) MessagesPerPeriod = 1;
+
 #ifdef DEBUG
-
-      PB->S << Offset << "(Scheduling a stress test message to peer PGCSes.)" << endl;
-
+      PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod
+            << " messages this period. DelayBeforeRunPeriodic=" << PPG->DelayBeforeRunPeriodic
+            << " StressInterval=" << PPG->StressInterval << ")" << endl;
 #endif
 
-      // Setting up the process SCN as the space limiter
-      Limiters.push_back(PB->PP->Intra_Process);
+      for (int i = 0; i < MessagesPerPeriod; i++)
+        {
+          Message *RunStresstest = 0;
+          CommandLine *PCL = 0;
+          vector<string> Limiters;
+          vector<string> Sources;
+          vector<string> Destinations;
+          string SCN;
 
-      // Setting up the block SCN as the source SCN
-      Sources.push_back(PB->GetSelfCertifyingName());
+          // Setting up the process SCN as the space limiter
+          Limiters.push_back(PB->PP->Intra_Process);
 
-      // Setting up the block SCN as the destination SCN
-      Destinations.push_back(PB->GetSelfCertifyingName());
+          // Setting up the block SCN as the source SCN
+          Sources.push_back(PB->GetSelfCertifyingName());
 
-      // Creating a new message
-      PB->PP->NewMessage(GetTime(), 1, false, RunStresstest);
+          // Setting up the block SCN as the destination SCN
+          Destinations.push_back(PB->GetSelfCertifyingName());
 
-      // Creating the ng -cl -m command line
-      PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunStresstest, PCL);
+          // Creating a new message
+          PB->PP->NewMessage(GetTime(), 1, false, RunStresstest);
 
-      // Adding a ng -run --stresstest command line
-      RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
+          // Creating the ng -cl -m command line
+          PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunStresstest, PCL);
 
-      // Generate the SCN
-      PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
+          // Adding a ng -run --stresstest command line
+          RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
 
-      // Creating the ng -scn --s command line
-      PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
+          // Generate the SCN
+          PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
 
-      // Push the message to the GW input queue
-      PPG->PGW->PushToInputQueue(RunStresstest);
+          // Creating the ng -scn --s command line
+          PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
+
+          // Push the message to the GW input queue
+          PPG->PGW->PushToInputQueue(RunStresstest);
+        }
     }
 
   StressCounter++;

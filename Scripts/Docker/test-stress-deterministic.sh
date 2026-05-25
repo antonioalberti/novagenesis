@@ -92,7 +92,12 @@ echo "  PGCS2 log: docker logs -f pgcs2"
 echo "  Stats1:    cat /tmp/pgcs1-io/PGCS/StressTest_Stats.txt"
 echo "  Stats2:    cat /tmp/pgcs2-io/PGCS/StressTest_Stats.txt"
 echo "  CPU:       docker stats pgcs1 pgcs2"
-echo
+echo ""
+echo "Debug (if crash):"
+echo "  docker logs pgcs2 2>&1 | tail -100"
+echo "  docker exec pgcs1 gdb -batch -ex bt -ex info registers /home/ng/workspace/novagenesis/Build/PGCS PID"
+echo "  docker exec pgcs1 strace -p PGCS_PID 2>&1"
+echo ""
 echo "Stop:       docker stop pgcs1 pgcs2 && docker rm pgcs1 pgcs2 && docker network rm pgcs-stress-net"
 echo
 
