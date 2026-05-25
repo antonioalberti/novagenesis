@@ -121,7 +121,7 @@
 // #define DEBUG3  // DEBUG6 or 3 are mutually exclusive
 // #define DEBUG5  // Details of each segment sent
 // #define DEBUG6 // TODO - FIXP/Update - Created a new debug only for child thread transfer
-// #define STATISTICS
+#define STATISTICS
 
 union ethframe
 {
@@ -190,6 +190,10 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
   tsmidown->Initialization("tsmidown", "MEAN_ARITHMETIC", "Delay since message object instantiation (seconds) in the NG processes", 1);
   tsmidown1->Initialization("tsmidown1", "MEAN_ARITHMETIC", "Delay since message object instantiation (seconds) in the NG processes for type 1 messages", 1);
 
+  DelayStats = new OutputVariable(this);
+  DelayStats->Initialization("delay", "MEAN_ARITHMETIC", "One-way delay for stress test messages (seconds)", 1);
+  DelayStats->SetFileName("StressDelay_Results.txt");
+
 #endif
 
   MessageNumber = 0;
@@ -215,6 +219,7 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 
   // Open stress test stats file
   StressStats.OpenOutputFile("StressTest_Stats.txt", _Path, "DEFAULT");
+  DelayStats->SetFilePath(_Path);
 
   // Creating a -run --initialization message
   PP->NewMessage(GetTime(), 0, false, PIM);
@@ -241,6 +246,7 @@ PG::~PG()
   delete rtt;
   delete tsmidown;
   delete tsmidown1;
+  delete DelayStats;
 
   Tuple* Temp = 0;
 

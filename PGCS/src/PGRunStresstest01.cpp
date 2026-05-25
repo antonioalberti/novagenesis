@@ -134,6 +134,11 @@ PGRunStresstest01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
       PCL->NewArgument(1);
       PCL->SetArgumentElement(0, 0, PB->IntToString((int)PPG->StressSent));
 
+      // Embed send timestamp in payload for delay measurement
+      char TimeStr[64];
+      snprintf(TimeStr, sizeof(TimeStr), "%.6f", PB->GetTime());
+      StressPing->SetPayloadFromCharArray(TimeStr, strlen(TimeStr));
+
       // Generate SCN
       PB->GenerateSCNFromMessageBinaryPatterns(StressPing, SCN);
 

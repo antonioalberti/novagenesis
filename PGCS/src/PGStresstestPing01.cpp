@@ -34,6 +34,7 @@
 #endif
 
 #include <iostream>
+#include <stdexcept>
 
 #define DEBUG
 
@@ -62,15 +63,45 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
 
   PPG->StressReceived++;
 
-#ifdef DEBUG
-  PB->S << Offset << "(Stress ping received. Total Received=" << PPG->StressReceived << ")" << endl;
-#endif
+  // Calculate one-way delay from payload timestamp
+  double Delay = 0;
+  long long PayloadSize = 0;
+  if (_ReceivedMessage && _ReceivedMessage->GetPayloadSize(PayloadSize) == OK && PayloadSize > 0)
+    {
+      char *PayloadPtr = nullptr;
+      _ReceivedMessage->GetPayloadFromCharArray(PayloadPtr);
+      if (PayloadPtr)
+        {
+          string PayloadStr(PayloadPtr, PayloadSize);
+          try {
+            double SendTime = stod(PayloadStr);
+            Delay = PB->GetTime() - SendTime;
+            if (Delay < 0) Delay = 0;
+            PPG->DelayStats->Sample(Delay);
+            PPG->DelayStats->CalculateArithmetic();
+          } catch (...) {
+            Delay = 0;
+          }
+        }
+    }
 
   if (PPG->StressReceived % 100 == 0)
     {
-      PPG->StressStats << PPG->GetTime () << " Sent=" << PPG->StressSent
-		       << " Recv=" << PPG->StressReceived
-		       << " Drop=" << PPG->StressDropped << endl;
+      double LossRate = 0;
+      if (PPG->StressSent > 0)
+        LossRate = 100.0 * (1.0 - (double)PPG->StressReceived / (double)PPG->StressSent);
+
+      PPG->StressStats << PPG->GetTime()
+                       << " Sent=" << PPG->StressSent
+                       << " Recv=" << PPG->StressReceived
+                       << " Drop=" << PPG->StressDropped
+                       << " Loss=" << LossRate << "%"
+                       << " DelayAvg=" << PPG->DelayStats->GetMean()
+                       << " DelaySigma=" << PPG->DelayStats->GetSigma()
+                       << " DelayME=" << PPG->DelayStats->GetME()
+                       << " DelayLower=" << PPG->DelayStats->GetLower()
+                       << " DelayUp=" << PPG->DelayStats->GetUp()
+                       << endl;
     }
 
   return OK;

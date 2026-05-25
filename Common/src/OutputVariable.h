@@ -122,6 +122,16 @@ class OutputVariable {
   void CalculateWeighted (double Time);
   double GetMean ()
   { return Mean; }
+  double GetSigma ()
+  { return Sigma; }
+  double GetSE ()
+  { return SE; }
+  double GetME ()
+  { return ME; }
+  double GetLower ()
+  { return Lower; }
+  double GetUp ()
+  { return Up; }
 
   // Owner related functions
   void SetOwner (Block *Owner_)
