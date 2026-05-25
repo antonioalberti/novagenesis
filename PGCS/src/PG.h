@@ -302,6 +302,17 @@ class PG : public Block {
   double DelayBetweenExpositions;
 
   // ------------------------------------------------------------------------------------------------------------------------------
+  // Stress test counters and configuration
+  // ------------------------------------------------------------------------------------------------------------------------------
+
+  bool StressEnabled;
+  double StressInterval;
+  unsigned long long StressSent;
+  unsigned long long StressReceived;
+  unsigned long long StressDropped;
+  File StressStats;
+
+  // ------------------------------------------------------------------------------------------------------------------------------
   // Statistic variables and functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
@@ -326,6 +337,8 @@ class PG : public Block {
   friend class PGRunPublishing01;
   friend class PGRunPeriodic01;
   friend class PGRunExposition01;
+  friend class PGRunStresstest01;
+  friend class PGStresstestPing01;
 };
 
 struct PARAMETERS1 {

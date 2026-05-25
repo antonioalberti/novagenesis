@@ -4121,6 +4121,54 @@ PGCS/src/PGRunPublishing01.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.s
 .PHONY : PGCS/src/PGRunPublishing01.cpp.s
 
+PGCS/src/PGRunStresstest01.o: PGCS/src/PGRunStresstest01.cpp.o
+.PHONY : PGCS/src/PGRunStresstest01.o
+
+# target to build an object file
+PGCS/src/PGRunStresstest01.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o
+.PHONY : PGCS/src/PGRunStresstest01.cpp.o
+
+PGCS/src/PGRunStresstest01.i: PGCS/src/PGRunStresstest01.cpp.i
+.PHONY : PGCS/src/PGRunStresstest01.i
+
+# target to preprocess a source file
+PGCS/src/PGRunStresstest01.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.i
+.PHONY : PGCS/src/PGRunStresstest01.cpp.i
+
+PGCS/src/PGRunStresstest01.s: PGCS/src/PGRunStresstest01.cpp.s
+.PHONY : PGCS/src/PGRunStresstest01.s
+
+# target to generate assembly for a file
+PGCS/src/PGRunStresstest01.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.s
+.PHONY : PGCS/src/PGRunStresstest01.cpp.s
+
+PGCS/src/PGStresstestPing01.o: PGCS/src/PGStresstestPing01.cpp.o
+.PHONY : PGCS/src/PGStresstestPing01.o
+
+# target to build an object file
+PGCS/src/PGStresstestPing01.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o
+.PHONY : PGCS/src/PGStresstestPing01.cpp.o
+
+PGCS/src/PGStresstestPing01.i: PGCS/src/PGStresstestPing01.cpp.i
+.PHONY : PGCS/src/PGStresstestPing01.i
+
+# target to preprocess a source file
+PGCS/src/PGStresstestPing01.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.i
+.PHONY : PGCS/src/PGStresstestPing01.cpp.i
+
+PGCS/src/PGStresstestPing01.s: PGCS/src/PGStresstestPing01.cpp.s
+.PHONY : PGCS/src/PGStresstestPing01.s
+
+# target to generate assembly for a file
+PGCS/src/PGStresstestPing01.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PGCS.dir/build.make CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.s
+.PHONY : PGCS/src/PGStresstestPing01.cpp.s
+
 PGCS/src/execPGCS.o: PGCS/src/execPGCS.cpp.o
 .PHONY : PGCS/src/execPGCS.o
 
@@ -5032,6 +5080,12 @@ help:
 	@echo "... PGCS/src/PGRunPublishing01.o"
 	@echo "... PGCS/src/PGRunPublishing01.i"
 	@echo "... PGCS/src/PGRunPublishing01.s"
+	@echo "... PGCS/src/PGRunStresstest01.o"
+	@echo "... PGCS/src/PGRunStresstest01.i"
+	@echo "... PGCS/src/PGRunStresstest01.s"
+	@echo "... PGCS/src/PGStresstestPing01.o"
+	@echo "... PGCS/src/PGStresstestPing01.i"
+	@echo "... PGCS/src/PGStresstestPing01.s"
 	@echo "... PGCS/src/execPGCS.o"
 	@echo "... PGCS/src/execPGCS.i"
 	@echo "... PGCS/src/execPGCS.s"

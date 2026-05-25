@@ -73,6 +73,7 @@ class PGRunPeriodic01 : public Action {
   // TODO: Added in Feb. 2022 to deal with hellos frequency
   unsigned int HelloCounter;
   unsigned int ExpositionCounter;
+  unsigned int StressCounter;
 
   // Run the actions behind a received message
   virtual int
@@ -89,6 +90,9 @@ class PGRunPeriodic01 : public Action {
 
   // Publish PGCS data to NRNCS
   int PGCSPublishingScheduling ();
+
+  // Schedule stress test messages to peer PGCSes
+  int StresstestScheduling ();
 
 };
 

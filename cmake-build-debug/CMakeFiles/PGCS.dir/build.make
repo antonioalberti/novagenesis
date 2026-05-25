@@ -517,6 +517,34 @@ CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/PGCS/src/PGRunPublishing01.cpp -o CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.s
 
+CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o: CMakeFiles/PGCS.dir/flags.make
+CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o: /home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp
+CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o: CMakeFiles/PGCS.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o -MF CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o.d -o CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp
+
+CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp > CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.i
+
+CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp -o CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.s
+
+CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o: CMakeFiles/PGCS.dir/flags.make
+CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o: /home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp
+CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o: CMakeFiles/PGCS.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o -MF CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o.d -o CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp
+
+CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp > CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.i
+
+CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp -o CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.s
+
 # Object files for target PGCS
 PGCS_OBJECTS = \
 "CMakeFiles/PGCS.dir/PGCS/src/Core.cpp.o" \
@@ -550,7 +578,9 @@ PGCS_OBJECTS = \
 "CMakeFiles/PGCS.dir/PGCS/src/PGRunHello03.cpp.o" \
 "CMakeFiles/PGCS.dir/PGCS/src/PGRunInitialization01.cpp.o" \
 "CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o" \
-"CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.o"
+"CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.o" \
+"CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o" \
+"CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o"
 
 # External object files for target PGCS
 PGCS_EXTERNAL_OBJECTS =
@@ -587,10 +617,12 @@ PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGRunHello03.cpp.o
 PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGRunInitialization01.cpp.o
 PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o
 PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.o
+PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o
+PGCS: CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o
 PGCS: CMakeFiles/PGCS.dir/build.make
 PGCS: libCommon.a
 PGCS: CMakeFiles/PGCS.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Linking CXX executable PGCS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Linking CXX executable PGCS"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/PGCS.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

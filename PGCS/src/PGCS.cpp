@@ -102,10 +102,6 @@ PGCS::PGCS (string _LN, key_t _Key, string _flag, string _Port, string _Role, ve
 	  Core *PCore = (Core *)PCoreB;
 	}
 
-  // Create StressTest block (always, enabled/disabled via PGCS.ini)
-  Block *PStressTestB = 0;
-  NewBlock ("StressTest", PStressTestB);
-
   Stacks->size ();
 
   // Run the base class GW
@@ -190,31 +186,6 @@ int PGCS::NewBlock (string _LN, Block *&_PB)
 
 	  _PB = (Block *)PCore;
 
-	  InsertBlock (_PB);
-
-	  return OK;
-	}
-
-  if (_LN == "StressTest")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
-
-	  GetBlock (GWLN, PGWB);
-	  PGW = (GW *)PGWB;
-
-	  GetBlock (HTLN, PHTB);
-	  PHT = (HT *)PHTB;
-
-	  unsigned int Index = GetBlocksSize ();
-
-	  StressTest *PST = new StressTest (_LN, this, Index, PGW, PHT, GetPath ());
-
-	  _PB = (Block *)PST;
 	  InsertBlock (_PB);
 
 	  return OK;

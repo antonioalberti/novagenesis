@@ -41,12 +41,13 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG
+#define DEBUG
 
 PGRunPeriodic01::PGRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
   HelloCounter = 0;
   ExpositionCounter=0;
+  StressCounter=0;
 }
 
 PGRunPeriodic01::~PGRunPeriodic01 ()
@@ -91,6 +92,9 @@ PGRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
   // Publish PGCS data to PSS/NRNCS
   PGCSPublishingScheduling ();
+
+  // Schedule stress test messages to peer PGCSes
+  StresstestScheduling ();
 
   // Check for domain and upper level peer domain names
   //DiscoverDomainNames();
@@ -303,9 +307,9 @@ int PGRunPeriodic01::HelloScheduling ()
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
 #ifdef DEBUG
-  PB->S << Offset1 << "(Counter = " << Counter << " )" << endl;
-  PB->S << Offset1 << "(Counter % (int)PPG->DelayBetweenHellos01 = " << Counter % (int)PPG->DelayBetweenHellos01 << " )" << endl;
-  PB->S << Offset1 << "(Counter % (int)PPG->DelayBetweenHellos02 = " << Counter % (int)PPG->DelayBetweenHellos02 << " )" << endl;
+  PB->S << Offset1 << "(HelloCounter = " << HelloCounter << " )" << endl;
+  PB->S << Offset1 << "(HelloCounter % (int)PPG->DelayBetweenHellos01 = " << HelloCounter % (int)PPG->DelayBetweenHellos01 << " )" << endl;
+  PB->S << Offset1 << "(HelloCounter % (int)PPG->DelayBetweenHellos02 = " << HelloCounter % (int)PPG->DelayBetweenHellos02 << " )" << endl;
 #endif
 
   // ******************************************************
@@ -469,8 +473,8 @@ int PGRunPeriodic01::ExpositionScheduling ()
 	  // Creating the ng -cl -m command line
 	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
 
-	  // Adding a ng -run --periodic command line
-	  RunExposition->NewCommandLine ("-run", "--exposition", "0.1", PCL);
+	// Adding a ng -run --periodic command line
+	RunExposition->NewCommandLine ("-run", "--exposition", "0.1", PCL);
 
 	  // Generate the SCN
 	  PB->GenerateSCNFromMessageBinaryPatterns (RunExposition, SCN);
@@ -543,6 +547,85 @@ int PGRunPeriodic01::PGCSPublishingScheduling ()
 
 	  PPG->AlreadyPublishedBasicBindings = true;
 	}
+
+  return Status;
+}
+
+// Schedule stress test messages to peer PGCSes
+int PGRunPeriodic01::StresstestScheduling ()
+{
+  int Status = ERROR;
+  string Offset = "                    ";
+  PG *PPG = 0;
+  Message *RunStresstest = 0;
+  vector<string> Limiters;
+  vector<string> Sources;
+  vector<string> Destinations;
+  CommandLine *PCL = 0;
+
+  PPG = (PG *)PB;
+
+#ifdef DEBUG
+  PB->S << Offset << "(StresstestScheduling: StressEnabled=" << PPG->StressEnabled 
+        << " PGCSTuples.size=" << PPG->PGCSTuples.size() 
+        << " StressCounter=" << StressCounter 
+        << " StressInterval=" << PPG->StressInterval << ")" << endl;
+#endif
+
+  if (!PPG->StressEnabled)
+    {
+#ifdef DEBUG
+      PB->S << Offset << "(StresstestScheduling: StressTest DISABLED — exiting)" << endl;
+#endif
+      return Status;
+    }
+
+  // Only send if peers have been discovered (PGCSTuples is populated by PGHelloIHC01)
+  if (PPG->PGCSTuples.size() == 0)
+    {
+#ifdef DEBUG
+      PB->S << Offset << "(StresstestScheduling: No peers discovered yet — exiting)" << endl;
+#endif
+      return Status;
+    }
+
+  if (StressCounter % (int)PPG->StressInterval == 0)
+    {
+#ifdef DEBUG
+
+      PB->S << Offset << "(Scheduling a stress test message to peer PGCSes.)" << endl;
+
+#endif
+
+      // Setting up the process SCN as the space limiter
+      Limiters.push_back(PB->PP->Intra_Process);
+
+      // Setting up the block SCN as the source SCN
+      Sources.push_back(PB->GetSelfCertifyingName());
+
+      // Setting up the block SCN as the destination SCN
+      Destinations.push_back(PB->GetSelfCertifyingName());
+
+      // Creating a new message
+      PB->PP->NewMessage(GetTime(), 1, false, RunStresstest);
+
+      // Creating the ng -cl -m command line
+      PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunStresstest, PCL);
+
+      // Adding a ng -run --stresstest command line
+      RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
+
+      // Generate the SCN
+      PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
+
+      // Creating the ng -scn --s command line
+      PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
+
+      // Push the message to the GW input queue
+      PPG->PGW->PushToInputQueue(RunStresstest);
+    }
+
+  StressCounter++;
 
   return Status;
 }

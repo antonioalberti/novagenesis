@@ -187,8 +187,10 @@ add_executable(PGCS
     PGCS/src/PGRunPeriodic01.h
     PGCS/src/PGRunPublishing01.cpp
     PGCS/src/PGRunPublishing01.h
-    PGCS/src/StressTest.cpp
-    PGCS/src/StressTest.h)
+    PGCS/src/PGRunStresstest01.cpp
+    PGCS/src/PGRunStresstest01.h
+    PGCS/src/PGStresstestPing01.cpp
+    PGCS/src/PGStresstestPing01.h)
 
 target_link_libraries (PGCS LINK_PRIVATE Common)
 

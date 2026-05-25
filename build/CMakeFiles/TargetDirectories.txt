@@ -1,0 +1,11 @@
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/Common.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/ContentApp.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/GIRS.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/HTS.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/IoTTestApp.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/NBTestApp.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/PGCS.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/PSS.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/NRNCS.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/edit_cache.dir
+/home/gandalf/workspace/novagenesis/build/CMakeFiles/rebuild_cache.dir

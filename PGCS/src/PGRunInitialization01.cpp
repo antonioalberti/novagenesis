@@ -67,8 +67,6 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   PG *PPG = 0;
   string Offset = "                    ";
   PGCS *PPGCS = 0;
-  Block *PStressTestB = 0;
-  StressTest *PST = 0;
   string PeerPGSHID;
   string Parameter;
   string Value;
@@ -161,6 +159,32 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 			}
 		}
 
+	  if (Parameter == "StressTest")
+		{
+		  if (Value == "1")
+			{
+			  PPG->StressEnabled = true;
+			  PB->S << Offset << "(StressTest is ENABLED)" << endl;
+			}
+		  else
+			{
+			  PPG->StressEnabled = false;
+			  PB->S << Offset << "(StressTest is DISABLED)" << endl;
+			}
+		}
+
+	  if (Parameter == "StressInterval")
+		{
+		  Temp = PB->StringToDouble (Value);
+
+		  if (Temp > 0)
+			{
+			  PPG->StressInterval = Temp;
+
+			  PB->S << Offset << "(StressInterval is " << Temp << ")" << endl;
+			}
+		}
+
 	  if (Parameter == "DelayBetweenExpositions")
 		{
 		  Temp = PB->StringToDouble (Value);
@@ -173,27 +197,6 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 			}
 
 		  break;
-		}
-
-	  if (Parameter == "StressTest")
-		{
-		  PB->PP->GetBlock ("StressTest", PStressTestB);
-
-		  if (PStressTestB != 0)
-			{
-			  PST = (StressTest *)PStressTestB;
-
-			  if (Value == "1")
-				{
-				  PST->Enabled = true;
-				  PB->S << Offset << "(StressTest is ENABLED)" << endl;
-				}
-			  else
-				{
-				  PST->Enabled = false;
-				  PB->S << Offset << "(StressTest is DISABLED)" << endl;
-				}
-			}
 		}
 	}
 
