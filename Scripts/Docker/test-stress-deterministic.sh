@@ -53,7 +53,6 @@ docker run -d \
     --privileged \
     --ipc=private \
     --network pgcs-stress-net \
-    --name pgcs1 \
     -v /tmp/pgcs1-io:/home/ng/workspace/novagenesis/IO \
     ${IMAGE} \
     /home/ng/workspace/novagenesis/IO/PGCS/ 0 Intra_Domain \
@@ -66,7 +65,6 @@ docker run -d \
     --privileged \
     --ipc=private \
     --network pgcs-stress-net \
-    --name pgcs2 \
     -v /tmp/pgcs2-io:/home/ng/workspace/novagenesis/IO \
     ${IMAGE} \
     /home/ng/workspace/novagenesis/IO/PGCS/ 0 Intra_Domain \

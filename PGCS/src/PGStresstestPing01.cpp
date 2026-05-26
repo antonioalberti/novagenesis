@@ -36,7 +36,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#define DEBUG
+//#define DEBUG
 
 PGStresstestPing01::PGStresstestPing01 (string _LN, Block *_PB, MessageBuilder *_PMB)
 	: Action (_LN, _PB, _PMB)
@@ -87,14 +87,34 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
 
   if (PPG->StressReceived % 100 == 0)
     {
-      double LossRate = 0;
-      if (PPG->StressSent > 0)
-        LossRate = 100.0 * (1.0 - (double)PPG->StressReceived / (double)PPG->StressSent);
+      double LossRate = 100.0;
+      unsigned long long Expected = 0;
+      int NPeers = (int)PPG->PGCSTuples.size();
 
+      if (NPeers > 0 && PPG->StressInterval > 0)
+        {
+          double Elapsed = PB->GetTime() - PB->PP->InstantiationTime;
+          if (Elapsed > 0)
+            Expected = (unsigned long long)(NPeers * Elapsed / PPG->StressInterval);
+        }
+
+      if (Expected > 0)
+        LossRate = 100.0 * (1.0 - (double)PPG->StressReceived / (double)Expected);
+
+      // Sample loss rate to OutputVariable (exported to .dat)
+      PPG->Loss->Sample(LossRate);
+      PPG->Loss->CalculateArithmetic();
+      PPG->Loss->SampleToFile(PB->GetTime());
+
+      // Also write delay stats
+      PPG->DelayStats->SampleToFile(PB->GetTime());
+
+      // Summary line to StressStats
       PPG->StressStats << PPG->GetTime()
+                       << " NPeers=" << NPeers
                        << " Sent=" << PPG->StressSent
                        << " Recv=" << PPG->StressReceived
-                       << " Drop=" << PPG->StressDropped
+                       << " Expected=" << Expected
                        << " Loss=" << LossRate << "%"
                        << " DelayAvg=" << PPG->DelayStats->GetMean()
                        << " DelaySigma=" << PPG->DelayStats->GetSigma()

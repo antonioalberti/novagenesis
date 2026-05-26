@@ -161,6 +161,7 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
   StressSent = 0;
   StressReceived = 0;
   StressDropped = 0;
+  StressDelayCount = 0;
 
   // Set auxiliary variables
   AwareOfAPS = false;
@@ -181,18 +182,13 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 #ifdef STATISTICS
 
   // Allocating the statistics variables
-  rtt = new OutputVariable(this);
-  tsmidown = new OutputVariable(this);
-  tsmidown1 = new OutputVariable(this);
-
-  // Setting the statistics variables
-  rtt->Initialization("rtt", "MEAN_ARITHMETIC", "Round trip time for neighbor PGCS (seconds)", 1);
-  tsmidown->Initialization("tsmidown", "MEAN_ARITHMETIC", "Delay since message object instantiation (seconds) in the NG processes", 1);
-  tsmidown1->Initialization("tsmidown1", "MEAN_ARITHMETIC", "Delay since message object instantiation (seconds) in the NG processes for type 1 messages", 1);
-
   DelayStats = new OutputVariable(this);
-  DelayStats->Initialization("delay", "MEAN_ARITHMETIC", "One-way delay for stress test messages (seconds)", 1);
+  DelayStats->Initialization("delay", "MEAN_ARITHMETIC", "One-way delay for stress test messages (seconds)", 0);
   DelayStats->SetFileName("StressDelay_Results.txt");
+
+  Loss = new OutputVariable(this);
+  Loss->Initialization("loss", "MEAN_ARITHMETIC", "Packet loss rate for stress test (percent)", 0);
+  Loss->SetFileName("StressLoss_Results.txt");
 
 #endif
 
@@ -243,10 +239,8 @@ PG::~PG()
        << "[StressTest] Final: Sent=" << StressSent
        << " Received=" << StressReceived << " Dropped=" << StressDropped << endl;
 
-  delete rtt;
-  delete tsmidown;
-  delete tsmidown1;
   delete DelayStats;
+  delete Loss;
 
   Tuple* Temp = 0;
 
@@ -810,36 +804,6 @@ int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Si
                 MessageCounter++;
 
                 SequenceNumber = 0;
-
-#ifdef STATISTICS
-
-                Time = GetTime();
-
-                // Sample
-                tsmidown->Sample(Time - M->GetInstantiationTime());
-
-                // Update the mean
-                tsmidown->CalculateArithmetic();
-
-                // Sample to file
-                tsmidown->SampleToFile(Time);
-
-                // **************************************************
-                // Type 1 messages statistics
-                // **************************************************
-                if (M->GetType() == 1)
-                {
-                  // Sample
-                  tsmidown1->Sample(Time - M->GetInstantiationTime());
-
-                  // Update the mean
-                  tsmidown1->CalculateArithmetic();
-
-                  // Sample to file
-                  tsmidown1->SampleToFile(Time);
-                }
-
-#endif
               }
               else
               {
@@ -1793,34 +1757,6 @@ int PG::SendToAUDPSocket(string _Identifier, unsigned int _Size, Message* M)
               SequenceNumber = 0;
 
               Time = GetTime();
-
-#ifdef STATISTICS
-
-              // Sample
-              tsmidown->Sample(Time - M->GetInstantiationTime());
-
-              // Update the mean
-              tsmidown->CalculateArithmetic();
-
-              // Sample to file
-              tsmidown->SampleToFile(Time);
-
-              // **************************************************
-              // Type 1 messages statistics
-              // **************************************************
-              if (M->GetType() == 1)
-              {
-                // Sample
-                tsmidown1->Sample(Time - M->GetInstantiationTime());
-
-                // Update the mean
-                tsmidown1->CalculateArithmetic();
-
-                // Sample to file
-                tsmidown1->SampleToFile(Time);
-              }
-
-#endif
             }
             else
             {
@@ -2740,7 +2676,7 @@ void* PG::get_in_addr(struct sockaddr* sa)
 // Reset all statistics
 void PG::ResetStatistics()
 {
-  rtt->Reset();
+  // rtt removed - keeping only DelayStats for stress test
 }
 
 void PG::Hex2Char(char* szHex, unsigned char& rch)

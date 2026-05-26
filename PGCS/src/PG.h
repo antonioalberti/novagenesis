@@ -313,14 +313,11 @@ class PG : public Block {
   int    StressDelayCount;
   File StressStats;
   OutputVariable *DelayStats;
+  OutputVariable *Loss;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Statistic variables and functions
   // ------------------------------------------------------------------------------------------------------------------------------
-
-  OutputVariable *rtt;            // IHC Round trip time (seconds)
-  OutputVariable *tsmidown;        // Delay since instantiation up to IHC message forwarding (seconds)
-  OutputVariable *tsmidown1;        // Delay since instantiation up to IHC message forwarding (seconds) for message type 1
 
   void ResetStatistics ();
 
