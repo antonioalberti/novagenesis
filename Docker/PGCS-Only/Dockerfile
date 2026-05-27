@@ -8,6 +8,7 @@ RUN apt-get update -y && \
     apt-get install cmake -y && \
     apt-get install gdb valgrind strace -y && \
     apt-get install net-tools -y && \
+    apt-get install tcpdump -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Create NovaGenesis folders

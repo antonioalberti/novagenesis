@@ -7,6 +7,7 @@ RUN apt-get update -y && \
     apt-get install gcc g++ -y && \
     apt-get install cmake -y && \
     apt-get install net-tools -y && \
+    apt-get install tcpdump -y && \
     apt-get install python3 python3-pip -y
 
 # Install Pillow and numpy for image generation (BuildPhotos.py)

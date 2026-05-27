@@ -6,7 +6,8 @@ MAINTAINER Antonio Marcos Alberti "antonioalberti@gmail.com"
 RUN apt-get update -y && \
     apt-get install gcc g++ -y && \
     apt-get install cmake -y && \
-    apt-get install net-tools -y
+    apt-get install net-tools -y && \
+    apt-get install tcpdump -y
 
 # Prepare multiprocess supervisor
 RUN apt-get update && apt-get install -y supervisor
