@@ -103,14 +103,14 @@ PGMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> 
 				if (_PCL->GetArgument (0, Limiters) == OK && _PCL->GetArgument (1, Sources) == OK
 				  && _PCL->GetArgument (2, Destinations) == OK)
 				{
-				  cerr << ">>> PGMsgCl01: Arg0.size=" << Limiters.size()
-					   << " Arg1.size=" << Sources.size()
-					   << " Arg2.size=" << Destinations.size()
-					   << " Arg0[0]=" << Limiters.at(0)
-					   << " MyHID=" << PB->PP->GetHostSelfCertifyingName() << endl;
-				  for (unsigned int d = 0; d < Destinations.size(); d++) {
-				    cerr << ">>> PGMsgCl01: Dest[" << d << "]=" << Destinations.at(d) << endl;
-				  }
+				  //cerr << ">>> PGMsgCl01: Arg0.size=" << Limiters.size()
+					   //<< " Arg1.size=" << Sources.size()
+					   //<< " Arg2.size=" << Destinations.size()
+					   //<< " Arg0[0]=" << Limiters.at(0)
+					   //<< " MyHID=" << PB->PP->GetHostSelfCertifyingName() << endl;
+				  //for (unsigned int d = 0; d < Destinations.size(); d++) {
+				    //cerr << ">>> PGMsgCl01: Dest[" << d << "]=" << Destinations.at(d) << endl;
+				  //}
 			  if (Limiters.size () > 0 && Sources.size () > 0 && Destinations.size () > 0)
 				{
 				  // ****************************************************
