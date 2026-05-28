@@ -331,8 +331,6 @@ IRStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 														  // ******************************************************************
 														  // Reset gateway statistics
 														  // ******************************************************************
-
-														  PIR->PGW->ResetStatistics();
 													  }
 												  else
 													  {

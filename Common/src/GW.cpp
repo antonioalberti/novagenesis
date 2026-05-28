@@ -1244,11 +1244,6 @@ int GW::GetHTBindingValues (unsigned int _Category, string _Key, vector<string> 
   return Status;
 }
 
-// Reset all statistics
-void GW::ResetStatistics ()
-{
-
-}
 
 // Wrapper function for ReadFromOutputQueue() thread
 void GW::ReadFromOutputQueueThreadWrapper (void *_PGW)

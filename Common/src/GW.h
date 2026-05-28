@@ -272,7 +272,6 @@ class GW : public Block {
   // Delay parameters
   double DelayBeforeStatusIPC;
 
-  void ResetStatistics ();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

@@ -545,12 +545,6 @@ int PSRunPeriodic01::Operational ()
 	  // Change the state from initialization to exposition
 	  PB->State = "operational";
 
-	  // ******************************************************************
-	  // Reset gateway statistics
-	  // ******************************************************************
-
-	  PPS->PGW->ResetStatistics ();
-
 	  PB->S << Offset
 			<< "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
 			<< endl;

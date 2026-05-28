@@ -604,8 +604,6 @@ int DHTRunPeriodic01::Operational ()
 
   if (GoToOperational1 == true && GoToOperational2 == true && PB->State != "operational")
 	{
-	  // Reset Statistics
-	  PDHT->PGW->ResetStatistics ();
 
 	  // Change the state from initialization to exposition
 	  PB->State = "operational";

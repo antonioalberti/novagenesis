@@ -266,10 +266,6 @@ NRRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   // Push the message to the GW input queue
   PNR->PGW->PushToInputQueue (RunPeriodic);
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
-
-  PNR->PGW->ResetStatistics ();
-
   PB->State = "operational";
 
   PB->S << Offset
