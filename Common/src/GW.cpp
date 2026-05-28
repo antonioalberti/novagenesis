@@ -81,8 +81,7 @@ GW::GW (string _LN, Process *_PP, unsigned int _Index, string _Path) : Block (_L
   StopGateway = false;
   State = "initialization";
   ScheduleStatusFlag = false;
-  PreviousDiscreteTime = 0;
-  MaxSegmentSize = MAX_MESSAGE_SIZE;                            // The size of the shared memory segment
+  MaxSegmentSize = MAX_MESSAGE_SIZE;
 
   // Setting the delays
   DelayBeforeStatusIPC = 2;
@@ -362,264 +361,215 @@ void GW::PushToInputQueue (Message *M)
 #endif
 
   if (M != 0)
-	{
-	  if (M->GetNumberofCommandLines (NoCL) == OK)
-		{
-		  if (NoCL > 2)
-			{
-			  // Avoid deleting the message
-			  M->UnmarkToDelete ();
+    {
+      if (M->GetNumberofCommandLines (NoCL) == OK)
+        {
+          if (NoCL > 2)
+            {
+              // Avoid deleting the message
+              M->UnmarkToDelete ();
 
-			  // Set the message tag
-			  M->SetTag (InputQueueTag);
+              // Set the message tag
+              M->SetTag (InputQueueTag);
 
 #ifdef STATISTICS
-
-			  SamplingBeforePushingToInputQueue(M);
-
+              SamplingBeforePushingToInputQueue(M);
 #endif
 
-		  // Push the message to the queue
-		  InputQueue.push (M);
+              // Lock for push + notify (thread-safe w.r.t. Gateway() pop)
+              {
+                std::lock_guard<std::mutex> lock(InputQueueMutex);
 
-		  // Increases the tag counter
-		  InputQueueTag++;
+                // Push the message to the queue
+                InputQueue.push (M);
 
-		  // Notify Gateway thread that new input is available
-		  {
-		    std::lock_guard<std::mutex> lock(InputQueueMutex);
-		    InputQueueCV.notify_one();
-		  }
-			}
-		  else
-			{
-			  //S <<"          (ERROR: The message has less than 3 command lines at input queue)" << endl;
-
-			  // Mark to delete the message
-			  M->MarkToDelete ();
-			}
-		}
-	  else
-		{
-		  S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
-
-		  // Mark to delete the message
-		  M->MarkToDelete ();
-		}
-	}
+                // Increases the tag counter
+                InputQueueTag++;
+              }
+              // Notify after unlock to minimize time input thread is blocked
+              InputQueueCV.notify_one();
+            }
+          else
+            {
+              // Mark to delete the message
+              M->MarkToDelete ();
+            }
+        }
+      else
+        {
+          S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
+          M->MarkToDelete ();
+        }
+    }
   else
-	{
-	  S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
-
-	  // Mark to delete the message
-	  M->MarkToDelete ();
-	}
+    {
+      S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
+      M->MarkToDelete ();
+    }
 }
 
 // Push a Message into the output message priority queue
 void GW::PushToOutputQueue (std::string OQS, Message *M)
 {
-
-#ifdef DEBUG
-
-  S << "[6]       (Pushing the following message to the OutputQueue " << OQS << ". Size = " << OutputQueues[OQS].size ()
-	<< ")" << endl;
-
-  S << "(" << endl << *M << ")"
-	<< endl;
-
-#endif
-
   unsigned int NoCL = 0;
-  size_t MaxSegmentSize = MAX_MESSAGE_SIZE;                            // The size of the shared memory segment
+  size_t MaxSegmentSize = MAX_MESSAGE_SIZE;
   long long MessageSize = 0;
   string Offset = "          ";
 
-  if (M != 0)
-	{
-	  M->ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray ();
-
-	  // Get the Message size
-	  if (M->GetMessageSize (MessageSize) == OK)
-		{
-		  // Test to check if the Message is not empty and if it fits on the shm segment size
-		  if (MessageSize > 0 && MessageSize <= (MaxSegmentSize - 8))
-			{
-			  if (M->GetNumberofCommandLines (NoCL) == OK)
-				{
-				  if (NoCL > 2)
-					{
-					  // Avoid deleting the message
-					  M->UnmarkToDelete ();
-
-					  // Set the message tag
-					  M->SetTag (OutputQueueTag);
-
-#ifdef STATISTICS
-
-					  SamplingBeforePushingToOutputQueue(M);
-
+#ifdef DEBUG
+  S << "[6]       (Pushing the following message to the OutputQueue " << OQS << ". Size = " << OutputQueues[OQS].size () << ")" << endl;
+  S << "(" << endl << *M << ")" << endl;
 #endif
 
-					  //S << "          (The size of the OutputQueue is = "<<OutputQueue.size()<<")"<<endl;
+  if (M != 0)
+    {
+      M->ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray ();
 
-					  // Push the message to the queue
-					  OutputQueues[OQS].push (M);
+      if (M->GetMessageSize (MessageSize) == OK)
+        {
+          if (MessageSize > 0 && MessageSize <= (MaxSegmentSize - 8))
+            {
+              if (M->GetNumberofCommandLines (NoCL) == OK)
+                {
+                  if (NoCL > 2)
+                    {
+                      M->UnmarkToDelete ();
+                      M->SetTag (OutputQueueTag);
 
-					  //S << "          (The size of the OutputQueue is = "<<OutputQueue.size()<<")"<<endl;
+#ifdef STATISTICS
+                      SamplingBeforePushingToOutputQueue(M);
+#endif
 
-				  // Increases the tag counter
-				  OutputQueueTag++;
-
-				  // Notify output thread that new messages are available
-				  {
-				    std::lock_guard<std::mutex> lock(OutputQueueMutex);
-				    NewOutputMessage = true;
-				    OutputQueueCV.notify_one();
-				  }
-
-				}
-			  else
-				{
-				  S << "          (ERROR: The message has less than 3 command lines at output queue)" << endl;
-
-				  // Mark to delete the message
-					  M->MarkToDelete ();
-					}
-				}
-			  else
-				{
-				  S << "          (ERROR: Unable to read the number of command lines at output queue)" << endl;
-
-				  // Mark to delete the message
-				  M->MarkToDelete ();
-				}
-
-			}
-		  else
-			{
-			  S << Offset << "(ERROR: Invalid message size at output queue)" << endl;
-
-			  // Mark to delete the message
-			  M->MarkToDelete ();
-			}
-		}
-	  else
-		{
-		  S << Offset << "(ERROR: Unable to get the message size at output queue)" << endl;
-
-		  // Mark to delete the message
-		  M->MarkToDelete ();
-		}
-	}
+                      // Lock for push + notify (thread-safe w.r.t. ReadFromOutputQueue)
+                      {
+                        std::lock_guard<std::mutex> lock(OutputQueueMutex);
+                        OutputQueues[OQS].push (M);
+                        OutputQueueTag++;
+                        NewOutputMessage = true;
+                      }
+                      OutputQueueCV.notify_one();
+                    }
+                  else
+                    {
+                      S << Offset << "(ERROR: The message has less than 3 command lines at output queue)" << endl;
+                      M->MarkToDelete ();
+                    }
+                }
+              else
+                {
+                  S << Offset << "(ERROR: Unable to read the number of command lines at output queue)" << endl;
+                  M->MarkToDelete ();
+                }
+            }
+          else
+            {
+              S << Offset << "(ERROR: Invalid message size at output queue)" << endl;
+              M->MarkToDelete ();
+            }
+        }
+      else
+        {
+          S << Offset << "(ERROR: Unable to get the message size at output queue)" << endl;
+          M->MarkToDelete ();
+        }
+    }
   else
-	{
-	  S << "          (ERROR: The message being store in output queue is corrupted)" << endl;
-
-	  // Mark to delete the message
-	  M->MarkToDelete ();
-	}
+    {
+      S << "          (ERROR: The message being store in output queue is corrupted)" << endl;
+      M->MarkToDelete ();
+    }
 }
 
 // Read a Message from output message priority queues. Only the GW can forward messages to shared memory instances
 void GW::ReadFromOutputQueue ()
 {
   Message *PM1 = NULL;
-  sem_t *mutex;
+  sem_t *mutex = NULL;
 
-  // ****************************************************************************
-  // Step 3 : Read OutputQueues and Dispatch
-  // ****************************************************************************
+  // Cache the semaphore (avoid sem_open/sem_close per iteration)
+  mutex = CachedSemaphores["Output_Queue"];
+  if (mutex == NULL)
+    {
+      mutex = sem_open("Output_Queue", O_CREAT, 0666, 1);
+      if (mutex != SEM_FAILED)
+        CachedSemaphores["Output_Queue"] = mutex;
+    }
 
-  // Modified in 11th April 2021 to deal with parallel shared memories.
-
-  // Set the semaphore name
   string SemaphoreName = "Output_Queue";
 
   while (StopGateway == false)
     {
-      // Wait for output messages or stop flag (condition variable replaces busy-wait)
+      // Wait for output messages or stop flag (blocking wait - zero CPU when idle)
       {
         std::unique_lock<std::mutex> lock(OutputQueueMutex);
-        OutputQueueCV.wait_for(lock, std::chrono::milliseconds(1),
-                               [this](){ return NewOutputMessage || StopGateway; });
+        OutputQueueCV.wait(lock, [this](){ return NewOutputMessage || StopGateway; });
         if (StopGateway) break;
         NewOutputMessage = false;
       }
 
-      mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+      if (mutex == NULL || mutex == SEM_FAILED)
+        {
+          mutex = sem_open(SemaphoreName.c_str (), O_CREAT, 0666, 1);
+          if (mutex == SEM_FAILED)
+            {
+              perror("Output Queue: unable to open semaphore");
+              continue;
+            }
+          CachedSemaphores["Output_Queue"] = mutex;
+        }
 
-	  // Check for error on semaphore open
-	  if (mutex != SEM_FAILED)
-	{
-	  // Retry sem_trywait with backoff to avoid CPU spin
-	  int LockAttempts = 0;
-	  while (sem_trywait (mutex) != 0 && LockAttempts < 100)
-		{
-		  tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
-		  LockAttempts++;
-		}
-	  if (LockAttempts < 100)
-		{
-		  map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
+      // Lock the output queue mutex for thread-safe iteration
+      {
+        std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
-			  for (it = OutputQueues.begin (); it != OutputQueues.end (); it++)
-				{
-				  // Verify if there is a message on the queue
-				  if (!it->second.empty ())
-					{
-					  PM1 = it->second.top ();
+        // Retry sem_trywait with backoff
+        int LockAttempts = 0;
+        while (sem_trywait (mutex) != 0 && LockAttempts < 100)
+          {
+            tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+            LockAttempts++;
+          }
 
-#ifdef STATISTICS
-					  SamplingBeforeWritingToSHM(PM1);
-#endif
+        if (LockAttempts < 100)
+          {
+            map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
 
-					  // Shared memory IPC
-					  if (WriteToSharedMemory3 (it->first, PM1) == OK)
-						{
-						  it->second.pop ();
-
-						  // Mark the message to be deleted
-						  PM1->MarkToDelete ();
-						}
-					  else
-						{
-#ifdef STATISTICS
-						  // Note: Considers that the message entered the queue again. But in fact it never left. Just the statistics are reset
-						  SamplingBeforePushingToOutputQueue(PM1);
-#endif
-						}
+            for (it = OutputQueues.begin (); it != OutputQueues.end (); it++)
+              {
+                if (!it->second.empty ())
+                  {
+                    PM1 = it->second.top ();
 
 #ifdef STATISTICS
-					  SamplingAfterSHMService(PM1);
+                    SamplingBeforeWritingToSHM(PM1);
 #endif
-					}
-				}
 
-			  if (sem_post (mutex) != 0) // Successfully locked the semaphore, so unlock it
-				{
-				  perror ("Writing Output Queue : sem_post");
-				}
-			}
+                    // Shared memory IPC
+                    if (WriteToSharedMemory3 (it->first, PM1) == OK)
+                      {
+                        it->second.pop ();
+                        PM1->MarkToDelete ();
+                      }
 
-		  if (sem_close (mutex) != 0)
-			{
-			  perror ("Writing Output Queue : sem_close");
-			}
-		}
-	  else
-		{
-		  perror ("Writing Output Queue : unable to create/open semaphore");
+#ifdef STATISTICS
+                    SamplingAfterSHMService(PM1);
+#endif
+                  }
+              }
 
-		  sem_unlink (SemaphoreName.c_str ());
-		}
+            if (sem_post (mutex) != 0)
+              {
+                perror ("Writing Output Queue : sem_post");
+              }
+          }
+      } // unlock OutputQueuesMutex
 
-	  // Sleep to avoid CPU overheating
-	  tthread::this_thread::sleep_for (tthread::chrono::microseconds (10));
-	}
+      // Sleep briefly to avoid CPU spin on retry
+      tthread::this_thread::sleep_for (tthread::chrono::microseconds (10));
+    }
 }
 
-// Read Messages from the queues and forward to other ShowMessages()processes via IPC/IHC
+// Read Messages from the queues and forward to other processes via IPC/IHC
 void GW::Gateway ()
 {
   Message *PM1 = NULL;
@@ -630,174 +580,117 @@ void GW::Gateway ()
   double ScheduledTime = 0;
   double Time = 0;
   long long int MessageSize = 0;
+  std::chrono::milliseconds waitTimeout;
+  double secondsUntilNext = 1.0; // default 1s when queue empty
 
-  // Added in April 11th, 2021 to provide a separated thread for output queues serving
+  // Start output queue thread
   tthread::thread *T = new tthread::thread (&GW::ReadFromOutputQueueThreadWrapper, this);
 
-  while (StopGateway == false) // If true, the gateway will exit
+  while (StopGateway == false)
     {
-      // Wait for input queue or stop flag (condition variable replaces busy-wait)
+      // Calculate how long to wait: time until next scheduled message
+      {
+        std::lock_guard<std::mutex> lock(InputQueueMutex);
+        if (!InputQueue.empty())
+          {
+            double nextTime = InputQueue.top ()->GetTime ();
+            double now = GetTime ();
+            secondsUntilNext = nextTime - now;
+            if (secondsUntilNext < 0) secondsUntilNext = 0;
+          }
+        else
+          {
+            secondsUntilNext = 1.0; // no messages, check SHM every 1s max
+          }
+      }
+
+      // Wait for input queue or stop flag (timer-aware blocking wait)
       {
         std::unique_lock<std::mutex> lock(InputQueueMutex);
-        InputQueueCV.wait_for(lock, std::chrono::milliseconds(1),
+        waitTimeout = std::chrono::milliseconds((long long)(secondsUntilNext * 1000));
+        InputQueueCV.wait_for(lock, waitTimeout,
                               [this](){ return !InputQueue.empty() || StopGateway; });
         if (StopGateway) break;
       }
 
-      // ****************************************************************************
-      // Step 1 : Read InputQueue
-      // ****************************************************************************
+      // Lock, pop all due messages, unlock — minimize critical section
+      PM1 = NULL;
+      RunFlag = false;
+      Time = GetTime ();
 
-      // Skip processing if queue empty (wait_for can time out without predicate satisfaction)
-      if (!InputQueue.empty())
+      {
+        std::lock_guard<std::mutex> lock(InputQueueMutex);
+        if (!InputQueue.empty())
+          {
+            PM1 = InputQueue.top ();
+            ScheduledTime = PM1->GetTime ();
+            if (ScheduledTime < Time)
+              {
+                InputQueue.pop ();
+                RunFlag = true;
+              }
+            else
+              {
+                PM1 = NULL; // not yet due, leave in queue
+              }
+          }
+      }
+
+      // Step 2 : Run procedure to interpret and run the received message
+      if (PM1 != NULL && RunFlag == true)
         {
 
-          // Check the message in the input queue
-          PM1 = InputQueue.top ();
-
-		  // Get the message time
-		  ScheduledTime = PM1->GetTime ();
-
-		  // Get the current time
-		  Time = GetTime ();
-
-		  // If the message scheduled time is smaller than the current time, remove the message from the queue
-		  // Otherwise, keep the message on the queue
-		  if (ScheduledTime < Time)
-			{
-#ifdef DEBUG
-			  S << endl << setprecision (10) << "          (t = " << Time << ")" << endl;
-#endif
-
-			  if (NumberOfCycles % 500 == 0)
-				{
-				  S << endl << setprecision (10) << "          (t = " << Time << ")" << endl;
-				  S << "[1]       (IQ Size = " << InputQueue.size () << ")" << endl;
-
-				  map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
-
-				  unsigned int Counter = 0;
-
-				  for (it = OutputQueues.begin (); it != OutputQueues.end (); it++)
-					{
-					  Counter++;
-
-					  S << "[6]       (OQ[" << Counter << "] Size = " << it->second.size () << ")" << endl;
-					}
-
-				  S << Offset << "(Messages in memory = " << PP->GetNumberOfMessages () << ")" << endl;
-				}
-
 #ifdef STATISTICS
-
-			  SamplingAfterRemovingFromInputQueue(PM1);
-
-#endif
-
-			  //S << "          (Reading the message from the InputQueue)"<< endl;
-
-			  InputQueue.pop ();
-
-			  //S << Offset << "(The popping was a success. Size = " << InputQueue.size() << ")"<<endl;
-
-			  //S << Offset << "(Calling the run to process the message)" << endl;
-
-			  RunFlag = true;
-			}
-		  else
-			{
-			  // Set the discrete time
-			  DiscreteTime = floor (Time);
-
-#ifdef DEBUG
-			  if (DiscreteTime != PreviousDiscreteTime)
-				{
-				  S << setprecision (10) << "          (Waiting " << (ScheduledTime - Time) << " sec)" << endl;
-				}
-#endif
-
-			  // Stores the previous discrete time for the next loop
-			  PreviousDiscreteTime = DiscreteTime;
-
-			  RunFlag = false;
-			}
-		}
-
-	  // ****************************************************************************
-	  // Step 2 : Run procedure to interpret and run the received message
-	  // ****************************************************************************
-
-	  if (PM1 != NULL)
-		{
-		  if (RunFlag == true)
-			{
-
-#ifdef STATISTICS
-			  SamplingBeforeRun(PM1);
+          SamplingAfterRemovingFromInputQueue(PM1);
 #endif
 
 #ifdef DEBUG
-			  S << "[2]       (Going to process the following message with instantiation number "
-				<< PM1->InstantiationNumber << ")" << endl;
-			  //S << "[2]       (Processing)" << endl;
+          if (NumberOfCycles % 500 == 0)
+            {
+              S << endl << setprecision (10) << "          (t = " << Time << ")" << endl;
+              S << "[1]       (IQ Size = " << InputQueue.size () << ")" << endl;
 
-			  S << "(" << endl << *PM1 << ")" << endl;
-#endif
-
-			  // *************************
-			  // Run
-			  // *************************
-			  Run (PM1, PM2);
-
-#ifdef DEBUG
-			  S << "[3]       (Finished processing.)" << endl;
+              map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> >::iterator it;
+              unsigned int Counter = 0;
+              for (it = OutputQueues.begin (); it != OutputQueues.end (); it++)
+                {
+                  Counter++;
+                  S << "[6]       (OQ[" << Counter << "] Size = " << it->second.size () << ")" << endl;
+                }
+              S << Offset << "(Messages in memory = " << PP->GetNumberOfMessages () << ")" << endl;
+            }
 #endif
 
 #ifdef STATISTICS
-			  SamplingAfterRun(PM1);
+          SamplingBeforeRun(PM1);
 #endif
 
-#ifdef DEBUG
-			  S << "[3]       (Deleting messages previously marked to delete.)" << endl;
+          Run (PM1, PM2);
+
+#ifdef STATISTICS
+          SamplingAfterRun(PM1);
 #endif
 
-#ifdef DEBUG2
+          PP->DeleteMarkedMessages ();
 
-			  PP->ShowMessages ();
+          PM1 = NULL;
+          RunFlag = false;
+        }
 
-#endif
+      // Step 4 : Read OS IPC — poll shared memory for messages from other processes
+      ReadFromSharedMemory3 ();
 
-			  PP->DeleteMarkedMessages ();
+      NumberOfCycles++;
+    }
 
-#ifdef DEBUG
+  // Stop the output thread
+  if (StopGateway == false)
+    {
+      StopGateway = true;
+      OutputQueueCV.notify_all();
+    }
 
-			  S << "[3]       (Finished deleting)" << endl;
-
-#endif
-
-		  // Make the pointer null
-		  PM1 = NULL;
-
-	  RunFlag = false;
-	}
-	}  // End of input queue processing block
-
-      // ****************************************************************************
-      // Step 4 : Read OS IPC
-      // ****************************************************************************
-
-	  // Read from shared memory
-	  ReadFromSharedMemory3 ();
-
-	  NumberOfCycles++;
-
-	  // Sleep to avoid CPU overheating
-	  tthread::this_thread::sleep_for (tthread::chrono::microseconds (10));
-	}
-
-  // Added in April 11th, 2021 to provide a separated thread for output queues serving
   T->join ();
-
   delete T;
 }
 
@@ -1526,6 +1419,9 @@ int GW::ReturnIPCSHMID (key_t _Key, int &_shmid)
 void GW::SetStopGatewayFlag (bool _F)
 {
   StopGateway = _F;
+  // Wake up both threads blocked on wait()
+  InputQueueCV.notify_all();
+  OutputQueueCV.notify_all();
 }
 
 // Set a value behind a key

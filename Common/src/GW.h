@@ -120,6 +120,10 @@
 #include <mutex>
 #endif
 
+#ifndef _ATOMIC_H
+#include <atomic>
+#endif
+
 #ifndef _TINYTHREAD_H
 #include "tinythread.h"
 #endif
@@ -170,7 +174,7 @@ class GW : public Block {
   unsigned int OutputQueueTag;
 
   // Stop gateway flag
-  bool StopGateway;
+  std::atomic<bool> StopGateway;
 
   // Mutex and condition variable for input queue synchronization
   std::mutex InputQueueMutex;
@@ -269,12 +273,8 @@ class GW : public Block {
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Delay parameters
-  // ------------------------------------------------------------------------------------------------------------------------------
+  // Delay parameters
   double DelayBeforeStatusIPC;
-
-  // Discrete timers
-  double DiscreteTime;
-  double PreviousDiscreteTime;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Statistic variables and functions
