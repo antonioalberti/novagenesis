@@ -62,7 +62,7 @@
 #endif
 
 
-//#define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 //#define DEBUG1  // To follow shared memory access
 //#define DEBUG2  // More on shm access
 //#define DEBUG3 // Even more on shm access
@@ -530,7 +530,27 @@ void GW::Gateway ()
         }
 
       // Step 4 : Read OS IPC — poll shared memory for messages from other processes
-      ReadFromSharedMemory3 ();
+      // Phase 2: rate limit to 100ms when no due messages to process (idle or waiting for future messages)
+      {
+        static auto lastSHMPoll = std::chrono::steady_clock::now();
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSHMPoll).count();
+        bool hasDueMessage = false;
+        {
+          std::lock_guard<std::mutex> lock(InputQueueMutex);
+          if (!InputQueue.empty())
+            {
+              double nextTime = InputQueue.top()->GetTime();
+              double currentTime = GetTime();
+              if (nextTime <= currentTime) hasDueMessage = true;
+            }
+        }
+        if (!hasDueMessage && elapsed >= 100)
+          {
+            ReadFromSharedMemory3 ();
+            lastSHMPoll = std::chrono::steady_clock::now();
+          }
+      }
 
       NumberOfCycles++;
     }
@@ -553,6 +573,7 @@ int GW::ReadFromSharedMemory3 ()
   double StartingTime;
   double EndingTime = 0;
 
+
   for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
 	   z++) // Modified in 9th April 2021 to deal with parallel shared memories.
 	{
@@ -567,10 +588,19 @@ int GW::ReadFromSharedMemory3 ()
 	  SemaphoreName = IntToString (
 		  PP->Key + z); // Modified in 9th April 2021 to deal with parallel shared memories.
 
-	  mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+	  // Cache semaphore to avoid sem_open/sem_close per iteration (Phase 2)
+	  mutex = CachedSemaphores[SemaphoreName];
+	  if (mutex == NULL)
+	    {
+	      mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+	      if (mutex != SEM_FAILED)
+	        {
+	          CachedSemaphores[SemaphoreName] = mutex;
+	        }
+	    }
 
 	  // Check for error on semaphore open
-	  if (mutex != SEM_FAILED)
+	  if (mutex != NULL && mutex != SEM_FAILED)
 		{
 
 #ifdef DEBUG3
@@ -831,16 +861,7 @@ int GW::ReadFromSharedMemory3 ()
 				}
 			}
 
-		  if (sem_close (mutex) == 0)
-			{
-#ifdef DEBUG3
-			  S << Offset << "(Closed the semaphore " << SemaphoreName << ")" << endl;
-#endif
-			}
-		  else
-			{
-			  perror ("reading SHM : sem_close");
-			}
+		  // Semaphore kept open in CachedSemaphores (Phase 2: no sem_close per iteration)
 
 		} // (mutex == SEM_FAILED) means it was unable to create/open the semaphore
 	  else
@@ -908,10 +929,19 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 
 	  if (shmid != -1)
 		{
-		  mutex = sem_open (_oqs.c_str (), O_CREAT, 0666, 1);
+		  // Cache semaphore to avoid sem_open/sem_close per iteration (Phase 2)
+		  mutex = CachedSemaphores[_oqs];
+		  if (mutex == NULL)
+		    {
+	      mutex = sem_open (_oqs.c_str (), O_CREAT, 0666, 1);
+	      if (mutex != SEM_FAILED)
+	        {
+	          CachedSemaphores[_oqs] = mutex;
+	        }
+	    }
 
 		  // Check for error on semaphore open
-		  if (mutex != SEM_FAILED)
+		  if (mutex != NULL && mutex != SEM_FAILED)
 			{
 
 			  // ***************************************************************************************
@@ -1125,16 +1155,7 @@ int GW::WriteToSharedMemory3 (std::string OQS, Message *M)
 				  perror ("writing SHM : semop");
 				}
 
-			  if (sem_close (mutex) == 0)
-				{
-#ifdef DEBUG3
-				  S << Offset << "(Closed the semaphore " << _oqs << ")" << endl;
-#endif
-				}
-			  else
-				{
-				  perror ("writing SHM : sem_close");
-				}
+			  // Semaphore kept open in CachedSemaphores (Phase 2: no sem_close per iteration)
 
 			} //(mutex != SEM_FAILED)
 		  else
