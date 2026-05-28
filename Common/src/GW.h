@@ -100,10 +100,6 @@
 #include <semaphore.h>
 #endif
 
-#ifndef __OUTPUTVARIABLE_H
-#include "OutputVariable.h"
-#endif
-
 #ifndef __FCNTL_H
 #include <fcntl.h>
 #endif
@@ -202,11 +198,6 @@ class GW : public Block {
   // Write to the shared memory
   int WriteToSharedMemory3 (std::string OQS, Message *M);
 
-  // Sent messages counter
-  unsigned long MessagesSent;
-
-  // Received messages counter
-  unsigned long MessagesReceived;
 
  public:
 
@@ -275,76 +266,6 @@ class GW : public Block {
   // Delay parameters
   // Delay parameters
   double DelayBeforeStatusIPC;
-
-  // ------------------------------------------------------------------------------------------------------------------------------
-  // Statistic variables and functions
-  // ------------------------------------------------------------------------------------------------------------------------------
-
-  // **************************************************
-  // All messages statistics
-  // **************************************************
-
-  // Input system
-  OutputVariable *twi;        // Waiting time (seconds/message)
-  OutputVariable *wi;        // Queue occupation (messages)
-  OutputVariable *tsi;        // Service time (seconds)
-  OutputVariable *si;        // Service occupation (messages)
-  OutputVariable *mii;        // Service rate (messages/second)
-  OutputVariable *ri;        // Service rate (bytes/second)
-  OutputVariable *li;        // Message length (bytes/message)
-
-  // Output system
-  OutputVariable *two;        // Waiting time (seconds/message)
-  OutputVariable *wo;        // Queue occupation (messages)
-  OutputVariable *tso;        // Service time (seconds)
-  OutputVariable *so;        // Service occupation (messages)
-  OutputVariable *mio;        // Service rate (messages/second)
-  OutputVariable *ro;        // Service rate (bytes/second)
-  OutputVariable *lo;        // Message length (bytes/message)
-
-  // Transit in the shared memory
-  OutputVariable *tshm;        // Service time (seconds/message)
-
-  // Shared memory
-  OutputVariable *tss;        // Service time (seconds/message)
-
-  // **************************************************
-  // Type 1 messages statistics
-  // **************************************************
-
-  // Input system
-  OutputVariable *twi1;        // Waiting time (seconds/message)
-  OutputVariable *wi1;        // Queue occupation (messages)
-  OutputVariable *tsi1;        // Service time (seconds)
-  OutputVariable *si1;        // Service occupation (messages)
-  OutputVariable *mii1;        // Service rate (messages/second)
-  OutputVariable *ri1;        // Service rate (bytes/second)
-  OutputVariable *li1;        // Message length (bytes/message)
-
-  // Output system
-  OutputVariable *two1;        // Waiting time (seconds/message)
-  OutputVariable *wo1;        // Queue occupation (messages)
-  OutputVariable *tso1;        // Service time (seconds)
-  OutputVariable *so1;        // Service occupation (messages)
-  OutputVariable *mio1;        // Service rate (messages/second)
-  OutputVariable *ro1;        // Service rate (bytes/second)
-  OutputVariable *lo1;        // Message length (bytes/message)
-
-  // Transit in the shared memory
-  OutputVariable *tshm1;        // Service time (seconds/message)
-
-  // Shared memory
-  OutputVariable *tss1;        // Service time (seconds/message)
-
-  void ResetStatistics ();
-
-  void SamplingBeforePushingToInputQueue (Message *PM1);
-  void SamplingAfterRemovingFromInputQueue (Message *PM1);
-  void SamplingBeforePushingToOutputQueue (Message *PM1);
-  void SamplingBeforeWritingToSHM (Message *PM1);
-  void SamplingAfterSHMService (Message *PM1);
-  void SamplingBeforeRun (Message *PM1);
-  void SamplingAfterRun (Message *PM1);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

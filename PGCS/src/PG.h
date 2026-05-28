@@ -312,14 +312,10 @@ class PG : public Block {
   unsigned long long StressDropped;
   int    StressDelayCount;
   File StressStats;
-  OutputVariable *DelayStats;
-  OutputVariable *Loss;
 
   // ------------------------------------------------------------------------------------------------------------------------------
-  // Statistic variables and functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  void ResetStatistics ();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

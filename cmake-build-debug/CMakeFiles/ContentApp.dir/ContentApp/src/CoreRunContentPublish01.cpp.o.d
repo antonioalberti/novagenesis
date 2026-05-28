@@ -309,7 +309,6 @@ CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunContentPublish01.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/struct_semid_ds.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_semid64_ds.h \
  /usr/include/semaphore.h /usr/include/x86_64-linux-gnu/bits/semaphore.h \
- /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.h \
  /usr/include/fcntl.h /usr/include/x86_64-linux-gnu/bits/fcntl.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
@@ -358,5 +357,6 @@ CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunContentPublish01.cpp.o: \
  /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
  /usr/include/arpa/inet.h \
  /home/gandalf/workspace/novagenesis/ContentApp/src/Core.h \
+ /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.h \
  /home/gandalf/workspace/novagenesis/Common/src/Subscription.h \
  /home/gandalf/workspace/novagenesis/Common/src/Publication.h

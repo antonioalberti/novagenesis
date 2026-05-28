@@ -311,8 +311,6 @@ PSStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 														  // ******************************************************************
 														  // Reset gateway statistics
 														  // ******************************************************************
-
-														  PPS->PGW->ResetStatistics();
 													  }
 												  else
 													  {

@@ -268,8 +268,6 @@ NRRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 
   //PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
-  PNR->PGW->ResetStatistics ();
-
   PB->State = "operational";
 
   PB->S << Offset
