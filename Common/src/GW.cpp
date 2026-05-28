@@ -102,94 +102,6 @@ GW::GW (string _LN, Process *_PP, unsigned int _Index, string _Path) : Block (_L
   Message *PIM = 0;
   Message *InlineResponseMessage = NULL;
 
-#ifdef STATISTICS
-
-  // Allocating and configuring the statistics variables
-
-  // **************************************************
-  // All messages statistics
-  // **************************************************
-  twi=new OutputVariable(this);
-  wi=new OutputVariable(this);
-  tsi=new OutputVariable(this);
-  si=new OutputVariable(this);
-  mii=new OutputVariable(this);
-  ri=new OutputVariable(this);
-  li=new OutputVariable(this);
-  two=new OutputVariable(this);
-  wo=new OutputVariable(this);
-  tso=new OutputVariable(this);
-  so=new OutputVariable(this);
-  mio=new OutputVariable(this);
-  ro=new OutputVariable(this);
-  lo=new OutputVariable(this);
-  tss=new OutputVariable(this);
-  tshm=new OutputVariable(this);
-
-  // Setting the statistics variables
-  twi->Initialization("twi","MEAN_ARITHMETIC","Input queue waiting time (seconds)",1);
-  wi->Initialization("wi","MEAN_WEIGHTED","Input queue occupation (messages)",1);
-  tsi->Initialization("tsi","MEAN_ARITHMETIC","Input server service time (seconds/message)",1);
-  si->Initialization("si","MEAN_WEIGHTED","Input server occupation (messages)",1);
-  mii->Initialization("mii","MEAN_ARITHMETIC","Input server service rate (messages/second)",1);
-  ri->Initialization("ri","MEAN_ARITHMETIC","Input server service rate (bytes/second)",1);
-  li->Initialization("li","MEAN_ARITHMETIC","Transit messages size (bytes)",1);
-
-  two->Initialization("two","MEAN_ARITHMETIC","Output queue waiting time (seconds)",1);
-  wo->Initialization("wo","MEAN_WEIGHTED","Output queue occupation (messages)",1);
-  tso->Initialization("tso","MEAN_ARITHMETIC","Output server service time (seconds/message)",1);
-  so->Initialization("so","MEAN_WEIGHTED","Output server occupation (messages)",1);
-  mio->Initialization("mio","MEAN_ARITHMETIC","Output server service rate (messages/second)",1);
-  ro->Initialization("ro","MEAN_ARITHMETIC","Output server service rate (bytes/second)",1);
-  lo->Initialization("lo","MEAN_ARITHMETIC","Transit messages size (bytes)",1);
-
-  tshm->Initialization("tshm","MEAN_ARITHMETIC","Time expend betweem write and read from shared memory (seconds)",1);
-
-  tss->Initialization("tss","MEAN_ARITHMETIC","Delay to read a message from the shared memory to a message object (seconds)",1);
-
-  // **************************************************
-  // Type 1 messages statistics
-  // **************************************************
-
-  twi1=new OutputVariable(this);
-  wi1=new OutputVariable(this);
-  tsi1=new OutputVariable(this);
-  si1=new OutputVariable(this);
-  mii1=new OutputVariable(this);
-  ri1=new OutputVariable(this);
-  li1=new OutputVariable(this);
-  two1=new OutputVariable(this);
-  wo1=new OutputVariable(this);
-  tso1=new OutputVariable(this);
-  so1=new OutputVariable(this);
-  mio1=new OutputVariable(this);
-  ro1=new OutputVariable(this);
-  lo1=new OutputVariable(this);
-  tss1=new OutputVariable(this);
-  tshm1=new OutputVariable(this);
-
-  // Setting the statistics variables
-  twi1->Initialization("twi1","MEAN_ARITHMETIC","Input queue waiting time (seconds)",1);
-  wi1->Initialization("wi1","MEAN_WEIGHTED","Input queue occupation (messages)",1);
-  tsi1->Initialization("tsi1","MEAN_ARITHMETIC","Input server service time (seconds/message)",1);
-  si1->Initialization("si1","MEAN_WEIGHTED","Input server occupation (messages)",1);
-  mii1->Initialization("mii1","MEAN_ARITHMETIC","Input server service rate (messages/second)",1);
-  ri1->Initialization("ri1","MEAN_ARITHMETIC","Input server service rate (bytes/second)",1);
-  li1->Initialization("li1","MEAN_ARITHMETIC","Transit messages size (bytes)",1);
-
-  two1->Initialization("two1","MEAN_ARITHMETIC","Output queue waiting time (seconds)",1);
-  wo1->Initialization("wo1","MEAN_WEIGHTED","Output queue occupation (messages)",1);
-  tso1->Initialization("tso1","MEAN_ARITHMETIC","Output server service time (seconds/message)",1);
-  so1->Initialization("so1","MEAN_WEIGHTED","Output server occupation (messages)",1);
-  mio1->Initialization("mio1","MEAN_ARITHMETIC","Output server service rate (messages/second)",1);
-  ro1->Initialization("ro1","MEAN_ARITHMETIC","Output server service rate (bytes/second)",1);
-  lo1->Initialization("lo1","MEAN_ARITHMETIC","Transit messages size (bytes)",1);
-
-  tshm1->Initialization("tshm1","MEAN_ARITHMETIC","Time expend betweem write and read from shared memory (seconds)",1);
-
-  tss1->Initialization("tss1","MEAN_ARITHMETIC","Delay to read a message from the shared memory to a message object (seconds)",1);
-
-#endif
 
   PP->GetBlock ("HT", PHTB);
 
@@ -220,44 +132,6 @@ GW::GW (string _LN, Process *_PP, unsigned int _Index, string _Path) : Block (_L
 GW::~GW ()
 {
 
-#ifdef STATISTICS
-
-  // Deallocating the statistics variables
-  delete twi;
-  delete wi;
-  delete tsi;
-  delete si;
-  delete mii;
-  delete ri;
-  delete li;
-  delete two;
-  delete wo;
-  delete tso;
-  delete so;
-  delete mio;
-  delete ro;
-  delete lo;
-  delete tss;
-  delete tshm;
-
-  delete twi1;
-  delete wi1;
-  delete tsi1;
-  delete si1;
-  delete mii1;
-  delete ri1;
-  delete li1;
-  delete two1;
-  delete wo1;
-  delete tso1;
-  delete so1;
-  delete mio1;
-  delete ro1;
-  delete lo1;
-  delete tss1;
-  delete tshm1;
-
-#endif
 
   vector<Action *>::iterator it4;
 
@@ -372,9 +246,6 @@ void GW::PushToInputQueue (Message *M)
               // Set the message tag
               M->SetTag (InputQueueTag);
 
-#ifdef STATISTICS
-              SamplingBeforePushingToInputQueue(M);
-#endif
 
               // Lock for push + notify (thread-safe w.r.t. Gateway() pop)
               {
@@ -436,9 +307,6 @@ void GW::PushToOutputQueue (std::string OQS, Message *M)
                       M->UnmarkToDelete ();
                       M->SetTag (OutputQueueTag);
 
-#ifdef STATISTICS
-                      SamplingBeforePushingToOutputQueue(M);
-#endif
 
                       // Lock for push + notify (thread-safe w.r.t. ReadFromOutputQueue)
                       {
@@ -540,9 +408,6 @@ void GW::ReadFromOutputQueue ()
                   {
                     PM1 = it->second.top ();
 
-#ifdef STATISTICS
-                    SamplingBeforeWritingToSHM(PM1);
-#endif
 
                     // Shared memory IPC
                     if (WriteToSharedMemory3 (it->first, PM1) == OK)
@@ -551,9 +416,6 @@ void GW::ReadFromOutputQueue ()
                         PM1->MarkToDelete ();
                       }
 
-#ifdef STATISTICS
-                    SamplingAfterSHMService(PM1);
-#endif
                   }
               }
 
@@ -640,9 +502,6 @@ void GW::Gateway ()
       if (PM1 != NULL && RunFlag == true)
         {
 
-#ifdef STATISTICS
-          SamplingAfterRemovingFromInputQueue(PM1);
-#endif
 
 #ifdef DEBUG
           if (NumberOfCycles % 500 == 0)
@@ -661,15 +520,9 @@ void GW::Gateway ()
             }
 #endif
 
-#ifdef STATISTICS
-          SamplingBeforeRun(PM1);
-#endif
 
           Run (PM1, PM2);
 
-#ifdef STATISTICS
-          SamplingAfterRun(PM1);
-#endif
 
           PP->DeleteMarkedMessages ();
 
@@ -915,62 +768,6 @@ int GW::ReadFromSharedMemory3 ()
 								  // Pushing message to the queue
 								  PushToInputQueue (PM);
 
-#ifdef STATISTICS
-
-								  // Set the service ending time
-								  EndingTime=GetTime();
-
-								  // Sample
-								  tss->Sample(EndingTime-StartingTime);
-
-								  // Update the mean
-								  tss->CalculateArithmetic();
-
-								  // Sample to file
-								  tss->SampleToFile(EndingTime);
-
-								  // **************************************************
-								  // Type 1 messages statistics
-								  // **************************************************
-								  if (PM->GetType() == 1)
-									  {
-										  // Sample
-										  tss1->Sample(EndingTime-StartingTime);
-
-										  // Update the mean
-										  tss1->CalculateArithmetic();
-
-										  // Sample to file
-										  tss1->SampleToFile(EndingTime);
-									  }
-
-								  // Measuring the delay between final write and beggining to read
-
-								  // Sample
-								  tshm->Sample(StartingTime-TimeStamp);
-
-								  // Update the mean
-								  SN							tshm->CalculateArithmetic();
-
-								  // Sample to file
-								  tshm->SampleToFile(EndingTime);
-
-								  // **************************************************
-								  // Type 1 messages statistics
-								  // **************************************************
-								  if (PM->GetType() == 1)
-									  {
-										  // Sample
-										  tshm->Sample(EndingTime-StartingTime);
-
-										  // Update the mean
-										  tshm->CalculateArithmetic();
-
-										  // Sample to file
-										  tshm->SampleToFile(EndingTime);
-									  }
-
-#endif
 
 								  delete[] HeaderTimeStampField;
 
@@ -1462,25 +1259,6 @@ void GW::ReadFromOutputQueueThreadWrapper (void *_PGW)
 void GW::ResetStatistics ()
 {
 
-#ifdef STATISTICS
-
-  twi->Reset();
-  wi->Reset();
-  tsi->Reset();
-  si->ResetButKeepLastValue();
-  mii->Reset();
-  ri->Reset();
-  li->Reset();
-  two->Reset();
-  wo->Reset();
-  tso->Reset();
-  so->ResetButKeepLastValue();
-  mio->Reset();
-  ro->Reset();
-  lo->Reset();
-  tss->Reset();
-
-#endif
 }
 
 void GW::SamplingBeforePushingToInputQueue (Message *PM1)
