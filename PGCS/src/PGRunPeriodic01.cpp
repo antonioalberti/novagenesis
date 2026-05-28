@@ -37,6 +37,8 @@
 #include "PG.h"
 #endif
 
+#include <iostream>
+
 #ifndef _PGCS_H
 #include "PGCS.h"
 #endif
@@ -300,9 +302,12 @@ int PGRunPeriodic01::HelloScheduling ()
   vector<string> Destinations;
   CommandLine *PCL = 0;
   PGCS *PPGCS = 0;
+  static long long callCount = 0;
+  static long long helloCount = 0;
 
   PPG = (PG *)PB;
   PPGCS = (PGCS *)PB->PP;
+  callCount++;
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
@@ -331,6 +336,11 @@ int PGRunPeriodic01::HelloScheduling ()
 
   if (HelloCounter % (int)PPG->DelayBetweenHellos01 == 0)
 	{
+	  helloCount++;
+	  std::cerr << "[HELLO] call=" << callCount << " hello=" << helloCount
+		    << " HelloCounter=" << HelloCounter
+		    << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
+		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
 
 #ifdef DEBUG
 
@@ -503,11 +513,19 @@ int PGRunPeriodic01::PGCSPublishingScheduling ()
   vector<string> Sources;
   vector<string> Destinations;
   CommandLine *PCL = 0;
+  static long long callCount = 0;
+  static long long publishCount = 0;
 
   PPG = (PG *)PB;
+  callCount++;
 
-  if (PPG->AlreadyPublishedBasicBindings == false && PPG->AwareOfAPS == true)
+  if (PPG->AlreadyPublishedBasicBindings == false && PPG-> AwareOfAPS == true)
 	{
+	  publishCount++;
+	  std::cerr << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
+		    << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
+		    << " AwareOfAPS=" << PPG->AwareOfAPS
+		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
 	  // ******************************************************
 	  // Schedule a message to run publishing names to PSS/NRNCS
 	  // ******************************************************
@@ -562,8 +580,11 @@ int PGRunPeriodic01::StresstestScheduling ()
   vector<string> Sources;
   vector<string> Destinations;
   CommandLine *PCL = 0;
+  static long long callCount = 0;
+  static long long sendCount = 0;
 
   PPG = (PG *)PB;
+  callCount++;
 
 #ifdef DEBUG
   PB->S << Offset << "(StresstestScheduling: StressEnabled=" << PPG->StressEnabled 
@@ -594,6 +615,13 @@ int PGRunPeriodic01::StresstestScheduling ()
       int MessagesPerPeriod = (int)(PPG->DelayBeforeRunPeriodic / PPG->StressInterval);
 
       if (MessagesPerPeriod < 1) MessagesPerPeriod = 1;
+
+      sendCount += MessagesPerPeriod;
+      std::cerr << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
+		<< " totalSent=" << sendCount
+		<< " StressEnabled=" << PPG->StressEnabled
+		<< " PGCSTuples=" << PPG->PGCSTuples.size()
+		<< " PID=" << PPG->GetSelfCertifyingName() << std::endl;
 
 #ifdef DEBUG
       PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod

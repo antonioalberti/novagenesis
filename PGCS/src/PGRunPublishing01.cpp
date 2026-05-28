@@ -33,6 +33,8 @@
 #include "PG.h"
 #endif
 
+#include <iostream>
+
 PGRunPublishing01::PGRunPublishing01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -56,8 +58,13 @@ PGRunPublishing01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
   Message *Publish = 0;
   vector<string> Values;
   string HashProcessLegibleName;
+  static long long runCount = 0;
 
   PPG = (PG *)PB;
+  runCount++;
+  std::cerr << "[PUBLISH_RUN] run=" << runCount
+	    << " PSTuples=" << PPG->PSTuples.size()
+	    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
 
   //PB->S << Offset <<  this->GetLegibleName() << endl;
 
