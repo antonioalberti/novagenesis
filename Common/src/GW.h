@@ -198,6 +198,11 @@ class GW : public Block {
   // Write to the shared memory
   int WriteToSharedMemory3 (std::string OQS, Message *M);
 
+  // Sent messages counter
+  unsigned long MessagesSent;
+
+  // Received messages counter
+  unsigned long MessagesReceived;
 
  public:
 
@@ -266,6 +271,8 @@ class GW : public Block {
   // Delay parameters
   // Delay parameters
   double DelayBeforeStatusIPC;
+
+  void ResetStatistics ();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

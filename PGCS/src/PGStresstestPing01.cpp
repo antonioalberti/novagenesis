@@ -77,6 +77,8 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
             double SendTime = stod(PayloadStr);
             Delay = PB->GetTime() - SendTime;
             if (Delay < 0) Delay = 0;
+            PPG->DelayStats->Sample(Delay);
+            PPG->DelayStats->CalculateArithmetic();
           } catch (...) {
             Delay = 0;
           }
@@ -99,6 +101,14 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
       if (Expected > 0)
         LossRate = 100.0 * (1.0 - (double)PPG->StressReceived / (double)Expected);
 
+      // Sample loss rate to OutputVariable (exported to .dat)
+      PPG->Loss->Sample(LossRate);
+      PPG->Loss->CalculateArithmetic();
+      PPG->Loss->SampleToFile(PB->GetTime());
+
+      // Also write delay stats
+      PPG->DelayStats->SampleToFile(PB->GetTime());
+
       // Summary line to StressStats
       PPG->StressStats << PPG->GetTime()
                        << " NPeers=" << NPeers
@@ -106,6 +116,11 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
                        << " Recv=" << PPG->StressReceived
                        << " Expected=" << Expected
                        << " Loss=" << LossRate << "%"
+                       << " DelayAvg=" << PPG->DelayStats->GetMean()
+                       << " DelaySigma=" << PPG->DelayStats->GetSigma()
+                       << " DelayME=" << PPG->DelayStats->GetME()
+                       << " DelayLower=" << PPG->DelayStats->GetLower()
+                       << " DelayUp=" << PPG->DelayStats->GetUp()
                        << endl;
     }
 

@@ -328,7 +328,11 @@ IRStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 																  PB->S << Offset << "(BID = " << PIR->PSTuples[i]->Values[3] << ")" << endl;
 															  }
 
+														  // ******************************************************************
+														  // Reset gateway statistics
+														  // ******************************************************************
 
+														  PIR->PGW->ResetStatistics();
 													  }
 												  else
 													  {

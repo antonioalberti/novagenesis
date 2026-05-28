@@ -354,8 +354,10 @@ CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
  /usr/include/arpa/inet.h \
- /home/gandalf/workspace/novagenesis/PGCS/src/PG.h /usr/include/netdb.h \
- /usr/include/rpc/netdb.h /usr/include/x86_64-linux-gnu/bits/netdb.h \
+ /home/gandalf/workspace/novagenesis/PGCS/src/PG.h \
+ /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.h \
+ /usr/include/netdb.h /usr/include/rpc/netdb.h \
+ /usr/include/x86_64-linux-gnu/bits/netdb.h \
  /home/gandalf/workspace/novagenesis/Common/src/tinythread.h \
  /home/gandalf/workspace/novagenesis/Common/src/MessageReceiving.h \
  /usr/include/x86_64-linux-gnu/sys/ioctl.h \
@@ -374,7 +376,6 @@ CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o: \
  /usr/include/x86_64-linux-gnu/asm/swab.h \
  /home/gandalf/workspace/novagenesis/PGCS/src/PGCS.h \
  /home/gandalf/workspace/novagenesis/PGCS/src/Core.h \
- /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.h \
  /home/gandalf/workspace/novagenesis/Common/src/Subscription.h \
  /home/gandalf/workspace/novagenesis/Common/src/Publication.h \
  /home/gandalf/workspace/novagenesis/Common/src/rapidjson/document.h \

@@ -549,6 +549,8 @@ int PSRunPeriodic01::Operational ()
 	  // Reset gateway statistics
 	  // ******************************************************************
 
+	  PPS->PGW->ResetStatistics ();
+
 	  PB->S << Offset
 			<< "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
 			<< endl;

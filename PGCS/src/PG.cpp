@@ -181,7 +181,14 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 
 #ifdef STATISTICS
 
+  // Allocating the statistics variables
+  DelayStats = new OutputVariable(this);
+  DelayStats->Initialization("delay", "MEAN_ARITHMETIC", "One-way delay for stress test messages (seconds)", 0);
+  DelayStats->SetFileName("StressDelay_Results.txt");
 
+  Loss = new OutputVariable(this);
+  Loss->Initialization("loss", "MEAN_ARITHMETIC", "Packet loss rate for stress test (percent)", 0);
+  Loss->SetFileName("StressLoss_Results.txt");
 
 #endif
 
@@ -208,6 +215,7 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 
   // Open stress test stats file
   StressStats.OpenOutputFile("StressTest_Stats.txt", _Path, "DEFAULT");
+  DelayStats->SetFilePath(_Path);
 
   // Creating a -run --initialization message
   PP->NewMessage(GetTime(), 0, false, PIM);
@@ -231,6 +239,8 @@ PG::~PG()
        << "[StressTest] Final: Sent=" << StressSent
        << " Received=" << StressReceived << " Dropped=" << StressDropped << endl;
 
+  delete DelayStats;
+  delete Loss;
 
   Tuple* Temp = 0;
 
@@ -2664,6 +2674,11 @@ void* PG::get_in_addr(struct sockaddr* sa)
 }
 
 // Reset all statistics
+void PG::ResetStatistics()
+{
+  // rtt removed - keeping only DelayStats for stress test
+}
+
 void PG::Hex2Char(char* szHex, unsigned char& rch)
 {
   rch = 0;

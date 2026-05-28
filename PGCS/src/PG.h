@@ -36,6 +36,10 @@
 #include "GW.h"
 #endif
 
+#ifndef __OUTPUTVARIABLE_H
+#include "OutputVariable.h"
+#endif
+
 #ifndef _HT_H
 #include "HT.h"
 #endif
@@ -312,10 +316,14 @@ class PG : public Block {
   unsigned long long StressDropped;
   int    StressDelayCount;
   File StressStats;
+  OutputVariable *DelayStats;
+  OutputVariable *Loss;
 
   // ------------------------------------------------------------------------------------------------------------------------------
+  // Statistic variables and functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
+  void ResetStatistics ();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes
