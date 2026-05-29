@@ -236,7 +236,7 @@ GWMsgCl01::ForwardMessageInsideOS (Message *_ReceivedMessage, CommandLine *_PCL,
   vector<string> *Values = new vector<string>;
   string BindingValue = "";
   string Offset = "          ";
-  sem_t *mutex;
+  static sem_t *OutputSem = NULL;  // Cached Output_Queue semaphore (Phase 2: avoid sem_open per call)
 
   PGW = (GW *)PB;
 
@@ -323,53 +323,44 @@ GWMsgCl01::ForwardMessageInsideOS (Message *_ReceivedMessage, CommandLine *_PCL,
 									<< BindingValue << ")" << endl;
 #endif
 
-							  // Modified in 11th April 2021 to deal with parallel shared memories.
-							  string SemaphoreName = "Output_Queue";
+												// Modified in 11th April 2021 to deal with parallel shared memories.
+												// Phase 2: Use cached semaphore with backoff to avoid busy-wait CPU spin
+												if (OutputSem == NULL)
+												  {
+													OutputSem = sem_open ("Output_Queue", O_CREAT, 0666, 1);
+											  }
 
-							  while (1)
-								{
-								  mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+												if (OutputSem != NULL && OutputSem != SEM_FAILED)
+												  {
+													// Acquire with backoff (max 100 * 100us = 10ms)
+													int LockAttempts = 0;
+													while (sem_trywait (OutputSem) != 0 && LockAttempts < 100)
+													  {
+														tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+														LockAttempts++;
+													  }
 
-								  // Check for error on semaphore open
-								  if (mutex != SEM_FAILED)
-									{
-#ifdef DEBUG
-									  PB->S << Offset << "(Writing Output Queue)" << endl;
-#endif
-									  if (sem_trywait (mutex) == 0)
-										{
-#ifdef DEBUG
-										  PB->S << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
-#endif
-										  // Push the message to the GW output queue
-										  PGW->PushToOutputQueue (BindingValue, _ReceivedMessage);
+													if (LockAttempts < 100)
+													  {
+														// Push the message to the GW output queue
+														PGW->PushToOutputQueue (BindingValue, _ReceivedMessage);
 
-										  Status = OK;
+														Status = OK;
 
-										  if (sem_post (mutex) != 0) // Successfully locked the semaphore, so unlock it
-											{
-											  perror ("Writing Output Queue : sem_post");
-											}
-										} // (sem_trywait(mutex) != 0) means UNABLE TO LOCK. If someone locked, it is normal to get this condition
-
-									  if (sem_close (mutex) != 0)
-										{
-										  perror ("Writing Output Queue : sem_close");
-										}
-									} // (mutex == SEM_FAILED) means it was unable to create/open the semaphore
-								  else
-									{
-									  perror ("Writing Output Queue : unable to create/open semaphore");
-
-									  sem_unlink (SemaphoreName.c_str ());
-									}
-
-								  if (Status == OK)
-									{
-									  break;
-									}
-								}
-							}
+														if (sem_post (OutputSem) != 0)
+														  {
+															perror ("Writing Output Queue : sem_post");
+														  }
+													  }
+													else
+													  {
+														PB->S << Offset << "(WARNING: Output Queue semaphore timeout)" << endl;
+													  }
+												  }
+												else
+												  {
+													perror ("Output Queue: unable to open semaphore");
+												  }
 						}
 					  else
 						{
@@ -378,60 +369,44 @@ GWMsgCl01::ForwardMessageInsideOS (Message *_ReceivedMessage, CommandLine *_PCL,
 					}
 				  else
 					{
-					  // ***************************************************
-					  // Alternative forwarding to the local OS PGCS
-					  // ***************************************************
+												// ***************************************************
+												// Alternative forwarding to the local OS PGCS
+												// ***************************************************
 
 #ifdef DEBUG
-					  PB->S << endl << endl << Offset << "(Forwarding: The destination IPC key is 11)" << endl;
+												PB->S << endl << endl << Offset << "(Forwarding: The destination IPC key is 11)" << endl;
 #endif
-					  // Modified in 11th April 2021 to deal with parallel shared memories.
-					  // Set the semaphore name
-					  string SemaphoreName = "Output_Queue";
+												// Phase 2: Use cached semaphore with backoff to avoid busy-wait CPU spin
+												if (OutputSem != NULL && OutputSem != SEM_FAILED)
+												  {
+													int LockAttempts = 0;
+													while (sem_trywait (OutputSem) != 0 && LockAttempts < 100)
+													  {
+														tthread::this_thread::sleep_for (tthread::chrono::microseconds (100));
+														LockAttempts++;
+													  }
 
-					  while (1)
-						{
-						  mutex = sem_open (SemaphoreName.c_str (), O_CREAT, 0666, 1);
+													if (LockAttempts < 100)
+													  {
+														// Push the message to the GW output queue
+														PGW->PushToOutputQueue ("11", _ReceivedMessage);
 
-						  // Check for error on semaphore open
-						  if (mutex != SEM_FAILED)
-							{
-#ifdef DEBUG
-							  PB->S << Offset << "(Writing Output Queue)" << endl;
-#endif
-							  if (sem_trywait (mutex) == 0)
-								{
-#ifdef DEBUG
-								  PB->S << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
-#endif
-								  // Push the message to the GW output queue
-								  PGW->PushToOutputQueue ("11", _ReceivedMessage);
+														Status = OK;
 
-								  Status = OK;
-
-								  if (sem_post (mutex) != 0) // Successfully locked the semaphore, so unlock it
-									{
-									  perror ("Writing Output Queue : sem_post");
-									}
-								} // (sem_trywait(mutex) != 0) means UNABLE TO LOCK. If someone locked, it is normal to get this condition
-
-							  if (sem_close (mutex) != 0)
-								{
-								  perror ("Writing Output Queue : sem_close");
-								}
-							} // (mutex == SEM_FAILED) means it was unable to create/open the semaphore
-						  else
-							{
-							  perror ("Writing Output Queue : unable to create/open semaphore");
-
-							  sem_unlink (SemaphoreName.c_str ());
-							}
-
-						  if (Status == OK)
-							{
-							  break;
-							}
-						}
+														if (sem_post (OutputSem) != 0)
+														  {
+															perror ("Writing Output Queue : sem_post");
+														  }
+													  }
+													else
+													  {
+														PB->S << Offset << "(WARNING: Output Queue semaphore timeout)" << endl;
+													  }
+												  }
+												else
+												  {
+													perror ("Output Queue: unable to open semaphore");
+												  }
 					}
 				}
 			}
