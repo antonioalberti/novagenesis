@@ -41,24 +41,12 @@
 #include "GWRunInitialization01.h"
 #endif
 
-#ifndef _GWSTATUSS01_H
-#include "GWStatusS01.h"
+#ifndef _GWHELLOIPC00_H
+#include "GWHelloIPC00.h"
 #endif
 
-#ifndef _GWSTATUSSCNS01_H
-#include "GWStatusSCNS01.h"
-#endif
-
-#ifndef _GWHELLOIPC01_H
-#include "GWHelloIPC01.h"
-#endif
-
-#ifndef _GWSCNSEQ01_H
-#include "GWSCNSeq01.h"
-#endif
-
-#ifndef _GWSCNACK01_H
-#include "GWSCNAck01.h"
+#ifndef _GWRUNHELLOIPC02_H
+#include "GWRunHelloIPC02.h"
 #endif
 
 #define DEBUG // To follow message processing
@@ -109,11 +97,8 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   // Creating the actions
   NewAction("-run --initialization 0.1", PA);
   NewAction("-m --cl 0.1", PA);
-  NewAction("-st --s 0.1", PA);
-  NewAction("-st --scns 0.1", PA);
-  NewAction("-hello --ipc 0.1", PA);
-  NewAction("-scn --seq 0.1", PA);
-  NewAction("-scn --ack 0.1", PA);
+  NewAction("-hello --ipc 0.0", PA);        // GWHelloIPC00 - receiver (replaces GWHelloIPC01)
+  NewAction("-run --helloIPC 0.2", PA);     // GWRunHelloIPC02 - periodic emitter
 
   // Creating a -run --initialization message
   PP->NewMessage(GetTime(), 0, false, PIM);
@@ -165,37 +150,16 @@ void GW::NewAction(const string _LN, Action*& _PA)
     Actions.push_back((Action*)P);
   }
 
-  if (_LN == "-st --s 0.1")
+  if (_LN == "-hello --ipc 0.0")
   {
-    GWStatusS01* P = new GWStatusS01(_LN, this, PP->PMB);
+    GWHelloIPC00* P = new GWHelloIPC00(_LN, this, PP->PMB);
 
     Actions.push_back((Action*)P);
   }
 
-  if (_LN == "-st --scns 0.1")
+  if (_LN == "-run --helloIPC 0.2")
   {
-    GWStatusSCNS01* P = new GWStatusSCNS01(_LN, this, PP->PMB);
-
-    Actions.push_back((Action*)P);
-  }
-
-  if (_LN == "-hello --ipc 0.1")
-  {
-    GWHelloIPC01* P = new GWHelloIPC01(_LN, this, PP->PMB);
-
-    Actions.push_back((Action*)P);
-  }
-
-  if (_LN == "-scn --seq 0.1")
-  {
-    GWSCNSeq01* P = new GWSCNSeq01(_LN, this, PP->PMB);
-
-    Actions.push_back((Action*)P);
-  }
-
-  if (_LN == "-scn --ack 0.1")
-  {
-    GWSCNAck01* P = new GWSCNAck01(_LN, this, PP->PMB);
+    GWRunHelloIPC02* P = new GWRunHelloIPC02(_LN, this, PP->PMB);
 
     Actions.push_back((Action*)P);
   }

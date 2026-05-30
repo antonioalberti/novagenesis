@@ -217,6 +217,42 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   // Push the message to the GW input queue
   PGW->PushToInputQueue (RunPeriodic);
 
+  // ******************************************************
+  // Schedule the first hello IPC emission
+  // ******************************************************
+
+  Message* RunHelloIPC = NULL;
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
+
+  // Setting up the process SCN as the space limiter
+  Limiters.push_back(PB->PP->Intra_Process);
+
+  // Setting up the block SCN as the source SCN
+  Sources.push_back(PB->GetSelfCertifyingName());
+
+  // Setting up the block SCN as the destination SCN
+  Destinations.push_back(PB->GetSelfCertifyingName());
+
+  // Creating a new message (schedule for next period)
+  PB->PP->NewMessage(GetTime() + 1.0, 1, false, RunHelloIPC);
+
+  // Creating the ng -cl -m command line
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunHelloIPC, PCL);
+
+  // Adding a ng -run --helloIPC 0.2 command line
+  RunHelloIPC->NewCommandLine("-run", "--helloIPC", "0.2", PCL);
+
+  // Generate the SCN
+  PB->GenerateSCNFromMessageBinaryPatterns(RunHelloIPC, SCN);
+
+  // Creating the ng -scn --s command line
+  PMB->NewSCNCommandLine("0.1", SCN, RunHelloIPC, PCL);
+
+  // Push the message to the GW input queue
+  PGW->PushToInputQueue(RunHelloIPC);
+
   //PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;

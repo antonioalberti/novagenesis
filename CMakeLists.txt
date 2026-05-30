@@ -64,20 +64,14 @@ add_library(Common
         Common/src/File.h
         Common/src/GW.cpp
         Common/src/GW.h
-        Common/src/GWHelloIPC01.cpp
-        Common/src/GWHelloIPC01.h
+        Common/src/GWHelloIPC00.cpp
+        Common/src/GWHelloIPC00.h
         Common/src/GWMsgCl01.cpp
         Common/src/GWMsgCl01.h
         Common/src/GWRunInitialization01.cpp
         Common/src/GWRunInitialization01.h
-        Common/src/GWSCNAck01.cpp
-        Common/src/GWSCNAck01.h
-        Common/src/GWSCNSeq01.cpp
-        Common/src/GWSCNSeq01.h
-        Common/src/GWStatusS01.cpp
-        Common/src/GWStatusS01.h
-        Common/src/GWStatusSCNS01.cpp
-        Common/src/GWStatusSCNS01.h
+        Common/src/GWRunHelloIPC02.cpp
+        Common/src/GWRunHelloIPC02.h
         Common/src/HashMultimaps.h
         Common/src/HT.cpp
         Common/src/HT.h

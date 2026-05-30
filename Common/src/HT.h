@@ -111,6 +111,9 @@ class HT : public Block {
   // Get a binding from the Bindings container at category _Cat
   int GetBinding (unsigned int _Cat, const string _Key, vector<string> *&_Values);
 
+  // Get all keys from the Bindings container at category _Cat
+  int GetBindingKeys (unsigned int _Cat, vector<string> &_Keys);
+
   // Revoke (remove) a binding from the Bindings container at category _Cat
   int RevokeBinding (unsigned int _Cat, const string _Key);
 

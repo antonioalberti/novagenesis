@@ -562,6 +562,35 @@ int HT::GetBinding (unsigned int _Cat, const string _Key, vector<string> *&_Valu
   return Status;
 }
 
+// Get all keys from the Bindings container at category _Cat
+int HT::GetBindingKeys (unsigned int _Cat, vector<string> &_Keys)
+{
+  int Status = ERROR;
+  string Offset = "                    ";
+
+  if (Bindings != 0)
+  {
+    Iterator it;
+    string PreviousKey = "";
+
+    for (it = Bindings[_Cat].begin(); it != Bindings[_Cat].end(); ++it)
+    {
+      if ((*it).first != PreviousKey)
+      {
+        _Keys.push_back((*it).first);
+        PreviousKey = (*it).first;
+        Status = OK;
+      }
+    }
+  }
+  else
+  {
+    S << "(ERROR: Unable to access the required hash table)" << endl;
+  }
+
+  return Status;
+}
+
 // Revoke a binding from the Bindings container
 int HT::RevokeBinding (unsigned int _Cat, const string _Key)
 {
