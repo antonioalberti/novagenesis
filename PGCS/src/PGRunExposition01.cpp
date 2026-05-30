@@ -41,7 +41,7 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG // This debug is important to follow PGCS running
+#define DEBUG // This debug is important to follow PGCS running
 
 PGRunExposition01::PGRunExposition01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -53,8 +53,6 @@ PGRunExposition01::~PGRunExposition01 ()
 
 // Run the actions behind a received command line
 // ng -run --exposition 0.1
-
-//TODO: FIXP/Update - This function has been revisited in August 2021. Copy it for your old version of code
 int
 PGRunExposition01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
 {

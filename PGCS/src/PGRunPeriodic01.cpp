@@ -337,10 +337,10 @@ int PGRunPeriodic01::HelloScheduling ()
   if (HelloCounter % (int)PPG->DelayBetweenHellos01 == 0)
 	{
 	  helloCount++;
-	  std::cerr << "[HELLO] call=" << callCount << " hello=" << helloCount
+	  std::cerr << std::endl << "[HELLO] call=" << callCount << " hello=" << helloCount
 		    << " HelloCounter=" << HelloCounter
 		    << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
-		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
+		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
 
 #ifdef DEBUG
 
@@ -522,10 +522,10 @@ int PGRunPeriodic01::PGCSPublishingScheduling ()
   if (PPG->AlreadyPublishedBasicBindings == false && PPG-> AwareOfAPS == true)
 	{
 	  publishCount++;
-	  std::cerr << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
+	  std::cerr << std::endl << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
 		    << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
 		    << " AwareOfAPS=" << PPG->AwareOfAPS
-		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
+		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
 	  // ******************************************************
 	  // Schedule a message to run publishing names to PSS/NRNCS
 	  // ******************************************************
@@ -617,11 +617,11 @@ int PGRunPeriodic01::StresstestScheduling ()
       if (MessagesPerPeriod < 1) MessagesPerPeriod = 1;
 
       sendCount += MessagesPerPeriod;
-      std::cerr << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
+      std::cerr << std::endl << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
 		<< " totalSent=" << sendCount
 		<< " StressEnabled=" << PPG->StressEnabled
 		<< " PGCSTuples=" << PPG->PGCSTuples.size()
-		<< " PID=" << PPG->GetSelfCertifyingName() << std::endl;
+		<< " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
 
 #ifdef DEBUG
       PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod

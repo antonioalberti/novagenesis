@@ -33,6 +33,8 @@
 #include "HT.h"
 #endif
 
+#define DEBUG
+
 GWStatusSCNS01::GWStatusSCNS01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -43,6 +45,8 @@ GWStatusSCNS01::~GWStatusSCNS01 ()
 
 // Run the actions behind a received command line
 // ng -st --scns _Version [ < 2 string _AckCommandName _AckCommandAlt > < 1 string _StatusCode > < _RelatedSCNsSize string S_1 ... S_RelatedSCNsSize > ]
+// ng -st --scns 0.1 [ < 2 s -hello --ipc > < 1 s 0 > < 1 s 6BBB1247 > ]
+
 int
 GWStatusSCNS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
 {
@@ -79,8 +83,12 @@ GWStatusSCNS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messag
   PGW = (GW *)PB;
 
   LegibleNames.push_back (PB->PP->GetLegibleName ());
+  
+#ifdef DEBUG
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
+
+#endif
 
   // Load the number of arguments
   if (_PCL->GetNumberofArguments (NA) == OK)
@@ -97,7 +105,9 @@ GWStatusSCNS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messag
 			  if (RelatedCommand.at (0) == "-hello" && RelatedCommand.at (1) == "--ipc" && StatusCode.at (0) == "0"
 				  && PB->State == "hello")
 				{
-				  //PB->S << Offset << "("<<LN<<" is moving to operational state)"<<endl;
+#ifdef DEBUG
+					PB->S << Offset << "("<<LN<<" is moving to operational state)"<<endl;
+#endif	  
 
 				  PB->State = "operational";
 
@@ -248,8 +258,6 @@ GWStatusSCNS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messag
 					  PGW->PushToInputQueue (GWStoreBind01Msg);
 
 					  Status = OK;
-
-					  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
 					}
 				}
 			}
@@ -272,7 +280,9 @@ GWStatusSCNS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messag
 	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
 	}
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#ifdef DEBUG
+  PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#endif
 
   return Status;
 }
