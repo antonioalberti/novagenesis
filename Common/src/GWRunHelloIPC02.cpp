@@ -54,7 +54,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  string Version = "0.1";
+  string Version = "0.2";
 
   PGW = (GW*)PB;
 
@@ -92,13 +92,13 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   Destinations.push_back("FFFFFFFF");
 
   // ******************************************************
-  // Create the first command line: ng -m --cl 0.1
+  // Create the first command line: ng -m --cl 0.2
   // ******************************************************
 
-  PMB->NewConnectionLessCommandLine(Version, &Limiters, &Sources, &Destinations, IPCHello, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, IPCHello, PCL);
 
   // ******************************************************
-  // Create the second command line: ng -hello --ipc 0.1
+  // Create the second command line: ng -hello --ipc 0.2
   // ******************************************************
 
   PMB->NewIPCHelloCommandLine("--ipc", Version, PB->PP->Key, PB->PP->GetLegibleName(), IPCHello, PCL);
@@ -112,7 +112,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   PB->GenerateSCNFromMessageBinaryPatterns(IPCHello, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine(Version, SCN, IPCHello, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, IPCHello, PCL);
 
   // ******************************************************
   // Push to output queue targeting PGCS SHM key 11

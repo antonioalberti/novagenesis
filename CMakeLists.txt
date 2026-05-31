@@ -64,8 +64,8 @@ add_library(Common
         Common/src/File.h
         Common/src/GW.cpp
         Common/src/GW.h
-        Common/src/GWHelloIPC00.cpp
-        Common/src/GWHelloIPC00.h
+        Common/src/GWHelloIPC02.cpp
+        Common/src/GWHelloIPC02.h
         Common/src/GWMsgCl01.cpp
         Common/src/GWMsgCl01.h
         Common/src/GWRunInitialization01.cpp

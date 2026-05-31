@@ -272,7 +272,7 @@ class GW : public Block {
   // ------------------------------------------------------------------------------------------------------------------------------
   friend class GWMsgCl01;
   friend class GWRunInitialization01;
-  friend class GWHelloIPC00;
+  friend class GWHelloIPC02;
   friend class GWRunHelloIPC02;
   friend class Message;
 };

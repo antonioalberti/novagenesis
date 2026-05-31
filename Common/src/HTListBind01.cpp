@@ -63,7 +63,7 @@ HTListBind01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 
   PB->S << endl << Offset << "(Hash Tables Size)" << endl;
 
-  for (unsigned int j = 0; j < 19; j++)
+  for (unsigned int j = 0; j < MAX_CATEGORIES; j++)
 	{
 	  if (PHT->Bindings != 0)
 		{

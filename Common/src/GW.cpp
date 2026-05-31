@@ -41,8 +41,8 @@
 #include "GWRunInitialization01.h"
 #endif
 
-#ifndef _GWHELLOIPC00_H
-#include "GWHelloIPC00.h"
+#ifndef _GWHelloIPC02_H
+#include "GWHelloIPC02.h"
 #endif
 
 #ifndef _GWRUNHELLOIPC02_H
@@ -97,7 +97,7 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   // Creating the actions
   NewAction("-run --initialization 0.1", PA);
   NewAction("-m --cl 0.1", PA);
-  NewAction("-hello --ipc 0.0", PA);        // GWHelloIPC00 - receiver (replaces GWHelloIPC01)
+  NewAction("-hello --ipc 0.2", PA);        // GWHelloIPC02 - receiver (replaces GWHelloIPC01)
   NewAction("-run --helloIPC 0.2", PA);     // GWRunHelloIPC02 - periodic emitter
 
   // Creating a -run --initialization message
@@ -150,9 +150,9 @@ void GW::NewAction(const string _LN, Action*& _PA)
     Actions.push_back((Action*)P);
   }
 
-  if (_LN == "-hello --ipc 0.0")
+  if (_LN == "-hello --ipc 0.2")
   {
-    GWHelloIPC00* P = new GWHelloIPC00(_LN, this, PP->PMB);
+    GWHelloIPC02* P = new GWHelloIPC02(_LN, this, PP->PMB);
 
     Actions.push_back((Action*)P);
   }

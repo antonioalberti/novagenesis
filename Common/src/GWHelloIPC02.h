@@ -1,9 +1,9 @@
 /*
 	NovaGenesis
 
-	Name:		GWRunHelloIPC02
-	Object:		GWRunHelloIPC02
-	File:		GWRunHelloIPC02.h
+	Name:		GWHelloIPC02
+	Object:		GWHelloIPC02
+	File:		GWHelloIPC02.h
 	Author:		Antonio Marcos Alberti
 	Date:		05/2026
 	Version:	0.2
@@ -25,8 +25,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _GWRUNHELLOIPC02_H
-#define _GWRUNHELLOIPC02_H
+#ifndef _GWHelloIPC02_H
+#define _GWHelloIPC02_H
 
 #ifndef _STRING_H
 #include <string>
@@ -51,23 +51,29 @@ class Block;
 
 using namespace std;
 
-class GWRunHelloIPC02 : public Action {
+class GWHelloIPC02 : public Action {
  public:
 
   // Constructor
-  GWRunHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB);
+  GWHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  ~GWRunHelloIPC02();
+  ~GWHelloIPC02();
 
   // Run the actions behind a received command line
-  // ng -run --helloIPC 0.2
+  // ng -hello --ipc 0.2 [ < 2 string Peer_Key Peer_LN > ]
   int Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
  private:
 
-  // Self-reschedule after 1 second
-  void SelfReschedule(Message* _ReceivedMessage);
+  // Store peer bindings in local HT
+  int StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerKey, string& _PeerLN);
+
+  // Forward hello to other known peers (only on PGCS)
+  int ForwardToPeers(Message* _ReceivedMessage, CommandLine* _PCL, string& _SenderPID);
+
+  // Create a copy of the hello message for forwarding
+  int CreateHelloCopy(Message* _OriginalMessage, CommandLine* _OriginalPCL, Message*& _CopyMessage, CommandLine*& _CopyPCL);
 };
 
 #endif

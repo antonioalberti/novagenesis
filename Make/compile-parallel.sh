@@ -45,11 +45,17 @@ echo "============================================"
 
 # ---- Status tracking ----
 STATUS_DIR=$(mktemp -d /tmp/ng-build-XXXXXX)
+LOG_DIR="$STATUS_DIR/logs"
+mkdir -p "$LOG_DIR"
 trap "rm -rf $STATUS_DIR" EXIT
 
 ACTIVE=0
 FAILED=0
 COMPILED=0
+
+echo ""
+echo "Logs directory: $LOG_DIR"
+echo ""
 
 for service in $SERVICES; do
     # Wait if we're at max concurrency
@@ -59,10 +65,14 @@ for service in $SERVICES; do
             svc=$(basename "$f" .done)
             exit_code=$(cat "$STATUS_DIR/$svc.exit" 2>/dev/null)
             if [ "$exit_code" = "0" ]; then
-                echo "  ✓ $svc"
+                echo "  [OK] $service (see $LOG_DIR/$svc.log)"
                 COMPILED=$((COMPILED + 1))
             else
-                echo "  ✗ $svc FAILED (exit $exit_code)"
+                echo "  [FAIL] $service (exit $exit_code)"
+                echo "  ---- Full stderr output for $svc ----"
+                cat "$LOG_DIR/$svc.log" 2>/dev/null
+                echo "  ---- End of $svc output ----"
+                echo ""
                 FAILED=$((FAILED + 1))
             fi
             rm -f "$STATUS_DIR/$svc.done" "$STATUS_DIR/$svc.exit"
@@ -71,35 +81,46 @@ for service in $SERVICES; do
         sleep 0.5
     done
 
-    echo "  ▶ Compiling $service..."
+    echo "  [>>] Compiling $service..."
     ACTIVE=$((ACTIVE + 1))
 
     (
+        # Compile, capture ALL stderr (errors + warnings) to log file
         if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
             -o "$BUILD_DIR/$service" "$service/src/"*.cpp Common/src/*.cpp \
-            -I Common/src/ -lpthread -lrt 2>"$STATUS_DIR/$service.log"; then
+            -I Common/src/ -lpthread -lrt 2>"$LOG_DIR/$service.log"; then
             echo 0 > "$STATUS_DIR/$service.exit"
         else
             echo $? > "$STATUS_DIR/$service.exit"
-            # Show first 10 error lines
-            head -10 "$STATUS_DIR/$service.log" > "$STATUS_DIR/$service.err"
         fi
         touch "$STATUS_DIR/$service.done"
     ) &
 done
 
 # ---- Wait for remaining jobs ----
-echo "  Waiting for remaining jobs..."
-while [ "$COMPILED" -lt "$NUM_SERVICES" ] && [ "$((COMPILED + FAILED))" -lt "$NUM_SERVICES" ]; do
+echo ""
+echo "  Waiting for remaining jobs to complete..."
+echo ""
+while [ "$((COMPILED + FAILED))" -lt "$NUM_SERVICES" ]; do
     for f in "$STATUS_DIR"/*.done; do
+        # Handle case where no .done files exist yet
+        [ -f "$f" ] || continue
         svc=$(basename "$f" .done)
         exit_code=$(cat "$STATUS_DIR/$svc.exit" 2>/dev/null)
         if [ "$exit_code" = "0" ]; then
-            echo "  ✓ $svc"
+            echo "  [OK] $svc compiled successfully"
+            # Show warning count if any
+            warn_count=$(grep -c ": warning:" "$LOG_DIR/$svc.log" 2>/dev/null || true)
+            if [ "$warn_count" -gt 0 ]; then
+                echo "        ($warn_count warnings, see $LOG_DIR/$svc.log)"
+            fi
             COMPILED=$((COMPILED + 1))
         else
-            echo "  ✗ $svc FAILED"
-            cat "$STATUS_DIR/$svc.err" 2>/dev/null
+            echo "  [FAIL] $svc (exit $exit_code)"
+            echo "  ---- Full stderr output for $svc ----"
+            cat "$LOG_DIR/$svc.log" 2>/dev/null
+            echo "  ---- End of $svc output ----"
+            echo ""
             FAILED=$((FAILED + 1))
         fi
         rm -f "$STATUS_DIR/$svc.done" "$STATUS_DIR/$svc.exit"
@@ -110,10 +131,14 @@ while [ "$COMPILED" -lt "$NUM_SERVICES" ] && [ "$((COMPILED + FAILED))" -lt "$NU
 done
 
 # ---- Report ----
+echo ""
 echo "============================================"
 echo " Build complete: $COMPILED succeeded, $FAILED failed"
 echo "============================================"
 
 if [ "$FAILED" -gt 0 ]; then
+    echo ""
+    echo "Full build logs are in: $LOG_DIR"
+    ls -la "$LOG_DIR"/*.log 2>/dev/null
     exit 1
 fi
