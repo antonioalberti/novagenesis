@@ -559,7 +559,6 @@ int GW::ReadFromSharedMemory3()
   int Status = ERROR;
   string Offset = "          ";
   double StartingTime;
-  double EndingTime = 0;
 
   for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
        z++) // Modified in 9th April 2021 to deal with parallel shared memories.

@@ -86,11 +86,55 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
         StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), PeerData.at(0), PeerData.at(1));
 
         // ******************************************************
-        // If this is the PGCS, forward the hello to all other known peers
+        // If this is the PGCS, send a hello reply to the sender
+        // and forward the hello to all other known peers
         // ******************************************************
 
         if (PB->PP->GetLegibleName() == "PGCS")
         {
+          // Get the sender's IPC key from Category 19 (PeerPID -> IPCKey)
+          string senderIPCKey = "";
+          vector<string>* SenderKeys = new vector<string>;
+          if (PGW->GetHTBindingValues(19, ReceivedMessageSources.at(0), SenderKeys) == OK && SenderKeys->size() > 0)
+          {
+            senderIPCKey = SenderKeys->at(0);
+          }
+          delete SenderKeys;
+
+          if (!senderIPCKey.empty())
+          {
+            // Build a hello IPC reply message with PGCS's own key and name
+            Message* HelloReply = 0;
+            CommandLine* ReplyPCL = 0;
+            vector<string> Limiters;
+            vector<string> Sources;
+            vector<string> Destinations;
+            string ReplyVersion = "0.2";
+
+            PB->PP->NewMessage(GetTime(), 0, false, HelloReply);
+
+            Limiters.push_back(PB->PP->Intra_OS);
+            Sources.push_back(PB->PP->GetSelfCertifyingName());
+            Sources.push_back(PB->GetSelfCertifyingName());
+            Destinations.push_back("FFFFFFFF");
+            Destinations.push_back("FFFFFFFF");
+
+            PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, HelloReply, ReplyPCL);
+            PMB->NewIPCHelloCommandLine("--ipc", ReplyVersion, PB->PP->Key, PB->PP->GetLegibleName(), HelloReply, ReplyPCL);
+
+            string SCN = "FFFFFFFF";
+            PB->GenerateSCNFromMessageBinaryPatterns(HelloReply, SCN);
+            PMB->NewSCNCommandLine("0.1", SCN, HelloReply, ReplyPCL);
+
+            PB->S << Offset << "(Sending hello IPC reply to peer " << PeerData.at(1) << " with key = " << senderIPCKey << ")" << endl;
+            PGW->PushToOutputQueue(senderIPCKey, HelloReply);
+          }
+          else
+          {
+            PB->S << Offset << "(ERROR: Unable to get IPC key for sender PID " << ReceivedMessageSources.at(0) << ")" << endl;
+          }
+
+          // Forward the hello to all other known peers (not the sender)
           ForwardToPeers(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0));
         }
       }
