@@ -67,7 +67,10 @@ class GWHelloIPC02 : public Action {
  private:
 
   // Store peer bindings in local HT
-  int StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerKey, string& _PeerLN);
+  // _PeerPID: sender PID from -m --cl (index 2: HID, OSID, PID, BID)
+  // _PeerIPCKey: peer IPC key (hash from hello command)
+  // _PeerLN: peer legible name
+  int StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerIPCKey, string& _PeerLN);
 
   // Forward hello to other known peers (only on PGCS)
   int ForwardToPeers(Message* _ReceivedMessage, CommandLine* _PCL, string& _SenderPID);

@@ -81,9 +81,9 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 
         // ******************************************************
         // Store all peer bindings in the local HT
-        // ******************************************************
-
-        StorePeerBindings(_ReceivedMessage, _PCL, PeerData.at(0), PeerData.at(1));
+        // ReceivedMessageSources.at(0) is the sender PID from -m --cl source field
+        // PeerData.at(0) is the peer IPC key (hash), PeerData.at(1) is the legible name
+        StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), PeerData.at(0), PeerData.at(1));
 
         // ******************************************************
         // If this is the PGCS, forward the hello to all other known peers
@@ -115,8 +115,11 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
   return Status;
 }
 
-// Store peer bindings in local HT (same 5 categories as original GWHelloIPC01)
-int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerKey, string& _PeerLN)
+// Store peer bindings in local HT
+// _PeerPID: sender PID from -m --cl (used as key for cat 1, 3, 5)
+// _PeerIPCKey: peer IPC key (hash from hello command, used as value for cat 19)
+// _PeerLN: peer legible name
+int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerIPCKey, string& _PeerLN)
 {
   int Status = OK;
   unsigned int Category;
@@ -131,31 +134,41 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
   PB->GenerateSCNFromCharArrayBinaryPatterns(_PeerLN, HashLegiblePeerProcessName);
 
   // ******************************************************
-  // Binding: PID -> IPC Input Key (Category 19)
+  // Binding: PeerPID -> LegibleName (Category 1)
   // ******************************************************
 
-  Category = 19;
-  Key = _PeerKey;
-  Values.push_back(_PeerKey);
+  Category = 1;
+  Key = _PeerPID;
+  Values.push_back(_PeerLN);
   PGW->StoreHTBindingValues(Category, Key, &Values);
   Values.clear();
 
   // ******************************************************
-  // Binding Hash("Legible Process Name") -> PID (Category 2)
+  // Binding: PeerPID -> IPC Key (Category 19)
+  // ******************************************************
+
+  Category = 19;
+  Key = _PeerPID;
+  Values.push_back(_PeerIPCKey);
+  PGW->StoreHTBindingValues(Category, Key, &Values);
+  Values.clear();
+
+  // ******************************************************
+  // Binding Hash("Legible Process Name") -> PeerPID (Category 2)
   // ******************************************************
 
   Category = 2;
   Key = HashLegiblePeerProcessName;
-  Values.push_back(_PeerKey);
+  Values.push_back(_PeerPID);
   PGW->StoreHTBindingValues(Category, Key, &Values);
   Values.clear();
 
   // ******************************************************
-  // Binding: PID -> Hash("Legible Process Name") (Category 3)
+  // Binding: PeerPID -> Hash("Legible Process Name") (Category 3)
   // ******************************************************
 
   Category = 3;
-  Key = _PeerKey;
+  Key = _PeerPID;
   Values.push_back(HashLegiblePeerProcessName);
   PGW->StoreHTBindingValues(Category, Key, &Values);
   Values.clear();
@@ -171,12 +184,12 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
   Values.clear();
 
   // ******************************************************
-  // Binding: PID -> BID (Category 5)
+  // Binding: PeerPID -> BID (Category 5)
   // ******************************************************
 
   Category = 5;
-  Key = _PeerKey;
-  Values.push_back(_PeerKey);
+  Key = _PeerPID;
+  Values.push_back(_PeerPID);
   PGW->StoreHTBindingValues(Category, Key, &Values);
   Values.clear();
 
@@ -207,8 +220,7 @@ int GWHelloIPC02::ForwardToPeers(Message* _ReceivedMessage, CommandLine* _PCL, s
   }
 
   // Get all PIDs from category 19 (hello IPC discovered peers only)
-  // Category 13 contains ALL peers (including non-IPC internal processes),
-  // category 19 only has peers discovered via hello IPC.
+  // Category 19 only has peers discovered via hello IPC.
   // This prevents forwarding hellos to segments with no reader.
   if (PGW->PHT->GetBindingKeys(19, KnownPIDs) == OK)
   {
@@ -224,47 +236,60 @@ int GWHelloIPC02::ForwardToPeers(Message* _ReceivedMessage, CommandLine* _PCL, s
         continue;
       }
 
-      // Get the IPC key for this peer (category 19)
+      // Get the IPC key for this peer (category 19: PeerKey -> IPCKey)
+      string peerIPCKey = "";
       vector<string>* PeerKeys = new vector<string>;
       if (PGW->GetHTBindingValues(19, peerPID, PeerKeys) == OK && PeerKeys->size() > 0)
       {
-        string peerIPCKey = PeerKeys->at(0);
+        peerIPCKey = PeerKeys->at(0);
+      }
+      delete PeerKeys;
 
-        // Do not forward to any of this process's own SHM input segment keys
-        // This prevents writing hellos to segments that have no reader
-        bool isSelfSegment = false;
-        for (unsigned int z = 0; z < selfInputKeys.size(); z++)
-        {
-          if (peerIPCKey == selfInputKeys.at(z))
-          {
-            isSelfSegment = true;
-            break;
-          }
-        }
+      if (peerIPCKey.empty())
+      {
+        continue;
+      }
 
-        if (isSelfSegment)
-        {
-          PB->S << Offset << "(Skipping peer with key = " << peerIPCKey << ": self input segment)" << endl;
-          delete PeerKeys;
-          continue;
-        }
+      // Get peer legible name (category 1: PeerKey -> LegibleName)
+      string peerLN = "";
+      vector<string>* PeerNames = new vector<string>;
+      if (PGW->GetHTBindingValues(1, peerPID, PeerNames) == OK && PeerNames->size() > 0)
+      {
+        peerLN = PeerNames->at(0);
+      }
+      delete PeerNames;
 
-        // Create a copy of the hello message for this peer
-        Message* HelloCopy = NULL;
-        CommandLine* CopyPCL = NULL;
-
-        if (CreateHelloCopy(_ReceivedMessage, _PCL, HelloCopy, CopyPCL) == OK)
+      // Do not forward to any of this process's own SHM input segment keys
+      // This prevents writing hellos to segments that have no reader
+      bool isSelfSegment = false;
+      for (unsigned int z = 0; z < selfInputKeys.size(); z++)
+      {
+        if (peerIPCKey == selfInputKeys.at(z))
         {
-          PB->S << Offset << "(Forwarding hello to peer with key = " << peerIPCKey << ")" << endl;
-          PGW->PushToOutputQueue(peerIPCKey, HelloCopy);
-        }
-        else
-        {
-          PB->S << Offset << "(ERROR: Failed to create hello copy for peer)" << endl;
+          isSelfSegment = true;
+          break;
         }
       }
 
-      delete PeerKeys;
+      if (isSelfSegment)
+      {
+        PB->S << Offset << "(Skipping peer " << peerLN << " with key = " << peerIPCKey << ": self input segment)" << endl;
+        continue;
+      }
+
+      // Create a copy of the hello message for this peer
+      Message* HelloCopy = NULL;
+      CommandLine* CopyPCL = NULL;
+
+      if (CreateHelloCopy(_ReceivedMessage, _PCL, HelloCopy, CopyPCL) == OK)
+      {
+        PB->S << Offset << "(Forwarding hello to peer " << peerLN << " with key = " << peerIPCKey << ")" << endl;
+        PGW->PushToOutputQueue(peerIPCKey, HelloCopy);
+      }
+      else
+      {
+        PB->S << Offset << "(ERROR: Failed to create hello copy for peer " << peerLN << ")" << endl;
+      }
     }
   }
   else

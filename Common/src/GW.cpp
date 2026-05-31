@@ -482,6 +482,30 @@ void GW::Gateway()
       }
       S << Offset << "(Messages in memory = " << PP->GetNumberOfMessages() << ")" << endl;
 
+      S << "[7]       Current peer processes on this OS are:" << endl;
+
+      // List peers from category 1 (hello IPC discovered peers)
+      {
+        vector<string> Cat1Keys;
+        if (PHT->GetBindingKeys(1, Cat1Keys) == OK)
+        {
+          for (unsigned int i = 0; i < Cat1Keys.size(); i++)
+          {
+            vector<string>* Cat1Vals = new vector<string>;
+            if (PHT->GetBinding(1, Cat1Keys.at(i), Cat1Vals) == OK)
+            {
+              S << "            Cat[1] " << Cat1Keys.at(i);
+              for (unsigned int j = 0; j < Cat1Vals->size(); j++)
+              {
+                S << " -> " << Cat1Vals->at(j);
+              }
+              S << endl;
+            }
+            delete Cat1Vals;
+          }
+        }
+      }
+
 #endif
 
       Run(PM1, PM2);
