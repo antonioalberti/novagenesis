@@ -12,6 +12,7 @@ shopt -s nullglob
 cd "$(dirname "$0")/.." || exit 1
 
 BUILD_DIR="cmake-build-debug"
+rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
 # ---- Parse arguments ----

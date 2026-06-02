@@ -25,7 +25,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _CONTENTAPP_H"
+ #ifndef _CONTENTAPP_H
 #define _APP_H
 
 #include "Process.h"

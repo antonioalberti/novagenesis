@@ -122,6 +122,15 @@ int GWExposition02::ExposePeers()
       }
       delete ExposedKeys;
 
+           // Get the exposed peer's IPC key from category 19
+      string exposedBID = "";
+      vector<string>* ExposedBIDs = new vector<string>;
+      if (PGW->GetHTBindingValues(5, exposedPID, ExposedBIDs) == OK && ExposedBIDs->size() > 0)
+      {
+        exposedBID = ExposedBIDs->at(0);
+      }
+      delete ExposedBIDs;
+
       if (exposedIPCKey.empty())
       {
         PB->S << Offset << "(GWExposition02: ERROR: No IPC key for peer PID " << exposedPID << ")" << endl;
@@ -143,8 +152,6 @@ int GWExposition02::ExposePeers()
         continue;
       }
 
-      PB->S << Offset << "(GWExposition02: Exposing peer " << exposedLN << " with PID " << exposedPID << " and key " << exposedIPCKey << ")" << endl;
-
       key_t peerKey = (key_t)std::stol(exposedIPCKey);
 
       // Send to all OTHER known peers (not the exposed peer itself, not self)
@@ -154,6 +161,8 @@ int GWExposition02::ExposePeers()
         {
           continue; // Don't send back to the exposed peer
         }
+
+        PB->S << Offset << "(GWExposition02: Exposing peer " << exposedLN << " with PID " << exposedPID << " and key " << exposedIPCKey << ")" << endl;
 
         string targetPID = KnownPIDs.at(j);
 
@@ -179,6 +188,15 @@ int GWExposition02::ExposePeers()
           targetLN = TargetNames->at(0);
         }
         delete TargetNames;
+
+        // Get target peer BID from category 5
+        string targetBID = "";
+        vector<string>* TargetBIDs = new vector<string>;
+        if (PGW->GetHTBindingValues(5, targetPID, TargetBIDs) == OK && TargetBIDs->size() > 0)
+        {
+          targetBID = TargetBIDs->at(0);
+        }
+        delete TargetBIDs;
 
         // Do not forward to any of this process's own SHM input segment keys
         bool isSelfSegment = false;
@@ -207,14 +225,17 @@ int GWExposition02::ExposePeers()
 
         PB->PP->NewMessage(GetTime(), 0, false, FreshHello);
 
+        // Setting up the OS SCN as the space limiter
         FLimiters.push_back(PB->PP->Intra_OS);
 
-        // Use the exposed peer's identity as sender (so receiver learns about the exposed peer)
-        FSources.push_back(exposedPID);
-        FSources.push_back(exposedPID);
+        // Setting up this process PID as the first source SCN
+        FSources.push_back(PB->PP->GetSelfCertifyingName());
 
-        FDestinations.push_back("FFFFFFFF");
-        FDestinations.push_back("FFFFFFFF");
+        // Setting up the GW block SCN as the second source SCN
+        FSources.push_back(PB->GetSelfCertifyingName());
+
+        FDestinations.push_back(targetPID);
+        FDestinations.push_back(targetBID);
 
         PMB->NewConnectionLessCommandLine("0.1", &FLimiters, &FSources, &FDestinations, FreshHello, FreshPCL);
         PMB->NewIPCHelloCommandLine("--ipc", Version, peerKey, exposedLN, FreshHello, FreshPCL);
@@ -244,6 +265,15 @@ void GWExposition02::SelfReschedule(Message* _ReceivedMessage)
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
+
+  // Setting up the OS SCN as the space limiter
+  Limiters.push_back(PB->PP->Intra_Process);
+
+  // Setting up this process BID as the source SCN
+  Sources.push_back(PB->GetSelfCertifyingName());
+
+  // Setting up this process BID as the destination SCN
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Create a new message scheduled 1 second from now
   PB->PP->NewMessage(GetTime() + 1.0, 1, false, SelfMsg);
