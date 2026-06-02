@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/GIRS/src -I/home/gandalf/workspace/novagenesis/HTS/src -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/PSS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src
 
-CXX_FLAGS =  -O0 -g3 -p -pg -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -std=gnu++20
+CXX_FLAGS =  -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fsanitize=address -fno-omit-frame-pointer -g -std=gnu++20
 

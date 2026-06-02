@@ -62,7 +62,7 @@
 
 #define ERROR 1
 #define OK 0
-#define MAX_CATEGORIES 20
+#define MAX_CATEGORIES 21
 
 using namespace std;
 

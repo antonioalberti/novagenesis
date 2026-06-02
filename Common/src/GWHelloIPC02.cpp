@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWHelloIPC02
-	Object:		GWHelloIPC02
-	File:		GWHelloIPC02.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2026
-	Version:	0.2
+        Name:		GWHelloIPC02
+        Object:		GWHelloIPC02
+        File:		GWHelloIPC02.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -178,10 +178,10 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
   PB->GenerateSCNFromCharArrayBinaryPatterns(_PeerLN, HashLegiblePeerProcessName);
 
   // ******************************************************
-  // Binding: PeerPID -> LegibleName (Category 1)
+  // Binding: PeerPID -> LegibleName (Category 20)
   // ******************************************************
 
-  Category = 1;
+  Category = 20;
   Key = _PeerPID;
   Values.push_back(_PeerLN);
   PGW->StoreHTBindingValues(Category, Key, &Values);

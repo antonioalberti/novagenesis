@@ -181,19 +181,19 @@ CMakeFiles/Common.dir/Common/src/GW.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GW.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GW.cpp -o CMakeFiles/Common.dir/Common/src/GW.cpp.s
 
-CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o: CMakeFiles/Common.dir/flags.make
-CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC01.cpp
-CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC01.cpp
+CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o: CMakeFiles/Common.dir/flags.make
+CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp
+CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp
 
-CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC01.cpp > CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.i
+CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp > CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.i
 
-CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC01.cpp -o CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.s
+CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp -o CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.s
 
 CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp
@@ -223,66 +223,24 @@ CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWRunInitialization01.cpp -o CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.s
 
-CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o: CMakeFiles/Common.dir/flags.make
-CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWSCNAck01.cpp
-CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWSCNAck01.cpp
+CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o: CMakeFiles/Common.dir/flags.make
+CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp
+CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp
 
-CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWSCNAck01.cpp > CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.i
+CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp > CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.i
 
-CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWSCNAck01.cpp -o CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.s
-
-CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o: CMakeFiles/Common.dir/flags.make
-CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWSCNSeq01.cpp
-CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWSCNSeq01.cpp
-
-CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWSCNSeq01.cpp > CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.i
-
-CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWSCNSeq01.cpp -o CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.s
-
-CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o: CMakeFiles/Common.dir/flags.make
-CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWStatusS01.cpp
-CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWStatusS01.cpp
-
-CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWStatusS01.cpp > CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.i
-
-CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWStatusS01.cpp -o CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.s
-
-CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o: CMakeFiles/Common.dir/flags.make
-CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/GWStatusSCNS01.cpp
-CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o -MF CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWStatusSCNS01.cpp
-
-CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/gandalf/workspace/novagenesis/Common/src/GWStatusSCNS01.cpp > CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.i
-
-CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWStatusSCNS01.cpp -o CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.s
+CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp -o CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.s
 
 CMakeFiles/Common.dir/Common/src/HT.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HT.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HT.cpp
 CMakeFiles/Common.dir/Common/src/HT.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/Common.dir/Common/src/HT.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/Common.dir/Common/src/HT.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HT.cpp.o -MF CMakeFiles/Common.dir/Common/src/HT.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HT.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HT.cpp
 
 CMakeFiles/Common.dir/Common/src/HT.cpp.i: cmake_force
@@ -296,7 +254,7 @@ CMakeFiles/Common.dir/Common/src/HT.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTBindReport01.cpp
 CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTBindReport01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.i: cmake_force
@@ -310,7 +268,7 @@ CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTDeliveryBind01.cpp
 CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTDeliveryBind01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.i: cmake_force
@@ -324,7 +282,7 @@ CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTGetBind01.cpp
 CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTGetBind01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.i: cmake_force
@@ -338,7 +296,7 @@ CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTInfoPayload01.cpp
 CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTInfoPayload01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.i: cmake_force
@@ -352,7 +310,7 @@ CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTListBind01.cpp
 CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTListBind01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.i: cmake_force
@@ -366,7 +324,7 @@ CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTMessageSeq01.cpp
 CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTMessageSeq01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.i: cmake_force
@@ -380,7 +338,7 @@ CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp
 CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.i: cmake_force
@@ -394,7 +352,7 @@ CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTRevokeBind01.cpp
 CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRevokeBind01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.i: cmake_force
@@ -408,7 +366,7 @@ CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTRunInitialization01.cpp
 CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRunInitialization01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.i: cmake_force
@@ -422,7 +380,7 @@ CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp
 CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.i: cmake_force
@@ -436,7 +394,7 @@ CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTSCNSeq01.cpp
 CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTSCNSeq01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.i: cmake_force
@@ -450,7 +408,7 @@ CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTStatusS01.cpp
 CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTStatusS01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.i: cmake_force
@@ -464,7 +422,7 @@ CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/HTStoreBind01.cpp
 CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o -MF CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o.d -o CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTStoreBind01.cpp
 
 CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.i: cmake_force
@@ -478,7 +436,7 @@ CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/Message.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/Message.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/Message.cpp
 CMakeFiles/Common.dir/Common/src/Message.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/Common.dir/Common/src/Message.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/Common.dir/Common/src/Message.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/Message.cpp.o -MF CMakeFiles/Common.dir/Common/src/Message.cpp.o.d -o CMakeFiles/Common.dir/Common/src/Message.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Message.cpp
 
 CMakeFiles/Common.dir/Common/src/Message.cpp.i: cmake_force
@@ -492,7 +450,7 @@ CMakeFiles/Common.dir/Common/src/Message.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/MessageBuilder.cpp
 CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o -MF CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o.d -o CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/MessageBuilder.cpp
 
 CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.i: cmake_force
@@ -506,7 +464,7 @@ CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/MurmurHash3.cpp
 CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o -MF CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o.d -o CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/MurmurHash3.cpp
 
 CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.i: cmake_force
@@ -520,7 +478,7 @@ CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.cpp
 CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o -MF CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o.d -o CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.cpp
 
 CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.i: cmake_force
@@ -534,7 +492,7 @@ CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/Process.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/Process.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/Process.cpp
 CMakeFiles/Common.dir/Common/src/Process.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/Common.dir/Common/src/Process.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/Common.dir/Common/src/Process.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/Process.cpp.o -MF CMakeFiles/Common.dir/Common/src/Process.cpp.o.d -o CMakeFiles/Common.dir/Common/src/Process.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Process.cpp
 
 CMakeFiles/Common.dir/Common/src/Process.cpp.i: cmake_force
@@ -548,7 +506,7 @@ CMakeFiles/Common.dir/Common/src/Process.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/Prompt_iostream.cpp
 CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o -MF CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o.d -o CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Prompt_iostream.cpp
 
 CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.i: cmake_force
@@ -562,7 +520,7 @@ CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.s: cmake_force
 CMakeFiles/Common.dir/Common/src/tinythread.cpp.o: CMakeFiles/Common.dir/flags.make
 CMakeFiles/Common.dir/Common/src/tinythread.cpp.o: /home/gandalf/workspace/novagenesis/Common/src/tinythread.cpp
 CMakeFiles/Common.dir/Common/src/tinythread.cpp.o: CMakeFiles/Common.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/Common.dir/Common/src/tinythread.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/Common.dir/Common/src/tinythread.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Common.dir/Common/src/tinythread.cpp.o -MF CMakeFiles/Common.dir/Common/src/tinythread.cpp.o.d -o CMakeFiles/Common.dir/Common/src/tinythread.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/tinythread.cpp
 
 CMakeFiles/Common.dir/Common/src/tinythread.cpp.i: cmake_force
@@ -583,13 +541,10 @@ Common_OBJECTS = \
 "CMakeFiles/Common.dir/Common/src/CommandLine.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/File.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/GW.cpp.o" \
-"CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o" \
+"CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.o" \
-"CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o" \
-"CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o" \
-"CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o" \
-"CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o" \
+"CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/HT.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o" \
 "CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o" \
@@ -623,13 +578,10 @@ libCommon.a: CMakeFiles/Common.dir/Common/src/CLISCNAck01.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/CommandLine.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/File.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/GW.cpp.o
-libCommon.a: CMakeFiles/Common.dir/Common/src/GWHelloIPC01.cpp.o
+libCommon.a: CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.o
-libCommon.a: CMakeFiles/Common.dir/Common/src/GWSCNAck01.cpp.o
-libCommon.a: CMakeFiles/Common.dir/Common/src/GWSCNSeq01.cpp.o
-libCommon.a: CMakeFiles/Common.dir/Common/src/GWStatusS01.cpp.o
-libCommon.a: CMakeFiles/Common.dir/Common/src/GWStatusSCNS01.cpp.o
+libCommon.a: CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/HT.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o
@@ -653,7 +605,7 @@ libCommon.a: CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o
 libCommon.a: CMakeFiles/Common.dir/Common/src/tinythread.cpp.o
 libCommon.a: CMakeFiles/Common.dir/build.make
 libCommon.a: CMakeFiles/Common.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Linking CXX static library libCommon.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Linking CXX static library libCommon.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/Common.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Common.dir/link.txt --verbose=$(VERBOSE)
 

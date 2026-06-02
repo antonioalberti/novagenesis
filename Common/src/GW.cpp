@@ -484,24 +484,24 @@ void GW::Gateway()
 
       S << "[7]       Current peer processes on this OS are:" << endl;
 
-      // List peers from category 1 (hello IPC discovered peers)
+      // List peers from category 20 (hello IPC discovered peers)
       {
-        vector<string> Cat1Keys;
-        if (PHT->GetBindingKeys(1, Cat1Keys) == OK)
+        vector<string> Cat20Keys;
+        if (PHT->GetBindingKeys(20, Cat20Keys) == OK)
         {
-          for (unsigned int i = 0; i < Cat1Keys.size(); i++)
+          for (unsigned int i = 0; i < Cat20Keys.size(); i++)
           {
-            vector<string>* Cat1Vals = new vector<string>;
-            if (PHT->GetBinding(1, Cat1Keys.at(i), Cat1Vals) == OK)
+            vector<string>* Cat20Vals = new vector<string>;
+            if (PHT->GetBinding(20, Cat20Keys.at(i), Cat20Vals) == OK)
             {
-              S << "            Cat[1] " << Cat1Keys.at(i);
-              for (unsigned int j = 0; j < Cat1Vals->size(); j++)
+              S << "            Cat[20] " << Cat20Keys.at(i);
+              for (unsigned int j = 0; j < Cat20Vals->size(); j++)
               {
-                S << " -> " << Cat1Vals->at(j);
+                S << " -> " << Cat20Vals->at(j);
               }
               S << endl;
             }
-            delete Cat1Vals;
+            delete Cat20Vals;
           }
         }
       }
