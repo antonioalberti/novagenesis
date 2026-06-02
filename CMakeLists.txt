@@ -72,6 +72,8 @@ add_library(Common
         Common/src/GWRunInitialization01.h
         Common/src/GWRunHelloIPC02.cpp
         Common/src/GWRunHelloIPC02.h
+        Common/src/GWExposition02.cpp
+        Common/src/GWExposition02.h
         Common/src/HashMultimaps.h
         Common/src/HT.cpp
         Common/src/HT.h

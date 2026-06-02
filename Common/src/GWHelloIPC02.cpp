@@ -294,10 +294,10 @@ int GWHelloIPC02::ForwardToPeers(Message* _ReceivedMessage, CommandLine* _PCL, s
         continue;
       }
 
-      // Get peer legible name (category 1: PeerKey -> LegibleName)
+      // Get peer legible name (category 20: PeerKey -> LegibleName)
       string peerLN = "";
       vector<string>* PeerNames = new vector<string>;
-      if (PGW->GetHTBindingValues(1, peerPID, PeerNames) == OK && PeerNames->size() > 0)
+      if (PGW->GetHTBindingValues(20, peerPID, PeerNames) == OK && PeerNames->size() > 0)
       {
         peerLN = PeerNames->at(0);
       }
@@ -350,10 +350,7 @@ int GWHelloIPC02::CreateHelloCopy(Message* _OriginalMessage, CommandLine* _Origi
   int Status = OK;
   vector<string> PeerData;
   CommandLine* GWMsgCl01 = 0;
-  GW* PGW = 0;
   string Offset = "          ";
-
-  PGW = (GW*)PB;
 
   // Get the peer key and legible name from the original hello command line
   _OriginalPCL->GetArgument(0, PeerData);
@@ -397,8 +394,10 @@ int GWHelloIPC02::CreateHelloCopy(Message* _OriginalMessage, CommandLine* _Origi
   string CLVersion = "0.1";
   PMB->NewConnectionLessCommandLine(CLVersion, &Limiters, &Sources, &Destinations, NewMsg, NewPCL);
 
-  // Add the -hello --ipc command line with same peer data
-  PMB->NewIPCHelloCommandLine("--ipc", Version, PB->PP->Key, PB->PP->GetLegibleName(), NewMsg, NewPCL);
+  // Add the -hello --ipc command line with original sender's peer data
+  // PeerData.at(0) = original sender key, PeerData.at(1) = original sender name
+  // Use std::stol to convert string key back to key_t for the function signature
+  PMB->NewIPCHelloCommandLine("--ipc", Version, std::stol(PeerData.at(0)), PeerData.at(1), NewMsg, NewPCL);
 
   // Generate the SCN
   string SCN = "FFFFFFFF";

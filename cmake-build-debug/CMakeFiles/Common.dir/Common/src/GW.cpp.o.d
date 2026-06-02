@@ -356,4 +356,5 @@ CMakeFiles/Common.dir/Common/src/GW.cpp.o: \
  /home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.h \
  /home/gandalf/workspace/novagenesis/Common/src/GWRunInitialization01.h \
  /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.h \
- /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.h
+ /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.h \
+ /home/gandalf/workspace/novagenesis/Common/src/GWExposition02.h

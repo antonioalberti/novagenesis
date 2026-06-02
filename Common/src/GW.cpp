@@ -49,6 +49,10 @@
 #include "GWRunHelloIPC02.h"
 #endif
 
+#ifndef _GWEXPOSITION02_H
+#include "GWExposition02.h"
+#endif
+
 #define DEBUG // To follow message processing
 // #define DEBUG1  // To follow shared memory access
 // #define DEBUG2  // More on shm access
@@ -99,6 +103,8 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   NewAction("-m --cl 0.1", PA);
   NewAction("-hello --ipc 0.2", PA);        // GWHelloIPC02 - receiver (replaces GWHelloIPC01)
   NewAction("-run --helloIPC 0.2", PA);     // GWRunHelloIPC02 - periodic emitter
+  NewAction("-exposition 0.2", PA);         // GWExposition02 - periodic peer exposition on PGCS
+  NewAction("-run --exposition 0.2", PA);   // GWExposition02 - periodic trigger
 
   // Creating a -run --initialization message
   PP->NewMessage(GetTime(), 0, false, PIM);
@@ -160,6 +166,20 @@ void GW::NewAction(const string _LN, Action*& _PA)
   if (_LN == "-run --helloIPC 0.2")
   {
     GWRunHelloIPC02* P = new GWRunHelloIPC02(_LN, this, PP->PMB);
+
+    Actions.push_back((Action*)P);
+  }
+
+  if (_LN == "-exposition 0.2")
+  {
+    GWExposition02* P = new GWExposition02(_LN, this, PP->PMB);
+
+    Actions.push_back((Action*)P);
+  }
+
+  if (_LN == "-run --exposition 0.2")
+  {
+    GWExposition02* P = new GWExposition02(_LN, this, PP->PMB);
 
     Actions.push_back((Action*)P);
   }

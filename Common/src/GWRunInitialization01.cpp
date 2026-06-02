@@ -59,7 +59,7 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   vector<string> Values;
   string OperatingSystemLegibleNameSCN;
   string Offset = "                    ";
-  Message *RunPeriodic = 0;
+  Message *RunExposition = 0;
 
   PGW = (GW *)PB;
 
@@ -163,6 +163,9 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 		}
 	}
 
+   // Push the message to the GW input queue
+  PGW->PushToInputQueue (StoringInitialBinds);
+
   // ******************************************************
   // Finish
   // ******************************************************
@@ -173,49 +176,44 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine ("0.1", SCN, StoringInitialBinds, PCL);
 
-  // Clear the temporary containers
+  // ******************************************************
+  // Schedule a message to run exposition first time
+  // ******************************************************
   Values.clear ();
-  Limiters.clear ();
-  Sources.clear ();
-  Destinations.clear ();
-
-  // ******************************************************
-  // Schedule a message to run periodic first time
-  // ******************************************************
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
-  // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  // Setting up the block SCN as the source SCN
+  Sources.push_back(PB->GetSelfCertifyingName());
 
-  // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PHTB->GetSelfCertifyingName ());
+  // Setting up the block SCN as the destination SCN
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 1, false, RunPeriodic);
+  // Creating a new message (schedule for next period)
+  PB->PP->NewMessage(GetTime() + 1.0, 1, false, RunExposition);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
 
-  // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  // Adding a ng -run --exposition 0.2 command line
+  RunExposition->NewCommandLine("-run", "--exposition", "0.2", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(RunExposition, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
-
-  // ******************************************************
-  // Finish
-  // ******************************************************
+  PMB->NewSCNCommandLine("0.1", SCN, RunExposition, PCL);
 
   // Push the message to the GW input queue
-  PGW->PushToInputQueue (StoringInitialBinds);
+  PGW->PushToInputQueue(RunExposition);
 
-  // Push the message to the GW input queue
-  PGW->PushToInputQueue (RunPeriodic);
+  // ******************************************************
+  // Schedule the first hello IPC emission
+  // ******************************************************
 
   // ******************************************************
   // Schedule the first hello IPC emission
@@ -254,6 +252,10 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   PGW->PushToInputQueue(RunHelloIPC);
 
   //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+
+  // ******************************************************
+  // Finish
+  // ******************************************************
 
   return Status;
 }

@@ -123,12 +123,12 @@ CMakeFiles/Common.dir/clean:
 CMakeFiles/ContentApp.dir/all: CMakeFiles/Common.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ContentApp.dir/build.make CMakeFiles/ContentApp.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ContentApp.dir/build.make CMakeFiles/ContentApp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=19,20,21,22,23,24,25,26,27,28,29 "Built target ContentApp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=19,20,21,22,23,24,25,26,27,28,29,30 "Built target ContentApp"
 .PHONY : CMakeFiles/ContentApp.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ContentApp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 29
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 30
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ContentApp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/ContentApp.dir/rule
@@ -149,12 +149,12 @@ CMakeFiles/ContentApp.dir/clean:
 CMakeFiles/GIRS.dir/all: CMakeFiles/Common.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIRS.dir/build.make CMakeFiles/GIRS.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIRS.dir/build.make CMakeFiles/GIRS.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=30,31,32,33,34,35,36,37,38,39,40,41 "Built target GIRS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles --progress-num=31,32,33,34,35,36,37,38,39,40,41 "Built target GIRS"
 .PHONY : CMakeFiles/GIRS.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/GIRS.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 30
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/GIRS.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/gandalf/workspace/novagenesis/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/GIRS.dir/rule

@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Common.dir/Common/src/File.cpp.o.d"
   "CMakeFiles/Common.dir/Common/src/GW.cpp.o"
   "CMakeFiles/Common.dir/Common/src/GW.cpp.o.d"
+  "CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.o"
+  "CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.o.d"
   "CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o"
   "CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o.d"
   "CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o"

@@ -425,6 +425,30 @@ Common/src/GW.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Common.dir/build.make CMakeFiles/Common.dir/Common/src/GW.cpp.s
 .PHONY : Common/src/GW.cpp.s
 
+Common/src/GWExposition02.o: Common/src/GWExposition02.cpp.o
+.PHONY : Common/src/GWExposition02.o
+
+# target to build an object file
+Common/src/GWExposition02.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Common.dir/build.make CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.o
+.PHONY : Common/src/GWExposition02.cpp.o
+
+Common/src/GWExposition02.i: Common/src/GWExposition02.cpp.i
+.PHONY : Common/src/GWExposition02.i
+
+# target to preprocess a source file
+Common/src/GWExposition02.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Common.dir/build.make CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.i
+.PHONY : Common/src/GWExposition02.cpp.i
+
+Common/src/GWExposition02.s: Common/src/GWExposition02.cpp.s
+.PHONY : Common/src/GWExposition02.s
+
+# target to generate assembly for a file
+Common/src/GWExposition02.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Common.dir/build.make CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.s
+.PHONY : Common/src/GWExposition02.cpp.s
+
 Common/src/GWHelloIPC02.o: Common/src/GWHelloIPC02.cpp.o
 .PHONY : Common/src/GWHelloIPC02.o
 
@@ -4546,6 +4570,9 @@ help:
 	@echo "... Common/src/GW.o"
 	@echo "... Common/src/GW.i"
 	@echo "... Common/src/GW.s"
+	@echo "... Common/src/GWExposition02.o"
+	@echo "... Common/src/GWExposition02.i"
+	@echo "... Common/src/GWExposition02.s"
 	@echo "... Common/src/GWHelloIPC02.o"
 	@echo "... Common/src/GWHelloIPC02.i"
 	@echo "... Common/src/GWHelloIPC02.s"
