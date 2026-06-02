@@ -77,13 +77,26 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
       {
         GWMsgCl01->GetArgument(1, ReceivedMessageSources);
 
-        PB->S << Offset << "(Discovered the peer service = " << PeerData.at(1) << " via shared memory. IPC is working properly.)" << endl;
+        // Check if this peer is already known (Category 20: PID -> LN)
+        vector<string>* ExistingLN = new vector<string>;
+        bool alreadyKnown = (PGW->GetHTBindingValues(20, ReceivedMessageSources.at(0), ExistingLN) == OK
+                             && ExistingLN->size() > 0);
+        delete ExistingLN;
 
-        // ******************************************************
-        // Store all peer bindings in the local HT
-        // ReceivedMessageSources.at(0) is the sender PID from -m --cl source field
-        // PeerData.at(0) is the peer IPC key (hash), PeerData.at(1) is the legible name
-        StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), ReceivedMessageSources.at(1), PeerData.at(0), PeerData.at(1));
+        if (alreadyKnown)
+        {
+          // Peer already discovered — skip redundant store and logging
+        }
+        else
+        {
+          PB->S << Offset << "(Discovered the peer service = " << PeerData.at(1) << " via shared memory. IPC is working properly.)" << endl;
+
+          // ******************************************************
+          // Store all peer bindings in the local HT
+          // ReceivedMessageSources.at(0) is the sender PID from -m --cl source field
+          // PeerData.at(0) is the peer IPC key (hash), PeerData.at(1) is the legible name
+          StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), ReceivedMessageSources.at(1), PeerData.at(0), PeerData.at(1));
+        }
       }
       else
       {
