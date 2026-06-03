@@ -303,13 +303,32 @@ int Block::Run(Message *_ReceivedMessage, Message *&_InlineResponseMessage)
 
 							// Set overall status
 							for (unsigned int j=0; j<NCL; j++)
-								{
-									if (CLStatus[j] == ERROR) {Status = ERROR;}
-								}
+							{
+								if (CLStatus[j] == ERROR) {Status = ERROR;}
+							}
 
 							StopProcessingMessage=false;
 
-						}
+							// FIX NG-042-05 (2026-06-03): Mark for delete at the end of the
+							// successful CL processing loop. Up to NG-042-04, only specific
+							// actions (m--cl forward, etc.) marked _ReceivedMessage for
+							// deletion. Any action that produced new messages (HTRunPeriodic01,
+							// GWRunHelloIPC02 SelfReschedule, GWExposition02 SelfReschedule,
+							// inline responses) but did NOT explicitly mark the original
+							// caused it to stay in Process::Messages[] forever — the leak
+							// we observed as +N msg/sec in the log.
+							//
+							// Safety: this is idempotent (actions like m--cl that already
+							// marked it are no-ops), and no current action retains an async
+							// reference to _ReceivedMessage after Run() returns. The actual
+							// delete happens in PP->DeleteMarkedMessages() in the Gateway loop,
+							// which already runs after Block::Run() returns.
+							//
+							// See: https://github.com/antonioalberti/novagenesis/issues/NG-042-05
+							// Revert plan: Docs/REVERT.md
+							_ReceivedMessage->MarkToDelete();
+
+							}
 					else
 						{
 							S << "(ERROR: Invalid number of command lines)" << endl;
