@@ -1046,11 +1046,13 @@ void Process::GenerateSCNFromProcessBinaryPatterns4Bytes(Process *_PP, string &_
 		{
 			std::stringstream Data;
 
-			Data << _PP;
-			Data << &_PP->Blocks;
-			Data << &_PP->LN;
-			Data << &_PP->SCN;
-			Data << &_PP->Path;
+			// FIX (NG-042-01): removed non-deterministic pointer inputs
+			// (_PP, &_PP->Blocks) that made the SCN vary with ASLR/realloc.
+			// Keep only stable, content-based inputs: LN + Path from both
+			// the target process and the caller. This guarantees the SCN is
+			// reproducible across runs for the same (LN, Path) pair.
+			Data << _PP->LN;
+			Data << _PP->Path;
 			Data << LN;
 			Data << Path;
 
@@ -1127,22 +1129,38 @@ void Process::GenerateSCNFromProcessBinaryPatterns4Bytes(Process *_PP, string &_
 // Generate process self-certified name from its binary patterns
 void Process::GenerateSCNFromProcessBinaryPatterns16Bytes(Process *_PP, string &_SCN)
 {
-	vector<string> 				Strings(4);
-	const void*					key;
-	unsigned int				*Bytes=new unsigned int;
-	unsigned int				*Temp=new unsigned int[4];
-	char 						*Chars=new char[4];
-	int 						*Input=new int[4];
-	unsigned char	 			*Output=new unsigned char[16];
-	int							Index=0;
+	vector<string> 	Strings(4);
+	const void*		key;
+	unsigned int		*Bytes=new unsigned int;
+	unsigned int		*Temp=new unsigned int[4];
+	char 			*Chars=new char[4];
+	int 			*Input=new int[4];
+	unsigned char		*Output=new unsigned char[16];
+	int					Index=0;
 
 	if (_PP != 0)
 		{
+			// FIX (NG-042-01): use deterministic string-hash inputs
+			// (LN, Path) instead of pointer addresses. The previous
+			// `((long long)_PP)` and `((long long)&_PP->Blocks)` varied
+			// with ASLR and realloc. We hash each stable field into a
+			// short hex string and use a stable integer fold of it.
+			string hashLN, hashPath, hashDLN;
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->LN, hashLN);
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->Path, hashPath);
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->DLN, hashDLN);
+
+			// Stable integer fold: take last 8 hex chars (32 bits) of each hash
+			auto hexToInt = [](const string& h) -> int {
+				if (h.size() < 8) return 0;
+				return (int)std::stoul(h.substr(h.size() - 8), nullptr, 16);
+			};
+
 			// Setting the input integers for each round
-			Input[0]=(((long long)_PP))*(110503);
-			Input[1]=(((long long)&_PP->Blocks))*(132049);
-			Input[2]=(((long long)&_PP->DLN))*(216091);
-			Input[3]=(((long long)&_PP->LN))*(756839);
+			Input[0]=hexToInt(hashLN)*(110503);
+			Input[1]=hexToInt(hashPath)*(132049);
+			Input[2]=hexToInt(hashDLN)*(216091);
+			Input[3]=hexToInt(hashLN)*(756839);
 
 			_SCN="";
 
@@ -1231,15 +1249,34 @@ void Process::GenerateSCNFromProcessBinaryPatterns32Bytes(Process *_PP, string &
 
 	if (_PP != 0)
 		{
+			// FIX (NG-042-01): use deterministic string-hash inputs
+			// (LN, Path, DLN, SCN) instead of pointer addresses. The
+			// previous `((long long)_PP)` and `((long long)&_PP->Blocks)`
+			// varied with ASLR and realloc. Hash each stable field into
+			// a hex string and fold it to a stable long long.
+			string hashLN, hashPath, hashDLN, hashSCN;
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->LN, hashLN);
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->Path, hashPath);
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->DLN, hashDLN);
+			GenerateSCNFromCharArrayBinaryPatterns(_PP->SCN, hashSCN);
+
+			// Stable long long fold: parse first 16 hex chars of each hash.
+			// If shorter, treat missing digits as zero.
+			auto hexToLL = [](const string& h) -> long long {
+				if (h.empty()) return 0;
+				string padded = h.size() < 16 ? string(16 - h.size(), '0') + h : h.substr(0, 16);
+				return (long long)std::stoull(padded, nullptr, 16);
+			};
+
 			// Setting the input integers for each round
-			Input[0]=(((long long)_PP))*(110503);
-			Input[1]=(((long long)&_PP->Blocks))*(132049);
-			Input[2]=(((long long)&_PP->DLN))*(216091);
-			Input[3]=(((long long)&_PP->LN))*(756839);
-			Input[4]=(((long long)&_PP->SCN))*(859433);
-			Input[5]=(((long long)&_PP->Path))*(1257787);
-			Input[6]=(((long long)_PP))*(1398269);
-			Input[7]=(((long long)_PP))*(2976221);
+			Input[0]=hexToLL(hashLN)*(110503);
+			Input[1]=hexToLL(hashPath)*(132049);
+			Input[2]=hexToLL(hashDLN)*(216091);
+			Input[3]=hexToLL(hashLN)*(756839);
+			Input[4]=hexToLL(hashSCN)*(859433);
+			Input[5]=hexToLL(hashPath)*(1257787);
+			Input[6]=hexToLL(hashLN)*(1398269);
+			Input[7]=hexToLL(hashPath)*(2976221);
 
 			_SCN="";
 
