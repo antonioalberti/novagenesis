@@ -141,7 +141,30 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
 
 #ifdef DEBUG
 
-    PB->S << Offset << "(Forwarding: The destination block has the SCN = " << Key << ")" << endl;
+    // Look up the destination process legible name from local PHT (Cat 20: PID -> LN)
+    // to make routing decisions and leak diagnostics visible in the log.
+    string DestLN = "unknown";
+    string DestPID = "(none)";
+    if (ReceivedMessageDestinations.size() >= 2)
+    {
+      DestPID = ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2);
+      vector<string>* LNValues = new vector<string>;
+      if (PGW->GetHTBindingValues(20, DestPID, LNValues) == OK && LNValues->size() > 0)
+      {
+        DestLN = LNValues->at(0);
+      }
+      delete LNValues;
+
+      // Flag if the destination is the local process itself
+      if (DestPID == PB->PP->GetSelfCertifyingName())
+      {
+        DestLN = "[self] " + DestLN;
+      }
+    }
+
+    PB->S << Offset << "(Forwarding: The destination block has the SCN = " << Key
+          << ", target process = " << DestLN
+          << " (PID = " << DestPID << "))" << endl;
 
 #endif
 
