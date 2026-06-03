@@ -82,6 +82,16 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   // Block related
 
+  // ******************************************************
+  // Binding: PeerPID -> LegibleName (Category 20)
+  // ******************************************************
+
+  Category = 20;
+  Key = PB->PP->GetSelfCertifyingName();
+  Values.push_back(PB->PP->GetLegibleName());
+  PGW->StoreHTBindingValues(Category, Key, &Values);
+  Values.clear();
+
   PMB->NewStoreBindingCommandLineFromBLNToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
   PMB->NewStoreBindingCommandLineFromHashBLNToBLN("0.1", PB, StoringInitialBinds, PCL);

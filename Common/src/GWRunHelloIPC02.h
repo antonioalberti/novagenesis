@@ -63,11 +63,6 @@ class GWRunHelloIPC02 : public Action {
   // Run the actions behind a received command line
   // ng -run --helloIPC 0.2
   int Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
-
- private:
-
-  // Self-reschedule after 1 second
-  void SelfReschedule(Message* _ReceivedMessage);
 };
 
 #endif

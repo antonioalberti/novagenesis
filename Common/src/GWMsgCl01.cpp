@@ -141,30 +141,7 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
 
 #ifdef DEBUG
 
-    // Look up the destination process legible name from local PHT (Cat 20: PID -> LN)
-    // to make routing decisions and leak diagnostics visible in the log.
-    string DestLN = "unknown";
-    string DestPID = "(none)";
-    if (ReceivedMessageDestinations.size() >= 2)
-    {
-      DestPID = ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2);
-      vector<string>* LNValues = new vector<string>;
-      if (PGW->GetHTBindingValues(20, DestPID, LNValues) == OK && LNValues->size() > 0)
-      {
-        DestLN = LNValues->at(0);
-      }
-      delete LNValues;
-
-      // Flag if the destination is the local process itself
-      if (DestPID == PB->PP->GetSelfCertifyingName())
-      {
-        DestLN = "[self] " + DestLN;
-      }
-    }
-
-    PB->S << Offset << "(Forwarding: The destination block has the SCN = " << Key
-          << ", target process = " << DestLN
-          << " (PID = " << DestPID << "))" << endl;
+    PB->S << Offset << "(Forwarding: The destination block has the SCN = " << Key << endl;
 
 #endif
 
@@ -260,17 +237,20 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
             // Do not stop processing the other command lines of the message. The destination is the GW
             PB->StopProcessingMessage = false;
 
-            // FIX NG-042-04 (2026-06-03): Mark for delete.
+            // FIX 2026-06-03: Mark for delete.
             // The destination is the GW itself (index 1). All remaining CLs in
             // this message (e.g., hello--ipc, scn--seq) will run in this same
             // block, after which the message is fully processed. Block::Run()
             // does NOT mark for delete on the success path, so without this
             // explicit mark the message stays in Process::Messages[] forever,
             // causing the +N msg/sec leak we observed in the log.
-            // See: https://github.com/antonioalberti/novagenesis/issues/NG-042-04
+      
             _ReceivedMessage->MarkToDelete();
+            
+#ifdef DEBUG
+            PB->S << Offset <<  "(Forwarding: The destination is the gateway)" << endl;
+#endif
 
-            // PB->S << Offset <<  "(Forwarding: The destination is the gateway)" << endl;
           }
         }
         else

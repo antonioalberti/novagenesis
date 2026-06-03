@@ -62,12 +62,10 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   if (PB->PP->Key == 11)
   {
     // PGCS does not need to announce itself via hello IPC
-    // Self-reschedule anyway to keep the periodic timer alive
-    SelfReschedule(_ReceivedMessage);
     return Status;
   }
 
-  PB->S << Offset << "(Periodic hello IPC emission for " << PB->PP->GetLegibleName() << ")" << endl;
+  PB->S << Offset << "(Periodic hello IPC 0.2 emission for " << PB->PP->GetLegibleName() << ")" << endl;
 
   // ******************************************************
   // Creating a hello IPC message to send to PGCS via SHM key 11
@@ -122,37 +120,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
 
   PGW->PushToOutputQueue("11", IPCHello);
 
-  // ******************************************************
-  // Self-reschedule for next execution in 1 second
-  // ******************************************************
-
-  SelfReschedule(_ReceivedMessage);
-
   PB->S << Offset << "(Done)" << endl;
 
   return Status;
-}
-
-// Self-reschedule: create a copy of this command with time +1s
-void GWRunHelloIPC02::SelfReschedule(Message* _ReceivedMessage)
-{
-  Message* SelfMsg = 0;
-  CommandLine* PCL = 0;
-
-  // Create a new message scheduled 1 second from now
-  PB->PP->NewMessage(GetTime() + 1.0, 1, false, SelfMsg);
-
-  // Copy the command lines from the received message
-  SelfMsg->NewCommandLine("-run", "--helloIPC", "0.2", PCL);
-
-  // Generate the SCN
-  string SCN = "FFFFFFFF";
-  PB->GenerateSCNFromMessageBinaryPatterns(SelfMsg, SCN);
-
-  // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine("0.1", SCN, SelfMsg, PCL);
-
-  // Push to the GW input queue
-  GW* PGW = (GW*)PB;
-  PGW->PushToInputQueue(SelfMsg);
 }

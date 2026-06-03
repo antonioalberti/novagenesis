@@ -59,7 +59,7 @@ int GWExposition02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mes
   if (PB->PP->GetLegibleName() != "PGCS")
   {
     PB->S << Offset << "(GWExposition02: Not PGCS, skipping exposition)" << endl;
-    SelfReschedule(_ReceivedMessage);
+
     return Status;
   }
 
@@ -68,7 +68,7 @@ int GWExposition02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mes
   // Expose all known peers to all other known peers
   ExposePeers();
 
-  // Self-reschedule for next execution in 1 second
+  // Self-reschedule for next execution in 10 second
   SelfReschedule(_ReceivedMessage);
 
   PB->S << Offset << "(GWExposition02: Done)" << endl;
@@ -105,8 +105,6 @@ int GWExposition02::ExposePeers()
       PB->S << Offset << "(GWExposition02: No known peers to expose)" << endl;
       return Status;
     }
-
-    PB->S << Offset << "(GWExposition02: Exposing " << KnownPIDs.size() << " known peers to each other)" << endl;
 
     // For each known peer, build a hello and send to all other peers
     for (unsigned int i = 0; i < KnownPIDs.size(); i++)
@@ -233,7 +231,7 @@ int GWExposition02::ExposePeers()
         // the forwarded hello look like PGCS was the originator. The receiver
         // then stored a binding like `Cat[20] PGCS_PID -> NRNCS` (mismatch)
         // and Categories 5/6 were never populated correctly, breaking
-        // domain discovery. See NG-042-02 follow-up.
+        // domain discovery. 
         FSources.push_back(exposedPID);
         FSources.push_back(exposedBID);
 
@@ -279,7 +277,7 @@ void GWExposition02::SelfReschedule(Message* _ReceivedMessage)
   Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Create a new message scheduled 1 second from now
-  PB->PP->NewMessage(GetTime() + 1.0, 1, false, SelfMsg);
+  PB->PP->NewMessage(GetTime() + 10, 1, false, SelfMsg);
 
 // Creating the ng -cl -m command line
   PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, SelfMsg, PCL);

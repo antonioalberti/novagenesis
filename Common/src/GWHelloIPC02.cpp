@@ -94,6 +94,7 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
           // ******************************************************
           // Store all peer bindings in the local HT
           // ReceivedMessageSources.at(0) is the sender PID from -m --cl source field
+          // ReceivedMessageSources.at(1) is the sender BID from -m --cl source field
           // PeerData.at(0) is the peer IPC key (hash), PeerData.at(1) is the legible name
           StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), ReceivedMessageSources.at(1), PeerData.at(0), PeerData.at(1));
         }

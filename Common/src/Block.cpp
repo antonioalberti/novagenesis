@@ -309,7 +309,7 @@ int Block::Run(Message *_ReceivedMessage, Message *&_InlineResponseMessage)
 
 							StopProcessingMessage=false;
 
-							// FIX NG-042-05 (2026-06-03): Mark for delete at the end of the
+							// FIX (2026-06-03): Mark for delete at the end of the
 							// successful CL processing loop. Up to NG-042-04, only specific
 							// actions (m--cl forward, etc.) marked _ReceivedMessage for
 							// deletion. Any action that produced new messages (HTRunPeriodic01,
@@ -323,9 +323,7 @@ int Block::Run(Message *_ReceivedMessage, Message *&_InlineResponseMessage)
 							// reference to _ReceivedMessage after Run() returns. The actual
 							// delete happens in PP->DeleteMarkedMessages() in the Gateway loop,
 							// which already runs after Block::Run() returns.
-							//
-							// See: https://github.com/antonioalberti/novagenesis/issues/NG-042-05
-							// Revert plan: Docs/REVERT.md
+
 							_ReceivedMessage->MarkToDelete();
 
 							}

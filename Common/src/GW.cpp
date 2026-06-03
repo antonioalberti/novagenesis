@@ -207,9 +207,7 @@ void GW::PushToInputQueue(Message* M)
 
 #ifdef DEBUG
 
-  // TODO: FIXP/Oct 2021. Improving debug
-
-  S << "[1]       (Pushing a message the following message to InputQueue. Size = " << InputQueue.size()
+  S << "[1]       (Pushing the following message to InputQueue. Size = " << InputQueue.size()
     << ". Message instantiation number is " << M->InstantiationNumber << ")" << endl;
 
   S << "(" << endl
@@ -505,7 +503,7 @@ void GW::Gateway()
       S << "[7]       Current peer processes on this OS are:" << endl;
 
       // List peers from category 20 (hello IPC discovered peers)
-      {
+      
         vector<string> Cat20Keys;
         if (PHT->GetBindingKeys(20, Cat20Keys) == OK)
         {
@@ -523,10 +521,50 @@ void GW::Gateway()
             }
             delete Cat20Vals;
           }
-
-          S << endl;
         }
-      }
+
+        // List peers from category 19 (hello IPC discovered peers)
+      
+        vector<string> Cat19Keys;
+        if (PHT->GetBindingKeys(19, Cat19Keys) == OK)
+        {
+          for (unsigned int j = 0; j < Cat19Keys.size(); j++)
+          {
+            vector<string>* Cat19Vals = new vector<string>;
+            if (PHT->GetBinding(19, Cat19Keys.at(j), Cat19Vals) == OK)
+            {
+              S << "            Cat[19] " << Cat19Keys.at(j);
+              for (unsigned int k = 0; k < Cat19Vals->size(); k++)
+              {
+                S << " -> " << Cat19Vals->at(k);
+              }
+              S << endl;
+            }
+            delete Cat19Vals;
+          }
+        }
+
+        // List peers from category 15 (hello IHC discovered peers)
+      
+        vector<string> Cat15Keys;
+        if (PHT->GetBindingKeys(15, Cat15Keys) == OK)
+        {
+          for (unsigned int j = 0; j < Cat15Keys.size(); j++)
+          {
+            vector<string>* Cat15Vals = new vector<string>;
+            if (PHT->GetBinding(15, Cat15Keys.at(j), Cat15Vals) == OK)
+            {
+              S << "            Cat[15] " << Cat15Keys.at(j);
+              for (unsigned int k = 0; k < Cat15Vals->size(); k++)
+              {
+                S << " -> " << Cat15Vals->at(k);
+              }
+              S << endl;
+            }
+            delete Cat15Vals;
+          }
+        }
+      
 
 #endif
 
