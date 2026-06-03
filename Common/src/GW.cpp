@@ -523,6 +523,8 @@ void GW::Gateway()
             }
             delete Cat20Vals;
           }
+
+          S << endl;
         }
       }
 
