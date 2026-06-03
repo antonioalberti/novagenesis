@@ -260,6 +260,16 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
             // Do not stop processing the other command lines of the message. The destination is the GW
             PB->StopProcessingMessage = false;
 
+            // FIX NG-042-04 (2026-06-03): Mark for delete.
+            // The destination is the GW itself (index 1). All remaining CLs in
+            // this message (e.g., hello--ipc, scn--seq) will run in this same
+            // block, after which the message is fully processed. Block::Run()
+            // does NOT mark for delete on the success path, so without this
+            // explicit mark the message stays in Process::Messages[] forever,
+            // causing the +N msg/sec leak we observed in the log.
+            // See: https://github.com/antonioalberti/novagenesis/issues/NG-042-04
+            _ReceivedMessage->MarkToDelete();
+
             // PB->S << Offset <<  "(Forwarding: The destination is the gateway)" << endl;
           }
         }
