@@ -788,6 +788,10 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideProcess(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
+
+          // Mark the message to be deleted. Same convention as the inline path below.
+          // Without this, every forwarded message leaks in the Messages container.
+          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Intra_OS)
         {
@@ -799,6 +803,8 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideOS(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
+
+          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Intra_Domain)
         {
@@ -810,6 +816,8 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideDomain(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
+
+          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Inter_Domain)
         {
@@ -821,6 +829,8 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardInterDomainMessage(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
+
+          _ReceivedMessage->MarkToDelete();
         }
         else
         {

@@ -228,11 +228,14 @@ int GWExposition02::ExposePeers()
         // Setting up the OS SCN as the space limiter
         FLimiters.push_back(PB->PP->Intra_OS);
 
-        // Setting up this process PID as the first source SCN
-        FSources.push_back(PB->PP->GetSelfCertifyingName());
-
-        // Setting up the GW block SCN as the second source SCN
-        FSources.push_back(PB->GetSelfCertifyingName());
+        // Setting up the originator's (exposed peer's) PID and GW BID as
+        // the source SCNs. Previously this used PGCS's own SCN, which made
+        // the forwarded hello look like PGCS was the originator. The receiver
+        // then stored a binding like `Cat[20] PGCS_PID -> NRNCS` (mismatch)
+        // and Categories 5/6 were never populated correctly, breaking
+        // domain discovery. See NG-042-02 follow-up.
+        FSources.push_back(exposedPID);
+        FSources.push_back(exposedBID);
 
         FDestinations.push_back(targetPID);
         FDestinations.push_back(targetBID);
