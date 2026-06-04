@@ -77,8 +77,25 @@ int GWExposition02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mes
 }
 
 // Build and send hello messages for all known peers to all other known peers
-// For each known peer PID, builds a hello IPC message advertising that peer's
-// identity and sends it to every other known peer's SHM key.
+// and also expose the LOCAL process (PGCS) to each known peer.
+//
+// Phase 1: For each known peer PID, builds a hello IPC message advertising
+//          that peer's identity and sends it to every other known peer's
+//          SHM key. (Peer-to-peer redistribution.)
+//
+// Phase 2: For the LOCAL process (PGCS), builds a hello IPC message
+//          advertising PGCS's own identity (self PID/BID/LN/SHM key) and
+//          sends it to each known peer's SHM key. This is needed because
+//          GWRunHelloIPC02 is intentionally disabled on PGCS (its SHM key
+//          11 is well-known and statically configured on the peers), yet
+//          some bindings that peers (e.g. ContentApp) need can only be
+//          delivered via a hello 0.2 message, not via the static key
+//          advertisement. With Phase 2, every known peer receives exactly
+//          one hello 0.2 from PGCS per exposition cycle, regardless of how
+//          many other peers are known. This also resolves NG-042-03
+//          ("GWExposition02 useless with 1 peer"): with a single known
+//          peer, Phase 1 generates zero messages, but Phase 2 still
+//          delivers the PGCS hello to that peer.
 int GWExposition02::ExposePeers()
 {
   int Status = OK;
@@ -248,6 +265,119 @@ int GWExposition02::ExposePeers()
         PB->S << Offset << "(GWExposition02: Sending exposition of " << exposedLN << " to " << targetLN << " with key = " << targetIPCKey << ")" << endl;
         PGW->PushToOutputQueue(targetIPCKey, FreshHello);
       }
+    }
+
+    // Phase 2: expose the LOCAL process (PGCS) to each known peer.
+    //
+    // PGCS does not run GWRunHelloIPC02 (key 11 is the well-known
+    // initialization key, statically configured on every peer). Without
+    // Phase 2, peers would never receive a hello 0.2 originated by PGCS,
+    // and the bindings that hello carries (peer self-identification that
+    // goes beyond the static key advertisement) would be missing on the
+    // peer side. Phase 2 also resolves NG-042-03: with a single known
+    // peer, Phase 1 emits zero messages (i==j filter drops the only
+    // iteration), but Phase 2 still delivers the PGCS hello to that
+    // peer.
+    PB->S << Offset << "(GWExposition02: Self-exposing PGCS to " << KnownPIDs.size() << " known peer(s))" << endl;
+
+    string selfPID = PB->PP->GetSelfCertifyingName();
+    string selfBID = selfPID; // GW BID of the local process == PID
+    string selfLN = PB->PP->GetLegibleName();
+    key_t selfKey = (key_t)selfBaseKey;
+
+    for (unsigned int j = 0; j < KnownPIDs.size(); j++)
+    {
+      string targetPID = KnownPIDs.at(j);
+
+      // Defensive: skip self (self should not be in cat 19, but the
+      // isSelfSegment check below would also catch this case)
+      if (targetPID == selfPID)
+      {
+        continue;
+      }
+
+      // Get the target peer's IPC key from category 19
+      string targetIPCKey = "";
+      vector<string>* TargetKeys = new vector<string>;
+      if (PGW->GetHTBindingValues(19, targetPID, TargetKeys) == OK && TargetKeys->size() > 0)
+      {
+        targetIPCKey = TargetKeys->at(0);
+      }
+      delete TargetKeys;
+
+      if (targetIPCKey.empty())
+      {
+        continue;
+      }
+
+      // Get target peer legible name for logging
+      string targetLN = "";
+      vector<string>* TargetNames = new vector<string>;
+      if (PGW->GetHTBindingValues(20, targetPID, TargetNames) == OK && TargetNames->size() > 0)
+      {
+        targetLN = TargetNames->at(0);
+      }
+      delete TargetNames;
+
+      // Get target peer BID from category 5
+      string targetBID = "";
+      vector<string>* TargetBIDs = new vector<string>;
+      if (PGW->GetHTBindingValues(5, targetPID, TargetBIDs) == OK && TargetBIDs->size() > 0)
+      {
+        targetBID = TargetBIDs->at(0);
+      }
+      delete TargetBIDs;
+
+      // Do not forward to any of this process's own SHM input segment keys
+      bool isSelfSegment = false;
+      for (unsigned int z = 0; z < selfInputKeys.size(); z++)
+      {
+        if (targetIPCKey == selfInputKeys.at(z))
+        {
+          isSelfSegment = true;
+          break;
+        }
+      }
+
+      if (isSelfSegment)
+      {
+        continue;
+      }
+
+      // Build a fresh hello IPC message advertising the LOCAL process.
+      // This is identical to what GWRunHelloIPC02 would build, except
+      // that destinations are the specific target peer (not FFFFFFFF)
+      // and the IPC key being advertised is the local process's own
+      // SHM key (selfKey), not a remote peer's key.
+      Message* SelfHello = 0;
+      CommandLine* SelfPCL = 0;
+      vector<string> SelfLimiters;
+      vector<string> SelfSources;
+      vector<string> SelfDestinations;
+      string Version = "0.2";
+
+      PB->PP->NewMessage(GetTime(), 0, false, SelfHello);
+
+      // Setting up the OS SCN as the space limiter
+      SelfLimiters.push_back(PB->PP->Intra_OS);
+
+      // Source: the local process's PID and GW BID (PGCS)
+      SelfSources.push_back(selfPID);
+      SelfSources.push_back(selfBID);
+
+      // Destination: the target peer (specific, not broadcast)
+      SelfDestinations.push_back(targetPID);
+      SelfDestinations.push_back(targetBID);
+
+      PMB->NewConnectionLessCommandLine("0.1", &SelfLimiters, &SelfSources, &SelfDestinations, SelfHello, SelfPCL);
+      PMB->NewIPCHelloCommandLine("--ipc", Version, selfKey, selfLN, SelfHello, SelfPCL);
+
+      string SelfSCN = "FFFFFFFF";
+      PB->GenerateSCNFromMessageBinaryPatterns(SelfHello, SelfSCN);
+      PMB->NewSCNCommandLine("0.1", SelfSCN, SelfHello, SelfPCL);
+
+      PB->S << Offset << "(GWExposition02: PGCS self-exposing to " << targetLN << " (key = " << targetIPCKey << "))" << endl;
+      PGW->PushToOutputQueue(targetIPCKey, SelfHello);
     }
   }
   else
