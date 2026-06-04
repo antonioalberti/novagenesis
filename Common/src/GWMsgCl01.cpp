@@ -246,6 +246,9 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
             // causing the +N msg/sec leak we observed in the log.
       
             _ReceivedMessage->MarkToDelete();
+
+            // Set Status
+              Status = OK;
             
 #ifdef DEBUG
             PB->S << Offset <<  "(Forwarding: The destination is the gateway)" << endl;
@@ -356,13 +359,13 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
         // PID -> Output Key
 
         // Setting up the category
-        Category = 13;
+        Category = 19;
 
         // Setting up the key.
         Key = ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2);
 
 #ifdef DEBUG
-        PB->S << Offset << "(Looking at Category 13 for the shared memory key behind the SCN = " << Key << ")"
+        PB->S << Offset << "(Looking at Category 19 for the shared memory key behind the SCN = " << Key << ")"
               << endl;
 #endif
 
@@ -389,10 +392,14 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
                 // Phase 2: Use SafePushToOutputQueue to avoid busy-wait and sem_open overhead
                 SafePushToOutputQueue(PGW,BindingValue, _ReceivedMessage, Offset, PB, Status);
               }
+              else
+              {
+                PB->S << Offset << "(ERROR: Empty destination values vector)" << endl;
+              }
             }
             else
             {
-              PB->S << Offset << "(ERROR: Null values vector)" << endl;
+              PB->S << Offset << "(ERROR: Null destination values vector)" << endl;
             }
           }
           else
@@ -421,32 +428,25 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 
 #ifdef DEBUG
       PB->S << endl
-            << Offset << "(Forwarding: A ng -hello --ipc 0.1 message was received)" << endl
+            << Offset << "(Forwarding: A ng -hello --ipc 0.2 message was received)" << endl
             << endl;
 #endif
 
-      // Create a new message to answer the one being processed at GW
-      PB->PP->NewMessage(GetTime(), 0, false, GWStatusS01Msg);
+      // Modified in 04/06/2026 to deal with new IPC hello implementation
+      // Do not stop processing the other command lines of the message. The destination is the PGCS
+      PB->StopProcessingMessage = false;
 
-      // Store this message on the scheduled messages container
-      ScheduledMessages.push_back(GWStatusS01Msg);
+      // FIX 2026-06-03: Mark for delete.
+      // The destination is the PGCS::GW itself (index 1). All remaining CLs in
+      // this message (e.g., hello--ipc, scn--seq) will run in this same
+      // block, after which the message is fully processed. Block::Run()
+      // does NOT mark for delete on the success path, so without this
+      // explicit mark the message stays in Process::Messages[] forever,
+      // causing the +N msg/sec leak we observed in the log.
 
-      // Clear the destinations vector, since it is empty
-      ReceivedMessageDestinations.clear();
+      _ReceivedMessage->MarkToDelete();
 
-      // Add this process SCN to the destinations vector
-      ReceivedMessageDestinations.push_back(PB->PP->GetSelfCertifyingName());
-
-      // Add this block SCN to the destinations vector
-      ReceivedMessageDestinations.push_back(PB->GetSelfCertifyingName());
-
-      // Create a new ng -m --cl 0.1 command line
-      PMB->NewConnectionLessCommandLine("0.1",
-                                        &ReceivedMessageLimiters,
-                                        &ReceivedMessageDestinations,
-                                        &ReceivedMessageSources,
-                                        GWStatusS01Msg,
-                                        GWMsgCl01);
+      Status=OK;
     }
   }
   else
@@ -757,7 +757,7 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Running the action " << this->GetLegibleName() << " at block " << PB->GetLegibleName() << ")"
+  PB->S << endl << Offset << "(Running the action " << this->GetLegibleName() << " at block " << PB->GetLegibleName() << ")"
         << endl;
 
   PB->S << Offset << this->GetLegibleName() << endl;
