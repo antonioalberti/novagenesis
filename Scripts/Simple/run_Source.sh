@@ -49,7 +49,7 @@ else
     echo "WARNING: No photos generated."
 fi
 
-# Run ContentApp (needs root for raw sockets)
-echo "Starting ContentApp in Source mode (IO: $IO_DIR) ..."
+# Run ContentApp under gdb (debug mode — captures crash backtrace)
+echo "Starting ContentApp in Source mode under gdb (IO: $IO_DIR) ..."
 cd "$BASE/cmake-build-debug"
-./ContentApp "$IO_DIR/" Source
+gdb -batch -ex "run" -ex "bt full" -ex "info registers" -ex "thread apply all bt full" -ex "quit" --args ./ContentApp "$IO_DIR/" Source

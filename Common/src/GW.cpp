@@ -55,7 +55,7 @@
 
 #define DEBUG // To follow message processing
 // #define DEBUG1  // To follow shared memory access
-// #define DEBUG2  // More on shm access
+#define DEBUG2  // More on shm access
 // #define DEBUG3 // Even more on shm access
 
 union semun
@@ -102,6 +102,7 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   NewAction("-run --initialization 0.1", PA);
   NewAction("-m --cl 0.1", PA);
   NewAction("-hello --ipc 0.2", PA);        // GWHelloIPC02 - receiver (replaces GWHelloIPC01)
+  NewAction("-hello --ipc 2.0", PA);        // GWHelloIPC02 - receiver with HT BID support
   NewAction("-run --helloIPC 0.2", PA);     // GWRunHelloIPC02 - periodic emitter
   NewAction("-exposition 0.2", PA);         // GWExposition02 - periodic peer exposition on PGCS
   NewAction("-run --exposition 0.2", PA);   // GWExposition02 - periodic trigger
@@ -157,6 +158,13 @@ void GW::NewAction(const string _LN, Action*& _PA)
   }
 
   if (_LN == "-hello --ipc 0.2")
+  {
+    GWHelloIPC02* P = new GWHelloIPC02(_LN, this, PP->PMB);
+
+    Actions.push_back((Action*)P);
+  }
+
+  if (_LN == "-hello --ipc 2.0")
   {
     GWHelloIPC02* P = new GWHelloIPC02(_LN, this, PP->PMB);
 

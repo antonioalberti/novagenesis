@@ -70,7 +70,8 @@ class GWHelloIPC02 : public Action {
   // _PeerPID: sender PID from -m --cl (index 2: HID, OSID, PID, BID)
   // _PeerIPCKey: peer IPC key (hash from hello command)
   // _PeerLN: peer legible name
-  int StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerBID, string& _PeerIPCKey, string& _PeerLN);
+  // _PeerHTBID: optional peer HT block BID (v2.0+, PGCS only)
+  int StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerBID, string& _PeerIPCKey, string& _PeerLN, string& _PeerHTBID);
 };
 
 #endif

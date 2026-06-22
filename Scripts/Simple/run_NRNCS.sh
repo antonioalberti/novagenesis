@@ -4,4 +4,4 @@
 BASE=/home/gandalf/workspace/novagenesis
 
 cd $BASE/cmake-build-debug
-./NRNCS $BASE/IO/NRNCS/
+gdb -batch -ex "run" -ex "bt" -ex "quit" --args ./NRNCS $BASE/IO/NRNCS/

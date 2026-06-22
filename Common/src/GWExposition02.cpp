@@ -369,8 +369,20 @@ int GWExposition02::ExposePeers()
       SelfDestinations.push_back(targetPID);
       SelfDestinations.push_back(targetBID);
 
+      // Get the local HT block BID for inclusion in hello v2.0
+      // This enables the receiver to discover PGCS::HT and address
+      // discovery messages directly to it.
+      string selfHTBID = "";
+      {
+        Block* PHTB = 0;
+        if (PB->PP->GetBlock("HT", PHTB) == OK && PHTB != 0)
+        {
+          selfHTBID = PHTB->GetSelfCertifyingName();
+        }
+      }
+
       PMB->NewConnectionLessCommandLine("0.1", &SelfLimiters, &SelfSources, &SelfDestinations, SelfHello, SelfPCL);
-      PMB->NewIPCHelloCommandLine("--ipc", Version, selfKey, selfLN, SelfHello, SelfPCL);
+      PMB->NewIPCHelloCommandLine("--ipc", "2.0", selfKey, selfLN, selfHTBID, SelfHello, SelfPCL);
 
       string SelfSCN = "FFFFFFFF";
       PB->GenerateSCNFromMessageBinaryPatterns(SelfHello, SelfSCN);

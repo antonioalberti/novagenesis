@@ -28,9 +28,9 @@ if [ $# -ge 1 ]; then
     # Deterministic mode: -p with peer MAC
     PEER_MAC="$1"
     echo "Deterministic mode: peer MAC = ${PEER_MAC}"
-    sudo ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -p Ethernet Intra_Domain "$IFACE" "$PEER_MAC" 1200
+    sudo gdb -batch -ex "run" -ex "bt" -ex "quit" --args ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -p Ethernet Intra_Domain "$IFACE" "$PEER_MAC" 1200
 else
     # Broadcast discovery mode
     echo "Discovery mode (-de)"
-    sudo ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -de Ethernet "$IFACE" 1200
+    sudo gdb -batch -ex "run" -ex "bt" -ex "quit" --args ./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -de Ethernet "$IFACE" 1200
 fi

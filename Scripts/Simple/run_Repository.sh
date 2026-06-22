@@ -23,7 +23,7 @@ else
     fi
 fi
 
-# Run ContentApp
-echo "Starting ContentApp in Repository mode (IO: $IO_DIR) ..."
+# Run ContentApp under gdb (debug mode — captures crash backtrace)
+echo "Starting ContentApp in Repository mode under gdb (IO: $IO_DIR) ..."
 cd "$BASE/cmake-build-debug"
-./ContentApp "$IO_DIR/" Repository
+gdb -batch -ex "run" -ex "bt full" -ex "info registers" -ex "thread apply all bt full" -ex "quit" --args ./ContentApp "$IO_DIR/" Repository

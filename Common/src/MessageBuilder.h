@@ -102,8 +102,12 @@ class MessageBuilder
 				Message *_M, CommandLine *& _PCL);
 
 		// Creates an IPC hello command line header
-		// ng -hello --ipc _Version [ < 2 Peer_Key Peer_LN > ]
-		int NewIPCHelloCommandLine(string _Alternative, string _Version, key_t _Key, string _LN, Message *_M, CommandLine *& _PCL);
+			// ng -hello --ipc _Version [ < 2 Peer_Key Peer_LN > ]
+			int NewIPCHelloCommandLine(string _Alternative, string _Version, key_t _Key, string _LN, Message *_M, CommandLine *& _PCL);
+
+			// Creates an IPC hello command line header with HT BID (v2.0)
+			// ng -hello --ipc _Version [ < 2 Peer_Key Peer_LN > < 1 Peer_HT_BID > ]
+			int NewIPCHelloCommandLine(string _Alternative, string _Version, key_t _Key, string _LN, string _HTBID, Message *_M, CommandLine *& _PCL);
 
 		// Creates an IHC hello command line header
 		// ng -hello --ihc _Version GW_SCN HT_SCN Legacy_Stack Legacy_Address

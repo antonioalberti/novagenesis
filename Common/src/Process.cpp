@@ -417,9 +417,9 @@ int Process::GetBlock(string _LN, Block *&_PB)
 				{
 					_PB=PB;
 
-					break;
-
 					Status=OK;
+
+					break;
 				}
 		}
 

@@ -46,7 +46,7 @@
 #endif
 
 #define DEBUG
-////#define DEBUG1
+#define DEBUG1
 
 static sem_t* GetCachedOutputQueueSemaphore()
 {
@@ -326,22 +326,11 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 
         Status = ForwardMessageInsideProcess(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
 
-        if (PB->StopProcessingMessage == false)
-        {
-          // Create a new message to answer the one being processed at GW
-          PB->PP->NewMessage(GetTime(), 0, false, GWStatusS01Msg);
-
-          // Store the index of this message on Messages container
-          ScheduledMessages.push_back(GWStatusS01Msg);
-
-          // Create a new ng -m --cl 0.1 command line
-          PMB->NewConnectionLessCommandLine("0.1",
-                                            &ReceivedMessageLimiters,
-                                            &ReceivedMessageDestinations,
-                                            &ReceivedMessageSources,
-                                            GWStatusS01Msg,
-                                            GWMsgCl01);
-        }
+        // Removed GWStatusS01Msg creation (was dead code):
+        // The message was created with only 1 CL, pushed to ScheduledMessages,
+        // and never consumed by any action. It was then marked for delete by
+        // the Block::Run() cleanup loop — pure waste. Eliminating it removes
+        // the need for the ScheduledMessages mechanism entirely.
       }
       else
       {
@@ -801,10 +790,6 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideProcess(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
-
-          // Mark the message to be deleted. Same convention as the inline path below.
-          // Without this, every forwarded message leaks in the Messages container.
-          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Intra_OS)
         {
@@ -816,8 +801,6 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideOS(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
-
-          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Intra_Domain)
         {
@@ -829,8 +812,6 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardMessageInsideDomain(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
-
-          _ReceivedMessage->MarkToDelete();
         }
         else if (Key == PB->PP->Inter_Domain)
         {
@@ -842,8 +823,6 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 #endif
 
           Status = ForwardInterDomainMessage(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
-
-          _ReceivedMessage->MarkToDelete();
         }
         else
         {

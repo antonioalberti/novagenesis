@@ -198,6 +198,30 @@ int MessageBuilder::NewIPCHelloCommandLine(string _Alternative, string _Version,
 	return Status;
 }
 
+// Creates a hello command line header with HT BID (v2.0)
+// ng -hello --ipc _Version [ < 2 Peer_Key Peer_LN > < 1 Peer_HT_BID > ]
+int MessageBuilder::NewIPCHelloCommandLine(string _Alternative, string _Version, key_t _Key, string _LN, string _HTBID, Message *_M, CommandLine *& _PCL)
+{
+	int Status = OK;
+
+	_M->NewCommandLine("-hello", _Alternative, _Version, _PCL);
+
+	// First argument: < 2 Key LN >
+	_PCL->NewArgument(2);
+	_PCL->SetArgumentElement(0, 0, IntToString(_Key));
+	_PCL->SetArgumentElement(0, 1, _LN);
+
+	// Second argument (optional): < 1 HT_BID >
+	// Only add when _HTBID is non-empty
+	if (!_HTBID.empty())
+	{
+		_PCL->NewArgument(1);
+		_PCL->SetArgumentElement(1, 0, _HTBID);
+	}
+
+	return Status;
+}
+
 // Creates a hello command line header
 // ng -hello --ihc _Version GW_SCN HT_SCN _Stack _Interface _Identifier
 int MessageBuilder::NewIHCHelloCommandLine(string _Alternative, string _Version, string _GW_SCN, string _HT_SCN, string _Stack, string _Interface, string _Identifier, Message *_M, CommandLine *& _PCL)

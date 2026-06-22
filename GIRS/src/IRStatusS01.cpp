@@ -191,7 +191,7 @@ IRStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 													  }
 												  else
 													  {
-														  PB->S << Offset <<  "(ERROR: Failed to discover the PGS_PID and its HT_BID)" << endl;
+														  PB->S << Offset <<  "(ERROR: Failed to discover the PGCS_PID and its HT_BID)" << endl;
 													  }
 											  }
 									  }
@@ -300,7 +300,7 @@ IRStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 													  }
 												  else
 													  {
-														  PB->S << Offset <<  "(ERROR: Failed to discover the PGS_PID and its HT_BID)" << endl;
+														  PB->S << Offset <<  "(ERROR: Failed to discover the PGCS_PID and its HT_BID)" << endl;
 													  }
 											  }
 									  }
@@ -493,7 +493,7 @@ IRStatusS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 															  }
 														  else
 															  {
-																  PB->S << Offset <<  "(ERROR: Failed to discover the PGS_PID and its HT_BID)" << endl;
+																  PB->S << Offset <<  "(ERROR: Failed to discover the PGCS_PID and its HT_BID)" << endl;
 															  }
 
 														  Status=OK;

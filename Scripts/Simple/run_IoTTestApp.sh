@@ -4,4 +4,4 @@
 BASE=/home/gandalf/workspace/novagenesis
 
 cd $BASE/cmake-build-debug
-./IoTTestApp IoTTestApp $BASE/IO/IoTTestApp/
+gdb -batch -ex "run" -ex "bt" -ex "quit" --args ./IoTTestApp IoTTestApp $BASE/IO/IoTTestApp/

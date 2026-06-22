@@ -263,6 +263,14 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
   // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   // ******************************************************
+  // Move to operational state
+  // ******************************************************
+
+  PB->State = "operational";
+
+  PB->S << Offset << "(State: Operational)" << endl << endl << endl;
+
+  // ******************************************************
   // Finish
   // ******************************************************
 

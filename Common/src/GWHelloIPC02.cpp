@@ -64,10 +64,22 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
   // Get the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
   {
-    if (NA == 1)
+    if (NA >= 1)
     {
-      // Get the peer key and legible name
+      // Get the peer key and legible name (always present, argument 0)
       _PCL->GetArgument(0, PeerData);
+
+      // Get the optional HT BID (argument 1, present in v2.0+ from PGCS)
+      string PeerHTBID = "";
+      if (NA >= 2)
+      {
+        vector<string> HTData;
+        _PCL->GetArgument(1, HTData);
+        if (HTData.size() > 0)
+        {
+          PeerHTBID = HTData.at(0);
+        }
+      }
 
       // Get the sending process PID and GW block BID from the -m --cl command line
       CommandLine* GWMsgCl01 = 0;
@@ -86,6 +98,7 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
         if (alreadyKnown)
         {
           // Peer already discovered — skip redundant store and logging
+          PB->S << Offset << "Already aware of the peer service: "<< ReceivedMessageSources.at(0) << endl;
         }
         else
         {
@@ -96,7 +109,7 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
           // ReceivedMessageSources.at(0) is the sender PID from -m --cl source field
           // ReceivedMessageSources.at(1) is the sender BID from -m --cl source field
           // PeerData.at(0) is the peer IPC key (hash), PeerData.at(1) is the legible name
-          StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), ReceivedMessageSources.at(1), PeerData.at(0), PeerData.at(1));
+          StorePeerBindings(_ReceivedMessage, _PCL, ReceivedMessageSources.at(0), ReceivedMessageSources.at(1), PeerData.at(0), PeerData.at(1), PeerHTBID);
         }
       }
       else
@@ -124,7 +137,8 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 // _PeerPID: sender PID from -m --cl (used as key for cat 1, 3, 5)
 // _PeerIPCKey: peer IPC key (hash from hello command, used as value for cat 19)
 // _PeerLN: peer legible name
-int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerBID, string& _PeerIPCKey, string& _PeerLN)
+// _PeerHTBID: optional peer HT block BID (v2.0+, PGCS only)
+int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL, string& _PeerPID, string& _PeerBID, string& _PeerIPCKey, string& _PeerLN, string& _PeerHTBID)
 {
   int Status = OK;
   unsigned int Category;
@@ -194,9 +208,38 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
 
   Category = 5;
   Key = _PeerPID;
+
+  // Always store the GW BID
   Values.push_back(_PeerBID);
+
+  // Also store the HT BID when available (v2.0+ from PGCS)
+  // This enables DiscoverHomonymsBlocksBIDsFromProcessLegibleName("PGCS","HT",...)
+  // to find the HT BID via intersection between Cat[5] and Cat[2] Hash("HT")
+  if (!_PeerHTBID.empty() && _PeerHTBID != _PeerBID)
+  {
+    Values.push_back(_PeerHTBID);
+  }
+
   PGW->StoreHTBindingValues(Category, Key, &Values);
   Values.clear();
+
+  // ******************************************************
+  // Binding: Hash("HT") -> HT_BID (Category 2) [v2.0+ only]
+  // ******************************************************
+
+  if (!_PeerHTBID.empty())
+  {
+    string HashHT;
+    PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
+
+    Category = 2;
+    Key = HashHT;
+    Values.push_back(_PeerHTBID);
+    PGW->StoreHTBindingValues(Category, Key, &Values);
+    Values.clear();
+
+    PB->S << Offset << "(Stored HT BID " << _PeerHTBID << " for peer " << _PeerLN << " in Cat[2] Hash(\"HT\"))" << endl;
+  }
 
   return Status;
 }
