@@ -333,13 +333,18 @@ void GW::PushToOutputQueue(std::string OQS, Message* M)
 }
 
 // Read a Message from output message priority queues. Only the GW can forward messages to shared memory instances
+// SPEC-007: Decouple WriteToSharedMemory3 from OutputQueueMutex. Pop at most
+// one message per queue into a local batch, write each to SHM outside the lock,
+// re-push failures under lock. Re-evaluate NewOutputMessage after partial drain
+// to prevent the output thread from sleeping with pending messages.
 void GW::ReadFromOutputQueue()
 {
   Message* PM1 = NULL;
+  std::string currentOQS;
 
   while (StopGateway == false)
   {
-    // Wait for output messages or stop flag (blocking wait - zero CPU when idle)
+    // Wait for output messages or stop flag (blocking wait — zero CPU when idle)
     {
       std::unique_lock<std::mutex> lock(OutputQueueMutex);
       OutputQueueCV.wait(lock, [this]()
@@ -349,58 +354,66 @@ void GW::ReadFromOutputQueue()
       NewOutputMessage = false;
     }
 
-    // Lock the output queue mutex for thread-safe iteration and pop
-    // SPEC-006: Named semaphore "Output_Queue" removed — OutputQueueMutex
-    // alone provides mutual exclusion. No spin, no timeout, no message drops.
-    // SPEC-006b: Retry loop for undelivered messages. If WriteToSharedMemory3
-    // fails (peer SHM busy), sleep briefly and retry instead of waiting for
-    // the next push notification. Prevents backlog when receiver is slow.
-    bool deliveredAll = false;
-    while (!deliveredAll && StopGateway == false)
+    // Phase 1: Pop at most one message per queue (under lock — microseconds)
+    std::vector<std::pair<std::string, Message*>> batch;
     {
-      deliveredAll = true;
+      std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
+      for (auto it = OutputQueues.begin(); it != OutputQueues.end(); it++)
       {
-        std::lock_guard<std::mutex> qlock(OutputQueueMutex);
-
-        map<std::string, priority_queue<Message*, vector<Message*>, DereferenceCompareNode>>::iterator it;
-
-        for (it = OutputQueues.begin(); it != OutputQueues.end(); it++)
+        if (!it->second.empty())
         {
-          if (!it->second.empty())
-          {
-            PM1 = it->second.top();
-
-            // Shared memory IPC
-            if (WriteToSharedMemory3(it->first, PM1) == OK)
-            {
-              it->second.pop();
-              PM1->MarkToDelete();
-            }
-            else
-            {
-              // SHM busy — message stays in queue, retry after brief sleep
-              deliveredAll = false;
-            }
-          }
+          PM1 = it->second.top();
+          it->second.pop();
+          batch.emplace_back(it->first, PM1);
         }
-      } // unlock OutputQueueMutex
-
-      if (!deliveredAll)
-      {
-        // Check for new messages before retrying (avoids missing a notify
-        // that arrived during the unlocked sleep)
-        {
-          std::unique_lock<std::mutex> lock(OutputQueueMutex);
-          if (NewOutputMessage)
-          {
-            NewOutputMessage = false;
-          }
-        }
-
-        // Sleep outside the lock so writers can push while we wait
-        tthread::this_thread::sleep_for(tthread::chrono::milliseconds(1));
       }
+    } // Lock released
+
+    if (batch.empty())
+      continue;
+
+    // Phase 2: Write each message to SHM (OUTSIDE the lock)
+    bool anyFailed = false;
+
+    for (auto& kv : batch)
+    {
+      if (WriteToSharedMemory3(kv.first, kv.second) == OK)
+      {
+        kv.second->MarkToDelete();
+      }
+      else
+      {
+        // SHM busy — re-push under lock for retry on next cycle
+        {
+          std::lock_guard<std::mutex> qlock(OutputQueueMutex);
+          OutputQueues[kv.first].push(kv.second);
+        }
+        anyFailed = true;
+      }
+    }
+
+    // Re-evaluate NewOutputMessage: check if queues still have work
+    // (critical: without this, the output thread could sleep with pending
+    // messages because NewOutputMessage was cleared before the cycle started)
+    {
+      std::lock_guard<std::mutex> qlock(OutputQueueMutex);
+      bool hasMoreWork = false;
+      for (auto it = OutputQueues.begin(); it != OutputQueues.end(); it++)
+      {
+        if (!it->second.empty())
+        {
+          hasMoreWork = true;
+          break;
+        }
+      }
+      NewOutputMessage = hasMoreWork;
+    }
+
+    // Backpressure: brief sleep if any message failed (peer SHM still busy)
+    if (anyFailed)
+    {
+      tthread::this_thread::sleep_for(tthread::chrono::milliseconds(1));
     }
   }
 }
