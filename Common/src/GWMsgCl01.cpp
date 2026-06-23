@@ -45,8 +45,8 @@
 #include <fcntl.h>
 #endif
 
-#define DEBUG
-#define DEBUG1
+// #define DEBUG
+// #define DEBUG1
 
 static sem_t* GetCachedOutputQueueSemaphore()
 {

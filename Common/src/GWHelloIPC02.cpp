@@ -98,7 +98,9 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
         if (alreadyKnown)
         {
           // Peer already discovered — skip redundant store and logging
+#ifdef DEBUG
           PB->S << Offset << "Already aware of the peer service: "<< ReceivedMessageSources.at(0) << endl;
+#endif
         }
         else
         {
