@@ -12,7 +12,7 @@
 set -e
 
 BASE=/home/gandalf/workspace/novagenesis
-PHOTOS=${1:-50}
+PHOTOS=${1:-100}
 WIDTH=${2:-800}
 HEIGHT=${3:-600}
 IO_DIR="$BASE/IO/Source1"
