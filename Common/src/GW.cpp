@@ -81,12 +81,8 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   // Initialize output message notification flag
   NewOutputMessage = false;
 
-  // Cache Output_Queue semaphore to avoid repeated sem_open
-  sem_t* out_sem = sem_open("Output_Queue", O_CREAT, 0666, 1);
-  if (out_sem != SEM_FAILED)
-  {
-    CachedSemaphores["Output_Queue"] = out_sem;
-  }
+  // SPEC-006: Named semaphore "Output_Queue" removed from constructor.
+  // OutputQueueMutex alone protects OutputQueues.
 
   Action* PA = 0;
   CommandLine* PCL = 0;
@@ -340,18 +336,6 @@ void GW::PushToOutputQueue(std::string OQS, Message* M)
 void GW::ReadFromOutputQueue()
 {
   Message* PM1 = NULL;
-  sem_t* mutex = NULL;
-
-  // Cache the semaphore (avoid sem_open/sem_close per iteration)
-  mutex = CachedSemaphores["Output_Queue"];
-  if (mutex == NULL)
-  {
-    mutex = sem_open("Output_Queue", O_CREAT, 0666, 1);
-    if (mutex != SEM_FAILED)
-      CachedSemaphores["Output_Queue"] = mutex;
-  }
-
-  string SemaphoreName = "Output_Queue";
 
   while (StopGateway == false)
   {
@@ -365,31 +349,20 @@ void GW::ReadFromOutputQueue()
       NewOutputMessage = false;
     }
 
-    if (mutex == NULL || mutex == SEM_FAILED)
+    // Lock the output queue mutex for thread-safe iteration and pop
+    // SPEC-006: Named semaphore "Output_Queue" removed — OutputQueueMutex
+    // alone provides mutual exclusion. No spin, no timeout, no message drops.
+    // SPEC-006b: Retry loop for undelivered messages. If WriteToSharedMemory3
+    // fails (peer SHM busy), sleep briefly and retry instead of waiting for
+    // the next push notification. Prevents backlog when receiver is slow.
+    bool deliveredAll = false;
+    while (!deliveredAll && StopGateway == false)
     {
-      mutex = sem_open(SemaphoreName.c_str(), O_CREAT, 0666, 1);
-      if (mutex == SEM_FAILED)
-      {
-        perror("Output Queue: unable to open semaphore");
-        continue;
-      }
-      CachedSemaphores["Output_Queue"] = mutex;
-    }
+      deliveredAll = true;
 
-    // Lock the output queue mutex for thread-safe iteration
-    {
-      std::lock_guard<std::mutex> qlock(OutputQueueMutex);
-
-      // Retry sem_trywait with backoff
-      int LockAttempts = 0;
-      while (sem_trywait(mutex) != 0 && LockAttempts < 100)
       {
-        tthread::this_thread::sleep_for(tthread::chrono::microseconds(100));
-        LockAttempts++;
-      }
+        std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
-      if (LockAttempts < 100)
-      {
         map<std::string, priority_queue<Message*, vector<Message*>, DereferenceCompareNode>>::iterator it;
 
         for (it = OutputQueues.begin(); it != OutputQueues.end(); it++)
@@ -404,18 +377,31 @@ void GW::ReadFromOutputQueue()
               it->second.pop();
               PM1->MarkToDelete();
             }
+            else
+            {
+              // SHM busy — message stays in queue, retry after brief sleep
+              deliveredAll = false;
+            }
+          }
+        }
+      } // unlock OutputQueueMutex
+
+      if (!deliveredAll)
+      {
+        // Check for new messages before retrying (avoids missing a notify
+        // that arrived during the unlocked sleep)
+        {
+          std::unique_lock<std::mutex> lock(OutputQueueMutex);
+          if (NewOutputMessage)
+          {
+            NewOutputMessage = false;
           }
         }
 
-        if (sem_post(mutex) != 0)
-        {
-          perror("Writing Output Queue : sem_post");
-        }
+        // Sleep outside the lock so writers can push while we wait
+        tthread::this_thread::sleep_for(tthread::chrono::milliseconds(1));
       }
-    } // unlock OutputQueuesMutex
-
-    // Sleep briefly to avoid CPU spin on retry
-    tthread::this_thread::sleep_for(tthread::chrono::microseconds(10));
+    }
   }
 }
 

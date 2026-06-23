@@ -48,42 +48,17 @@
 // #define DEBUG
 // #define DEBUG1
 
-static sem_t* GetCachedOutputQueueSemaphore()
-{
-  static sem_t* cachedSem = NULL;
-  if (cachedSem == NULL)
-  {
-    cachedSem = sem_open("Output_Queue", O_CREAT, 0666, 1);
-  }
-  return cachedSem;
-}
+// SPEC-006: Named semaphore "Output_Queue" removed. OutputQueueMutex
+// (inside PushToOutputQueue) already protects OutputQueues. The named
+// semaphore was redundant, inconsistent (3/4 writers bypassed it), and
+// caused cross-process contention + message drops.
 
 static int SafePushToOutputQueue(GW* _PGW, string _OQS, Message* _M,
                                  string _Offset, Block* _PB, int& _Status)
 {
-  sem_t* mutex = GetCachedOutputQueueSemaphore();
-  if (mutex == NULL || mutex == SEM_FAILED)
-  {
-    perror("Output Queue: unable to open semaphore");
-    return ERROR;
-  }
-  int lockAttempts = 0;
-  while (sem_trywait(mutex) != 0 && lockAttempts < 100)
-  {
-    tthread::this_thread::sleep_for(tthread::chrono::microseconds(100));
-    lockAttempts++;
-  }
-  if (lockAttempts >= 100)
-  {
-    _PB->S << _Offset << "(WARNING: Output Queue semaphore timeout)" << endl;
-    return ERROR;
-  }
+  // PushToOutputQueue internally acquires OutputQueueMutex for thread-safe push.
   _PGW->PushToOutputQueue(_OQS, _M);
   _Status = OK;
-  if (sem_post(mutex) != 0)
-  {
-    perror("Writing Output Queue : sem_post");
-  }
   return OK;
 }
 
