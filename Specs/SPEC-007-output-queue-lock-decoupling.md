@@ -174,51 +174,65 @@ The destination's SHM poll interval is 10ms (SPEC-005), so in the best case the 
 
 ### 4.1 Approach
 
-Split `ReadFromOutputQueue` into two phases:
+Split `ReadFromOutputQueue` into two phases, processing **at most one message per queue per cycle**:
 
-1. **Pop phase** (under lock): pop one message from the queue, release lock
-2. **Write phase** (no lock): call `WriteToSharedMemory3` outside the lock
-3. **Handle result** (under lock): if OK, mark message for deletion; if ERROR, re-push the message to the queue
+1. **Pop phase** (under lock): pop the top message from each non-empty queue into a local batch (one per queue, typically 2-4 messages). Release lock.
+2. **Write phase** (no lock): call `WriteToSharedMemory3` for each message in the batch
+3. **Handle result** (under lock): if OK, `MarkToDelete()`; if ERROR, re-push the message to its queue
+4. **Re-evaluate** (under lock): check if any queues still have pending messages and update `NewOutputMessage` accordingly — prevents the output thread from sleeping with unprocessed messages
 
-This way, while `WriteToSharedMemory3` is blocking on the SHM semaphore or the `'w'` flag, the main thread can push new messages to the OutputQueue.
+This way:
+- While `WriteToSharedMemory3` is processing the SHM semaphore or the `'w'` flag, the main thread can push new messages
+- No single queue can starve others (each queue gets one attempt per cycle)
+- The crash window is limited: at most N messages are outside the queues at any time (N = number of queues, typically 2-4)
+- Per-queue FIFO order is preserved (only `top()` of each queue is popped)
 
 ### 4.2 What changes
 
 | Component | Before (SPEC-006 v2.0) | After (SPEC-007) |
-|-----------|------------------------|------------------|
-| `ReadFromOutputQueue` | Lock → iterate all queues → `WriteToSharedMemory3` for each → unlock → retry loop | Lock → pop one message → unlock → `WriteToSharedMemory3` → if fail, re-push under lock → repeat |
-| Retry strategy | Retry loop holding the mutex (SPEC-006b) | Retry by re-pushing to queue; the `OutputQueueCV` notification cycle handles it naturally |
-| Lock hold time | Up to 10ms × N messages per iteration | O(1) per pop/re-push (microseconds) |
+||-----------|------------------------|------------------|
+|| `ReadFromOutputQueue` | Lock → iterate all queues → `WriteToSharedMemory3` for each → unlock → retry loop | Lock → pop one per queue into local batch → unlock → `WriteToSharedMemory3` for each → if fail, re-push under lock → re-evaluate `NewOutputMessage` → repeat |
+|| Retry strategy | Retry loop holding the mutex (SPEC-006b) | Per-queue retry: `WriteToSharedMemory3` failure re-pushes the message; next cycle pops it again naturally |
+|| Lock hold time | Up to 10ms × N messages per iteration | O(N_queues) per pop (microseconds) — always small |
+|| Fairness across queues | All processed atomically per iteration (fair) | One attempt per queue per cycle (fair — no starvation) |
+|| Crash window | 0 (messages always in queue) | At most N_queues messages temporarily outside queues (typically 2-4) |
 
 ### 4.3 Why this is safe
 
 1. **OutputQueueMutex still protects the map**: All access to `OutputQueues` (push, pop, iterate) goes through `OutputQueueMutex`. The only change is that `WriteToSharedMemory3` is called outside the lock.
 
-2. **Message ownership is clear**: After `top()`, the message pointer is not in any queue (it's still pointed to by the priority_queue's `top()` until `pop()`). We `pop()` under lock, then the message is owned by the local variable `PM1`. No other thread can access it.
+2. **Message ownership is clear**: After `pop()`, the message pointer is owned by the local batch. No other thread can access it while it's outside the queue.
 
-3. **Re-push on failure is safe**: If `WriteToSharedMemory3` fails, we re-acquire the lock and push the message back. The priority queue's comparator (`DereferenceCompareNode`) uses `GetTime()` and `GetTag()`, so the message retains its original priority and will be retried in order.
+3. **Re-push on failure is safe**: If `WriteToSharedMemory3` fails, we re-acquire the lock and push the message back. The priority queue's comparator uses `GetTime()` and `GetTag()`, so the message retains its original priority and will be retried in order.
 
-4. **No message drops**: Messages are only removed from the queue after `WriteToSharedMemory3` succeeds. Failed messages go back to the queue.
+4. **No message drops**: Messages are only removed from the queue after `WriteToSharedMemory3` succeeds (and `MarkToDelete()` is called). Failed messages go back to the queue.
 
-5. **No lost wakeups**: After re-pushing a failed message, `NewOutputMessage` is set to `true` and `OutputQueueCV.notify_one()` is called, so the thread will immediately retry.
+5. **Crash window is bounded**: At most N_queues messages can be outside the queues at any instant. With 2-4 queues, this is 2-4 messages — safe and bounded.
 
-6. **No starvation of new pushes**: The main thread can push while the output thread is in `WriteToSharedMemory3`. New messages will be processed in priority order on the next pop.
+6. **No lost wakeups**: The `NewOutputMessage` flag is re-evaluated after each cycle by scanning all queues for remaining work. If any queue still has messages, the flag is set to `true`, preventing the output thread from blocking at the next `wait()`.
+
+7. **Per-queue ordering preserved**: Only the `top()` of each queue is popped per cycle. Within each queue, messages are processed in strict priority order (by `GetTime()` then `GetTag()`). A failed message is re-pushed with its original priority, so it stays at the correct position.
+
+8. **No starvation of new pushes**: The main thread can push while the output thread is in `WriteToSharedMemory3`. New messages appear in the queue scan at the start of the next cycle.
 
 ### 4.4 Trade-offs
 
 | Aspect | Before (SPEC-006 v2.0) | After (SPEC-007) |
-|--------|------------------------|------------------|
-| Lock hold per message | Up to 10ms (SHM sem + write) | ~1us (pop/re-push only) |
-| Main thread blocking | Yes — blocked during SHM write + retry | No — can push while SHM write in progress |
-| Throughput under load | Degrades — queue grows, RTTs increase | Sustained — SHM writes overlap with pushes |
-| Message ordering | Strict (all queues processed atomically) | Per-queue FIFO (pop one at a time, re-push failures) |
-| CPU on contention | High — retry loop spins | Low — failed messages sleep via CV wait |
-| Retry latency | 1ms (sleep between retries) | ~10ms (CV wait for next notification cycle) |
+||--------|------------------------|------------------|
+|| Lock hold per message | Up to 10ms (SHM sem + write) | ~1us per pop/re-push |
+|| Main thread blocking | Yes — blocked during SHM write + retry | No — can push while SHM write in progress |
+|| Throughput under load | Degrades — queue grows, RTTs increase | Sustained — SHM writes overlap with pushes |
+|| Fairness across queues | All processed atomically | One attempt per queue per cycle (fair) |
+|| Per-queue ordering | Strict | Preserved (only top() popped per cycle) |
+|| Crash window | 0 messages outside queue | At most N_queues (~2-4) |
+|| New-push responsiveness | Depends on retry loop completion | Next cycle picks them up (bounded by batch size) |
+|| CPU on contention | High — retry loop spins | Low — failed messages re-push and cycle via CV wait |
 
-The only trade-off is slightly higher retry latency for failed SHM writes (1ms → ~10ms via CV wait cycle). This is acceptable because:
-- The SHM `'w'` flag typically clears within 10-20ms (the peer's Gateway poll interval)
-- A 10ms retry is still 1000× faster than the current 28-150s RTT backlog
-- The previous 1ms retry was ineffective anyway (the peer needs 10+ms to read)
+The trade-offs are acceptable because:
+- The crash window is bounded by the number of queues, not the total message count
+- Per-queue FIFO ordering is strictly preserved
+- The main thread can push freely while SHM writes are in progress
+- The one-per-queue pattern prevents any single blocked destination from starving others
 
 ---
 
@@ -273,7 +287,7 @@ void GW::ReadFromOutputQueue()
 
   while (StopGateway == false)
   {
-    // Wait for output messages or stop flag (blocking wait - zero CPU when idle)
+    // Wait for output messages or stop flag (blocking wait — zero CPU when idle)
     {
       std::unique_lock<std::mutex> lock(OutputQueueMutex);
       OutputQueueCV.wait(lock, [this]()
@@ -282,53 +296,64 @@ void GW::ReadFromOutputQueue()
       NewOutputMessage = false;
     }
 
-    // Pop one message at a time, write to SHM OUTSIDE the lock
-    bool hasMessages = true;
-    while (hasMessages && StopGateway == false)
+    // Phase 1: Pop at most one message per queue (under lock — microseconds)
+    std::vector<std::pair<std::string, Message*>> batch;
     {
-      // Phase 1: Pop (under lock — microseconds)
-      PM1 = NULL;
-      currentOQS.clear();
+      std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
+      for (auto it = OutputQueues.begin(); it != OutputQueues.end(); it++)
       {
-        std::lock_guard<std::mutex> qlock(OutputQueueMutex);
-
-        for (auto it = OutputQueues.begin(); it != OutputQueues.end(); it++)
+        if (!it->second.empty())
         {
-          if (!it->second.empty())
-          {
-            PM1 = it->second.top();
-            currentOQS = it->first;
-            it->second.pop();
-            break;  // Pop one, release lock immediately
-          }
+          PM1 = it->second.top();
+          it->second.pop();
+          batch.emplace_back(it->first, PM1);
         }
-      } // Lock released here
-
-      if (PM1 == NULL)
-      {
-        hasMessages = false;
-        break;
       }
+    } // Lock released
 
-      // Phase 2: Write to SHM (OUTSIDE the lock — can take up to 10ms)
-      if (WriteToSharedMemory3(currentOQS, PM1) == OK)
+    if (batch.empty())
+      continue;
+
+    // Phase 2: Write each message to SHM (OUTSIDE the lock)
+    bool anyFailed = false;
+
+    for (auto& kv : batch)
+    {
+      if (WriteToSharedMemory3(kv.first, kv.second) == OK)
       {
-        PM1->MarkToDelete();
+        kv.second->MarkToDelete();
       }
       else
       {
-        // SHM busy — re-push the message for retry on next cycle
+        // SHM busy — re-push under lock for retry on next cycle
         {
           std::lock_guard<std::mutex> qlock(OutputQueueMutex);
-          OutputQueues[currentOQS].push(PM1);
-          NewOutputMessage = true;
+          OutputQueues[kv.first].push(kv.second);
         }
-        OutputQueueCV.notify_one();
-
-        // Brief sleep to avoid busy-spin on a blocked SHM slot
-        tthread::this_thread::sleep_for(tthread::chrono::milliseconds(1));
+        anyFailed = true;
       }
+    }
+
+    // Re-evaluate NewOutputMessage: check if queues still have work
+    {
+      std::lock_guard<std::mutex> qlock(OutputQueueMutex);
+      bool hasMoreWork = false;
+      for (auto it = OutputQueues.begin(); it != OutputQueues.end(); it++)
+      {
+        if (!it->second.empty())
+        {
+          hasMoreWork = true;
+          break;
+        }
+      }
+      NewOutputMessage = hasMoreWork;
+    }
+
+    // Backpressure: brief sleep if any message failed (peer SHM still busy)
+    if (anyFailed)
+    {
+      tthread::this_thread::sleep_for(tthread::chrono::milliseconds(1));
     }
   }
 }
@@ -337,11 +362,13 @@ void GW::ReadFromOutputQueue()
 **Diff summary:**
 
 1. Remove the `deliveredAll` retry loop that held the lock during `WriteToSharedMemory3`
-2. Add inner `while (hasMessages)` loop that pops one message at a time
-3. Move `WriteToSharedMemory3` call outside the `lock_guard` scope
-4. On failure: re-push the message under lock, set `NewOutputMessage = true`, notify CV
-5. On failure: sleep 1ms outside the lock before retrying (prevents CPU spin)
-6. On success: `MarkToDelete()` outside the lock (safe — message is not in any queue)
+2. **Phase 1**: Pop **at most one message per queue** into a local `batch` vector (under lock — microseconds). All queues are served equally per cycle.
+3. **Phase 2**: Call `WriteToSharedMemory3` for each message **outside the lock**
+4. On `WriteToSharedMemory3` failure: re-push the message under lock, set `anyFailed = true` for backpressure sleep
+5. On `WriteToSharedMemory3` success: call `MarkToDelete()` outside the lock (safe — message is not in any queue)
+6. **After Phase 2**: Re-evaluate `NewOutputMessage` by scanning all queues. If any remain non-empty, set `NewOutputMessage = true` so the output thread does not block at the next `wait()`. This is critical: without this step, the thread would sleep with pending messages because `NewOutputMessage` was cleared before the cycle started.
+7. If any message failed (`anyFailed`), sleep 1ms outside the lock before returning to `wait()` — prevents busy-spin on a blocked SHM slot
+8. `OutputQueueCV.notify_one()` is **removed** from the re-push path — the re-evaluation of `NewOutputMessage` handles wakeup correctly, and the output thread (the only consumer of this CV) is already awake and looping
 
 ### 5.2 No changes needed elsewhere
 
@@ -467,20 +494,31 @@ git commit -m "fix(gw): decouple WriteToSharedMemory3 from OutputQueueMutex (SPE
 
 2. **The `'w'` flag creates a natural backpressure**: When the destination process is busy, the SHM flag stays `'w'`. The writer must wait. This is by design — it prevents overwriting unread messages. But waiting inside the lock is the problem, not the waiting itself.
 
-3. **`WriteToSharedMemory3` has its own `sem_trywait` spin loop**: The function already has a 100×100us = 10ms spin on the per-SHM-key semaphore. This spin happens INSIDE the `OutputQueueMutex` lock. Even without the `'w'` flag issue, this spin alone can block the main thread for 10ms per message.
+3. **`WriteToSharedMemory3` has its own `sem_trywait` spin loop**: The function already has a 100×100us = 10ms spin on the per-SHM-key semaphore. This spin happens INSIDE the `OutputQueueMutex` lock in the current code. Even without the `'w'` flag issue, this spin alone can block the main thread for 10ms per message. SPEC-007 moves this spin outside the lock.
 
-4. **The priority queue's `top()` + `pop()` is not atomic across queues**: The current code iterates all queues and writes to each one while holding the lock. The new code pops from the first non-empty queue and releases the lock. This means the order of processing across different queues may change. However, since all messages in a given queue are ordered by time, and the CV notification handles retries, this is safe.
+4. **Pop-one-at-a-time causes starvation between queues**: Selecting the first non-empty queue repeatedly means a blocked queue can monopolise the output thread. Other queues are never processed until the blocked queue's SHM clears. The fix is to pop at most one message per queue per cycle, not one message total.
 
-5. **The `NewOutputMessage` flag is set by both `PushToOutputQueue` and the re-push path**: This is correct — the flag means "there is at least one message in some queue". The CV wait will return immediately if the flag is set. After the pop loop exhausts all messages, the thread goes back to CV wait. If a re-push happened during the SHM write, the flag is already set, so the thread will immediately process the re-pushed message.
+5. **Batch-ALL increases crash window and breaks ordering**: Popping all messages from all queues into a single batch creates a large crash window (all messages outside their queues) and can invert per-queue ordering (M1 fails, M2 succeeds before M1 is re-pushed). The one-per-queue approach avoids both: at most N_queues messages are outside their queues, and only `top()` is popped per queue.
+
+6. **`NewOutputMessage` must be re-evaluated after partial drain**: When `NewOutputMessage` is set to `false` at the start of a cycle, but the cycle only processes one message per queue (not all messages), the flag becomes stale — queues may still have work. Without re-evaluation, the output thread can block at `wait()` with pending messages. The fix is to scan all queues after the cycle and set `NewOutputMessage = true` if any remain non-empty.
+
+7. **`notify_one()` in the re-push path is redundant**: The output thread is the only consumer of `OutputQueueCV`, and it is already awake and looping after a failed `WriteToSharedMemory3`. The `NewOutputMessage` re-evaluation after the cycle handles wakeup correctly. Adding `notify_one()` is harmless but unnecessary in a single-consumer design.
+
+8. **The priority queue's `top()` + `pop()` is not atomic across queues**: The old code iterated all queues and wrote to each one while holding the lock. The one-per-queue code pops one per queue and releases the lock. Message ordering across different queues may change between cycles, but within each queue FIFO order is strictly preserved.
+
+9. **`NewOutputMessage` as a predicate source-of-truth is fragile**: Relying on a boolean flag to indicate "there is work to do" is inherently fragile when the cycle doesn't drain all work. The re-evaluation step corrects this, but a more robust long-term design would use a predicate that checks queue emptiness directly inside the `wait()` lambda.
 
 ---
 
 ## 10. Acceptance Criteria
 
-- [ ] `ReadFromOutputQueue` does NOT call `WriteToSharedMemory3` inside `OutputQueueMutex` scope
-- [ ] `WriteToSharedMemory3` is called after the lock is released
-- [ ] Failed messages are re-pushed to the queue with `NewOutputMessage = true` + `notify_one()`
-- [ ] `MarkToDelete()` is called outside the lock
+- [x] `ReadFromOutputQueue` does NOT call `WriteToSharedMemory3` inside `OutputQueueMutex` scope
+- [x] `WriteToSharedMemory3` is called after the lock is released
+- [x] At most one message per queue is popped per cycle (no starvation)
+- [x] Failed messages are re-pushed to their queue without setting `NewOutputMessage` (re-evaluated after cycle)
+- [x] `NewOutputMessage` is re-evaluated after each cycle: scan all queues, set `true` if any non-empty
+- [x] `notify_one()` removed from re-push path (redundant in single-consumer design)
+- [x] `MarkToDelete()` is called outside the lock
 - [ ] PGCS + NRNCS + ContentApp compile successfully
 - [ ] RTTs remain stable (< 1s) during 3-minute run
 - [ ] All 50 photos published and received
