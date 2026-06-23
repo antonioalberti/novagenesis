@@ -431,6 +431,7 @@ void GW::Gateway()
   double Time = 0;
   long long int MessageSize = 0;
   std::chrono::milliseconds waitTimeout;
+  constexpr long long SHM_POLL_INTERVAL_MS = 10; // SHM poll every 10ms (SPEC-005)
   double secondsUntilNext = 1.0; // default 1s when queue empty
 
   // Start output queue thread
@@ -458,7 +459,8 @@ void GW::Gateway()
     // Wait for input queue or stop flag (timer-aware blocking wait)
     {
       std::unique_lock<std::mutex> lock(InputQueueMutex);
-      waitTimeout = std::chrono::milliseconds((long long)(secondsUntilNext * 1000));
+      waitTimeout = std::chrono::milliseconds(
+          std::min((long long)(secondsUntilNext * 1000), SHM_POLL_INTERVAL_MS));
       InputQueueCV.wait_for(lock, waitTimeout,
                             [this]()
                             { return !InputQueue.empty() || StopGateway; });
@@ -601,7 +603,7 @@ void GW::Gateway()
             hasDueMessage = true;
         }
       }
-      if (!hasDueMessage && elapsed >= 100)
+      if (!hasDueMessage && elapsed >= SHM_POLL_INTERVAL_MS)
       {
         ReadFromSharedMemory3();
         lastSHMPoll = std::chrono::steady_clock::now();

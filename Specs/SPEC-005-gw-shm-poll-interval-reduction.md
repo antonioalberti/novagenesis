@@ -173,7 +173,9 @@ This sleeps for at most 10ms, ensuring SHM is polled at least every 10ms.
 
 ---
 
-### Etapa E1: Apply SHM poll interval reduction
+**Status:** Implemented 2026-06-23. Changes verified: SHM_POLL_INTERVAL_MS=10, CV timeout capped, poll condition updated.
+
+### Etapa E1: Apply SHM poll interval reduction ✅ (2026-06-23)
 
 **Change:** `Common/src/GW.cpp` ~5 LOC
 
@@ -279,9 +281,9 @@ git commit -m "perf(gw): reduce SHM poll interval from 100ms to 10ms (SPEC-005)
 
 ## 12. Acceptance Criteria
 
-- [ ] `SHM_POLL_INTERVAL_MS` constant defined in `GW.cpp`
-- [ ] CV wait timeout capped at `SHM_POLL_INTERVAL_MS`
-- [ ] SHM poll condition uses `SHM_POLL_INTERVAL_MS`
+- [x] `SHM_POLL_INTERVAL_MS` constant defined in `GW.cpp`
+- [x] CV wait timeout capped at `SHM_POLL_INTERVAL_MS`
+- [x] SHM poll condition uses `SHM_POLL_INTERVAL_MS`
 - [ ] PGCS + NRNCS + ContentApp compile successfully
 - [ ] CPU usage < 20% per process during 60s run
 - [ ] SHM message latency < 20ms
