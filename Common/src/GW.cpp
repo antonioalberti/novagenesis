@@ -430,7 +430,7 @@ void GW::Gateway()
   double Time = 0;
   long long int MessageSize = 0;
   std::chrono::milliseconds waitTimeout;
-  constexpr long long SHM_POLL_INTERVAL_MS = 10; // SHM poll every 10ms (SPEC-005)
+  constexpr long long SHM_POLL_INTERVAL_MS = 1; // SHM poll every 1ms (SPEC-007a)
   double secondsUntilNext = 1.0; // default 1s when queue empty
 
   // Start output queue thread
