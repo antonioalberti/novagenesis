@@ -143,6 +143,8 @@ PGCS                                        ContentApp
 
 **Estado:** Critérios 1-2 verificados. Critérios 3-5 pendentes de validação após fix do GetBlock.
 
+**Update 26/06/2026:** O fix do GetBlock (commit 2124b8f) foi verificado por análise estática — `Status=OK` está antes do `break` em Process.cpp:420. A spec está implementada e consistente com o código. No entanto, a validação empirica dos critérios 3-5 está bloqueada pelo acesso SSH às VMs 101/102 (chave rotacionada, pendente deploy). Adicionalmente, o SPEC-008 (inter-PGCS exposition via raw socket) revelou que o `DiscoverHomonymsBlocksBIDsFromPID` ainda falha nesse cenário — mas por uma causa diferente da ausência de Cat[2] (ver SPEC-008).
+
 ---
 
 ## 4. Notas de implementação
