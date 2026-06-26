@@ -25,13 +25,6 @@ echo "Starting PGCS (Repository)..."
 
 sleep 2
 
-# Start NRNCS (Name Resolution and Network Cache Service)
-# Format: ./NRNCS <Path>
-echo "Starting NRNCS..."
-./NRNCS $BASE/IO/NRNCS/ > $BASE/IO/logs/NRNCS.log 2>&1 &
-
-sleep 2
-
 # Start ContentApp as Repository
 # Format: ./ContentApp <Path> <Role>
 echo "Starting ContentApp (Repository)..."
