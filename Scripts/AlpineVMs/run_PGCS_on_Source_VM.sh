@@ -20,10 +20,16 @@ BASE=/root/workspace/novagenesis
 
 echo "=== PGCS on Source VM (${VM_IP}) ==="
 echo "Interface: eth0 | Peer MAC: ${PEER_MAC}"
+
+# Clean previous execution
+echo "Cleaning previous execution..."
+ssh -i ${SSH_KEY} root@${VM_IP} "bash ${BASE}/Scripts/Simple/clean.sh" 2>&1
+echo "Clean done."
+
 echo "Opening SSH terminal... (Ctrl+C to stop PGCS)"
 echo ""
 
 ssh -t -i ${SSH_KEY} root@${VM_IP} \
   "cd ${BASE}/cmake-build-debug && \
-   sudo gdb -batch -ex \"run\" -ex \"bt\" -ex \"quit\" --args \
+   gdb -batch -ex \"run\" -ex \"bt\" -ex \"quit\" --args \
    ./PGCS ${BASE}/IO/PGCS/ 0 Intra_Domain -p Ethernet Intra_Domain eth0 ${PEER_MAC} 1200"
