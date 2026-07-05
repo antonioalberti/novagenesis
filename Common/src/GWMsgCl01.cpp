@@ -45,7 +45,7 @@
 #include <fcntl.h>
 #endif
 
-// #define DEBUG
+#define DEBUG
 // #define DEBUG1
 
 // SPEC-006: Named semaphore "Output_Queue" removed. OutputQueueMutex
