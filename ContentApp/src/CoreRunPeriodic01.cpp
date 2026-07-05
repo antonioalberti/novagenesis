@@ -290,7 +290,7 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				  // Generate the get to discover peer SHM Key on PGCS
 				  // ***************************************************
 
-				  PMB->NewGetCommandLine ("0.1", 13, PCore->PSTuples[0]->Values[2], IPCUpdate, PCL);
+				  PMB->NewGetCommandLine ("0.1", 19, PCore->PSTuples[0]->Values[2], IPCUpdate, PCL);
 
 				  // Generate the SCN
 				  PB->GenerateSCNFromMessageBinaryPatterns (IPCUpdate, SCN);

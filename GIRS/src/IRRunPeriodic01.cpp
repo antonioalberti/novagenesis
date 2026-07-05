@@ -665,9 +665,9 @@ int IRRunPeriodic01::Operational ()
 	  // Generate the get to discover peer SHM Key on PGCS
 	  // ***************************************************
 
-	  PMB->NewGetCommandLine ("0.1", 13, PIR->PSSTuples[0]->Values[2], IPCUpdate, PCL);
+	  PMB->NewGetCommandLine ("0.1", 19, PIR->PSSTuples[0]->Values[2], IPCUpdate, PCL);
 
-	  PMB->NewGetCommandLine ("0.1", 13, PIR->HTSTuples[0]->Values[2], IPCUpdate, PCL);
+	  PMB->NewGetCommandLine ("0.1", 19, PIR->HTSTuples[0]->Values[2], IPCUpdate, PCL);
 
 	  // Generate the SCN
 	  PB->GenerateSCNFromMessageBinaryPatterns (IPCUpdate, SCN);
