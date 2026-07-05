@@ -250,66 +250,20 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 #endif
 			  PCore->Exposition (PB->PP->Intra_Domain, ScheduledMessages);
 
+			  // SPEC-010 E2: Also expose bindings locally (Intra_OS) for same-VM peer
+			  // discovery without depending on NRNCS propagation
+			  PCore->Exposition (PB->PP->Intra_OS, ScheduledMessages);
+
 			  PCore->RunExpose = false;
 
 			  PB->State = "operational";
 
-			  // *************************************************************************
-			  // Discover NRNCS IPC key, if in the local OS
-			  // *************************************************************************
-
-			  PB->PP->DiscoverHomonymsBlocksBIDsFromProcessLegibleName ("PGCS", "HT", PGCSPID, PGCSBIDs, PB);
-
-			  if (PGCSBIDs->size () > 0)
-				{
-				  // ***************************************************
-				  // Prepare the first command line
-				  // ***************************************************
-
-				  // Setting up the OSID as the space limiter
-				  Limiters.push_back (PB->PP->Intra_OS);
-
-				  // Setting up the this process as the first source SCN
-				  Sources.push_back (PB->PP->GetSelfCertifyingName ());
-
-				  // Setting up the PS block SCN as the source SCN
-				  Sources.push_back (PB->GetSelfCertifyingName ());
-
-				  // Setting up the PGCS PID as the destination SCN
-				  Destinations.push_back (PGCSPID);
-
-				  // Setting up the PGCS::HT BID as the destination SCN
-				  Destinations.push_back (PGCSBIDs->at (0));
-
-				  // Creating a new message
-				  PB->PP->NewMessage (GetTime (), 1, false, IPCUpdate);
-
-				  // Creating the ng -cl -m command line
-				  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, IPCUpdate, PCL);
-
-				  // ***************************************************
-				  // Generate the get to discover peer SHM Key on PGCS
-				  // ***************************************************
-
-				  PMB->NewGetCommandLine ("0.1", 19, PCore->PSTuples[0]->Values[2], IPCUpdate, PCL);
-
-				  // Generate the SCN
-				  PB->GenerateSCNFromMessageBinaryPatterns (IPCUpdate, SCN);
-
-				  // Creating the ng -scn --s command line
-				  PMB->NewSCNCommandLine ("0.1", SCN, IPCUpdate, PCL);
-
-				  // ******************************************************
-				  // Finish
-				  // ******************************************************
-
-				  // Push the message to the GW input queue
-				  PCore->PGW->PushToInputQueue (IPCUpdate);
-				}
-			  else
-				{
-				  PB->S << Offset << "(ERROR: Failed to discover the PGCS_PID and its HT_BID)" << endl;
-				}
+			  // SPEC-010 E1: Removed Cat[19] IPC key lookup for NRNCS PID.
+			  // The GWHelloIPC02 stores Cat[19] with key = PGCS PID (the process that
+			  // sends hello IPC 2.0), NOT NRNCS PID. Querying Cat[19] with NRNCS PID
+			  // always failed, causing the GW fallback to IPC key 11 (PGCS).
+			  // Intra_Domain messages are routed through the local PGCS, which
+			  // handles cross-OS forwarding natively via raw socket.
 			}
 		}
 	}

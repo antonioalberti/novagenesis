@@ -192,12 +192,20 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 											}
 										}
 
-									  if (StoreFlag == true)
+									if (StoreFlag == true)
 										{
-										  // Store the learned tuple on the peer server app tuples
-										  PCore->PeerServerAppTuples.push_back (Apps[k]);
+										  // SPEC-010 E4: Verify Cat[5] binding exists before storing
+										  vector<string> *Cat5BIDs = new vector<string>;
+										  bool HasCat5 = (PB->PP->GetHTBindingValues (5, Servers->at (i), Cat5BIDs) == OK
+														  && Cat5BIDs->size () > 0);
+										  delete Cat5BIDs;
 
-										  unsigned int _I = PCore->PeerServerAppTuples.size () - 1;
+										  if (HasCat5)
+											{
+											  // Store the learned tuple on the peer server app tuples
+											  PCore->PeerServerAppTuples.push_back (Apps[k]);
+
+											  unsigned int _I = PCore->PeerServerAppTuples.size () - 1;
 
 #ifdef DEBUG
 
@@ -247,6 +255,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 															<< endl;
 													}
 												}
+											}
 											}
 										}
 									  else
