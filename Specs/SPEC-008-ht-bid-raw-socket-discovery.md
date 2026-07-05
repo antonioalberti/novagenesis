@@ -3,7 +3,7 @@
 **Autor:** Antonio Marcos Alberti
 **Data:** 25/06/2026
 **Revisão:** 26/06/2026 — diagnóstico original corrigido após análise estática completa
-**Estado:** Draft (revisão em curso — causa raiz por confirmar empiricamente)
+**Estado:** Draft — **SPEC-008 Rev2 proposta em secção 11**
 
 ---
 
@@ -226,3 +226,170 @@ Adicionar em `PGRunExposition01.cpp` antes da linha 140:
 3. **Message lifecycle**: As SPECs 002/003 podem ter efeitos colaterais subtis no processamento de mensagens `-sr --b`. Verificar se HTStoreBind01::Run() é realmente chamado.
 4. **Valores vazios em bindings**: HT::GetBinding ignora valores vazios (`if (E != "")`). Se o HT_SCN do emissor for vazio, a binding existe mas é ignorada no lookup.
 5. **Timing**: O PGRunExposition01 pode correr num momento em que as bindings ainda não foram processadas, mesmo que eventualmente sejam.
+
+---
+
+## 11. SPEC-008 Rev2 — Proposta de Correção (05/07/2026)
+
+### 11.1 Contexto
+
+A SPEC-008 original (v1, 26/06/2026) concluiu que o código em `ScheduleStoreBindings` armazena correctamente as bindings Cat[5] PID→HT_BID e Cat[2] Hash("HT")→HT_BID. No entanto, o erro `Unable to get peer PGCS::HT BID` persiste no runtime.
+
+Análise adicional (05/07/2026) durante SPEC-010 (ContentApp bindings) e investigação do NRNCS revelou que:
+
+**O problema é de timing (H1 confirmado conceptualmente):**
+
+1. `PGHelloIHC01::Run()` recebe o `-hello --ihc` do peer PGCS via raw socket
+2. `ScheduleStoreBindings` cria uma mensagem `-sr --b` e faz `PushToInputQueue` (linha 528)
+3. A mensagem é processada **assincronamente** pelo ciclo `RoundRobinMessageProcessing` do GW
+4. `PGRunExposition01::Run()` corre **antes** da mensagem ser processada
+5. As bindings Cat[5] e Cat[2] ainda **não estão no HT** quando o lookup é feito
+6. `DiscoverHomonymsBlocksBIDsFromPID` falha → erro na linha 420
+
+A mensagem de store é eventualmente processada, mas `PGRunExposition01` já falhou para este peer. Nas iterações seguintes, a binding pode já estar presente e a exposição funciona — ou não, dependendo do momento exacto do ciclo.
+
+### 11.2 Solução Proposta: Direct HT Storage (sem mensagem)
+
+Em vez de criar uma mensagem `-sr --b` para a fila, o `ScheduleStoreBindings` deve armazenar todas as bindings **directamente no HT** usando `PGW->StoreHTBindingValues(Category, Key, &Values)`. A mensagem é **eliminada** por ser redundante — o único consumidor é o `HTStoreBind01` local, e o armazenamento directo é mais rápido e elimina a race condition.
+
+**Vantagens:**
+- Sem race condition — bindings disponíveis imediatamente
+- Menos mensagens no pipeline do GW (menos ciclos de processamento)
+- `PGW->StoreHTBindingValues` já existe e é usada em `GWRunInitialization01` (linha 92) e `GWHelloIPC02` (linhas 164, 174, etc.)
+- Código mais simples e directo
+
+### 11.3 Ficheiros a Modificar
+
+| Ficheiro | Alteração | Descrição |
+|----------|-----------|-----------|
+| `PGCS/src/PGHelloIHC01.cpp` | Substituir criação de mensagem por direct HT stores | Remover `NewMessage`, `NewConnectionLessCommandLine` e todos os `NewCommonCommandLine`/`NewStoreBindingCommandLine*`, substituir por `PGW->StoreHTBindingValues` |
+
+### 11.4 Bindings a Armazenar Directamente
+
+O `ScheduleStoreBindings` actualmente cria uma mensagem com todas as bindings. A mensagem será removida e substituída por chamadas directas a `StoreHTBindingValues`. As bindings a armazenar são:
+
+| Categoria | Key | Value | Descrição |
+|-----------|-----|-------|-----------|
+| 6 | `_ReceivedElements[0]` (HID) | `_ReceivedElements[1]` (OSID) | HID→OSID |
+| 7 | `_ReceivedElements[1]` (OSID) | `_ReceivedElements[0]` (HID) | OSID→HID |
+| 9 | Hash("Host") | `_ReceivedElements[0]` (HID) | Host ID lookup |
+| 8 | `_ReceivedElements[0]` (HID) | "Host" | HID→LegibleName "Host" |
+| 2 | Hash("OS") | `_ReceivedElements[1]` (OSID) | OS lookup |
+| 3 | `_ReceivedElements[1]` (OSID) | Hash("OS") | OSID→Hash("OS") |
+| 5 | `_ReceivedElements[1]` (OSID) | `_ReceivedElements[2]` (PID) | OSID→PID |
+| 7 | `_ReceivedElements[2]` (PID) | `_ReceivedElements[0]` (HID) | PID→HID |
+| 2 | Hash("PGCS") | `_ReceivedElements[2]` (PID) | PGCS PID — **para descoberta** |
+| 3 | `_ReceivedElements[2]` (PID) | Hash("PGCS") | PID→Hash("PGCS") |
+| **5** | **`_ReceivedElements[2]` (PID)** | **`_ReceivedElements[3]` (PG_BID)** | **PID→PG_BID** |
+| 2 | Hash("PG") | `_ReceivedElements[3]` (PG_BID) | PG BID lookup |
+| 3 | `_ReceivedElements[3]` (PG_BID) | Hash("PG") | PG_BID→Hash("PG") |
+| **5** | **`_ReceivedElements[2]` (PID)** | **`_ReceivedElements[4]` (GW_BID)** | **PID→GW_BID** |
+| 2 | Hash("GW") | `_ReceivedElements[4]` (GW_BID) | GW BID lookup |
+| 3 | `_ReceivedElements[4]` (GW_BID) | Hash("GW") | GW_BID→Hash("GW") |
+| **5** | **`_ReceivedElements[2]` (PID)** | **`_ReceivedElements[5]` (HT_BID)** | **PID→HT_BID** ⬅️ CRÍTICO |
+| **2** | **Hash("HT")** | **`_ReceivedElements[5]` (HT_BID)** | **Hash("HT")→HT_BID** ⬅️ CRÍTICO |
+| **3** | **`_ReceivedElements[5]` (HT_BID)** | **Hash("HT")** | **HT_BID→Hash("HT")** ⬅️ CRÍTICO |
+
+As **críticas** (Cat 5 PID→HT_BID e Cat 2 Hash("HT")→HT_BID) são as que `PGRunExposition01` usa para o lookup que falha.
+
+### 11.5 Código a Implementar
+
+Substituir todo o corpo de `ScheduleStoreBindings` (linhas 242-533) por armazenamento directo no HT. O código mantém apenas a declaração de variáveis e as chamadas a `PPGB->PGW->StoreHTBindingValues`:
+
+```cpp
+  // ********************************************************
+  // SPEC-008 Rev2: Store bindings directly in HT to avoid
+  // race condition between message queue processing and
+  // PGRunExposition01 execution.
+  // ********************************************************
+
+  // Cat[6] HID -> OSID
+  Category = 6;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(1));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[5] OSID -> PID
+  Category = 5;
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[5] PID -> PG_BID
+  Category = 5;
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(3));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[5] PID -> GW_BID
+  Values.push_back(_ReceivedElements.at(4));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[5] PID -> HT_BID (CRITICAL — for PGRunExposition01)
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[2] Hash("HT") -> HT_BID (CRITICAL — for PGRunExposition01)
+  Category = 2;
+  string HashHT;
+  PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
+  Key = HashHT;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[2] Hash("PGCS") -> Peer PID
+  Category = 2;
+  string HashPGCS;
+  PB->GenerateSCNFromCharArrayBinaryPatterns("PGCS", HashPGCS);
+  Key = HashPGCS;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+```
+
+### 11.6 Requisitos
+
+- **`PPGB->PGW`** deve estar acessível (já está — `PG *PPGB = (PG *)PB;` na linha 250)
+- **`PGW->StoreHTBindingValues`** deve ser pública (já é — usada em `GWHelloIPC02.cpp` e `GWRunInitialization01.cpp`)
+- **`PB->GenerateSCNFromCharArrayBinaryPatterns`** deve ser acessível (já é — usado em toda a Common/src)
+
+### 11.7 Cenário Alternativo: Sem Direct Store
+
+Se a solução directa não for aceite, a alternativa é adicionar um atraso no `PGRunExposition01` para aguardar que as mensagens sejam processadas:
+
+```cpp
+// Alternative: yield to let pending store bindings be processed
+PB->PP->RoundRobinMessageProcessing();
+```
+
+### 11.8 Diagnóstico (E0-E3 da SPEC-008 v1)
+
+Manter as etapas de diagnóstico propostas na v1 (secção 5), mas com prioridade reduzida — a correção directa elimina a necessidade de confirmar a hipótese H1.
+
+### 11.9 Decisões
+
+| # | Decisão | Data | Razão |
+|---|---------|------|-------|
+| R1 | Direct HT storage **substitui** a mensagem (não acumula) | 05/07/2026 | Mensagem era redundante — único consumidor era HTStoreBind01 local |
+| R2 | ScheduleStoreBindings passa a armazenar tudo directamente | 05/07/2026 | Elimina race condition e reduz ciclos de processamento |
+| R3 | Cat[5] PID → HT_BID combinado com PG_BID e GW_BID | 05/07/2026 | StoreHTBindingValues adiciona ao multimap sem limpar anteriores |
+
+### 11.10 Critérios de Aceitação
+
+1. `PGRunExposition01` não imprime `ERROR: Unable to get peer PGCS::HT BID`
+2. Mensagens de exposição são enviadas entre PGCS peers dentro de 1 ciclo
+3. ContentApp recebe bindings NRNCS/HTS/GIRS via exposição inter-PGCS
+4. ContentApp sai de "The domain NRNCS is still unknown"
+5. Nenhum crash novo introduzido
+6. `ScheduleStoreBindings` não cria nem envia mensagens (código mais enxuto)
+
+### 11.11 Ficheiros Afectados
+
+| Ficheiro | Acção |
+|----------|-------|
+| `PGCS/src/PGHelloIHC01.cpp` | Reescrever ScheduleStoreBindings: remover criação de mensagem, adicionar direct stores |
+| `PGCS/src/PGRunExposition01.cpp` | Sem alterações (o bug é no ScheduleStoreBindings, não aqui) |

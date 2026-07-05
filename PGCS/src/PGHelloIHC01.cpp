@@ -243,289 +243,250 @@ int PGHelloIHC01::ScheduleStoreBindings (string _Case, vector<string> &_Received
 {
   int Status = OK;
 
-  Message *StoreBind01Msg = 0;
-  CommandLine *StatusS01 = 0;
-  CommandLine *MsgCl01 = 0;
-  CommandLine *StoreBind01 = 0;
   PG *PPGB = 0;
-  string HID;
-  string PID;
-  string BID;
-  vector<string> StoreBind01MsgLimiters;
-  vector<string> StoreBind01MsgSources;
-  vector<string> StoreBind01MsgDestinations;
-  string Version = "0.1";
   unsigned int Category;
   string Key;
   vector<string> Values;
   string Offset = "                    ";
-  string GW_SCN;
-  string HT_SCN;
+  string HashOS;
+  string HashHost;
+  string HashPGCS;
+  string HashPG;
+  string HashGW;
+  string HashHT;
   PGCS *PPGCS = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *PSCNCL = 0;
 
   PPGCS = (PGCS *)PB->PP;
   PPGB = (PG *)PB;
-  PHTB = (Block *)PPGB->PHT;
 
-  // Generate the MsgCl header for the store message
-  StoreBind01MsgLimiters.push_back (PB->PP->Intra_Process);
-  StoreBind01MsgSources.push_back (PB->GetSelfCertifyingName ());
-  StoreBind01MsgDestinations.push_back (PPGB->PHT->GetSelfCertifyingName ());
+  // SPEC-008 Rev2: Store bindings directly in the HT to eliminate
+  // race condition between message queue processing and
+  // PGRunExposition01 execution. The message -sr --b was removed
+  // because it was redundant — the only consumer was HTStoreBind01
+  // which stored in the same HT.
 
-  // ******************************************************
-  // Schedule a message to store the learned name bindings
-  // ******************************************************
-
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, StoreBind01Msg);
-
-  // ******************************************************
-  // Setting up the first command line
-  // ******************************************************
-
-  // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &StoreBind01MsgLimiters, &StoreBind01MsgSources, &StoreBind01MsgDestinations, StoreBind01Msg, MsgCl01);
+  // Generate hash keys
+  PB->GenerateSCNFromCharArrayBinaryPatterns("Host", HashHost);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("OS", HashOS);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("PGCS", HashPGCS);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("PG", HashPG);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("GW", HashGW);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
 
   // ******************************************************
-  // Binding Received HID to Received OSID
+  // Cat[6] HID -> OSID
   // ******************************************************
-
-  // Setting up the category
   Category = 6;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (0);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (1));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(1));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received OSID to Received HID
+  // Cat[7] OSID -> HID
   // ******************************************************
-
-  // Setting up the category
   Category = 7;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (1);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (0));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received HID to Hash("Host") and vice-versa
+  // Cat[9] Hash("Host") -> HID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 9, "Host", _ReceivedElements
-	  .at (0), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, _ReceivedElements.at (0), "Host", StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Binding Received OSID to Hash("OS") and vice-versa
-  // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "OS", _ReceivedElements
-	  .at (1), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (1), "OS", StoreBind01Msg, StoreBind01);
+  Category = 9;
+  Key = HashHost;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received OSID to Received PGCS PID
+  // Cat[8] HID -> "Host"
   // ******************************************************
+  Category = 8;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back("Host");
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[2] Hash("OS") -> OSID
+  // ******************************************************
+  Category = 2;
+  Key = HashOS;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(1));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // ******************************************************
+  // Cat[3] OSID -> Hash("OS")
+  // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(HashOS);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // ******************************************************
+  // Cat[5] OSID -> PID
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (1);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (2));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Host HID
+  // Cat[7] PID -> HID
   // ******************************************************
-
-  // Setting up the category
   Category = 7;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (0));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Hash("PGCS") and vice-versa
+  // Cat[2] Hash("PGCS") -> PID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "PGCS", _ReceivedElements
-	  .at (2), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (2), "PGCS", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashPGCS;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received PG BID
+  // Cat[3] PID -> Hash("PGCS")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(HashPGCS);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> PG_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (3));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(3));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PG BID to Hash("PG") and vice-versa
+  // Cat[2] Hash("PG") -> PG_BID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "PG", _ReceivedElements
-	  .at (3), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (3), "PG", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashPG;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(3));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received GW BID
+  // Cat[3] PG_BID -> Hash("PG")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(3);
+  Values.clear();
+  Values.push_back(HashPG);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> GW_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (4));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(4));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received GW BID to Hash("GW") and vice-versa
+  // Cat[2] Hash("GW") -> GW_BID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "GW", _ReceivedElements
-	  .at (4), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (4), "GW", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashGW;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(4));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received HT BID
+  // Cat[3] GW_BID -> Hash("GW")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(4);
+  Values.clear();
+  Values.push_back(HashGW);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> HT_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (5));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received HT BID to Hash("HT") and vice-versa
+  // Cat[2] Hash("HT") -> HT_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "HT", _ReceivedElements
-	  .at (5), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (5), "HT", StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Binding Peer PGCS HID to informed Peer Identifier.
-  // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHIDToIdentifier ("0.1", _ReceivedElements
-	  .at (0), _PeerIdentifier, StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashHT;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Peer PGCS identifier to HID.
+  // Cat[3] HT_BID -> Hash("HT")
+  // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(5);
+  Values.clear();
+  Values.push_back(HashHT);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // ******************************************************
+  // Peer address bindings (Cat[8] / Cat[15])
   // ******************************************************
 
-  PMB->NewStoreBindingCommandLineFromIdentifierToHID ("0.1", _PeerIdentifier, _ReceivedElements
-	  .at (0), StoreBind01Msg, StoreBind01);
+  // Cat[8] HID -> Peer Stack Hash
+  string HashPeerStack;
+  PB->GenerateSCNFromCharArrayBinaryPatterns(_PeerStack, HashPeerStack);
+  Category = 8;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(HashPeerStack);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[15] HID -> Peer Identifier
+  Category = 15;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(_PeerIdentifier);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[15] Peer Identifier -> HID
+  Category = 15;
+  Key = _PeerIdentifier;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Peer PGCS HID to Hash(Peer PGCS stack).
+  // -de mode: associate client socket with CSID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, _ReceivedElements
-	  .at (0), _PeerStack, StoreBind01Msg, StoreBind01);
-
-  // TODO: FIXP/Update - Added to deal with the PGCS -de initialization in September 2nd, 2021
-
   if (_Case == "-de" && PPGCS->CSIDs->size () > 0)
 	{
 	  PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at (0)
 			<< " for the peer PGCS with MAC "
 			<< _PeerIdentifier << ")" << endl;
 
-	  // Binding Ethernet address to CSID
-	  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", _PeerIdentifier, PPGCS->CSIDs
-		  ->at (0), StoreBind01Msg, StoreBind01);
+	  // Cat[15] Peer Identifier -> CSID
+	  Category = 15;
+	  Key = _PeerIdentifier;
+	  Values.clear();
+	  	  Values.push_back(PB->IntToString(PPGCS->CSIDs->at(0)));
+	  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 	}
-
-  // ******************************************************
-  // Setting up the SCN command line
-  // ******************************************************
-
-  // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (StoreBind01Msg, SCN);
-
-  // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Finish
-  // ******************************************************
-
-  // Push the message to the GW input queue
-  PPGB->PGW->PushToInputQueue (StoreBind01Msg);
 
   Status = OK;
 
