@@ -240,7 +240,7 @@ CoreRunDiscover01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				{
 
 #ifdef DEBUG
-				  PB->S << Offset << "(Sending a discovery message to the domain's PSS/NRNCS)" << endl;
+				  PB->S << Offset << "(Sending a discovery message to the domain's NRNCS)" << endl;
 #endif
 
 				  if (PCore->PSTuples.size () > 0)
@@ -378,7 +378,7 @@ CoreRunDiscover01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				  else
 					{
 					  PB->S << Offset
-							<< "(Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)"
+							<< "(Warning: Unable to send the discovery message. The domain NRNCS is still unknown)"
 							<< endl;
 					}
 				}

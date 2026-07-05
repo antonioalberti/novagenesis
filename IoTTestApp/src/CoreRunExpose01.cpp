@@ -83,7 +83,7 @@ CoreRunExpose01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 				{
 				  PB->S << Offset << "(Generating a message to publish in the domain scope some bindings)" << endl;
 
-				  PB->S << Offset << "(Number of PSS/NRNCS(s) is " << PCore->PSTuples.size () << ")" << endl;
+				  PB->S << Offset << "(Number of NRNCS(s) is " << PCore->PSTuples.size () << ")" << endl;
 
 				  // Setting up the OSID as the space limiter
 				  Limiters.push_back (PB->PP->Intra_Domain);

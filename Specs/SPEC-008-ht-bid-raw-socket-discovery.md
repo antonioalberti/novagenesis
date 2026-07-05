@@ -16,7 +16,7 @@ PGRunExposition01.cpp:420
 (ERROR: Unable to get peer PGCS::HT BID from local hash table)
 ```
 
-**Sintoma visível:** A exposição inter-PGCS (envio de bindings HTS, GIRS, PSS, NRNCS entre PGCS peers) nunca acontece. O ContentApp fica preso em "The domain PSS/NRNCS is still unknown" porque nunca recebe as bindings de serviços do PGCS peer via exposição.
+**Sintoma visível:** A exposição inter-PGCS (envio de bindings HTS, GIRS, PSS, NRNCS entre PGCS peers) nunca acontece. O ContentApp fica preso em "The domain NRNCS is still unknown" porque nunca recebe as bindings de serviços do PGCS peer via exposição.
 
 ## 2. Diagnóstico original (INCORRECTO — 25/06/2026)
 
@@ -205,8 +205,8 @@ Adicionar em `PGRunExposition01.cpp` antes da linha 140:
 
 1. `PGRunExposition01` já não imprime `ERROR: Unable to get peer PGCS::HT BID from local hash table`
 2. Mensagens de exposição são enviadas entre PGCS peers
-3. ContentApp recebe bindings HTS/GIRS/PSS/NRNCS via exposição
-4. ContentApp sai de "The domain PSS/NRNCS is still unknown"
+3. ContentApp recebe bindings HTS/GIRS/NRNCS via exposição
+4. ContentApp sai de "The domain NRNCS is still unknown"
 5. Nenhum crash novo introduzido
 
 ## 9. Decisões

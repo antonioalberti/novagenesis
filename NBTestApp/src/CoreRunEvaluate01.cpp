@@ -192,7 +192,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 					{
 					  PCore->PSTuples.push_back (PSs[g]);
 
-					  PB->S << Offset1 << "(Discovered a PSS/NRNCS)" << endl;
+					  PB->S << Offset1 << "(Discovered a NRNCS)" << endl;
 
 					  PCore->ScheduledMessagesCreation = true;
 

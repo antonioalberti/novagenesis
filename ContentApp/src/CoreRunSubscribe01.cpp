@@ -81,7 +81,7 @@ CoreRunSubscribe01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Me
 		  if (Category.size () > 0 && Keys.size ())
 			{
 
-			  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which PSS/NRNCS the content has been submitted.
+			  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which NRNCS the content has been submitted.
 			  for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
 				{
 				  Subcription = NULL;

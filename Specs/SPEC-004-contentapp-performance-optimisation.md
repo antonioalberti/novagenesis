@@ -102,7 +102,7 @@ PGCS starts ──> NRNCS starts ──> ContentApp starts
                     │  2. DiscoverySecondStep(Intra_Domain)  │
                     │     +DelayBeforeDiscovery (10s)        │
                     │                                        │
-                    │  3. Check PSS/NRNCS awareness          │
+                    │  3. Check NRNCS awareness          │
                     │     If aware:                          │
                     │       4. DiscoveryFirstStep(Intra_OS)  │
                     │          +DelayBeforeDiscovery (10s)   │
@@ -119,7 +119,7 @@ PGCS starts ──> NRNCS starts ──> ContentApp starts
                     │     at +DelayBeforeRunPeriodic         │
                     └────────────────────────────────────────┘
                                     │
-                                    ▼ (after PSS/NRNCS discovered)
+                                    ▼ (after NRNCS discovered)
                     CoreRunEvaluate01 (on scheduled messages)
                     │
                     │  Checks every DelayBeforeANewPeerEvaluation (5s)
@@ -135,7 +135,7 @@ PGCS starts ──> NRNCS starts ──> ContentApp starts
                     │  ──── 60s WAIT (from INI) ────
                     │
                     ▼
-                    (Service Offer delivered to Repository via PSS/NRNCS)
+                    (Service Offer delivered to Repository via NRNCS)
                     │
                     ▼
                     Repository receives offer → CoreRunEvaluate01 processes "Offer"
@@ -166,8 +166,8 @@ PGCS starts ──> NRNCS starts ──> ContentApp starts
 | Phase | Delay Source | Time |
 |-------|-------------|------|
 | Start → first periodic | `DelayBeforeRunPeriodic` (INI) | 10s |
-| First periodic → PSS/NRNCS discovered | `DelayBeforeDiscovery` × 1 (overwrite) | 10s |
-| PSS/NRNCS → Exposition | Immediate (same periodic) | 0s |
+| First periodic → NRNCS discovered | `DelayBeforeDiscovery` × 1 (overwrite) | 10s |
+| NRNCS → Exposition | Immediate (same periodic) | 0s |
 | Exposition → next periodic | `DelayBeforeRunPeriodic` | 10s |
 | Periodic → Evaluate discovers Repository | `DelayBeforeANewPeerEvaluation` | 5s |
 | Evaluate → Invite (Service Offer) | `DelayBeforePublishingServiceOffer` (INI) | **60s** |
@@ -232,8 +232,8 @@ Same flow, but additionally:
 
 | File | Change | LOC |
 |------|--------|-----|
-| `ContentApp/src/CoreRunPeriodic01.cpp` | After PSS/NRNCS is discovered, skip Intra_Domain discovery and only do Intra_OS. The Intra_Domain discovery is only needed before PSS/NRNCS is known. Once known, Intra_OS is sufficient for PGCS HT_BID lookup. | ~15 LOC |
-| `ContentApp/src/CoreRunPeriodic01.cpp` | Remove the second `Cat2Keywords.clear() + push_back` block (L163-L173) when PSS/NRNCS is already known — reuse the first block's keywords. | ~5 LOC |
+| `ContentApp/src/CoreRunPeriodic01.cpp` | After NRNCS is discovered, skip Intra_Domain discovery and only do Intra_OS. The Intra_Domain discovery is only needed before NRNCS is known. Once known, Intra_OS is sufficient for PGCS HT_BID lookup. | ~15 LOC |
+| `ContentApp/src/CoreRunPeriodic01.cpp` | Remove the second `Cat2Keywords.clear() + push_back` block (L163-L173) when NRNCS is already known — reuse the first block's keywords. | ~5 LOC |
 | `ContentApp/src/CoreRunEvaluate01.cpp` | Reduce the `DelayBeforeRunPeriodic = 30` override (L243) to `10` and `DelayBeforeRunPeriodic = 60` (L361) to `15`. These overrides currently slow down the periodic loop after discovery, which delays subscription resubmission and photo publishing. | 2 LOC |
 
 **Expected result:**
@@ -320,7 +320,7 @@ ContentBurstSize 200
 6. Start Repository (`run_Repository.sh`)
 7. Record timestamps from logs:
    - ContentApp start time
-   - First "Discovered a PSS/NRNCS!" time
+   - First "Discovered a NRNCS!" time
    - First "Discovered a Repository" time
    - First "Publishing the content" time
    - First 200 photos published time
@@ -361,9 +361,9 @@ Ref: SPEC-004, SPEC-005, NG-042-07"
 | Test | Method | Pass criteria |
 |------|--------|---------------|
 | Timer verification | Read INI files after E1 | Values match spec |
-| PSS/NRNCS discovery | Check ContentApp log for "Discovered a PSS/NRNCS!" | Within 15s of start |
+| NRNCS discovery | Check ContentApp log for "Discovered a NRNCS!" | Within 15s of start |
 | Exposition | Check log for "Generating a message to publish in the domain scope" | Within same periodic cycle |
-| Service Offer | Check Source log for "Discovered a Repository" | Within 20s of PSS/NRNCS discovery |
+| Service Offer | Check Source log for "Discovered a Repository" | Within 20s of NRNCS discovery |
 | Acceptance | Check Repository log for Service_Accepted file creation | Within 5s of Service Offer |
 | Photo Publish | Check Source log for "Publishing the content" | Within 25s of ContentApp start |
 | 200 photos | Count "Publishing the content" lines | 200 lines within 35s |
@@ -377,7 +377,7 @@ Ref: SPEC-004, SPEC-005, NG-042-07"
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
 | Race condition: Service Offer sent before Repository has bindings | Medium | Discovery fails, offer lost | Keep `DelayBeforePublishingServiceOffer` at 5s (not 1s). If fails, increase to 10s. |
-| Intra_Domain skip breaks cross-OS discovery | Low | Peers on other OSes not found | Only skip when `PSTuples.size() > 0` (PSS/NRNCS already known). For multi-OS scenarios, add a config flag. |
+| Intra_Domain skip breaks cross-OS discovery | Low | Peers on other OSes not found | Only skip when `PSTuples.size() > 0` (NRNCS already known). For multi-OS scenarios, add a config flag. |
 | DelayBeforeRunPeriodic override too aggressive | Low | OutputQueue flooding | Monitor OutputQueue size in logs. If > 50 messages, revert to 20s/30s. |
 | ContentBurstSize=200 with 1s delay causes memory pressure | Low | Messages in memory > MAX_MESSAGES_IN_MEMORY | The existing break at L232 (`Counter == ContentBurstSize`) and L232 (`GetNumberOfMessages >= MAX-200`) already guard this. |
 | GW.cpp 100ms SHM poll adds latency to offer/acceptance | Medium | Up to 600ms total across cycle | Addressed by SPEC-005 (reduce poll interval to 10ms for ContentApp). Even without SPEC-005, 600ms is negligible vs the 20-25s total cycle. |
@@ -434,7 +434,7 @@ Ref: SPEC-004, SPEC-005, NG-042-07"
 - [x] INI files updated: ServiceOffer=30, PhotoPublish=1, Discovery=3 (E1)
 - [ ] GW.cpp updated: SHM_POLL_INTERVAL_MS=10, CV timeout capped (E2)
 - [ ] PGCS + NRNCS + ContentApp compile successfully after GW.cpp change (E2)
-- [ ] PSS/NRNCS discovery completes within 15s of ContentApp start
+- [ ] NRNCS discovery completes within 15s of ContentApp start
 - [ ] Service Offer sent within 50s of ContentApp start
 - [ ] First photo published within 60s of ContentApp start
 - [ ] 200 photos published within 70s of ContentApp start

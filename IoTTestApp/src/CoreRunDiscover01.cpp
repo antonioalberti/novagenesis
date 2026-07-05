@@ -232,7 +232,7 @@ CoreRunDiscover01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 			  if (Limiter.at (0) == PB->PP->GetDomainSelfCertifyingName ())
 				{
 #ifdef DEBUG
-				  PB->S << Offset <<"(Sending a discovery message to the domain's PSS/NRNCS)"<< endl;
+				  PB->S << Offset <<"(Sending a discovery message to the domain's NRNCS)"<< endl;
 #endif
 
 				  for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
@@ -374,7 +374,7 @@ CoreRunDiscover01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				  if (PCore->PSTuples.size () == 0)
 					{
 					  PB->S << Offset
-							<< "(Warning: Unable to send the discovery message. The domain PSS/NRNCS is still unknown)"
+							<< "(Warning: Unable to send the discovery message. The domain NRNCS is still unknown)"
 							<< endl;
 					}
 				}

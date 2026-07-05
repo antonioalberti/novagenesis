@@ -112,12 +112,12 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 
   PCore = (Core *)PB;
 
-  PB->S << Offset << "(1. Check for PSS/NRNCS awareness.)" << endl;
+  PB->S << Offset << "(1. Check for NRNCS awareness.)" << endl;
 
   // Run other procedures if it is aware of at least one NRNCS
   if (PCore->PSTuples.size () > 0)
 	{
-	  PB->S << Offset1 << "(The PGCS is already aware of this PSS/NRNCS)" << endl;
+	  PB->S << Offset1 << "(The PGCS is already aware of this NRNCS)" << endl;
 
 	  if (PCore->RunExpose == true && TimeToExpose < GetTime ())
 		{
@@ -352,7 +352,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 	}
   else
 	{
-	  PB->S << Offset1 << "(Waiting for PSS/NRNCS discovery)" << endl;
+	  PB->S << Offset1 << "(Waiting for NRNCS discovery)" << endl;
 	}
 
   delete Candidates;

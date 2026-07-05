@@ -137,10 +137,10 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 
   PCore = (Core *)PB;
 
-  PB->S << Offset << "(1. Check for PSS/NRNCS awareness.)" << endl;
+  PB->S << Offset << "(1. Check for NRNCS awareness.)" << endl;
 
   // *************************************************************
-  // Check for PSS/NRNCS discovery first Step
+  // Check for NRNCS discovery first Step
   // *************************************************************
   if (PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, "PSS", PB) == ERROR &&
 	  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, "NRNCS", PB) == ERROR)
@@ -162,7 +162,7 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 
 #ifdef DEBUG
 
-	  PB->S << Offset1 << "(Not aware of any PSS/NRNCS on Categories 2 and 9. Prepare discover first step)" << endl;
+	  PB->S << Offset1 << "(Not aware of any NRNCS on Categories 2 and 9. Prepare discover first step)" << endl;
 
 #endif
 
@@ -171,12 +171,12 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
   else
 	{
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Aware of a PSS/NRNCS on Categories 2 and 9)" << endl;
+	  PB->S << Offset1 << "(Aware of a NRNCS on Categories 2 and 9)" << endl;
 #endif
 	}
 
   // *************************************************************
-  // Check for PSS/NRNCS discovery second Step
+  // Check for NRNCS discovery second Step
   // *************************************************************
   if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("PSS", "PS", PSs, PB) == ERROR &&
 	  PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("NRNCS", "NR", PSs, PB) == ERROR)
@@ -197,14 +197,14 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 	  PCore->DiscoverySecondStep (PB->PP->Intra_OS, &Cat2Keywords, &Cat9Keywords, _ScheduledMessages);
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Not aware of any PSS/NRNCS on Categories 5 and 6. Prepare discover second step)" << endl;
+	  PB->S << Offset1 << "(Not aware of any NRNCS on Categories 5 and 6. Prepare discover second step)" << endl;
 #endif
 
 	  _ClearScheduledMessage = false;
 	}
   else
 	{
-	  // Test storage of new PSS/NRNCS if there is some candidate
+	  // Test storage of new NRNCS if there is some candidate
 	  if (PSs.size () > 0)
 		{
 		  // Loop over the discovered candidates
@@ -220,7 +220,7 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 					{
 					  StoreFlag = false;
 
-					  PB->S << Offset1 << "(The IoTTestApp is already aware of a PSS/NRNCS)" << endl;
+					  PB->S << Offset1 << "(The IoTTestApp is already aware of a NRNCS)" << endl;
 					}
 				}
 
@@ -228,16 +228,16 @@ int CoreRunEvaluate01::CheckForPSAwareness (vector<Message *> &_ScheduledMessage
 				{
 				  PCore->PSTuples.push_back (PSs[g]);
 
-				  PB->S << Offset1 << "(Discovered a PSS/NRNCS)" << endl;
+				  PB->S << Offset1 << "(Discovered a NRNCS)" << endl;
 				}
 			}
 		}
 	  else
 		{
-		  //PB->S << Offset1 << "(There is no candidate for PSS/NRNCS)"<<endl;
+		  //PB->S << Offset1 << "(There is no candidate for NRNCS)"<<endl;
 		}
 
-	  // Run other procedures if it is aware of at least one PSS/NRNCS
+	  // Run other procedures if it is aware of at least one NRNCS
 	  if (PCore->PSTuples.size () > 0)
 		{
 		  if (PCore->RunExpose == true && TimeToExpose < GetTime ())
@@ -408,7 +408,7 @@ int CoreRunEvaluate01::CheckForNewPeerApplication (vector<Message *> &_Scheduled
 	}
   else
 	{
-	  PB->S << Offset1 << "(Waiting for PSS/NRNCS discovery)" << endl;
+	  PB->S << Offset1 << "(Waiting for NRNCS discovery)" << endl;
 	}
 
   delete Candidates;
@@ -524,7 +524,7 @@ int CoreRunEvaluate01::CheckSubscriptions (vector<Message *> &_ScheduledMessages
 	}
   else
 	{
-	  PB->S << Offset1 << "(Waiting for PSS/NRNCS discovery)" << endl;
+	  PB->S << Offset1 << "(Waiting for NRNCS discovery)" << endl;
 	}
 
   return Status;

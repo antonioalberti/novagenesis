@@ -257,7 +257,7 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 			  // Change the interval between subscriptions
 			  PCore->DelayBeforeRunPeriodic = 0.5;
 
-			  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which PSS/NRNCS the content has been submitted.
+			  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which NRNCS the content has been submitted.
 			  for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
 				{
 				  Subscribe = NULL;

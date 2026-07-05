@@ -200,7 +200,7 @@ CoreNotifyS01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message
 			  if (SubscribingKeys.size () > 0)
 				{
 				  // TODO: FIXP/Update - Directly schedule subscription of content. Altered in September 2021
-				  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which PSS/NRNCS the content has been submitted.
+				  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which NRNCS the content has been submitted.
 				  for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
 					{
 					  SubscriptionM = NULL;

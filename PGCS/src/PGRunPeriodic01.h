@@ -79,7 +79,7 @@ class PGRunPeriodic01 : public Action {
   virtual int
   Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
 
-  // Check for PSS/NRNCS awareness
+  // Check for NRNCS awareness
   int PSAwareness ();
 
   // Schedule a hello to the peer PGSs

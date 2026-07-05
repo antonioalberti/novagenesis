@@ -37,7 +37,7 @@
 #include "Core.h"
 #endif
 
-// #define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 CoreRunPeriodic01::CoreRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -143,22 +143,22 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
 
 #ifdef DEBUG
-  PB->S << Offset << "(1. Check for PSS/NRNCS awareness.)" << endl;
+  PB->S << Offset << "(1. Check for NRNCS awareness.)" << endl;
 #endif
 
   // *************************************************************
-  // Check for PSS/NRNCS discovery first Step
+  // Check for NRNCS discovery first Step
   // *************************************************************
-  //TODO: FIXP/Update - Changed this function just to show whether PSS/NRNCS is already known
+  //TODO: FIXP/Update - Changed this function just to show whether NRNCS is already known
   if (PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, "PSS", PB) == OK ||
 	  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, "NRNCS", PB) == OK)
 	{
 #ifdef DEBUG
-	  PB->S << Offset << "(Aware of a PSS/NRNCS on Categories 2 and 9)" << endl;
+	  PB->S << Offset << "(Aware of a NRNCS on Categories 2 and 9)" << endl;
 #endif
 	}
 
-  //TODO: FIXP/Update - Decided to make this procedure independently of previous knowledge on PSS/NRNCS.
+  //TODO: FIXP/Update - Decided to make this procedure independently of previous knowledge on NRNCS.
 
   Cat2Keywords.clear();
 
@@ -176,7 +176,7 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
   PCore->DiscoveryFirstStep (PB->PP->Intra_OS, &Cat2Keywords, &Cat9Keywords, ScheduledMessages);
 
   // *************************************************************
-  // Check for PSS/NRNCS discovery second Step
+  // Check for NRNCS discovery second Step
   // *************************************************************
   if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("PSS", "PS", PSs, PB) == ERROR &&
 	  PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("NRNCS", "NR", PSs, PB) == ERROR)
@@ -197,13 +197,13 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 	  PCore->DiscoverySecondStep (PB->PP->Intra_OS, &Cat2Keywords, &Cat9Keywords, ScheduledMessages);
 
 #ifdef DEBUG
-	  PB->S << Offset << "(Not aware of any PSS/NRNCS on Categories 5 and 6. Prepare discover second step)" << endl;
+	  PB->S << Offset << "(Not aware of any NRNCS on Categories 5 and 6. Prepare discover second step)" << endl;
 #endif
 
 	}
   else
 	{
-	  // Testing storage of new PSS/NRNCS if there is some candidate
+	  // Testing storage of new NRNCS if there is some candidate
 	  if (PSs.size () > 0)
 		{
 		  // Loop over the discovered candidates
@@ -220,7 +220,7 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 					  StoreFlag = false;
 
 #ifdef DEBUG
-					  PB->S << Offset << "(The app is already aware of the PSS/NRNCS with PID = " << PSs[g]->Values[2] << ")" << endl;
+					  PB->S << Offset << "(The app is already aware of the NRNCS with PID = " << PSs[g]->Values[2] << ")" << endl;
 #endif
 					}
 				}
@@ -229,24 +229,25 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				{
 				  PCore->PSTuples.push_back (PSs[g]);
 
-				  PB->S << Offset << "(Discovered a PSS/NRNCS!)" << endl;
+				  PB->S << Offset << "(Discovered a NRNCS!)" << endl;
 				}
 			}
 		}
 	  else
 		{
 #ifdef DEBUG
-		  PB->S << Offset << "(There is no candidate for PSS/NRNCS)" << endl;
+		  PB->S << Offset << "(There is no candidate for NRNCS)" << endl;
 #endif
 		}
 
-	  // Run other procedures if it is aware of at least one PSS/NRNCS
+	  // Run other procedures if it is aware of at least one NRNCS
 	  if (PCore->PSTuples.size () > 0)
 		{
 		  if (PCore->RunExpose == true)
 			{
-			  //PB->S << Offset1 << "(Run expose once in entire life)"<<endl;
-
+#ifdef DEBUG
+			  PB->S << Offset << "(NRNCS)"<<endl;
+#endif
 			  PCore->Exposition (PB->PP->Intra_Domain, ScheduledMessages);
 
 			  PCore->RunExpose = false;
@@ -336,7 +337,7 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
   if (PCore->PSTuples.size () > 0 && SubscribingKeys.size() > 0)
 	{
-	  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which PSS/NRNCS the content has been submitted.
+	  // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which NRNCS the content has been submitted.
 	  for (unsigned int u = 0; u < PCore->PSTuples.size (); u++)
 		{
 		  SubscriptionM = NULL;

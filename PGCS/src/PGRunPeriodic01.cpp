@@ -92,7 +92,7 @@ PGRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
   // Expose learned core SCNs to the peer PGSs
   ExpositionScheduling ();
 
-  // Publish PGCS data to PSS/NRNCS
+  // Publish PGCS data to NRNCS
   PGCSPublishingScheduling ();
 
   // Schedule stress test messages to peer PGCSes
@@ -232,7 +232,7 @@ int PGRunPeriodic01::PSAwareness ()
 	{
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Not aware of any PSS/NRNCS.)" << endl;
+	  PB->S << Offset1 << "(Not aware of any NRNCS.)" << endl;
 #endif
 	}
   else
@@ -244,7 +244,7 @@ int PGRunPeriodic01::PSAwareness ()
 			  PPG->AwareOfAPS = true;
 
 #ifdef DEBUG
-			  PB->S << Offset1 << "(Aware of the PSS/NRNCS " << i << " )" << endl;
+			  PB->S << Offset1 << "(Aware of the NRNCS " << i << " )" << endl;
 			  PB->S << Offset1 << "(HID = " << ProcessesTuples[i]->Values[0] << ")" << endl;
 			  PB->S << Offset1 << "(OSID = " << ProcessesTuples[i]->Values[1] << ")" << endl;
 			  PB->S << Offset1 << "(PID = " << ProcessesTuples[i]->Values[2] << ")" << endl;
@@ -264,7 +264,7 @@ int PGRunPeriodic01::PSAwareness ()
 				{
 
 #ifdef DEBUG
-				  PB->S << Offset1 << "(A new PSS/NRNCS was discovered.)" << endl;
+				  PB->S << Offset1 << "(A new NRNCS was discovered.)" << endl;
 #endif
 
 				  PPG->PSTuples.push_back (ProcessesTuples[i]);
@@ -501,7 +501,7 @@ int PGRunPeriodic01::ExpositionScheduling ()
   return Status;
 }
 
-// Publish PGCS data to PSS/NRNCS
+// Publish PGCS data to NRNCS
 int PGRunPeriodic01::PGCSPublishingScheduling ()
 {
   int Status = ERROR;
@@ -527,12 +527,12 @@ int PGRunPeriodic01::PGCSPublishingScheduling ()
 		    << " AwareOfAPS=" << PPG->AwareOfAPS
 		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
 	  // ******************************************************
-	  // Schedule a message to run publishing names to PSS/NRNCS
+	  // Schedule a message to run publishing names to NRNCS
 	  // ******************************************************
 
 #ifdef DEBUG
 
-	  PB->S << Offset << "(5. Publishing PGCS name bindings to the PSS/NRNCS.)" << endl;
+	  PB->S << Offset << "(5. Publishing PGCS name bindings to the NRNCS.)" << endl;
 
 #endif
 

@@ -71,7 +71,7 @@ CoreSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
   //PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // ************************************************************************
-  // Sample the round trip time to publish on PSS/NRNCS
+  // Sample the round trip time to publish on NRNCS
   // ************************************************************************
 
   if (_PCL->GetNumberofArguments (NA) == OK)
@@ -100,7 +100,7 @@ CoreSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 
 					  double DeltaT = Now - PP->Timestamp;
 
-					  PB->S << Offset << setprecision (10) << "(The publication round trip time to PSS/NRNCS was "
+					  PB->S << Offset << setprecision (10) << "(The publication round trip time to NRNCS was "
 							<< DeltaT << ")" << endl;
 
 					  PCore->pubrtt->Sample (DeltaT);

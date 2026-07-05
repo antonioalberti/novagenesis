@@ -174,7 +174,7 @@ class PG : public Block {
   // Auxiliary containers
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  // Stores the discovered PSS/NRNCS tuples
+  // Stores the discovered NRNCS tuples
   vector<Tuple *> PSTuples;
 
   // Stores the informed peer PGCS tuples

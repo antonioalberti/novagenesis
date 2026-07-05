@@ -82,7 +82,7 @@ class Core : public Block {
 
  public:
 
-  // Auxiliary PSS/NRNCS tuples container
+  // Auxiliary NRNCS tuples container
   vector<Tuple *> PSTuples;
 
   // Auxiliary peer tuples container. Stores peer PGCSes and EPGSes

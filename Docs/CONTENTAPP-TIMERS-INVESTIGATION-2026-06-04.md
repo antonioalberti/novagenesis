@@ -46,7 +46,7 @@ Se uma otimização exigir mexer no protocolo, eu paro e pergunto antes de aplic
          │
 [t=+60]  Etapa 4: SERVICE OFFER (Source) [DelayBeforePublishingServiceOffer = 60s]
          ├── CoreRunExpose01.Run() (publica o que Source está oferecendo)
-         └── Push to PSS/NRNCS via -p --b
+         └── Push to NRNCS via -p --b
          │
 [t=??]   Etapa 5: ACCEPTANCE (Repository) [triggered by Service Offer arrival]
          ├── CoreRunInvite01.Run() (Repository aceita o offer)
@@ -126,7 +126,7 @@ Lidos de `ContentApp/src/Core.cpp` (construtor, linhas 117-123) e `ContentApp/sr
 - **Cálculo:** periodic(10s) + 5 discover(50s) = ~60s para uma "rodada completa" de discovery.
 
 ### 🟢 B5. Intra_Domain vs Intra_OS — duas passadas de discovery
-- **Sintoma:** o periodic faz discovery em DOIS escopos: Intra_Domain (procurando PSS/NRNCS em todo domínio) e Intra_OS (procurando PGCS no mesmo OS).
+- **Sintoma:** o periodic faz discovery em DOIS escopos: Intra_Domain (procurando NRNCS em todo domínio) e Intra_OS (procurando PGCS no mesmo OS).
 - **Análise:** o Intra_Domain é mais lento (precisa do NRNCS responder). O Intra_OS é local e rápido. Manter ambos é correto, mas podem ser otimizados.
 - **Otimização possível:** priorizar Intra_OS primeiro (é local, mais rápido), depois Intra_Domain. Ou fundir em uma única mensagem com ambos os lookups.
 

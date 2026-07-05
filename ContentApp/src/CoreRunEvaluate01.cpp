@@ -404,7 +404,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 	{
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Waiting for PSS/NRNCS discovery)" << endl;
+	  PB->S << Offset1 << "(Waiting for NRNCS discovery)" << endl;
 #endif
 	}
 
@@ -766,7 +766,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 	{
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Waiting for PSS/NRNCS discovery)" << endl;
+	  PB->S << Offset1 << "(Waiting for NRNCS discovery)" << endl;
 #endif
 	}
 
