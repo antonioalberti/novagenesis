@@ -41,7 +41,7 @@
 #include "ContentApp.h"
 #endif
 
-////#define DEBUG // To follow message processing
+//#define DEBUG // To follow message processing
 
 CoreDeliveryBind01::CoreDeliveryBind01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -202,8 +202,10 @@ CoreDeliveryBind01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Me
 							  double DeltaT = Time - PS->Timestamp;
 
 							  // TODO - FIXP/Update - Improving debug
+							  #ifdef DEBUG
 							  PB->S << endl << Offset << setprecision (10) << "(RTT from NRNCS was " << DeltaT << " seconds for the key "<<PS->Key<<".)"
 									<< endl;
+#endif
 
 #ifdef DEBUG
 							  PB->S << Offset << setprecision (10) << "(The subscription started at " << PS->Timestamp

@@ -87,7 +87,9 @@ CoreRunExpose01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 			{
 			  if (Limiter.at (0) == PB->PP->Intra_Domain)
 				{
-				  PB->S << Offset << "(Generating a message to publish in the domain scope some App bindings )" << endl;
+				  #ifdef DEBUG
+			  PB->S << Offset << "(Generating a message to publish in the domain scope some App bindings )" << endl;
+#endif
 
 				  // Setting up the OSID as the space limiter
 				  Limiters.push_back (PB->PP->Intra_Domain);

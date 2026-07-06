@@ -37,6 +37,8 @@
 #include "Core.h"
 #endif
 
+//#define DEBUG
+
 CoreSCNAck01::CoreSCNAck01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -99,7 +101,9 @@ CoreSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 
 					  double DeltaT = Now - PP->Timestamp;
 
-					  PB->S << Offset << setprecision (10) << "(RTT to NRNCS was " << DeltaT << ")" << endl;
+					  #ifdef DEBUG
+				  PB->S << Offset << setprecision (10) << "(RTT to NRNCS was " << DeltaT << ")" << endl;
+#endif
 
 					  PCore->pubrtt->Sample (DeltaT);
 

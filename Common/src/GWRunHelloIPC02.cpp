@@ -33,6 +33,8 @@
 #include "GW.h"
 #endif
 
+//#define DEBUG
+
 GWRunHelloIPC02::GWRunHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -65,7 +67,9 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
     return Status;
   }
 
+  #ifdef DEBUG
   PB->S << Offset << "(Periodic hello IPC 0.2 emission for " << PB->PP->GetLegibleName() << ")" << endl;
+#endif
 
   // ******************************************************
   // Creating a hello IPC message to send to PGCS via SHM key 11
@@ -116,11 +120,15 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   // Push to output queue targeting PGCS SHM key 11
   // ******************************************************
 
+  #ifdef DEBUG
   PB->S << Offset << "(Sending hello IPC to PGCS via SHM key 11)" << endl;
+#endif
 
   PGW->PushToOutputQueue("11", IPCHello);
 
+#ifdef DEBUG
   PB->S << Offset << "(Done)" << endl;
+#endif
 
   return Status;
 }

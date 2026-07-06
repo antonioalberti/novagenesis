@@ -151,7 +151,9 @@ CoreRunContentPublish01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vect
 
 				  PCore->NoPP++;
 
-				  PB->S << Offset << "(Publishing the content " << FileName << ". Publisher counter  " << PCore->NoPP << ". Running time is "<< setprecision(12) << GetTime() <<". )" << endl;
+				  #ifdef DEBUG
+			  PB->S << Offset << "(Publishing the content " << FileName << ". Publisher counter  " << PCore->NoPP << ". Running time is "<< setprecision(12) << GetTime() <<". )" << endl;
+#endif
 
 #ifdef DEBUG
 				  PCore->Debug.OpenOutputFile ();

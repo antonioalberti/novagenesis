@@ -275,7 +275,9 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
   // *************************************************************
   // TODO: FIXP/Update - Reschedule subscriptions that are delaying more than 10 second
 
+  #ifdef DEBUG
   PB->S << Offset << "(Looping over existent Subscriptions at this Content App)" <<endl;
+#endif
 
   for (unsigned int i = 0; i < PCore->Subscriptions.size (); i++)
 	{
