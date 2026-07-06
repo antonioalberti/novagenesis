@@ -37,6 +37,8 @@
 #include "GW.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunExpose01::CoreRunExpose01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -65,7 +67,11 @@ CoreRunExpose01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
   PCore = (Core *)PB;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+#ifdef DEBUG
+
+  PB->S << Offset <<  this->GetLegibleName() << endl;
+
+#endif
 
   // Load the number of arguments
   if (_PCL->GetNumberofArguments (NA) == OK)
@@ -175,6 +181,12 @@ CoreRunExpose01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 				  // Push the message to the GW input queue
 				  PCore->PGW->PushToInputQueue (Publish);
 
+#ifdef DEBUG
+
+  				  PB->S << *Publish << endl << endl << endl;
+
+#endif
+
 				  if (ScheduledMessages.size () > 0)
 					{
 					  Message *Temp = ScheduledMessages.at (0);
@@ -205,7 +217,11 @@ CoreRunExpose01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
   delete Values;
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#ifdef DEBUG
+
+  PB->S << Offset <<  "(Done)" << endl << endl << endl;
+
+#endif
 
   return Status;
 }
