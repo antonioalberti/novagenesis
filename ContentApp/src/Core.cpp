@@ -136,7 +136,6 @@ Core::Core (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, s
   GenerateStoreBindingsSCNSeq01 = false;
   GenerateRunX01 = true;
   GenerateRunXSCNSeq01 = true;
-  RunExpose = true;
 
   // Auxiliary counter
   Counter = 0;

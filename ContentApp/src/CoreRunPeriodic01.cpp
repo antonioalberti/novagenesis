@@ -243,28 +243,27 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 	  // Run other procedures if it is aware of at least one NRNCS
 	  if (PCore->PSTuples.size () > 0)
 		{
-		  if (PCore->RunExpose == true)
+		  // SPEC-011: Exposição periódica — corre em cada ciclo de
+		  // -run --periodic para garantir resiliência a PSTuples
+		  // vazio, mensagem perdida, ou destino incompleto na
+		  // primeira tentativa.
+		  PCore->Exposition (PB->PP->Intra_Domain, ScheduledMessages);
+
+		  // SPEC-010 E2: Also expose bindings locally (Intra_OS) for same-VM peer
+		  // discovery without depending on NRNCS propagation
+		  PCore->Exposition (PB->PP->Intra_OS, ScheduledMessages);
+
+		  // SPEC-011: State transition apenas na primeira vez
+		  if (PB->State != "operational")
 			{
-#ifdef DEBUG
-			  PB->S << Offset << "(NRNCS)"<<endl;
-#endif
-			  PCore->Exposition (PB->PP->Intra_Domain, ScheduledMessages);
-
-			  // SPEC-010 E2: Also expose bindings locally (Intra_OS) for same-VM peer
-			  // discovery without depending on NRNCS propagation
-			  PCore->Exposition (PB->PP->Intra_OS, ScheduledMessages);
-
-			  PCore->RunExpose = false;
-
 			  PB->State = "operational";
-
-			  // SPEC-010 E1: Removed Cat[19] IPC key lookup for NRNCS PID.
-			  // The GWHelloIPC02 stores Cat[19] with key = PGCS PID (the process that
-			  // sends hello IPC 2.0), NOT NRNCS PID. Querying Cat[19] with NRNCS PID
-			  // always failed, causing the GW fallback to IPC key 11 (PGCS).
-			  // Intra_Domain messages are routed through the local PGCS, which
-			  // handles cross-OS forwarding natively via raw socket.
 			}
+
+		  // The GWHelloIPC02 stores Cat[19] with key = PGCS PID (the process that
+		  // sends hello IPC 2.0), NOT NRNCS PID. Querying Cat[19] with NRNCS PID
+		  // always failed, causing the GW fallback to IPC key 11 (PGCS).
+		  // Intra_Domain messages are routed through the local PGCS, which
+		  // handles cross-OS forwarding natively via raw socket.
 		}
 	}
 

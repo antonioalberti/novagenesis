@@ -98,7 +98,6 @@ class Core : public Block {
   bool GenerateStoreBindingsSCNSeq01;
   bool GenerateRunX01;
   bool GenerateRunXSCNSeq01;
-  bool RunExpose;
 
   // Auxiliary counter
   unsigned int Counter;
