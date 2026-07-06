@@ -37,8 +37,8 @@
 #include "GW.h"
 #endif
 
-#define DEBUG // To follow message processing
-#define DEBUG1 // To follow message processing for flow control
+//#define DEBUG // To follow message processing
+//#define DEBUG1 // To follow message processing for flow control
 
 CoreNotifyS01::CoreNotifyS01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {

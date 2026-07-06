@@ -53,7 +53,7 @@
 #include "GWExposition02.h"
 #endif
 
-#define DEBUG // To follow message processing
+//#define DEBUG // To follow message processing
 // #define DEBUG1  // To follow shared memory access
 // #define DEBUG2  // More on shm access
 // #define DEBUG3 // Even more on shm access
