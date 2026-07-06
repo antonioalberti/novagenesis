@@ -121,6 +121,8 @@
 // #define DEBUG3  // DEBUG6 or 3 are mutually exclusive
 // #define DEBUG5  // Details of each segment sent
 // #define DEBUG6 // TODO - FIXP/Update - Created a new debug only for child thread transfer
+
+#define PG_LOG(msg) S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 #define STATISTICS
 
 union ethframe
@@ -548,8 +550,7 @@ int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Si
 
       if (MessageCounter % 100 == 0)
       {
-        S << endl
-          << Offset << "(Already sent " << MessageCounter << " messages to other peers.)" << endl;
+        PG_LOG("(Already sent " << MessageCounter << " messages to other peers.)");
       }
 
       if (ioctl(StringToInt(SIDs->at(0)), SIOCGIFINDEX, &buffer) >= 0)
@@ -1512,8 +1513,7 @@ int PG::SendToAUDPSocket(string _Identifier, unsigned int _Size, Message* M)
 
       if (MessageCounter % 1000 == 0)
       {
-        S << endl
-          << Offset << "(Already sent " << MessageCounter << " messages to other peers.)" << endl;
+        PG_LOG("(Already sent " << MessageCounter << " messages to other peers.)");
       }
 
       M->ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray();

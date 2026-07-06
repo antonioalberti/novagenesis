@@ -39,6 +39,8 @@
 
 //#define DEBUG // To follow message processing
 
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+
 CoreRunPeriodic01::CoreRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -229,10 +231,10 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				{
 				  PCore->PSTuples.push_back (PSs[g]);
 
-				  PB->S << Offset << "(Discovered a NRNCS! HID=" << PSs[g]->Values[0]
-						<< " OSID=" << PSs[g]->Values[1]
-						<< " PID=" << PSs[g]->Values[2]
-						<< " BID=" << PSs[g]->Values[3] << ")" << endl;
+				  LOG("(Discovered a NRNCS! HID=" << PSs[g]->Values[0]
+				      << " OSID=" << PSs[g]->Values[1]
+				      << " PID=" << PSs[g]->Values[2]
+				      << " BID=" << PSs[g]->Values[3] << ")");
 				}
 			}
 		}

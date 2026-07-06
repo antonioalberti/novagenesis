@@ -54,6 +54,8 @@
 #endif
 
 //#define DEBUG // To follow message processing
+
+#define LG(msg) S << endl << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl
 // #define DEBUG1  // To follow shared memory access
 // #define DEBUG2  // More on shm access
 // #define DEBUG3 // Even more on shm access
@@ -675,10 +677,8 @@ int GW::ReadFromSharedMemory3()
 
         //(shmid = shmget(key, SHM_SIZE, IPC_CREAT | 0666)
 
-        S << "          (Created an input shared memory segment with key = " << (PP->Key + z)
-          << " and identifier = "
-          << PP->shmid[z] << ")"
-          << endl; // Modified in 9th April 2021 to deal with parallel shared memories.
+        LG("(Created an input shared memory segment with key = " << (PP->Key + z)
+            << " and identifier = " << PP->shmid[z] << ")");
       }
       else
       {
@@ -979,8 +979,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
 
         StoreHTBindingValues(Category, _oqs, Values);
 
-        S << Offset << "(Storing the shared memory ID (shmid) = " << shmid << " on HT. The related key is "
-          << _oqs << ")" << endl;
+        LG("(Storing the shared memory ID (shmid) = " << shmid << " on HT. The related key is "
+    << _oqs << ")");
       }
     }
 
@@ -1034,8 +1034,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
               {
                 data[0] = (unsigned char)'f';
 
-                S << Offset << "(Initialized the shared memory with key " << _oqs
-                  << " regarding the r/w control flag)" << endl;
+                LG("(Initialized the shared memory with key " << _oqs
+    << " regarding the r/w control flag)");
               }
             }
 

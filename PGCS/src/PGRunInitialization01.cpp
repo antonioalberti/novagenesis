@@ -41,7 +41,9 @@
 #include "PGCS.h"
 #endif
 
-////#define DEBUG
+//#define DEBUG
+
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
 PGRunInitialization01::PGRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -369,14 +371,14 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 
 			  PPGCS->MyMACAddress = MAC;
 
-			  PB->S << Offset << "MyMACAddress = " << MAC << endl;
-			  PB->S << Offset << "Interface = " << _Interface << endl;
+			  LOG("MyMACAddress = " << MAC);
+			    LOG("Interface = " << _Interface);
 
-			  // Create a socket to send frames to a peer PGCS
-			  if (PPG->CreateRawSocket (CSID) == OK)
-				{
-				  PB->S << Offset << "(Created the client socket with CSID " << CSID << " for the peer PGCS with MAC "
-						<< PPGCS->Identifiers->at (i) << ")" << endl;
+			    // Create a socket to send frames to a peer PGCS
+			    if (PPG->CreateRawSocket (CSID) == OK)
+			    {
+			      LOG("(Created the client socket with CSID " << CSID << " for the peer PGCS with MAC "
+			          << PPGCS->Identifiers->at (i) << ")");
 
 				  // Binding Ethernet address to CSID
 				  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", PPGCS->Identifiers
@@ -395,8 +397,8 @@ PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
 				  // Create a socket to receive frames from a peer PGCS
 				  if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingIEEEThread == false)
 					{
-					  PB->S << Offset << "(Created the server socket with SSID " << SSID << " at my MAC address "
-							<< PPGCS->MyMACAddress << ")" << endl;
+					  LOG("(Created the server socket with SSID " << SSID << " at my MAC address "
+					      << PPGCS->MyMACAddress << ")");
 
 					  PPGCS->SSIDs->push_back (SSID);
 

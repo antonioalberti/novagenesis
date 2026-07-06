@@ -37,7 +37,9 @@
 #include "PGCS.h"
 #endif
 
-////#define DEBUG
+//#define DEBUG
+
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
 PGHelloIHC03::PGHelloIHC03 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -170,8 +172,8 @@ PGHelloIHC03::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
 			  if (StoreNewPGS == true
 				  && PeerTuple.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
 				{
-				  PB->S << Offset << "(A new peer PGCS was registered via point to point: " << PeerTuple.at (2)
-						<< " at the node identified by " << PeerIdentifier << ")" << endl;
+				  LOG("(A new peer PGCS was registered via point to point: " << PeerTuple.at (2)
+				      << " at the node identified by " << PeerIdentifier << ")");
 
 				  Tuple *PeerPGS = new Tuple;
 

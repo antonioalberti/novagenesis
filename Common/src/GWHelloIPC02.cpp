@@ -39,6 +39,8 @@
 
 // #define DEBUG
 
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+
 GWHelloIPC02::GWHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -104,7 +106,7 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
         }
         else
         {
-          PB->S << Offset << "(Discovered the peer service = " << PeerData.at(1) << " via shared memory. IPC is working properly.)" << endl;
+          LOG("(Discovered the peer service = " << PeerData.at(1) << " via shared memory. IPC is working properly.)");
 
           // ******************************************************
           // Store all peer bindings in the local HT
@@ -240,7 +242,7 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
     PGW->StoreHTBindingValues(Category, Key, &Values);
     Values.clear();
 
-    PB->S << Offset << "(Stored HT BID " << _PeerHTBID << " for peer " << _PeerLN << " in Cat[2] Hash(\"HT\"))" << endl;
+    LOG("(Stored HT BID " << _PeerHTBID << " for peer " << _PeerLN << " in Cat[2] Hash(\"HT\"))");
   }
 
   return Status;

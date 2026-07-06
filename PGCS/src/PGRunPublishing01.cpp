@@ -37,6 +37,8 @@
 
 //#define DEBUG
 
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+
 PGRunPublishing01::PGRunPublishing01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -82,7 +84,7 @@ PGRunPublishing01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 		{
 		  //PB->S << Offset <<  "(Generating a message to publish the binding <hash(\"PGCS\"), PGCS PID> )"<<endl;
 
-		  PB->S << Offset << "(Everything ok!)" << endl;
+		  LOG("(Everything ok!)");
 
 		  // Setting up the OSID as the space limiter
 		  Limiters.push_back (PB->PP->Intra_Domain);

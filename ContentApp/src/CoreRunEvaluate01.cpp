@@ -43,6 +43,8 @@
 
 //#define DEBUG // To follow message processing
 
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset1 << msg << endl
+
 CoreRunEvaluate01::CoreRunEvaluate01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -250,9 +252,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
 													  PCore->DelayBeforeRunPeriodic = 30;
 
-													  PB->S << Offset1
-															<< "(Discovered a Repository--------------------------------------------------------------------------------------------------)"
-															<< endl;
+													  LOG("(Discovered a Repository--------------------------------------------------------------------------------------------------)");
 													}
 												}
 											}
@@ -369,9 +369,7 @@ CoreRunEvaluate01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
 											  PCore->DelayBeforeRunPeriodic = 60;
 
-											  PB->S << Offset1
-													<< "(Discovered a Source --------------------------------------------------------------------------------------------------)"
-													<< endl;
+											  LOG("(Discovered a Source --------------------------------------------------------------------------------------------------)");
 											}
 										}
 									  else
