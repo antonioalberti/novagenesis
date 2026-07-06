@@ -35,6 +35,8 @@
 
 //#define DEBUG
 
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+
 HTInfoPayload01::HTInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -77,9 +79,7 @@ HTInfoPayload01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 					{
 					  string PayloadPath = PB->GetPath ();
 
-					  #ifdef DEBUG
-					  				  PB->S << endl << Offset << "(Received " << Values.at (0) << ")" << endl;
-					  #endif
+					  LOG("(Received " << Values.at (0) << ")");
 					  				  //PB->S << Offset <<  "(Saving the payload on the path "<<PayloadPath<<")" << endl;
 
 					  _ReceivedMessage->SetPayloadFileName (Values.at (0));

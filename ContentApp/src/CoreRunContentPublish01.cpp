@@ -38,7 +38,8 @@
 #endif
 
 //#define DEBUG // To follow message processing
-////#define DEBUG // To follow message processing regarding traffic profile
+
+#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
 
 
@@ -151,9 +152,7 @@ CoreRunContentPublish01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vect
 
 				  PCore->NoPP++;
 
-				  #ifdef DEBUG
-			  PB->S << Offset << "(Publishing the content " << FileName << ". Publisher counter  " << PCore->NoPP << ". Running time is "<< setprecision(12) << GetTime() <<". )" << endl;
-#endif
+				  LOG("(Publishing the content " << FileName << ". Publisher counter " << PCore->NoPP << ". Running time is " << setprecision(12) << GetTime() << ". )");
 
 #ifdef DEBUG
 				  PCore->Debug.OpenOutputFile ();
