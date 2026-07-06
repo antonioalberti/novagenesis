@@ -336,13 +336,15 @@ int PGRunPeriodic01::HelloScheduling ()
 
   if (HelloCounter % (int)PPG->DelayBetweenHellos01 == 0)
 	{
-	  helloCount++;
-	  std::cerr << std::endl << "[HELLO] call=" << callCount << " hello=" << helloCount
-		    << " HelloCounter=" << HelloCounter
-		    << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
-		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
+	  	  helloCount++;
+	  #ifdef DEBUG
+	  	  std::cerr << std::endl << "[HELLO] call=" << callCount << " hello=" << helloCount
+	  		    << " HelloCounter=" << HelloCounter
+	  		    << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
+	  		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
+	  #endif
 
-#ifdef DEBUG
+	  #ifdef DEBUG
 
 	  PB->S << Offset << "(2. Scheduling a hello 0.1 message to the peer PGCS(s).)" << endl;
 
@@ -521,11 +523,13 @@ int PGRunPeriodic01::PGCSPublishingScheduling ()
 
   if (PPG->AlreadyPublishedBasicBindings == false && PPG-> AwareOfAPS == true)
 	{
-	  publishCount++;
-	  std::cerr << std::endl << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
-		    << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
-		    << " AwareOfAPS=" << PPG->AwareOfAPS
-		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
+	  	  publishCount++;
+	  #ifdef DEBUG
+	  	  std::cerr << std::endl << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
+	  		    << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
+	  		    << " AwareOfAPS=" << PPG->AwareOfAPS
+	  		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
+	  #endif
 	  // ******************************************************
 	  // Schedule a message to run publishing names to NRNCS
 	  // ******************************************************
@@ -617,11 +621,13 @@ int PGRunPeriodic01::StresstestScheduling ()
       if (MessagesPerPeriod < 1) MessagesPerPeriod = 1;
 
       sendCount += MessagesPerPeriod;
+#ifdef DEBUG
       std::cerr << std::endl << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
 		<< " totalSent=" << sendCount
 		<< " StressEnabled=" << PPG->StressEnabled
 		<< " PGCSTuples=" << PPG->PGCSTuples.size()
 		<< " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
+#endif
 
 #ifdef DEBUG
       PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod

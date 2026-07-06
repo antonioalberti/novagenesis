@@ -58,12 +58,16 @@ int GWExposition02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mes
   // Only PGCS runs the exposition
   if (PB->PP->GetLegibleName() != "PGCS")
   {
+#ifdef DEBUG
     PB->S << Offset << "(GWExposition02: Not PGCS, skipping exposition)" << endl;
+#endif
 
     return Status;
   }
 
+#ifdef DEBUG
   PB->S << Offset << "(GWExposition02: Periodic exposition on PGCS)" << endl;
+#endif
 
   // Expose all known peers to all other known peers
   ExposePeers();
@@ -71,7 +75,9 @@ int GWExposition02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mes
   // Self-reschedule for next execution in 10 second
   SelfReschedule(_ReceivedMessage);
 
+#ifdef DEBUG
   PB->S << Offset << "(GWExposition02: Done)" << endl;
+#endif
 
   return Status;
 }
@@ -119,7 +125,9 @@ int GWExposition02::ExposePeers()
   {
     if (KnownPIDs.size() == 0)
     {
+#ifdef DEBUG
       PB->S << Offset << "(GWExposition02: No known peers to expose)" << endl;
+#endif
       return Status;
     }
 
@@ -148,7 +156,9 @@ int GWExposition02::ExposePeers()
 
       if (exposedIPCKey.empty())
       {
+#ifdef DEBUG
         PB->S << Offset << "(GWExposition02: ERROR: No IPC key for peer PID " << exposedPID << ")" << endl;
+#endif
         continue;
       }
 
@@ -163,7 +173,9 @@ int GWExposition02::ExposePeers()
 
       if (exposedLN.empty())
       {
+#ifdef DEBUG
         PB->S << Offset << "(GWExposition02: ERROR: No legible name for peer PID " << exposedPID << ")" << endl;
+#endif
         continue;
       }
 
@@ -177,7 +189,9 @@ int GWExposition02::ExposePeers()
           continue; // Don't send back to the exposed peer
         }
 
+        #ifdef DEBUG
         PB->S << Offset << "(GWExposition02: Exposing peer " << exposedLN << " with PID " << exposedPID << " and key " << exposedIPCKey << ")" << endl;
+#endif
 
         string targetPID = KnownPIDs.at(j);
 
@@ -262,7 +276,9 @@ int GWExposition02::ExposePeers()
         PB->GenerateSCNFromMessageBinaryPatterns(FreshHello, FSCN);
         PMB->NewSCNCommandLine("0.1", FSCN, FreshHello, FreshPCL);
 
+        #ifdef DEBUG
         PB->S << Offset << "(GWExposition02: Sending exposition of " << exposedLN << " to " << targetLN << " with key = " << targetIPCKey << ")" << endl;
+#endif
         PGW->PushToOutputQueue(targetIPCKey, FreshHello);
       }
     }
@@ -278,7 +294,9 @@ int GWExposition02::ExposePeers()
     // peer, Phase 1 emits zero messages (i==j filter drops the only
     // iteration), but Phase 2 still delivers the PGCS hello to that
     // peer.
+    #ifdef DEBUG
     PB->S << Offset << "(GWExposition02: Self-exposing PGCS to " << KnownPIDs.size() << " known peer(s))" << endl;
+#endif
 
     string selfPID = PB->PP->GetSelfCertifyingName();
     string selfBID = selfPID; // GW BID of the local process == PID
@@ -388,13 +406,17 @@ int GWExposition02::ExposePeers()
       PB->GenerateSCNFromMessageBinaryPatterns(SelfHello, SelfSCN);
       PMB->NewSCNCommandLine("0.1", SelfSCN, SelfHello, SelfPCL);
 
+      #ifdef DEBUG
       PB->S << Offset << "(GWExposition02: PGCS self-exposing to " << targetLN << " (key = " << targetIPCKey << "))" << endl;
+#endif
       PGW->PushToOutputQueue(targetIPCKey, SelfHello);
     }
   }
   else
   {
+#ifdef DEBUG
     PB->S << Offset << "(GWExposition02: No known peers to expose)" << endl;
+#endif
   }
 
   return Status;

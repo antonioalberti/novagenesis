@@ -52,7 +52,9 @@ int PGStresstestPing01::Run (Message *_ReceivedMessage, CommandLine *_PCL,
   PG *PPG = (PG *)PB;
   string Offset = "                    ";
 
+  #ifdef DEBUG
   std::cerr << ">>> PGStresstestPing01::Run CALLED <<<" << std::endl;
+#endif
 
 #ifdef DEBUG
   PB->S << Offset << this->GetLegibleName() << endl;

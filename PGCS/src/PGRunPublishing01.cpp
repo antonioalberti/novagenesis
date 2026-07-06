@@ -35,6 +35,8 @@
 
 #include <iostream>
 
+//#define DEBUG
+
 PGRunPublishing01::PGRunPublishing01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
@@ -62,9 +64,11 @@ PGRunPublishing01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 
   PPG = (PG *)PB;
   runCount++;
+  #ifdef DEBUG
   std::cerr << "[PUBLISH_RUN] run=" << runCount
 	    << " PSTuples=" << PPG->PSTuples.size()
 	    << " PID=" << PPG->GetSelfCertifyingName() << std::endl;
+#endif
 
   //PB->S << Offset <<  this->GetLegibleName() << endl;
 
