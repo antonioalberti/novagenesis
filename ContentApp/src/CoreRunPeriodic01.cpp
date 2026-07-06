@@ -229,7 +229,10 @@ CoreRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Mes
 				{
 				  PCore->PSTuples.push_back (PSs[g]);
 
-				  PB->S << Offset << "(Discovered a NRNCS!)" << endl;
+				  PB->S << Offset << "(Discovered a NRNCS! HID=" << PSs[g]->Values[0]
+						<< " OSID=" << PSs[g]->Values[1]
+						<< " PID=" << PSs[g]->Values[2]
+						<< " BID=" << PSs[g]->Values[3] << ")" << endl;
 				}
 			}
 		}
