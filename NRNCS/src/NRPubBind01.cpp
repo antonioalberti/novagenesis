@@ -41,7 +41,7 @@
 #include "NRNCS.h"
 #endif
 
-////#define DEBUG
+#define DEBUG
 
 NRPubBind01::NRPubBind01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
@@ -82,12 +82,9 @@ NRPubBind01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *
 			{
 			  if (Category.size () > 0 && Key.size () > 0 && Values.size () > 0)
 				{
-				  if (PB->State == "operational")
-					{
-					  // Change command line from ng -p --b to ng -sr --b
-					  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", PB->StringToInt (Category.at (0)), Key
-						  .at (0), &Values, InlineResponseMessage, PCL);
-					}
+					// Change command line from ng -p --b to ng -sr --b
+					PMB->NewCommonCommandLine ("-sr", "--b", "0.1", PB->StringToInt (Category.at (0)), Key
+						.at (0), &Values, InlineResponseMessage, PCL);
 				}
 			  else
 				{
