@@ -377,6 +377,11 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
                   << endl
                   << Offset << "(Forwarding: The destination IPC key is 11)" << endl;
 #endif
+            // SPEC-011: BindingValue was empty when Cat 19 lookup failed,
+            // causing SafePushToOutputQueue to push to key "" (nowhere).
+            // Set to well-known PGCS key "11" so intra-domain messages
+            // reach the PGCS for raw socket forwarding.
+            BindingValue = "11";
             // Modified in 11th April 2021 to deal with parallel shared memories.
             // Phase 2: Use SafePushToOutputQueue to avoid busy-wait and sem_open overhead
             SafePushToOutputQueue(PGW, BindingValue, _ReceivedMessage, Offset, PB, Status);
