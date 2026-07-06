@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis controller
-	Object:		epgs_controller
-	File:		epgs_controller.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis controller
+        Object:		epgs_controller
+        File:		epgs_controller.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -30,11 +30,11 @@
 
 #include "../DataStructures/epgs_structures.h"
 
-int RunHello (NgEPGS *ngEPGS);
-int RunExposition (NgEPGS *ngEPGS);
-int RunPubServiceOffer (NgEPGS *ngEPGS);
-int RunSubscribeServiceAcceptance (NgEPGS *ngEPGS);
-int RunPublishData (NgEPGS *ngEPGS);
-int ParseReceivedMessage2 (NgEPGS **ngEPGS);
+int RunHello(NgEPGS* ngEPGS);
+int RunExposition(NgEPGS* ngEPGS);
+int RunPubServiceOffer(NgEPGS* ngEPGS);
+int RunSubscribeServiceAcceptance(NgEPGS* ngEPGS);
+int RunPublishData(NgEPGS* ngEPGS);
+int ParseReceivedMessage2(NgEPGS** ngEPGS);
 
 #endif /* CONTROLLER_EPGS_CONTROLLER_H_ */

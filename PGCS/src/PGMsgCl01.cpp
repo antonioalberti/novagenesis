@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGMsgCl01
-	Object:		PGMsgCl01
-	File:		PGMsgCl01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGMsgCl01
+        Object:		PGMsgCl01
+        File:		PGMsgCl01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -39,9 +39,10 @@
 
 #include <iostream>
 
-//#define DEBUG
+// #define DEBUG
 
-PGMsgCl01::PGMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PGMsgCl01::PGMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
   ForwardingCase = " ";
 
@@ -50,23 +51,22 @@ PGMsgCl01::PGMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_L
   // Self-verifying names (SVNes) used to classify supported adaptation layers
 
   // Set auxiliary hash of natural language keywords
-  PB->GenerateSCNFromCharArrayBinaryPatterns ("Ethernet", HashEthernet);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("Ethernet", HashEthernet);
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns ("Wi-Fi", HashWiFi);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("Wi-Fi", HashWiFi);
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns ("IPv4_UDP", HashIPv4_UDP);
+  PB->GenerateSCNFromCharArrayBinaryPatterns("IPv4_UDP", HashIPv4_UDP);
 
   // **********************************************************************
 }
 
-PGMsgCl01::~PGMsgCl01 ()
+PGMsgCl01::~PGMsgCl01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -m --cl _Version [ < _LimitersSize string S_1 ... S_LimitersSize > < _SourcesSize string S_1 ... S_SourcesSize > < _DestinationsSize string S_1 ... S_Destinations > ]
-int
-PGMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PGMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   unsigned int NA = 0;
@@ -74,528 +74,530 @@ PGMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> 
   vector<string> Sources;
   vector<string> Destinations;
   vector<string> NewDestinations;
-  CommandLine *PCL;
+  CommandLine* PCL;
   string Offset = "                    ";
   string MessageHID;
   string MyHID;
-  PG *PPG = 0;
+  PG* PPG = 0;
   string Identifier;
   string HashStack;
   vector<string> GetBind01MsgLimiters;
   vector<string> GetBind01MsgSources;
   vector<string> GetBind01MsgDestinations;
-  vector<string> *PeerPGSHTBID = new vector<string>;
-  vector<string> *Identifiers = new vector<string>;
-  vector<string> *HashStacks = new vector<string>;
-  PGCS *PPGCS = 0;
+  vector<string>* PeerPGSHTBID = new vector<string>;
+  vector<string>* Identifiers = new vector<string>;
+  vector<string>* HashStacks = new vector<string>;
+  PGCS* PPGCS = 0;
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
 
-  PPGCS = (PGCS *)PB->PP;
+  PPGCS = (PGCS*)PB->PP;
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of argument
-	  if (NA == 3)
-		{
-		  // Get received command line arguments
-				if (_PCL->GetArgument (0, Limiters) == OK && _PCL->GetArgument (1, Sources) == OK
-				  && _PCL->GetArgument (2, Destinations) == OK)
-				{
-				  //cerr << ">>> PGMsgCl01: Arg0.size=" << Limiters.size()
-					   //<< " Arg1.size=" << Sources.size()
-					   //<< " Arg2.size=" << Destinations.size()
-					   //<< " Arg0[0]=" << Limiters.at(0)
-					   //<< " MyHID=" << PB->PP->GetHostSelfCertifyingName() << endl;
-				  //for (unsigned int d = 0; d < Destinations.size(); d++) {
-				    //cerr << ">>> PGMsgCl01: Dest[" << d << "]=" << Destinations.at(d) << endl;
-				  //}
-			  if (Limiters.size () > 0 && Sources.size () > 0 && Destinations.size () > 0)
-				{
-				  // ****************************************************
-				  // Intradomain, interhost
-				  // ****************************************************
-				  if (Destinations.size () == 4)
-					{
-					  // ***********************************************
-					  // Check the IHC case
-					  // ***********************************************
-					  if (Destinations.at (0) != "FFFFFFFF" && Destinations.at (1) != "FFFFFFFF" &&
-						  Destinations.at (2) != "FFFFFFFF")
-						{
-						  // ***********************************************
-						  // The typical case
-						  // ***********************************************
-						  MessageHID = Destinations.at (0);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of argument
+    if (NA == 3)
+    {
+      // Get received command line arguments
+      if (_PCL->GetArgument(0, Limiters) == OK && _PCL->GetArgument(1, Sources) == OK && _PCL->GetArgument(2, Destinations) == OK)
+      {
+        // cerr << ">>> PGMsgCl01: Arg0.size=" << Limiters.size()
+        //<< " Arg1.size=" << Sources.size()
+        //<< " Arg2.size=" << Destinations.size()
+        //<< " Arg0[0]=" << Limiters.at(0)
+        //<< " MyHID=" << PB->PP->GetHostSelfCertifyingName() << endl;
+        // for (unsigned int d = 0; d < Destinations.size(); d++) {
+        // cerr << ">>> PGMsgCl01: Dest[" << d << "]=" << Destinations.at(d) << endl;
+        //}
+        if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
+        {
+          // ****************************************************
+          // Intradomain, interhost
+          // ****************************************************
+          if (Destinations.size() == 4)
+          {
+            // ***********************************************
+            // Check the IHC case
+            // ***********************************************
+            if (Destinations.at(0) != "FFFFFFFF" && Destinations.at(1) != "FFFFFFFF" &&
+                Destinations.at(2) != "FFFFFFFF")
+            {
+              // ***********************************************
+              // The typical case
+              // ***********************************************
+              MessageHID = Destinations.at(0);
 
-						  MyHID = PB->PP->GetHostSelfCertifyingName ();
-
-#ifdef DEBUG
-
-						  PB->S << Offset << "(The Message HID is " << MessageHID << ")" << endl;
-
-						  PB->S << Offset << "(This host HID is " << MyHID << ")" << endl;
-
-#endif
-
-						  if (MessageHID == MyHID)
-							{
-							  // ***********************************************
-							  // The message is for the PG itself
-							  // ***********************************************
-
-#ifdef DEBUG
-							  // Set the forwarding case
-							  ForwardingCase = "Intraprocess: destination is a complete tuple at this PGCS";
-
-							  PB->S << endl << Offset << "(      " << ForwardingCase << "         )" << endl << endl;
-#endif
-
-							  // Set the message execution time
-							  InlineResponseMessage->SetTime (GetTime ());
-
-							  // Clear the sources vector
-							  Limiters.clear ();
-
-							  // Add this process PDI as the limiter
-							  Limiters.push_back (PB->PP->Intra_Process);
-
-							  // Cleaning the Destinations vector
-							  Destinations.clear ();
-
-							  Destinations.push_back (PB->GetSelfCertifyingName ());
-
-							  // Do not stop processing the other command lines of the message.
-							  PB->StopProcessingMessage = false;
-
-							  // Add a -m --cl 0.1 to the new message
-							  if (PMB->NewConnectionLessCommandLine (_PCL->Version, &Limiters, &Destinations, &Destinations, InlineResponseMessage, PCL)
-								  == OK)
-								{
-								  Status = OK;
-								}
-							  else
-								{
-								  PB->S << Offset << "(ERROR: Unable to create the -m --cl inline response message)"
-										<< endl;
-
-								  Status = ERROR;
-								}
-							}
-						  else
-							{
-							  // ***********************************************
-							  // The message is in transit to another host
-							  // ***********************************************
-#ifdef DEBUG
-							  // Set the forwarding case
-							  ForwardingCase = "Interhost: destination is a complete tuple outside this host";
-
-							  PB->S << endl << Offset << "(      " << ForwardingCase << "         )" << endl << endl;
-#endif
-
-							  // Stop processing the other command lines of the message. The destination is another block
-							  PB->StopProcessingMessage = true;
+              MyHID = PB->PP->GetHostSelfCertifyingName();
 
 #ifdef DEBUG
 
-							  PB->S << Offset << "(The destination HID is " << MessageHID << ")" << endl;
+              PB->S << Offset << "(The Message HID is " << MessageHID << ")" << endl;
+
+              PB->S << Offset << "(This host HID is " << MyHID << ")" << endl;
 
 #endif
-							  // ******************************************************************************************
-							  // Check for a peer PGCS already acknowledged by hello
-							  // ******************************************************************************************
 
-							  // Get binding between Peer PGCS HID and its identifier (legacy or not) on Category 15
-							  if (PB->PP->GetHTBindingValues (15, MessageHID, Identifiers) == OK)
-								{
-								  // Get binding between Peer PGCS HID and the Hash of the name of the peer PGCS stack (legacy or not)
-								  if (PB->PP->GetHTBindingValues (8, MessageHID, HashStacks) == OK)
-									{
+              if (MessageHID == MyHID)
+              {
+                // ***********************************************
+                // The message is for the PG itself
+                // ***********************************************
 
 #ifdef DEBUG
-									  PB->S << Offset << "(Using next peer forwarding)" << endl;
+                // Set the forwarding case
+                ForwardingCase = "Intraprocess: destination is a complete tuple at this PGCS";
 
+                PB->S << endl
+                      << Offset << "(      " << ForwardingCase << "         )" << endl
+                      << endl;
 #endif
 
-									  // Assert the Values vector
-									  if (Identifiers->size () > 0 && HashStacks->size () > 0)
-										{
-										  for (unsigned int q = 0; q < Identifiers->size (); q++)
-											{
+                // Set the message execution time
+                InlineResponseMessage->SetTime(GetTime());
+
+                // Clear the sources vector
+                Limiters.clear();
+
+                // Add this process PDI as the limiter
+                Limiters.push_back(PB->PP->Intra_Process);
+
+                // Cleaning the Destinations vector
+                Destinations.clear();
+
+                Destinations.push_back(PB->GetSelfCertifyingName());
+
+                // Do not stop processing the other command lines of the message.
+                PB->StopProcessingMessage = false;
+
+                // Add a -m --cl 0.1 to the new message
+                if (PMB->NewConnectionLessCommandLine(_PCL->Version, &Limiters, &Destinations, &Destinations, InlineResponseMessage, PCL) == OK)
+                {
+                  Status = OK;
+                }
+                else
+                {
+                  PB->S << Offset << "(ERROR: Unable to create the -m --cl inline response message)"
+                        << endl;
+
+                  Status = ERROR;
+                }
+              }
+              else
+              {
+                // ***********************************************
+                // The message is in transit to another host
+                // ***********************************************
 #ifdef DEBUG
-											  PB->S << Offset << "(The Identifier " << q << " is "
-													<< Identifiers->at (q) << ".)" << endl;
-#endif
-											}
+                // Set the forwarding case
+                ForwardingCase = "Interhost: destination is a complete tuple outside this host";
 
-										  // Carry the destination identifier (legacy or not)
-										  Identifier = Identifiers->at (0);
-
-										  for (unsigned int w = 0; w < HashStacks->size (); w++)
-											{
-											  // Carry the destination stack (legacy or not)
-											  HashStack = HashStacks->at (w);
-
-#ifdef DEBUG
-											  PB->S << Offset << "(Hash of the selected stack = " << HashStack << ")"
-													<< endl;
+                PB->S << endl
+                      << Offset << "(      " << ForwardingCase << "         )" << endl
+                      << endl;
 #endif
 
-											  for (unsigned int y = 0; y < PPGCS->Identifiers->size (); y++)
-												{
-#ifdef DEBUG
-												  PB->S << Offset << "(Identifiers[" << y << "] = "
-														<< PPGCS->Identifiers->at (y) << ")" << endl;
-#endif
-
-												  // TODO: FIXP/Update - Modified here to allow the case that the PPGCS->Identifiers->at (y) is FF:FF:FF:FF:FF:FF
-												  if (PPGCS->Identifiers->at (y) == Identifier || PPGCS->Identifiers->at (y) == "FF:FF:FF:FF:FF:FF")
-													{
-													  // ************************** Adaptation Layer **************************
-
-													  // Here are the calls for the function on PG that effectively send the packets!!
-													  // Check for the technologies accordingly to the peer.
-
-													  if (HashStack == HashIPv4_UDP)
-														{
-#ifdef DEBUG
-														  PB->S << Offset << "(The \"HashIPv4_UDP\" hash is = "
-																<< HashIPv4_UDP << ")" << endl;
-#endif
-														  // Send the message using the UDP socket
-														  PPG->SendToAUDPSocket (Identifier, PPGCS->Sizes
-															  ->at (y), _ReceivedMessage);
-
-														  // The message was already sent, so mark it to be deleted
-														  _ReceivedMessage->MarkToDelete ();
-														}
-
-													  if (HashStack == HashEthernet || HashStack == HashWiFi)
-														{
-#ifdef DEBUG
-														  PB->S << Offset << "(The \"Ethernet\" hash is = "
-																<< HashEthernet << ")" << endl;
-#endif
-
-														  // Send the message
-														  PPG->SendToARawSocket (PPGCS->Interfaces
-																					 ->at (y), Identifier, PPGCS->Sizes
-																					 ->at (y), _ReceivedMessage);
-
-														  // The message was already sent, so mark it to be deleted
-														  _ReceivedMessage->MarkToDelete ();
-														}
-
-													  // **********************************************************************
-													}
-												}
-											}
-										}
-									  else
-										{
-										  PB->S << Offset << "(ERROR: the obtained vector of identifiers is empty)"
-												<< endl;
-										}
-									}
-								  else
-									{
-									  PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS stack)" << endl;
-									}
-								}
-							  else
-								{
-								  // *****************************************************************************************************************
-								  // This code was added to allow a PGCS forward to another PGCS that it does not know using a relay PGCS in between
-								  // *****************************************************************************************************************
-
-								  // *****************************************************************************************************************
-								  // Note: This code bellow create a snow ball that propagates messages to all outputs, generating lots of traffic
-								  // *****************************************************************************************************************
-								  /*
-
-								  for (unsigned int w=0; w<PPGCS->Stacks->size(); w++)
-									  {
-										  // Calculate the hash of the stack
-										  PB->GenerateSCNFromCharArrayBinaryPatterns(PPGCS->Stacks->at(w),HashStack);
-
-
-
-#ifdef DEBUG
-										  PB->S << Offset <<  "(Using broadcast forwarding to all peers)" << endl;
-
-										  PB->S << Offset <<  "(Identifiers of stack ["<<w<<"] = "<<PPGCS->Identifiers->at(w)<<")"<<endl;
-#endif
-
-										  if (HashStack == HashZMQTCP)
-											  {
-#ifdef DEBUG
-												  PB->S << Offset <<  "(The \"ZMQ_TCP\" hash is = "<<HashZMQTCP<<")"<< endl;
-#endif
-												  // Send the message using the ZMQ socket
-												  PPG->SendToAZMQSocket(PPGCS->Identifiers->at(w),PPGCS->Sizes->at(w),_ReceivedMessage);
-
-												  // The message was already sent, so mark it to be deleted
-												  _ReceivedMessage->MarkToDelete();
-											  }
-
-										  if (HashStack == HashEthernet || HashStack == HashWiFi)
-											  {
-#ifdef DEBUG
-												  PB->S << Offset <<  "(The \"Ethernet\" hash is = "<<HashEthernet<<")"<< endl;
-#endif
-
-												  // Send the message
-												  PPG->SendToARawSocket(PPGCS->Interfaces->at(w),PPGCS->Identifiers->at(w),PPGCS->Sizes->at(w),_ReceivedMessage);
-
-												  // The message was already sent, so mark it to be deleted
-												  _ReceivedMessage->MarkToDelete();
-											  }
-									  }
-
-									  */
-
-								  PB->S << Offset << "(Warning: Unable to send the message. The Peer PGCS HID "
-										<< MessageHID << " is unknown on PGCS:HT Category 15)" << endl;
-
-								}
-							}
-						}
-					  else
-						{
-						  // ***********************************************
-						  // The ng -hello --ihc 0.1 case
-						  // ***********************************************
-
-						  // Do not stop processing the other command lines of the message.
-						  PB->StopProcessingMessage = false;
-						}
-					}
-
-				  // ****************************************************
-				  // Interdomain, interhost
-				  // ****************************************************
-				  if (Destinations.size () == 5)
-					{
-					  // ***********************************************
-					  // Check the IHC case
-					  // ***********************************************
-					  if (Destinations.at (0) != "FFFFFFFF" && Destinations.at (1) != "FFFFFFFF" &&
-						  Destinations.at (2) != "FFFFFFFF")
-						{
-						  // ***********************************************
-						  // The typical case
-						  // ***********************************************
-						  MessageHID = Destinations.at (1);
-
-						  MyHID = PB->PP->GetHostSelfCertifyingName ();
+                // Stop processing the other command lines of the message. The destination is another block
+                PB->StopProcessingMessage = true;
 
 #ifdef DEBUG
 
-						  PB->S << Offset << "(The Message HID is " << MessageHID << ")" << endl;
-
-						  PB->S << Offset << "(This host HID is " << MyHID << ")" << endl;
+                PB->S << Offset << "(The destination HID is " << MessageHID << ")" << endl;
 
 #endif
+                // ******************************************************************************************
+                // Check for a peer PGCS already acknowledged by hello
+                // ******************************************************************************************
 
-						  if (MessageHID == MyHID)
-							{
-							  // ***********************************************
-							  // The message is for the PG itself
-							  // ***********************************************
+                // Get binding between Peer PGCS HID and its identifier (legacy or not) on Category 15
+                if (PB->PP->GetHTBindingValues(15, MessageHID, Identifiers) == OK)
+                {
+                  // Get binding between Peer PGCS HID and the Hash of the name of the peer PGCS stack (legacy or not)
+                  if (PB->PP->GetHTBindingValues(8, MessageHID, HashStacks) == OK)
+                  {
 
 #ifdef DEBUG
-							  // Set the forwarding case
-							  ForwardingCase = "Intraprocess: destination is a complete tuple at this PGCS";
+                    PB->S << Offset << "(Using next peer forwarding)" << endl;
 
-							  PB->S << endl << Offset << "(      " << ForwardingCase << "         )" << endl << endl;
 #endif
 
-							  // Set the message execution time
-							  InlineResponseMessage->SetTime (GetTime ());
-
-							  // Clear the sources vector
-							  Limiters.clear ();
-
-							  // Add this process PDI as the limiter
-							  Limiters.push_back (PB->PP->Intra_Process);
-
-							  // Cleaning the Destinations vector
-							  Destinations.clear ();
-
-							  Destinations.push_back (PB->GetSelfCertifyingName ());
-
-							  // Do not stop processing the other command lines of the message.
-							  PB->StopProcessingMessage = false;
-
-							  // Add a -m --cl 0.1 to the new message
-							  if (PMB->NewConnectionLessCommandLine (_PCL->Version, &Limiters, &Destinations, &Destinations, InlineResponseMessage, PCL)
-								  == OK)
-								{
-								  Status = OK;
-								}
-							  else
-								{
-								  PB->S << Offset << "(ERROR: Unable to create the -m --cl inline response message)"
-										<< endl;
-
-								  Status = ERROR;
-								}
-							}
-						  else
-							{
-							  // ***********************************************
-							  // The message is in transit to another host outside this domain
-							  // ***********************************************
+                    // Assert the Values vector
+                    if (Identifiers->size() > 0 && HashStacks->size() > 0)
+                    {
+                      for (unsigned int q = 0; q < Identifiers->size(); q++)
+                      {
 #ifdef DEBUG
-							  // Set the forwarding case
-							  ForwardingCase = "Interdomain: destination is a complete tuple outside this host and domain";
-
-							  PB->S << endl << Offset << "(      " << ForwardingCase << "         )" << endl << endl;
+                        PB->S << Offset << "(The Identifier " << q << " is "
+                              << Identifiers->at(q) << ".)" << endl;
 #endif
+                      }
 
-							  // Stop processing the other command lines of the message. The destination is another block
-							  PB->StopProcessingMessage = true;
+                      // Carry the destination identifier (legacy or not)
+                      Identifier = Identifiers->at(0);
+
+                      for (unsigned int w = 0; w < HashStacks->size(); w++)
+                      {
+                        // Carry the destination stack (legacy or not)
+                        HashStack = HashStacks->at(w);
 
 #ifdef DEBUG
-
-							  PB->S << Offset << "(The destination HID is " << MessageHID << " and DID is "
-									<< Destinations.at (0) << ")" << endl;
-
+                        PB->S << Offset << "(Hash of the selected stack = " << HashStack << ")"
+                              << endl;
 #endif
 
-							  // Get binding between Peer PGCS HID and its identifier (legacy or not) on Category 15
-							  if (PB->PP->GetHTBindingValues (15, MessageHID, Identifiers) == OK)
-								{
-								  // Get binding between Peer PGCS HID and the Hash of the name of the peer PGCS stack (legacy or not)
-								  if (PB->PP->GetHTBindingValues (8, MessageHID, HashStacks) == OK)
-									{
-									  // Assert the Values vector
-									  if (Identifiers->size () > 0 && HashStacks->size () > 0)
-										{
-										  for (unsigned int q = 0; q < Identifiers->size (); q++)
-											{
-											  //PB->S << Offset <<  "(The Identifier "<<q<<" is "<<Identifiers->at(q)<<".)" << endl;
-											}
+                        for (unsigned int y = 0; y < PPGCS->Identifiers->size(); y++)
+                        {
+#ifdef DEBUG
+                          PB->S << Offset << "(Identifiers[" << y << "] = "
+                                << PPGCS->Identifiers->at(y) << ")" << endl;
+#endif
 
-										  // Carry the destination identifier (legacy or not)
-										  Identifier = Identifiers->at (0);
+                          // TODO: FIXP/Update - Modified here to allow the case that the PPGCS->Identifiers->at (y) is FF:FF:FF:FF:FF:FF
+                          if (PPGCS->Identifiers->at(y) == Identifier || PPGCS->Identifiers->at(y) == "FF:FF:FF:FF:FF:FF")
+                          {
+                            // ************************** Adaptation Layer **************************
 
-										  //cout << "Identifier = "<<Identifier<<endl;
+                            // Here are the calls for the function on PG that effectively send the packets!!
+                            // Check for the technologies accordingly to the peer.
 
-										  for (unsigned int w = 0; w < HashStacks->size (); w++)
-											{
-											  // Carry the destination stack (legacy or not)
-											  HashStack = HashStacks->at (w);
+                            if (HashStack == HashIPv4_UDP)
+                            {
+#ifdef DEBUG
+                              PB->S << Offset << "(The \"HashIPv4_UDP\" hash is = "
+                                    << HashIPv4_UDP << ")" << endl;
+#endif
+                              // Send the message using the UDP socket
+                              PPG->SendToAUDPSocket(Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
 
-											  //PB->S << Offset <<  "(The HashStack "<<w<<" is "<<HashStack[w]<<")" << endl;
+                              // The message was already sent, so mark it to be deleted
+                              _ReceivedMessage->MarkToDelete();
+                            }
+
+                            if (HashStack == HashEthernet || HashStack == HashWiFi)
+                            {
+#ifdef DEBUG
+                              PB->S << Offset << "(The \"Ethernet\" hash is = "
+                                    << HashEthernet << ")" << endl;
+#endif
+
+                              // Send the message
+                              PPG->SendToARawSocket(PPGCS->Interfaces
+                                                        ->at(y),
+                                                    Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
+
+                              // The message was already sent, so mark it to be deleted
+                              _ReceivedMessage->MarkToDelete();
+                            }
+
+                            // **********************************************************************
+                          }
+                        }
+                      }
+                    }
+                    else
+                    {
+                      PB->S << Offset << "(ERROR: the obtained vector of identifiers is empty)"
+                            << endl;
+                    }
+                  }
+                  else
+                  {
+                    PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS stack)" << endl;
+                  }
+                }
+                else
+                {
+                  // *****************************************************************************************************************
+                  // This code was added to allow a PGCS forward to another PGCS that it does not know using a relay PGCS in between
+                  // *****************************************************************************************************************
+
+                  // *****************************************************************************************************************
+                  // Note: This code bellow create a snow ball that propagates messages to all outputs, generating lots of traffic
+                  // *****************************************************************************************************************
+                  /*
+
+                  for (unsigned int w=0; w<PPGCS->Stacks->size(); w++)
+                          {
+                                  // Calculate the hash of the stack
+                                  PB->GenerateSCNFromCharArrayBinaryPatterns(PPGCS->Stacks->at(w),HashStack);
+
+
 
 #ifdef DEBUG
-											  cout << "Hash of the selected stack = " << HashStack << endl;
+                                  PB->S << Offset <<  "(Using broadcast forwarding to all peers)" << endl;
+
+                                  PB->S << Offset <<  "(Identifiers of stack ["<<w<<"] = "<<PPGCS->Identifiers->at(w)<<")"<<endl;
 #endif
 
-											  for (unsigned int y = 0; y < PPGCS->Identifiers->size (); y++)
-												{
+                                  if (HashStack == HashZMQTCP)
+                                          {
 #ifdef DEBUG
-												  cout << "Identifiers[" << y << "] = " << PPGCS->Identifiers->at (y)
-													   << endl;
+                                                  PB->S << Offset <<  "(The \"ZMQ_TCP\" hash is = "<<HashZMQTCP<<")"<< endl;
 #endif
+                                                  // Send the message using the ZMQ socket
+                                                  PPG->SendToAZMQSocket(PPGCS->Identifiers->at(w),PPGCS->Sizes->at(w),_ReceivedMessage);
 
-												  if (PPGCS->Identifiers->at (y) == Identifier)
-													{
-													  if (HashStack == HashIPv4_UDP)
-														{
+                                                  // The message was already sent, so mark it to be deleted
+                                                  _ReceivedMessage->MarkToDelete();
+                                          }
+
+                                  if (HashStack == HashEthernet || HashStack == HashWiFi)
+                                          {
 #ifdef DEBUG
-														  PB->S << Offset << "(The \"IPv4_UDP\" hash is = "
-																<< HashIPv4_UDP << ")" << endl;
+                                                  PB->S << Offset <<  "(The \"Ethernet\" hash is = "<<HashEthernet<<")"<< endl;
 #endif
-														  // Send the message using the ZMQ socket
-														  PPG->SendToAUDPSocket (Identifier, PPGCS->Sizes
-															  ->at (y), _ReceivedMessage);
 
-														  // The message was already sent, so mark it to be deleted
-														  _ReceivedMessage->MarkToDelete ();
-														}
+                                                  // Send the message
+                                                  PPG->SendToARawSocket(PPGCS->Interfaces->at(w),PPGCS->Identifiers->at(w),PPGCS->Sizes->at(w),_ReceivedMessage);
 
-													  if (HashStack == HashEthernet || HashStack == HashWiFi)
-														{
+                                                  // The message was already sent, so mark it to be deleted
+                                                  _ReceivedMessage->MarkToDelete();
+                                          }
+                          }
+
+                          */
+
+                  PB->S << Offset << "(Warning: Unable to send the message. The Peer PGCS HID "
+                        << MessageHID << " is unknown on PGCS:HT Category 15)" << endl;
+                }
+              }
+            }
+            else
+            {
+              // ***********************************************
+              // The ng -hello --ihc 0.1 case
+              // ***********************************************
+
+              // Do not stop processing the other command lines of the message.
+              PB->StopProcessingMessage = false;
+            }
+          }
+
+          // ****************************************************
+          // Interdomain, interhost
+          // ****************************************************
+          if (Destinations.size() == 5)
+          {
+            // ***********************************************
+            // Check the IHC case
+            // ***********************************************
+            if (Destinations.at(0) != "FFFFFFFF" && Destinations.at(1) != "FFFFFFFF" &&
+                Destinations.at(2) != "FFFFFFFF")
+            {
+              // ***********************************************
+              // The typical case
+              // ***********************************************
+              MessageHID = Destinations.at(1);
+
+              MyHID = PB->PP->GetHostSelfCertifyingName();
+
 #ifdef DEBUG
-														  PB->S << Offset << "(The \"Ethernet\" hash is = "
-																<< HashEthernet << ")" << endl;
+
+              PB->S << Offset << "(The Message HID is " << MessageHID << ")" << endl;
+
+              PB->S << Offset << "(This host HID is " << MyHID << ")" << endl;
+
 #endif
 
-														  // Send the message
-														  PPG->SendToARawSocket (PPGCS->Interfaces
-																					 ->at (y), Identifier, PPGCS->Sizes
-																					 ->at (y), _ReceivedMessage);
+              if (MessageHID == MyHID)
+              {
+                // ***********************************************
+                // The message is for the PG itself
+                // ***********************************************
 
-														  // The message was already sent, so mark it to be deleted
-														  _ReceivedMessage->MarkToDelete ();
-														}
-													}
-												}
-											}
-										}
-									  else
-										{
-										  PB->S << Offset << "(ERROR: the obtained vector of identifiers is empty)"
-												<< endl;
-										}
-									}
-								  else
-									{
-									  PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS stack)" << endl;
-									}
-								}
-							  else
-								{
-								  PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS identifier)" << endl;
-								}
-							}
-						}
-					  else
-						{
-						  // ***********************************************
-						  // The ng -hello --ihc 0.1 case
-						  // ***********************************************
+#ifdef DEBUG
+                // Set the forwarding case
+                ForwardingCase = "Intraprocess: destination is a complete tuple at this PGCS";
 
-						  // Do not stop processing the other command lines of the message.
-						  PB->StopProcessingMessage = false;
-						}
-					}
-				}
-			  else
-				{
-				  PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
+                PB->S << endl
+                      << Offset << "(      " << ForwardingCase << "         )" << endl
+                      << endl;
+#endif
 
-				  Status = ERROR;
-				}
-			}
-		  else
-			{
-			  PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+                // Set the message execution time
+                InlineResponseMessage->SetTime(GetTime());
 
-			  Status = ERROR;
-			}
-		}
-	  else
-		{
-		  PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+                // Clear the sources vector
+                Limiters.clear();
 
-		  Status = ERROR;
-		}
-	}
+                // Add this process PDI as the limiter
+                Limiters.push_back(PB->PP->Intra_Process);
+
+                // Cleaning the Destinations vector
+                Destinations.clear();
+
+                Destinations.push_back(PB->GetSelfCertifyingName());
+
+                // Do not stop processing the other command lines of the message.
+                PB->StopProcessingMessage = false;
+
+                // Add a -m --cl 0.1 to the new message
+                if (PMB->NewConnectionLessCommandLine(_PCL->Version, &Limiters, &Destinations, &Destinations, InlineResponseMessage, PCL) == OK)
+                {
+                  Status = OK;
+                }
+                else
+                {
+                  PB->S << Offset << "(ERROR: Unable to create the -m --cl inline response message)"
+                        << endl;
+
+                  Status = ERROR;
+                }
+              }
+              else
+              {
+                // ***********************************************
+                // The message is in transit to another host outside this domain
+                // ***********************************************
+#ifdef DEBUG
+                // Set the forwarding case
+                ForwardingCase = "Interdomain: destination is a complete tuple outside this host and domain";
+
+                PB->S << endl
+                      << Offset << "(      " << ForwardingCase << "         )" << endl
+                      << endl;
+#endif
+
+                // Stop processing the other command lines of the message. The destination is another block
+                PB->StopProcessingMessage = true;
+
+#ifdef DEBUG
+
+                PB->S << Offset << "(The destination HID is " << MessageHID << " and DID is "
+                      << Destinations.at(0) << ")" << endl;
+
+#endif
+
+                // Get binding between Peer PGCS HID and its identifier (legacy or not) on Category 15
+                if (PB->PP->GetHTBindingValues(15, MessageHID, Identifiers) == OK)
+                {
+                  // Get binding between Peer PGCS HID and the Hash of the name of the peer PGCS stack (legacy or not)
+                  if (PB->PP->GetHTBindingValues(8, MessageHID, HashStacks) == OK)
+                  {
+                    // Assert the Values vector
+                    if (Identifiers->size() > 0 && HashStacks->size() > 0)
+                    {
+                      for (unsigned int q = 0; q < Identifiers->size(); q++)
+                      {
+                        // PB->S << Offset <<  "(The Identifier "<<q<<" is "<<Identifiers->at(q)<<".)" << endl;
+                      }
+
+                      // Carry the destination identifier (legacy or not)
+                      Identifier = Identifiers->at(0);
+
+                      // cout << "Identifier = "<<Identifier<<endl;
+
+                      for (unsigned int w = 0; w < HashStacks->size(); w++)
+                      {
+                        // Carry the destination stack (legacy or not)
+                        HashStack = HashStacks->at(w);
+
+                        // PB->S << Offset <<  "(The HashStack "<<w<<" is "<<HashStack[w]<<")" << endl;
+
+#ifdef DEBUG
+                        cout << "Hash of the selected stack = " << HashStack << endl;
+#endif
+
+                        for (unsigned int y = 0; y < PPGCS->Identifiers->size(); y++)
+                        {
+#ifdef DEBUG
+                          cout << "Identifiers[" << y << "] = " << PPGCS->Identifiers->at(y)
+                               << endl;
+#endif
+
+                          if (PPGCS->Identifiers->at(y) == Identifier)
+                          {
+                            if (HashStack == HashIPv4_UDP)
+                            {
+#ifdef DEBUG
+                              PB->S << Offset << "(The \"IPv4_UDP\" hash is = "
+                                    << HashIPv4_UDP << ")" << endl;
+#endif
+                              // Send the message using the ZMQ socket
+                              PPG->SendToAUDPSocket(Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
+
+                              // The message was already sent, so mark it to be deleted
+                              _ReceivedMessage->MarkToDelete();
+                            }
+
+                            if (HashStack == HashEthernet || HashStack == HashWiFi)
+                            {
+#ifdef DEBUG
+                              PB->S << Offset << "(The \"Ethernet\" hash is = "
+                                    << HashEthernet << ")" << endl;
+#endif
+
+                              // Send the message
+                              PPG->SendToARawSocket(PPGCS->Interfaces
+                                                        ->at(y),
+                                                    Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
+
+                              // The message was already sent, so mark it to be deleted
+                              _ReceivedMessage->MarkToDelete();
+                            }
+                          }
+                        }
+                      }
+                    }
+                    else
+                    {
+                      PB->S << Offset << "(ERROR: the obtained vector of identifiers is empty)"
+                            << endl;
+                    }
+                  }
+                  else
+                  {
+                    PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS stack)" << endl;
+                  }
+                }
+                else
+                {
+                  PB->S << Offset << "(ERROR: Unable to obtain the peer PGCS identifier)" << endl;
+                }
+              }
+            }
+            else
+            {
+              // ***********************************************
+              // The ng -hello --ihc 0.1 case
+              // ***********************************************
+
+              // Do not stop processing the other command lines of the message.
+              PB->StopProcessingMessage = false;
+            }
+          }
+        }
+        else
+        {
+          PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
+
+          Status = ERROR;
+        }
+      }
+      else
+      {
+        PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+
+        Status = ERROR;
+      }
+    }
+    else
+    {
+      PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+
+      Status = ERROR;
+    }
+  }
   else
-	{
-	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
-	}
+  {
+    PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+  }
 
   delete PeerPGSHTBID;
   delete Identifiers;
   delete HashStacks;
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }

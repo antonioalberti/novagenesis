@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Publish/Subscribe
-	Object:		NR
-	File:		NR.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Publish/Subscribe
+        Object:		NR
+        File:		NR.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -69,17 +69,17 @@
 #include "NRRunPeriodic01.h"
 #endif
 
-NR::NR (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path)
-	: Block (_LN, _PP, _Index, _Path)
+NR::NR(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path)
+    : Block(_LN, _PP, _Index, _Path)
 {
   PGW = _PGW;
   PHT = _PHT;
   State = "initialization";
 
-  Message *PIM = 0;
-  CommandLine *PCL = 0;
-  Message *InlineResponseMessage = 0;
-  Action *PA = 0;
+  Message* PIM = 0;
+  CommandLine* PCL = 0;
+  Message* InlineResponseMessage = 0;
+  Action* PA = 0;
 
   // Setting the delays
   DelayBeforeRunInitiatilization = 3;
@@ -92,132 +92,132 @@ NR::NR (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, strin
   MarkForDeletion = false;
 
   // Creating the actions
-  NewAction ("-run --initialization 0.1", PA);
-  NewAction ("-m --cl 0.1", PA);
-  NewAction ("-st --s 0.1", PA);
-  NewAction ("-scn --ack 0.1", PA);
-  NewAction ("-d --b 0.1", PA);
-  NewAction ("-p --b 0.1", PA);
-  NewAction ("-s --b 0.1", PA);
-  NewAction ("-rvk --b 0.1", PA);
-  NewAction ("-scn --seq 0.1", PA);
-  NewAction ("-info --payload 0.1", PA);
-  NewAction ("-p --notify 0.1", PA);
-  NewAction ("-message --type 0.1", PA);
-  NewAction ("-run --periodic 0.1", PA);
+  NewAction("-run --initialization 0.1", PA);
+  NewAction("-m --cl 0.1", PA);
+  NewAction("-st --s 0.1", PA);
+  NewAction("-scn --ack 0.1", PA);
+  NewAction("-d --b 0.1", PA);
+  NewAction("-p --b 0.1", PA);
+  NewAction("-s --b 0.1", PA);
+  NewAction("-rvk --b 0.1", PA);
+  NewAction("-scn --seq 0.1", PA);
+  NewAction("-info --payload 0.1", PA);
+  NewAction("-p --notify 0.1", PA);
+  NewAction("-message --type 0.1", PA);
+  NewAction("-run --periodic 0.1", PA);
 
   // Creating a -run --initialization message
-  PP->NewMessage (GetTime (), 0, false, PIM);
+  PP->NewMessage(GetTime(), 0, false, PIM);
 
   // Adding only the run initialization command line
-  PIM->NewCommandLine ("-run", "--initialization", "0.1", PCL);
+  PIM->NewCommandLine("-run", "--initialization", "0.1", PCL);
 
   // Execute the procedure
-  Run (PIM, InlineResponseMessage);
+  Run(PIM, InlineResponseMessage);
 }
 
-NR::~NR ()
+NR::~NR()
 {
-  vector<Action *>::iterator it4;
+  vector<Action*>::iterator it4;
 
-  Action *Temp1;
+  Action* Temp1;
 
-  for (it4 = Actions.begin (); it4 != Actions.end (); it4++)
-	{
-	  Temp1 = *it4;
+  for (it4 = Actions.begin(); it4 != Actions.end(); it4++)
+  {
+    Temp1 = *it4;
 
-	  if (Temp1 != 0)
-		{
-		  delete Temp1;
-		}
+    if (Temp1 != 0)
+    {
+      delete Temp1;
+    }
 
-	  Temp1 = 0;
-	}
+    Temp1 = 0;
+  }
 }
 
 // Allocate and add an Action on Actions container
-void NR::NewAction (const string _LN, Action *&_PA)
+void NR::NewAction(const string _LN, Action*& _PA)
 {
   if (_LN == "-m --cl 0.1")
-	{
-	  NRMsgCl01 *P = new NRMsgCl01 (_LN, this, PP->PMB);
+  {
+    NRMsgCl01* P = new NRMsgCl01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --initialization 0.1")
-	{
-	  NRRunInitialization01 *P = new NRRunInitialization01 (_LN, this, PP->PMB);
+  {
+    NRRunInitialization01* P = new NRRunInitialization01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-d --b 0.1")
-	{
-	  NRDeliveryBind01 *P = new NRDeliveryBind01 (_LN, this, PP->PMB);
+  {
+    NRDeliveryBind01* P = new NRDeliveryBind01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-p --b 0.1")
-	{
-	  NRPubBind01 *P = new NRPubBind01 (_LN, this, PP->PMB);
+  {
+    NRPubBind01* P = new NRPubBind01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-scn --seq 0.1")
-	{
-	  NRSCNSeq01 *P = new NRSCNSeq01 (_LN, this, PP->PMB);
+  {
+    NRSCNSeq01* P = new NRSCNSeq01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-s --b 0.1")
-	{
-	  NRSubBind01 *P = new NRSubBind01 (_LN, this, PP->PMB);
+  {
+    NRSubBind01* P = new NRSubBind01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-rvk --b 0.1")
-	{
-	  NRRevokeBind01 *P = new NRRevokeBind01 (_LN, this, PP->PMB);
+  {
+    NRRevokeBind01* P = new NRRevokeBind01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-info --payload 0.1")
-	{
-	  NRInfoPayload01 *P = new NRInfoPayload01 (_LN, this, PP->PMB);
+  {
+    NRInfoPayload01* P = new NRInfoPayload01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-p --notify 0.1")
-	{
-	  NRPubNotify01 *P = new NRPubNotify01 (_LN, this, PP->PMB);
+  {
+    NRPubNotify01* P = new NRPubNotify01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --periodic 0.1")
-	{
-	  NRRunPeriodic01 *P = new NRRunPeriodic01 (_LN, this, PP->PMB);
+  {
+    NRRunPeriodic01* P = new NRRunPeriodic01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 }
 
 // Get an Action
-int NR::GetAction (string _LN, Action *&_PA)
+int NR::GetAction(string _LN, Action*& _PA)
 {
   int Status = ERROR;
   return Status;
 }
 
 // Delete an Action
-int NR::DeleteAction (string _LN)
+int NR::DeleteAction(string _LN)
 {
   int Status = ERROR;
   return Status;

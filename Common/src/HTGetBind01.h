@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		HTGetBind01
-	Object:		HTGetBind01
-	File:		HTGetBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		HTGetBind01
+        Object:		HTGetBind01
+        File:		HTGetBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,24 +49,18 @@
 
 class Block;
 
-class HTGetBind01 : public Action {
- public:
-
+class HTGetBind01 : public Action
+{
+public:
   // Constructor
-  HTGetBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  HTGetBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~HTGetBind01 ();
+  virtual ~HTGetBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis utilities
-	Object:		ng_util
-	File:		ng_util.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis utilities
+        Object:		ng_util
+        File:		ng_util.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -28,5 +28,5 @@
 #ifndef NG_UTIL_H_
 #define NG_UTIL_H_
 
-char *strtok_r (char *str, const char *delim, char **nextp);
+char* strtok_r(char* str, const char* delim, char** nextp);
 #endif /* NG_UTIL_H_ */

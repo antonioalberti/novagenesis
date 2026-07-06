@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Indirection Resolution
-	Object:		IR
-	File:		IR.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Indirection Resolution
+        Object:		IR
+        File:		IR.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,39 +49,38 @@
 
 using namespace std;
 
-class IR : public Block {
- private:
-
+class IR : public Block
+{
+private:
   // Gateway pointer
-  GW *PGW;
+  GW* PGW;
 
   // HT pointer
-  HT *PHT;
+  HT* PHT;
 
- public:
-
+public:
   // Auxiliary containers
-  vector<Tuple *> PSSTuples;
-  vector<Tuple *> HTSTuples;
+  vector<Tuple*> PSSTuples;
+  vector<Tuple*> HTSTuples;
 
   // Constructor
-  IR (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path);
+  IR(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path);
 
   // Destructor
-  ~IR ();
+  ~IR();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // Auxiliary flags
   bool GenerateSCNSeqForOriginalSource;
@@ -108,9 +107,3 @@ class IR : public Block {
 };
 
 #endif
-
-
-
-
-
-

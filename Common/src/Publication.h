@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Auxiliary publication object
-	Object:		Publication
-	File:		Publication.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Auxiliary publication object
+        Object:		Publication
+        File:		Publication.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -34,20 +34,12 @@
 
 class Publication
 {
-	public:
+public:
+  // The keys being published
+  string Key;
 
-		// The keys being published
-		string				Key;
-
-
-		// Timestamp for performance measurement
-		double				Timestamp;
+  // Timestamp for performance measurement
+  double Timestamp;
 };
 
 #endif
-
-
-
-
-
-

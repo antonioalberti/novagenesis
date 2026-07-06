@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Generic Indirecteion Resolution System
-	Object:		GIRS
-	File:		GIRS.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Generic Indirecteion Resolution System
+        Object:		GIRS
+        File:		GIRS.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -25,7 +25,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-//Comentário teste
+// Comentário teste
 //
 #ifndef _GIRS_H
 #include "GIRS.h"
@@ -35,57 +35,54 @@
 #include "IR.h"
 #endif
 
-GIRS::GIRS (string _LN, key_t _Key, string _Path) : Process (_LN, _Key, _Path)
+GIRS::GIRS(string _LN, key_t _Key, string _Path)
+    : Process(_LN, _Key, _Path)
 {
-  Block *PIRB = 0;
+  Block* PIRB = 0;
   string IRLN = "IR";
 
-  NewBlock (IRLN, PIRB);
+  NewBlock(IRLN, PIRB);
 
   // Run the base class GW
-  RunGateway ();
+  RunGateway();
 }
 
-GIRS::~GIRS ()
+GIRS::~GIRS()
 {
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int GIRS::NewBlock (string _LN, Block *&_PB)
+int GIRS::NewBlock(string _LN, Block*& _PB)
 {
   if (_LN == "IR")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW = 0;
+    HT* PHT = 0;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index = 0;
+    unsigned int Index = 0;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  IR *PIR = new IR (_LN, this, Index, PGW, PHT, GetPath ());
+    IR* PIR = new IR(_LN, this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PIR;
+    _PB = (Block*)PIR;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
-
-
-
-

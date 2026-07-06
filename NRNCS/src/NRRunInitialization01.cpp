@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		NRRunInitialization01
-	Object:		NRRunInitialization01
-	File:		NRRunInitialization01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		NRRunInitialization01
+        Object:		NRRunInitialization01
+        File:		NRRunInitialization01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -39,239 +39,238 @@
 
 ////#define DEBUG
 
-NRRunInitialization01::NRRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+NRRunInitialization01::NRRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-NRRunInitialization01::~NRRunInitialization01 ()
+NRRunInitialization01::~NRRunInitialization01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --initialization 0.1
-int
-NRRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int NRRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
-  Message *StoringInitialBinds = 0;
+  Message* StoringInitialBinds = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *NRCNCL = 0;
-  NR *PNR = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  CommandLine* NRCNCL = 0;
+  NR* PNR = 0;
   string Offset = "                    ";
   string Parameter;
   string Value;
   double Temp;
-  Message *RunPeriodic = 0;
+  Message* RunPeriodic = 0;
 
-  PNR = (NR *)PB;
+  PNR = (NR*)PB;
 
-  PHTB = (Block *)PNR->PHT;
+  PHTB = (Block*)PNR->PHT;
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PHTB->GetSelfCertifyingName ());
+  Destinations.push_back(PHTB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + PNR->DelayBeforeRunInitiatilization, 0, false, StoringInitialBinds);
+  PB->PP->NewMessage(GetTime() + PNR->DelayBeforeRunInitiatilization, 0, false, StoringInitialBinds);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBLNToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBLNToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPLNToHashPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPLNToHashPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashPLNToPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashPLNToPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashPLNToPID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashPLNToPID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToHashPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToHashPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromOSLNToHashOSLN("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromOSLNToHashOSLN("0.1",StoringInitialBinds,PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashOSLNToOSLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashOSLNToOSLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromOSIDToPID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToPID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHLNToHashHLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHLNToHashHLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashHLNToHLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashHLNToHLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromOSIDToHID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToHID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHIDToOSID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHIDToOSID("0.1", StoringInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromHIDToPID("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromHIDToPID("0.1",StoringInitialBinds,PCL);
 
-  //PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (StoringInitialBinds, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, StoringInitialBinds, NRCNCL);
+  PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, NRCNCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PNR->PGW->PushToInputQueue (StoringInitialBinds);
+  PNR->PGW->PushToInputQueue(StoringInitialBinds);
 
   // Clear the temporary containers
-  Limiters.clear ();
-  Sources.clear ();
-  Destinations.clear ();
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
 
   // ******************************************************
   // Load customized parameters if available
   // ******************************************************
 
-  PB->S << Offset << "(Loading customized parameters (if available) at " << PB->GetPath () << "NRNCS.ini)" << endl;
+  PB->S << Offset << "(Loading customized parameters (if available) at " << PB->GetPath() << "NRNCS.ini)" << endl;
 
   File F3;
 
-  F3.OpenInputFile ("NRNCS.ini", PB->GetPath (), "DEFAULT");
+  F3.OpenInputFile("NRNCS.ini", PB->GetPath(), "DEFAULT");
 
-  F3.seekg (0);
+  F3.seekg(0);
 
   char Line[512];
 
-  while (F3.getline (Line, sizeof (Line), '\n'))
-	{
-	  istringstream ins (Line);
+  while (F3.getline(Line, sizeof(Line), '\n'))
+  {
+    istringstream ins(Line);
 
-	  ins >> Parameter;
-	  ins >> Value;
+    ins >> Parameter;
+    ins >> Value;
 
-	  Temp = PB->StringToDouble (Value);
+    Temp = PB->StringToDouble(Value);
 
-	  if (Temp > 0)
-		{
-		  if (Parameter == "DelayBeforeRunInitiatilization")
-			{
-			  PNR->DelayBeforeRunInitiatilization = Temp;
+    if (Temp > 0)
+    {
+      if (Parameter == "DelayBeforeRunInitiatilization")
+      {
+        PNR->DelayBeforeRunInitiatilization = Temp;
 
-			  PB->S << Offset << "DelayBeforeRunInitiatilization is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforeRunInitiatilization is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforeGIRSDiscovery")
-			{
-			  PNR->DelayBeforeGIRSDiscovery = Temp;
+      if (Parameter == "DelayBeforeGIRSDiscovery")
+      {
+        PNR->DelayBeforeGIRSDiscovery = Temp;
 
-			  PB->S << Offset << "DelayBeforeGIRSDiscovery is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforeGIRSDiscovery is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforePIDPublishing")
-			{
-			  PNR->DelayBeforePIDPublishing = Temp;
+      if (Parameter == "DelayBeforePIDPublishing")
+      {
+        PNR->DelayBeforePIDPublishing = Temp;
 
-			  PB->S << Offset << "DelayBeforePIDPublishing is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforePIDPublishing is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforeRunExposition")
-			{
-			  Temp = PB->StringToInt (Value);
+      if (Parameter == "DelayBeforeRunExposition")
+      {
+        Temp = PB->StringToInt(Value);
 
-			  PNR->DelayBeforeRunExposition = Temp;
+        PNR->DelayBeforeRunExposition = Temp;
 
-			  PB->S << Offset << "DelayBeforeRunExposition is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforeRunExposition is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforeSendingToGIRS")
-			{
-			  PNR->DelayBeforeSendingToGIRS = Temp;
+      if (Parameter == "DelayBeforeSendingToGIRS")
+      {
+        PNR->DelayBeforeSendingToGIRS = Temp;
 
-			  PB->S << Offset << "DelayBeforeSendingToGIRS is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforeSendingToGIRS is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforeSendingANotification")
-			{
-			  PNR->DelayBeforeSendingANotification = Temp;
+      if (Parameter == "DelayBeforeSendingANotification")
+      {
+        PNR->DelayBeforeSendingANotification = Temp;
 
-			  PB->S << Offset << "DelayBeforeSendingANotification is " << Temp << endl;
-			}
+        PB->S << Offset << "DelayBeforeSendingANotification is " << Temp << endl;
+      }
 
-		  if (Parameter == "DelayBeforeRunPeriodic")
-			{
-			  PNR->DelayBeforeRunPeriodic = Temp;
+      if (Parameter == "DelayBeforeRunPeriodic")
+      {
+        PNR->DelayBeforeRunPeriodic = Temp;
 
-			  PB->S << Offset << "DelayBeforeRunPeriodic is " << Temp << endl;
+        PB->S << Offset << "DelayBeforeRunPeriodic is " << Temp << endl;
 
-			  break;
-			}
-		}
-	}
+        break;
+      }
+    }
+  }
 
-  F3.CloseFile ();
+  F3.CloseFile();
 
   // Clear the temporary containers
-  Limiters.clear ();
-  Sources.clear ();
-  Destinations.clear ();
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
 
   // ******************************************************
   // Schedule a message to run periodic first time
   // ******************************************************
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + 10, 1, false, RunPeriodic);
+  PB->PP->NewMessage(GetTime() + 10, 1, false, RunPeriodic);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
 
   // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PNR->PGW->PushToInputQueue (RunPeriodic);
+  PNR->PGW->PushToInputQueue(RunPeriodic);
 
   PB->State = "operational";
 
   PB->S << Offset
-		<< "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
-		<< endl;
+        << "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
+        << endl;
 
   return Status;
 }
-

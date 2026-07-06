@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWExposition02
-	Object:		GWExposition02
-	File:		GWExposition02.h
-	Author:		Antonio Marcos Alberti
-	Date:		06/2026
-	Version:	0.2
+        Name:		GWExposition02
+        Object:		GWExposition02
+        File:		GWExposition02.h
+        Author:		Antonio Marcos Alberti
+        Date:		06/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -51,9 +51,9 @@ class Block;
 
 using namespace std;
 
-class GWExposition02 : public Action {
- public:
-
+class GWExposition02 : public Action
+{
+public:
   // Constructor
   GWExposition02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
@@ -64,8 +64,7 @@ class GWExposition02 : public Action {
   // ng -exposition 0.2
   int Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
- private:
-
+private:
   // Self-reschedule after 1 second
   void SelfReschedule(Message* _ReceivedMessage);
 

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Name Resolution and Network Cache Service
-	Object:		execNRNCS
-	File:		execNRNCS.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Name Resolution and Network Cache Service
+        Object:		execNRNCS
+        File:		execNRNCS.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -35,64 +35,61 @@
 #include <sys/time.h>
 #endif
 
-int main (int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   int R = 0;
   bool Problem = false;
 
   if (argc != 0)
-	{
-	  if (argc == 2)
-		{
-		  string Path = argv[1];
+  {
+    if (argc == 2)
+    {
+      string Path = argv[1];
 
-		  cout << "*******************************************************************" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*  NovaGenesis(NG) Name Resolution and Network Cache Service v0.1 *" << endl;
-		  cout << "*  Copyright Antonio Marcos Alberti - April 2021         *" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*******************************************************************" << endl << endl;
+      cout << "*******************************************************************" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*  NovaGenesis(NG) Name Resolution and Network Cache Service v0.1 *" << endl;
+      cout << "*  Copyright Antonio Marcos Alberti - April 2021         *" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*******************************************************************" << endl
+           << endl;
 
-		  cout << "(The I/O path is " << Path << ")" << endl;
+      cout << "(The I/O path is " << Path << ")" << endl;
 
-		  long long Temp = (long long)&R;
+      long long Temp = (long long)&R;
 
-		  // Initialize the random generator
-		  srand ((unsigned int)Temp * time (NULL));
+      // Initialize the random generator
+      srand((unsigned int)Temp * time(NULL));
 
-		  // Generates a random key
-		  R = 1 + (rand () % 2147483647);
+      // Generates a random key
+      R = 1 + (rand() % 2147483647);
 
-		  // Set the shm key
-		  key_t Key = R;
+      // Set the shm key
+      key_t Key = R;
 
-		  // Create a process instance
-		  NRNCS execNRS ("NRNCS", Key, Path);
-		}
-	  else
-		{
-		  cout << "(ERROR: Wrong number of main() arguments)" << endl;
+      // Create a process instance
+      NRNCS execNRS("NRNCS", Key, Path);
+    }
+    else
+    {
+      cout << "(ERROR: Wrong number of main() arguments)" << endl;
 
-		  Problem = true;
-		}
-	}
+      Problem = true;
+    }
+  }
   else
-	{
-	  cout << "(ERROR: No argument supplied)" << endl;
+  {
+    cout << "(ERROR: No argument supplied)" << endl;
 
-	  Problem = true;
-	}
+    Problem = true;
+  }
 
   if (Problem == true)
-	{
-	  cout << "(Usage: ./NRNCS Path)" << endl;
-	  cout << "(Path example: /home/myprofile/workspace/novagenesis/IO/NRNCS/)" << endl;
-	}
+  {
+    cout << "(Usage: ./NRNCS Path)" << endl;
+    cout << "(Path example: /home/myprofile/workspace/novagenesis/IO/NRNCS/)" << endl;
+  }
 
   return 0;
 }
-
-
-
-

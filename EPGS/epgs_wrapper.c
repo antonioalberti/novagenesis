@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS wrapper to run an embedded/simulated version on Linux
-	Object:		epgs_wrapper
-	File:		epgs_wrapper.c
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS wrapper to run an embedded/simulated version on Linux
+        Object:		epgs_wrapper
+        File:		epgs_wrapper.c
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -31,115 +31,115 @@
 #include <stdio.h>
 #include <time.h>
 
-//#include "Ethernet.h"
+// #include "Ethernet.h"
 
-//#include "PhysicalLayer/WiFi/WiFi.h"
+// #include "PhysicalLayer/WiFi/WiFi.h"
 #include "epgs_ethernet.h"
 #include "epgs_defines.h"
 
-int ng_rand (void)
+int ng_rand(void)
 {
-  srand (time (NULL));
-  return rand ();
+  srand(time(NULL));
+  return rand();
 }
 
-int ng_atoi (const char *str)
+int ng_atoi(const char* str)
 {
-  return atoi (str);
+  return atoi(str);
 }
 
-unsigned long ng_strtoul (const char *str, char **endptr, int base)
+unsigned long ng_strtoul(const char* str, char** endptr, int base)
 {
-  return strtoul (str, endptr, base);
+  return strtoul(str, endptr, base);
 }
 
-void *ng_calloc (long unsigned int nitems, long unsigned int size)
+void* ng_calloc(long unsigned int nitems, long unsigned int size)
 {
-  return calloc (nitems, size);
+  return calloc(nitems, size);
 }
 
-void *ng_malloc (long unsigned int size)
+void* ng_malloc(long unsigned int size)
 {
-  return malloc (size);
+  return malloc(size);
 }
 
-void *ng_realloc (void *ptr, long unsigned int size)
+void* ng_realloc(void* ptr, long unsigned int size)
 {
-  return realloc (ptr, size);
+  return realloc(ptr, size);
 }
 
-void ng_free (void *ptr)
+void ng_free(void* ptr)
 {
-  free (ptr);
+  free(ptr);
 }
 
-void *ng_memcpy (void *ptrDst, const void *ptrSrc, long unsigned int size)
+void* ng_memcpy(void* ptrDst, const void* ptrSrc, long unsigned int size)
 {
-  return memcpy (ptrDst, ptrSrc, size);
+  return memcpy(ptrDst, ptrSrc, size);
 }
 
-int ng_strcmp (const char *ptrA, const char *ptrB)
+int ng_strcmp(const char* ptrA, const char* ptrB)
 {
-  return strcmp (ptrA, ptrB);
+  return strcmp(ptrA, ptrB);
 }
 
-char *ng_strcpy (char *ptrDst, const char *ptrSrc)
+char* ng_strcpy(char* ptrDst, const char* ptrSrc)
 {
-  return strcpy (ptrDst, ptrSrc);
+  return strcpy(ptrDst, ptrSrc);
 }
 
-long unsigned int ng_strlen (const char *str)
+long unsigned int ng_strlen(const char* str)
 {
-  return strlen (str);
+  return strlen(str);
 }
 
-char *ng_strncpy (char *ptrDst, const char *ptrSrc, long unsigned int n)
+char* ng_strncpy(char* ptrDst, const char* ptrSrc, long unsigned int n)
 {
-  return strncpy (ptrDst, ptrSrc, n);
+  return strncpy(ptrDst, ptrSrc, n);
 }
 
-char *ng_strcat (char *ptrDst, const char *ptrSrc)
+char* ng_strcat(char* ptrDst, const char* ptrSrc)
 {
-  return strcat (ptrDst, ptrSrc);
+  return strcat(ptrDst, ptrSrc);
 }
 
-long unsigned int ng_strspn (const char *str1, const char *str2)
+long unsigned int ng_strspn(const char* str1, const char* str2)
 {
-  return strspn (str1, str2);
+  return strspn(str1, str2);
 }
 
-long unsigned int ng_strcspn (const char *str1, const char *str2)
+long unsigned int ng_strcspn(const char* str1, const char* str2)
 {
-  return strcspn (str1, str2);
+  return strcspn(str1, str2);
 }
 
-int ng_printf (const char *format, ...)
-{
-  register int retval;
-  __builtin_va_list args;
-  __builtin_va_start(args, format);
-  retval = vprintf (format, args);
-  __builtin_va_end(args);
-  return retval;
-  //return 1;
-}
-
-int ng_sprintf (char *str, const char *format, ...)
+int ng_printf(const char* format, ...)
 {
   register int retval;
   __builtin_va_list args;
   __builtin_va_start(args, format);
-  retval = vsprintf (str, format, args);
+  retval = vprintf(format, args);
+  __builtin_va_end(args);
+  return retval;
+  // return 1;
+}
+
+int ng_sprintf(char* str, const char* format, ...)
+{
+  register int retval;
+  __builtin_va_list args;
+  __builtin_va_start(args, format);
+  retval = vsprintf(str, format, args);
   __builtin_va_end(args);
   return retval;
 }
 
-double ng_GetTime ()
+double ng_GetTime()
 {
   return 1000;
 }
 
-void ng_EthernetSendData (void *addr, long long size, char *_Interface)
+void ng_EthernetSendData(void* addr, long long size, char* _Interface)
 {
 
   //********************************************************************************
@@ -150,11 +150,11 @@ void ng_EthernetSendData (void *addr, long long size, char *_Interface)
 
   int SID;
 
-  CreateRawSocket (&SID);
+  CreateRawSocket(&SID);
 
-  printf ("\nSelected Interface: %-8s\n", _Interface);
+  printf("\nSelected Interface: %-8s\n", _Interface);
 
-  SendToARawSocket (SID, _Interface, addr, size);
+  SendToARawSocket(SID, _Interface, addr, size);
 
   //********************************************************************************
   //
@@ -162,7 +162,7 @@ void ng_EthernetSendData (void *addr, long long size, char *_Interface)
   //
   //********************************************************************************
 
-  //Ethernet_sendData(addr, size);
+  // Ethernet_sendData(addr, size);
 
   //********************************************************************************
   //
@@ -170,12 +170,11 @@ void ng_EthernetSendData (void *addr, long long size, char *_Interface)
   //
   //********************************************************************************
 
-  //WiFi_writePacket(addr, size);
+  // WiFi_writePacket(addr, size);
 }
 
-void ng_BLESendData (char *addr, long long size)
+void ng_BLESendData(char* addr, long long size)
 {
 
-
-  //EPGSMessage(addr, size);
+  // EPGSMessage(addr, size);
 }

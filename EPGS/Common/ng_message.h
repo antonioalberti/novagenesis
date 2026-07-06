@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis message
-	Object:		ng_message
-	File:		ng_message.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis message
+        Object:		ng_message
+        File:		ng_message.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -34,12 +34,13 @@
 #define DELETED_BY_APP true
 #define DELETED_BY_CORE false
 
-struct _ng_message {
+struct _ng_message
+{
   // Type
   short Type;
 
   // CommandLine container
-  NgCommand **CommandLines;
+  NgCommand** CommandLines;
 
   // Number of command lines
   unsigned int NoCL;
@@ -48,10 +49,10 @@ struct _ng_message {
   bool HasPayloadFlag;
 
   // Payload char array. Can be used to carry a payload in memory instead of saving it to a file
-  char *Payload;
+  char* Payload;
 
   // Message char array. Can be used to carry the message to memory instead of using a file
-  char *Msg;
+  char* Msg;
 
   // The size of the payload in bytes
   int PayloadSize;
@@ -65,25 +66,25 @@ struct _ng_message {
 
 typedef struct _ng_message NgMessage;
 
-void ng_create_message (double _Time, short _Type, bool _HasPayload, NgMessage **ngMessage);
+void ng_create_message(double _Time, short _Type, bool _HasPayload, NgMessage** ngMessage);
 
-void ng_destroy_message (struct _ng_message **ngMessage);
+void ng_destroy_message(struct _ng_message** ngMessage);
 
-int NewCommandLine (struct _ng_message *ngMessage, NgCommand *CL);
+int NewCommandLine(struct _ng_message* ngMessage, NgCommand* CL);
 
 // Get a CommandLine by its index
-int GetCommandLine (struct _ng_message *ngMessage, unsigned int _Index, NgCommand **CL);
+int GetCommandLine(struct _ng_message* ngMessage, unsigned int _Index, NgCommand** CL);
 
 // Set *Payload from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
-int SetPayloadFromCharArray (struct _ng_message *ngMessage, char *_Value, int _Size);
+int SetPayloadFromCharArray(struct _ng_message* ngMessage, char* _Value, int _Size);
 
 // Set *Msg from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
-int SetMessageFromCharArray (struct _ng_message *ngMessage, char *_Value, int _Size);
+int SetMessageFromCharArray(struct _ng_message* ngMessage, char* _Value, int _Size);
 
-int ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray (struct _ng_message **ngMessage);
+int ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray(struct _ng_message** ngMessage);
 
-void MessageToString (struct _ng_message *ngMessage, char **out);
+void MessageToString(struct _ng_message* ngMessage, char** out);
 
-void MessageFromString (const char *in, int msgSize, struct _ng_message **ngMessage);
+void MessageFromString(const char* in, int msgSize, struct _ng_message** ngMessage);
 
 #endif /* MESSAGE_NG_MESSAGE_H_ */

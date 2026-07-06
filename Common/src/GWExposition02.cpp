@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWExposition02
-	Object:		GWExposition02
-	File:		GWExposition02.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		06/2026
-	Version:	0.2
+        Name:		GWExposition02
+        Object:		GWExposition02
+        File:		GWExposition02.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		06/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -145,7 +145,7 @@ int GWExposition02::ExposePeers()
       }
       delete ExposedKeys;
 
-           // Get the exposed peer's IPC key from category 19
+      // Get the exposed peer's IPC key from category 19
       string exposedBID = "";
       vector<string>* ExposedBIDs = new vector<string>;
       if (PGW->GetHTBindingValues(5, exposedPID, ExposedBIDs) == OK && ExposedBIDs->size() > 0)
@@ -189,7 +189,7 @@ int GWExposition02::ExposePeers()
           continue; // Don't send back to the exposed peer
         }
 
-        #ifdef DEBUG
+#ifdef DEBUG
         PB->S << Offset << "(GWExposition02: Exposing peer " << exposedLN << " with PID " << exposedPID << " and key " << exposedIPCKey << ")" << endl;
 #endif
 
@@ -262,7 +262,7 @@ int GWExposition02::ExposePeers()
         // the forwarded hello look like PGCS was the originator. The receiver
         // then stored a binding like `Cat[20] PGCS_PID -> NRNCS` (mismatch)
         // and Categories 5/6 were never populated correctly, breaking
-        // domain discovery. 
+        // domain discovery.
         FSources.push_back(exposedPID);
         FSources.push_back(exposedBID);
 
@@ -276,25 +276,25 @@ int GWExposition02::ExposePeers()
         PB->GenerateSCNFromMessageBinaryPatterns(FreshHello, FSCN);
         PMB->NewSCNCommandLine("0.1", FSCN, FreshHello, FreshPCL);
 
-        #ifdef DEBUG
+#ifdef DEBUG
         PB->S << Offset << "(GWExposition02: Sending exposition of " << exposedLN << " to " << targetLN << " with key = " << targetIPCKey << ")" << endl;
 #endif
         PGW->PushToOutputQueue(targetIPCKey, FreshHello);
       }
     }
 
-    // Phase 2: expose the LOCAL process (PGCS) to each known peer.
-    //
-    // PGCS does not run GWRunHelloIPC02 (key 11 is the well-known
-    // initialization key, statically configured on every peer). Without
-    // Phase 2, peers would never receive a hello 0.2 originated by PGCS,
-    // and the bindings that hello carries (peer self-identification that
-    // goes beyond the static key advertisement) would be missing on the
-    // peer side. Phase 2 also resolves NG-042-03: with a single known
-    // peer, Phase 1 emits zero messages (i==j filter drops the only
-    // iteration), but Phase 2 still delivers the PGCS hello to that
-    // peer.
-    #ifdef DEBUG
+// Phase 2: expose the LOCAL process (PGCS) to each known peer.
+//
+// PGCS does not run GWRunHelloIPC02 (key 11 is the well-known
+// initialization key, statically configured on every peer). Without
+// Phase 2, peers would never receive a hello 0.2 originated by PGCS,
+// and the bindings that hello carries (peer self-identification that
+// goes beyond the static key advertisement) would be missing on the
+// peer side. Phase 2 also resolves NG-042-03: with a single known
+// peer, Phase 1 emits zero messages (i==j filter drops the only
+// iteration), but Phase 2 still delivers the PGCS hello to that
+// peer.
+#ifdef DEBUG
     PB->S << Offset << "(GWExposition02: Self-exposing PGCS to " << KnownPIDs.size() << " known peer(s))" << endl;
 #endif
 
@@ -406,7 +406,7 @@ int GWExposition02::ExposePeers()
       PB->GenerateSCNFromMessageBinaryPatterns(SelfHello, SelfSCN);
       PMB->NewSCNCommandLine("0.1", SelfSCN, SelfHello, SelfPCL);
 
-      #ifdef DEBUG
+#ifdef DEBUG
       PB->S << Offset << "(GWExposition02: PGCS self-exposing to " << targetLN << " (key = " << targetIPCKey << "))" << endl;
 #endif
       PGW->PushToOutputQueue(targetIPCKey, SelfHello);
@@ -443,8 +443,8 @@ void GWExposition02::SelfReschedule(Message* _ReceivedMessage)
   // Create a new message scheduled 1 second from now
   PB->PP->NewMessage(GetTime() + 10, 1, false, SelfMsg);
 
-// Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, SelfMsg, PCL);
+  // Creating the ng -cl -m command line
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, SelfMsg, PCL);
 
   // Copy the command lines from the received message
   SelfMsg->NewCommandLine("-run", "--exposition", "0.2", PCL);

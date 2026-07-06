@@ -53,9 +53,10 @@
 #include "GWExposition02.h"
 #endif
 
-//#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
-#define LG(msg) S << endl << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl
+#define LG(msg) S << endl \
+                  << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl
 // #define DEBUG1  // To follow shared memory access
 // #define DEBUG2  // More on shm access
 // #define DEBUG3 // Even more on shm access
@@ -99,11 +100,11 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   // Creating the actions
   NewAction("-run --initialization 0.1", PA);
   NewAction("-m --cl 0.1", PA);
-  NewAction("-hello --ipc 0.2", PA);        // GWHelloIPC02 - receiver (replaces GWHelloIPC01)
-  NewAction("-hello --ipc 2.0", PA);        // GWHelloIPC02 - receiver with HT BID support
-  NewAction("-run --helloIPC 0.2", PA);     // GWRunHelloIPC02 - periodic emitter
-  NewAction("-exposition 0.2", PA);         // GWExposition02 - periodic peer exposition on PGCS
-  NewAction("-run --exposition 0.2", PA);   // GWExposition02 - periodic trigger
+  NewAction("-hello --ipc 0.2", PA);      // GWHelloIPC02 - receiver (replaces GWHelloIPC01)
+  NewAction("-hello --ipc 2.0", PA);      // GWHelloIPC02 - receiver with HT BID support
+  NewAction("-run --helloIPC 0.2", PA);   // GWRunHelloIPC02 - periodic emitter
+  NewAction("-exposition 0.2", PA);       // GWExposition02 - periodic peer exposition on PGCS
+  NewAction("-run --exposition 0.2", PA); // GWExposition02 - periodic trigger
 
   // Creating a -run --initialization message
   PP->NewMessage(GetTime(), 0, false, PIM);
@@ -433,7 +434,7 @@ void GW::Gateway()
   long long int MessageSize = 0;
   std::chrono::milliseconds waitTimeout;
   constexpr long long SHM_POLL_INTERVAL_MS = 1; // SHM poll every 1ms (SPEC-007a)
-  double secondsUntilNext = 1.0; // default 1s when queue empty
+  double secondsUntilNext = 1.0;                // default 1s when queue empty
 
   // Start output queue thread
   tthread::thread* T = new tthread::thread(&GW::ReadFromOutputQueueThreadWrapper, this);
@@ -514,68 +515,67 @@ void GW::Gateway()
       S << "[7]       Current peer processes on this OS are:" << endl;
 
       // List peers from category 20 (hello IPC discovered peers)
-      
-        vector<string> Cat20Keys;
-        if (PHT->GetBindingKeys(20, Cat20Keys) == OK)
-        {
-          for (unsigned int i = 0; i < Cat20Keys.size(); i++)
-          {
-            vector<string>* Cat20Vals = new vector<string>;
-            if (PHT->GetBinding(20, Cat20Keys.at(i), Cat20Vals) == OK)
-            {
-              S << "            Cat[20] " << Cat20Keys.at(i);
-              for (unsigned int j = 0; j < Cat20Vals->size(); j++)
-              {
-                S << " -> " << Cat20Vals->at(j);
-              }
-              S << endl;
-            }
-            delete Cat20Vals;
-          }
-        }
 
-        // List peers from category 19 (hello IPC discovered peers)
-      
-        vector<string> Cat19Keys;
-        if (PHT->GetBindingKeys(19, Cat19Keys) == OK)
+      vector<string> Cat20Keys;
+      if (PHT->GetBindingKeys(20, Cat20Keys) == OK)
+      {
+        for (unsigned int i = 0; i < Cat20Keys.size(); i++)
         {
-          for (unsigned int j = 0; j < Cat19Keys.size(); j++)
+          vector<string>* Cat20Vals = new vector<string>;
+          if (PHT->GetBinding(20, Cat20Keys.at(i), Cat20Vals) == OK)
           {
-            vector<string>* Cat19Vals = new vector<string>;
-            if (PHT->GetBinding(19, Cat19Keys.at(j), Cat19Vals) == OK)
+            S << "            Cat[20] " << Cat20Keys.at(i);
+            for (unsigned int j = 0; j < Cat20Vals->size(); j++)
             {
-              S << "            Cat[19] " << Cat19Keys.at(j);
-              for (unsigned int k = 0; k < Cat19Vals->size(); k++)
-              {
-                S << " -> " << Cat19Vals->at(k);
-              }
-              S << endl;
+              S << " -> " << Cat20Vals->at(j);
             }
-            delete Cat19Vals;
+            S << endl;
           }
+          delete Cat20Vals;
         }
+      }
 
-        // List peers from category 15 (hello IHC discovered peers)
-      
-        vector<string> Cat15Keys;
-        if (PHT->GetBindingKeys(15, Cat15Keys) == OK)
+      // List peers from category 19 (hello IPC discovered peers)
+
+      vector<string> Cat19Keys;
+      if (PHT->GetBindingKeys(19, Cat19Keys) == OK)
+      {
+        for (unsigned int j = 0; j < Cat19Keys.size(); j++)
         {
-          for (unsigned int j = 0; j < Cat15Keys.size(); j++)
+          vector<string>* Cat19Vals = new vector<string>;
+          if (PHT->GetBinding(19, Cat19Keys.at(j), Cat19Vals) == OK)
           {
-            vector<string>* Cat15Vals = new vector<string>;
-            if (PHT->GetBinding(15, Cat15Keys.at(j), Cat15Vals) == OK)
+            S << "            Cat[19] " << Cat19Keys.at(j);
+            for (unsigned int k = 0; k < Cat19Vals->size(); k++)
             {
-              S << "            Cat[15] " << Cat15Keys.at(j);
-              for (unsigned int k = 0; k < Cat15Vals->size(); k++)
-              {
-                S << " -> " << Cat15Vals->at(k);
-              }
-              S << endl;
+              S << " -> " << Cat19Vals->at(k);
             }
-            delete Cat15Vals;
+            S << endl;
           }
+          delete Cat19Vals;
         }
-      
+      }
+
+      // List peers from category 15 (hello IHC discovered peers)
+
+      vector<string> Cat15Keys;
+      if (PHT->GetBindingKeys(15, Cat15Keys) == OK)
+      {
+        for (unsigned int j = 0; j < Cat15Keys.size(); j++)
+        {
+          vector<string>* Cat15Vals = new vector<string>;
+          if (PHT->GetBinding(15, Cat15Keys.at(j), Cat15Vals) == OK)
+          {
+            S << "            Cat[15] " << Cat15Keys.at(j);
+            for (unsigned int k = 0; k < Cat15Vals->size(); k++)
+            {
+              S << " -> " << Cat15Vals->at(k);
+            }
+            S << endl;
+          }
+          delete Cat15Vals;
+        }
+      }
 
 #endif
 
@@ -678,7 +678,7 @@ int GW::ReadFromSharedMemory3()
         //(shmid = shmget(key, SHM_SIZE, IPC_CREAT | 0666)
 
         LG("(Created an input shared memory segment with key = " << (PP->Key + z)
-            << " and identifier = " << PP->shmid[z] << ")");
+                                                                 << " and identifier = " << PP->shmid[z] << ")");
       }
       else
       {
@@ -980,7 +980,7 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
         StoreHTBindingValues(Category, _oqs, Values);
 
         LG("(Storing the shared memory ID (shmid) = " << shmid << " on HT. The related key is "
-    << _oqs << ")");
+                                                      << _oqs << ")");
       }
     }
 
@@ -1035,7 +1035,7 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
                 data[0] = (unsigned char)'f';
 
                 LG("(Initialized the shared memory with key " << _oqs
-    << " regarding the r/w control flag)");
+                                                              << " regarding the r/w control flag)");
               }
             }
 

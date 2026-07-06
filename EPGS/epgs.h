@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Embedded Proxy/Gateway Service
-	Object:		epgs
-	File:		epgs.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		Embedded Proxy/Gateway Service
+        Object:		epgs
+        File:		epgs.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -38,7 +38,7 @@
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int initEPGS (NgEPGS **ngEPGS);
+int initEPGS(NgEPGS** ngEPGS);
 
 /**
  *
@@ -48,7 +48,7 @@ int initEPGS (NgEPGS **ngEPGS);
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int destroyEPGS (NgEPGS **ngEPGS);
+int destroyEPGS(NgEPGS** ngEPGS);
 
 /**
  * Sets the Hardware configuration
@@ -63,8 +63,7 @@ int destroyEPGS (NgEPGS **ngEPGS);
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int
-setHwConfigurations (NgEPGS **ngEPGS, const char *hid, const char *soid, const char *pid, const char *Stack, const char *Interface, const char *Identifier);
+int setHwConfigurations(NgEPGS** ngEPGS, const char* hid, const char* soid, const char* pid, const char* Stack, const char* Interface, const char* Identifier);
 
 /**
  * Adds keywords that specifies the Node
@@ -74,7 +73,7 @@ setHwConfigurations (NgEPGS **ngEPGS, const char *hid, const char *soid, const c
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int addKeyWords (NgEPGS **ngEPGS, const char *name);
+int addKeyWords(NgEPGS** ngEPGS, const char* name);
 
 /**
  * Adds sensor features in name/value way.
@@ -85,7 +84,7 @@ int addKeyWords (NgEPGS **ngEPGS, const char *name);
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int addHwSensorFeature (NgEPGS **ngEPGS, const char *name, const char *value);
+int addHwSensorFeature(NgEPGS** ngEPGS, const char* name, const char* value);
 
 /**
  * Analysis the EPGS state and takes actions. This function must be called in a loop.
@@ -94,7 +93,7 @@ int addHwSensorFeature (NgEPGS **ngEPGS, const char *name, const char *value);
  *
  * @return State Machine ID (@see epgs_structures.h)
  */
-int processLoop (NgEPGS **ngEPGS);
+int processLoop(NgEPGS** ngEPGS);
 
 /**
  * Parses the received message and takes actions.
@@ -105,7 +104,7 @@ int processLoop (NgEPGS **ngEPGS);
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int newEthernetReceivedMessage (NgEPGS **ngEPGS, const char *message, int msgSize);
+int newEthernetReceivedMessage(NgEPGS** ngEPGS, const char* message, int msgSize);
 
 /**
  * Parses the bluetooth received message and takes actions.
@@ -116,7 +115,7 @@ int newEthernetReceivedMessage (NgEPGS **ngEPGS, const char *message, int msgSiz
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int newBLEReceivedMessage (NgEPGS **ngEPGS, const char *message, int msgSize);
+int newBLEReceivedMessage(NgEPGS** ngEPGS, const char* message, int msgSize);
 
 /**
  * Sets the data to be publish in the next cycle.
@@ -128,7 +127,7 @@ int newBLEReceivedMessage (NgEPGS **ngEPGS, const char *message, int msgSize);
  *
  * @return OK if success, ERROR otherwise (@see epgs_defines.h)
  */
-int setDataToPub (NgEPGS **ngEPGS, const char *fileName, const char *data, int dataLength);
+int setDataToPub(NgEPGS** ngEPGS, const char* fileName, const char* data, int dataLength);
 
 /**
  * Enables the periodic hello
@@ -137,6 +136,6 @@ int setDataToPub (NgEPGS **ngEPGS, const char *fileName, const char *data, int d
  * @param enable		true: EPGS will send periodic hello message.
  * 						false: Disable periodic hello message.
  */
-int enablePeriodicHello (NgEPGS **ngEPGS, bool enable);
+int enablePeriodicHello(NgEPGS** ngEPGS, bool enable);
 
 #endif /* NG_EPGS_H_ */

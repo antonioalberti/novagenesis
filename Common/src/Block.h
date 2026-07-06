@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Block
-	Object:		Block
-	File:		Block.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Block
+        Object:		Block
+        File:		Block.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -79,14 +79,14 @@
 #define ERROR 1
 #define OK 0
 
-//using namespace std;
+// using namespace std;
 using namespace tthread;
 
 class Process;
 
-class Block {
- private:
-
+class Block
+{
+private:
   // Legible Name
   string LN;
 
@@ -102,8 +102,7 @@ class Block {
   // Auxiliary prime numbers array
   unsigned int primes[32];
 
- public:
-
+public:
   // Operational state
   string State;
 
@@ -114,132 +113,126 @@ class Block {
   ConsoleOstream S;
 
   // Pointer to the process that hosts the block
-  Process *PP;
+  Process* PP;
 
   // Actions container
-  vector<Action *> Actions;
+  vector<Action*> Actions;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Main functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Constructor
-  Block (string _LN, Process *_PP, unsigned int _Index, string _Path);
+  Block(string _LN, Process* _PP, unsigned int _Index, string _Path);
 
   // Destructor
-  virtual ~Block ();
+  virtual ~Block();
 
   // Run the actions behind a received message
-  virtual int Run (Message *_ReceivedMessage, Message *&_InlineResponseMessage);
+  virtual int Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Basic functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Set block legible name
-  void SetLegibleName (string _LN);
+  void SetLegibleName(string _LN);
 
   // Set block self-certifying name
-  void SetSelfCertifyingName (string _SCN);
+  void SetSelfCertifyingName(string _SCN);
 
   // Set working path
-  void SetPath (string _Path);
+  void SetPath(string _Path);
 
   // Set operational state
-  void SetState (string _State);
+  void SetState(string _State);
 
   // Get block legible name
-  string GetLegibleName ();
+  string GetLegibleName();
 
   // Get block self-certifying name
-  string GetSelfCertifyingName ();
+  string GetSelfCertifyingName();
 
   // Get working path
-  string GetPath ();
+  string GetPath();
 
   // Get operational state
-  string GetState ();
+  string GetState();
 
   // Get index
-  unsigned int GetIndex ();
+  unsigned int GetIndex();
 
   // Allocate and add an Action on Actions container
-  virtual void NewAction (const string _LN, Action *&_PA);
+  virtual void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  virtual int GetAction (string _LN, Action *&_PA);
+  virtual int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  virtual int DeleteAction (string _LN);
+  virtual int DeleteAction(string _LN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  int StringToInt (string _String);
+  int StringToInt(string _String);
 
   // Convert int to string
-  string IntToString (int _Int);
+  string IntToString(int _Int);
 
   // Convert double to string
-  string DoubleToString (double _Double);
+  string DoubleToString(double _Double);
 
   // Converting string to double
-  double StringToDouble (string _String);
+  double StringToDouble(string _String);
 
   // Convert unsigned int to string
-  string UnsignedIntToString (unsigned int _Int);
+  string UnsignedIntToString(unsigned int _Int);
 
   // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns4Bytes (Block *_PB, string &_SCN);
+  void GenerateSCNFromBlockBinaryPatterns4Bytes(Block* _PB, string& _SCN);
 
   // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns16Bytes (Block *_PB, string &_SCN);
+  void GenerateSCNFromBlockBinaryPatterns16Bytes(Block* _PB, string& _SCN);
 
   // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns32Bytes (Block *_PB, string &_SCN);
+  void GenerateSCNFromBlockBinaryPatterns32Bytes(Block* _PB, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes (const char *_Input, long long _Size, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(const char* _Input, long long _Size, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes (const char *_Input, long long _Size, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(const char* _Input, long long _Size, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes (string _Input, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(string _Input, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes (string _Input, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(string _Input, string& _SCN);
 
   // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns4Bytes (Message *_M, string &_SCN);
+  int GenerateSCNFromMessageBinaryPatterns4Bytes(Message* _M, string& _SCN);
 
   // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns16Bytes (Message *_M, string &_SCN);
+  int GenerateSCNFromMessageBinaryPatterns16Bytes(Message* _M, string& _SCN);
 
   // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns (Block *_PB, string &_SCN);
+  void GenerateSCNFromBlockBinaryPatterns(Block* _PB, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns (const char *_Input, long long _Size, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns(const char* _Input, long long _Size, string& _SCN);
 
   // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns (string _Input, string &_SCN);
+  int GenerateSCNFromCharArrayBinaryPatterns(string _Input, string& _SCN);
 
   // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns (Message *_M, string &_SCN);
+  int GenerateSCNFromMessageBinaryPatterns(Message* _M, string& _SCN);
 
   // Return the current time in seconds
-  double GetTime ();
+  double GetTime();
 
   // Friends
   friend class Process;
 };
 
 #endif
-
-
-
-
-
-

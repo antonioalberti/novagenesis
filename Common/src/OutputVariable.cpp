@@ -1,14 +1,14 @@
-/*	
-	NovaGenesis
-	
-	Name:		OutputVariable
-	Object:		OutputVariable
-	File:		OutputVariable.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.4
+/*
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		OutputVariable
+        Object:		OutputVariable
+        File:		OutputVariable.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.4
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -39,9 +39,9 @@
 
 #include <math.h>
 
-OutputVariable::OutputVariable (Block *Owner_)
+OutputVariable::OutputVariable(Block* Owner_)
 {
-  double t = Owner->GetTime ();
+  double t = Owner->GetTime();
 
   Name = "UNKNOWN";
   Type = "UNKNOWN";
@@ -64,11 +64,11 @@ OutputVariable::OutputVariable (Block *Owner_)
   Offset = t;
 }
 
-OutputVariable::~OutputVariable ()
+OutputVariable::~OutputVariable()
 {
 }
 
-void OutputVariable::Initialization (string Name_, string Type_, string Description_, int Option_)
+void OutputVariable::Initialization(string Name_, string Type_, string Description_, int Option_)
 {
   Name = Name_;
   Type = Type_;
@@ -77,42 +77,42 @@ void OutputVariable::Initialization (string Name_, string Type_, string Descript
 
   string FileName;
 
-  FileName = Owner->PP->GetLegibleName () + "_" + Owner->GetLegibleName () + "_" + Name_ + ".dat";
+  FileName = Owner->PP->GetLegibleName() + "_" + Owner->GetLegibleName() + "_" + Name_ + ".dat";
 
-  Results.SetName (FileName);
-  Results.SetPath (Owner->GetPath ());
-  Results.SetOption ("DEFAULT");
-  Results.SetDescription ("");
+  Results.SetName(FileName);
+  Results.SetPath(Owner->GetPath());
+  Results.SetOption("DEFAULT");
+  Results.SetDescription("");
 
-  Results.OpenOutputFile (FileName, Owner->GetPath (), "DEFAULT");
+  Results.OpenOutputFile(FileName, Owner->GetPath(), "DEFAULT");
 
-  //Results<<"t"<<"\t"<<Name<<"\t"<<"M_"+Name<<endl;
+  // Results<<"t"<<"\t"<<Name<<"\t"<<"M_"+Name<<endl;
 
   if (Option == 1)
-	{
-	  Results.CloseFile ();
-	}
+  {
+    Results.CloseFile();
+  }
 
-  Results.setf (ios::scientific);
+  Results.setf(ios::scientific);
 }
 
-void OutputVariable::CalculateArithmetic ()
+void OutputVariable::CalculateArithmetic()
 {
   S1 = S1 + Value;
   Mean = S1 / Samples_Number;
-  Sqr = pow ((Value - Mean), 2);
+  Sqr = pow((Value - Mean), 2);
   S2 = S2 + Sqr;
 
   if (Samples_Number > 2)
-	{
-	  Sigma = sqrt (S2 / (Samples_Number - 1));
-	  SE = Sigma / sqrt (Samples_Number);
-	  ME = 1.96 * SE;
-	  Lower = Mean - ME;
-	  Up = Mean + ME;
-	}
+  {
+    Sigma = sqrt(S2 / (Samples_Number - 1));
+    SE = Sigma / sqrt(Samples_Number);
+    ME = 1.96 * SE;
+    Lower = Mean - ME;
+    Up = Mean + ME;
+  }
 
-  //if (Name == "twi")
+  // if (Name == "twi")
   //	{
   //		cout << setprecision(10) << endl << endl << "Value = " << Value << endl;
   //		cout << setprecision(10) << "S1 = " << S1 << endl;
@@ -130,31 +130,33 @@ void OutputVariable::CalculateArithmetic ()
   Samples_Number++;
 }
 
-void OutputVariable::CalculateWeighted (double Time)
+void OutputVariable::CalculateWeighted(double Time)
 {
   double E = 0;
 
-  if (Time == 0) Time = 1e-150;
-  if (Time == Offset) Time = Offset + 1e-150;
+  if (Time == 0)
+    Time = 1e-150;
+  if (Time == Offset)
+    Time = Offset + 1e-150;
 
   E = (Time - t_1) * v_1;
 
   S1 = S1 + E;
   Mean = S1 / (Time - Offset);
 
-  Sqr = pow ((v_1 - Mean), 2);
+  Sqr = pow((v_1 - Mean), 2);
   S2 = S2 + Sqr;
 
   if (Samples_Number > 2)
-	{
-	  Sigma = sqrt (S2 / (Samples_Number - 1));
-	  SE = Sigma / sqrt (Samples_Number);
-	  ME = 1.96 * SE;
-	  Lower = Mean - ME;
-	  Up = Mean + ME;
-	}
+  {
+    Sigma = sqrt(S2 / (Samples_Number - 1));
+    SE = Sigma / sqrt(Samples_Number);
+    ME = 1.96 * SE;
+    Lower = Mean - ME;
+    Up = Mean + ME;
+  }
 
-  //if (Name == "wi")
+  // if (Name == "wi")
   //	{
   //		cout << setprecision(10) << endl << endl << "Time = " << Time << endl;
   //		cout << setprecision(10) << "t_1 = " << t_1 << endl;
@@ -178,9 +180,9 @@ void OutputVariable::CalculateWeighted (double Time)
   Samples_Number++;
 }
 
-void OutputVariable::Reset ()
+void OutputVariable::Reset()
 {
-  double t = Owner->GetTime ();
+  double t = Owner->GetTime();
 
   S1 = 0;
   t_1 = t;
@@ -198,9 +200,9 @@ void OutputVariable::Reset ()
   Offset = t;
 }
 
-void OutputVariable::ResetButKeepLastValue ()
+void OutputVariable::ResetButKeepLastValue()
 {
-  double t = Owner->GetTime ();
+  double t = Owner->GetTime();
 
   S1 = 0;
   t_1 = t;
@@ -217,28 +219,28 @@ void OutputVariable::ResetButKeepLastValue ()
   Offset = t;
 }
 
-void OutputVariable::SampleToFile (double Time)
+void OutputVariable::SampleToFile(double Time)
 {
   // Sampling
   if (Option == 1)
-	{
-	  Results.OpenOutputFile ();
-	}
+  {
+    Results.OpenOutputFile();
+  }
 
-  Results << setprecision (10) << Time << " " << Value << " ";
+  Results << setprecision(10) << Time << " " << Value << " ";
 
   if (Type == "MEAN_WEIGHTED")
-	{
-	  if (Time > t_1)
-		{
-		  CalculateWeighted (Time);
-		}
-	}
+  {
+    if (Time > t_1)
+    {
+      CalculateWeighted(Time);
+    }
+  }
 
-  Results << setprecision (10) << Mean << " " << Sigma << " " << SE << " " << ME << " " << Lower << " " << Up << endl;
+  Results << setprecision(10) << Mean << " " << Sigma << " " << SE << " " << ME << " " << Lower << " " << Up << endl;
 
   if (Option == 1)
-	{
-	  Results.CloseFile ();
-	}
+  {
+    Results.CloseFile();
+  }
 }

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Simple application process
-	Object:		App
-	File:		App.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Simple application process
+        Object:		App
+        File:		App.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -25,7 +25,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _CONTENTAPP_H"
+#ifndef _CONTENTAPP_H "
 #include "ContentApp.h"
 #endif
 
@@ -33,57 +33,55 @@
 #include "Core.h"
 #endif
 
-ContentApp::ContentApp (string _LN, string _Role, key_t _Key, string _Path) : Process (_LN, _Key, _Path)
+ContentApp::ContentApp(string _LN, string _Role, key_t _Key, string _Path)
+    : Process(_LN, _Key, _Path)
 {
-  Block *PCoreB = 0;
+  Block* PCoreB = 0;
   string CoreLN = "Core";
   Role = _Role;
 
-  NewBlock (CoreLN, PCoreB);
+  NewBlock(CoreLN, PCoreB);
 
   // Run the base class GW
-  RunGateway ();
+  RunGateway();
 }
 
-ContentApp::~ContentApp ()
+ContentApp::~ContentApp()
 {
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int ContentApp::NewBlock (string _LN, Block *&_PB)
+int ContentApp::NewBlock(string _LN, Block*& _PB)
 {
   if (_LN == "Core")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW;
-	  HT *PHT;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW;
+    HT* PHT;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index;
+    unsigned int Index;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  Core *PCore = new Core (_LN, this, Index, PGW, PHT, GetPath ());
+    Core* PCore = new Core(_LN, this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PCore;
+    _PB = (Block*)PCore;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
-
-
-

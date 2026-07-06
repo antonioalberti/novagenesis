@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS pub notify
-	Object:		pubNotify
-	File:		pubNotify.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS pub notify
+        Object:		pubNotify
+        File:		pubNotify.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -31,7 +31,6 @@
 #include "../DataStructures/epgs_structures.h"
 #include "../Common/ng_message.h"
 
-int
-actionPublicationAndNotification (NgEPGS *ngEPGS, bool isData, char *fileName, char *filePayload, int payloadSize, NgMessage **pubNotifyMessage);
+int actionPublicationAndNotification(NgEPGS* ngEPGS, bool isData, char* fileName, char* filePayload, int payloadSize, NgMessage** pubNotifyMessage);
 
-#endif /* PUB_NOTIFY_H_ */ 
+#endif /* PUB_NOTIFY_H_ */

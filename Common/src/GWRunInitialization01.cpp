@@ -268,7 +268,9 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   PB->State = "operational";
 
-  PB->S << Offset << "(State: Operational)" << endl << endl << endl;
+  PB->S << Offset << "(State: Operational)" << endl
+        << endl
+        << endl;
 
   // ******************************************************
   // Finish

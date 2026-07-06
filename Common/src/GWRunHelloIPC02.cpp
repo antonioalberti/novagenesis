@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWRunHelloIPC02
-	Object:		GWRunHelloIPC02
-	File:		GWRunHelloIPC02.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2026
-	Version:	0.2
+        Name:		GWRunHelloIPC02
+        Object:		GWRunHelloIPC02
+        File:		GWRunHelloIPC02.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -33,7 +33,7 @@
 #include "GW.h"
 #endif
 
-//#define DEBUG
+// #define DEBUG
 
 GWRunHelloIPC02::GWRunHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -67,7 +67,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
     return Status;
   }
 
-  #ifdef DEBUG
+#ifdef DEBUG
   PB->S << Offset << "(Periodic hello IPC 0.2 emission for " << PB->PP->GetLegibleName() << ")" << endl;
 #endif
 
@@ -120,7 +120,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   // Push to output queue targeting PGCS SHM key 11
   // ******************************************************
 
-  #ifdef DEBUG
+#ifdef DEBUG
   PB->S << Offset << "(Sending hello IPC to PGCS via SHM key 11)" << endl;
 #endif
 

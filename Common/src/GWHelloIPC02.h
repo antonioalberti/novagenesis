@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWHelloIPC02
-	Object:		GWHelloIPC02
-	File:		GWHelloIPC02.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2026
-	Version:	0.2
+        Name:		GWHelloIPC02
+        Object:		GWHelloIPC02
+        File:		GWHelloIPC02.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -51,9 +51,9 @@ class Block;
 
 using namespace std;
 
-class GWHelloIPC02 : public Action {
- public:
-
+class GWHelloIPC02 : public Action
+{
+public:
   // Constructor
   GWHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
@@ -64,8 +64,7 @@ class GWHelloIPC02 : public Action {
   // ng -hello --ipc 0.2 [ < 2 string Peer_Key Peer_LN > ]
   int Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
- private:
-
+private:
   // Store peer bindings in local HT
   // _PeerPID: sender PID from -m --cl (index 2: HID, OSID, PID, BID)
   // _PeerIPCKey: peer IPC key (hash from hello command)

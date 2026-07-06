@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Embedded Proxy/Gateway Service defines
-	Object:		epgs_defines
-	File:		epgs_defines.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		Embedded Proxy/Gateway Service defines
+        Object:		epgs_defines
+        File:		epgs_defines.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -30,7 +30,11 @@
 
 // Boolean define
 typedef int bool;
-enum { false, true };
+enum
+{
+  false,
+  true
+};
 
 // ERROR TYPES
 #define NG_PROCESSING 2
@@ -49,14 +53,14 @@ static const char NG_STACK_ETHERNET[] = "Ethernet";
 static const char NG_STACK_WIFI[] = "Wifi";
 static const char NG_STACK_BLUETOOTH[] = "Bluetooth";
 
-//VBOX UBUNTU
-//static const char NG_INTERFACE_NAME[] = "enp0s3";
+// VBOX UBUNTU
+// static const char NG_INTERFACE_NAME[] = "enp0s3";
 
-//LAB COMPUTERS
-//static const char NG_INTERFACE_NAME[] = "enp2s0";
-//static char NG_INTERFACE_NAME[]="";
+// LAB COMPUTERS
+// static const char NG_INTERFACE_NAME[] = "enp2s0";
+// static char NG_INTERFACE_NAME[]="";
 
-//char NG_INTERFACE_NAME[]="";
+// char NG_INTERFACE_NAME[]="";
 
 #define MILLI_SECONDS_PER_CYCLE 1000 // 1 second per cycle
 

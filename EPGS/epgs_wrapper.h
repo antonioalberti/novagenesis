@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS wrapper to run an embedded/simulated version on Linux
-	Object:		epgs_wrapper
-	File:		epgs_wrapper.c
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS wrapper to run an embedded/simulated version on Linux
+        Object:		epgs_wrapper
+        File:		epgs_wrapper.c
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -25,8 +25,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     This header file contains functions that are used by the EPGS.
- 	All of them must be ported to the platform where the EPGS will be used.
- 	They are all based on standard C functions.
+        All of them must be ported to the platform where the EPGS will be used.
+        They are all based on standard C functions.
 */
 
 #ifndef EPGS_WRAPPER_H_
@@ -34,9 +34,9 @@
 
 #include "epgs_defines.h"
 
-#define NULL ((void *)0)
+#define NULL ((void*)0)
 
-//stdlib.h
+// stdlib.h
 
 /**
  * This function returns a pseudo-random number in the range of 0 to RAND_MAX.
@@ -44,7 +44,7 @@
  *
  * @return This function returns an integer value between 0 and RAND_MAX.
  */
-int ng_rand (void);
+int ng_rand(void);
 
 /**
  * This function converts the string argument str to an integer (type int).
@@ -53,7 +53,7 @@ int ng_rand (void);
  *
  * @return This function returns the converted integral number as an int value. If no valid conversion could be performed, it returns zero.
  */
-int ng_atoi (const char *str);
+int ng_atoi(const char* str);
 
 /**
  * This function converts the initial part
@@ -66,7 +66,7 @@ int ng_atoi (const char *str);
  *
  * @return This function returns the converted integral number as a long int value. If no valid conversion could be performed, a zero value is returned.
  */
-unsigned long ng_strtoul (const char *str, char **endptr, int base);
+unsigned long ng_strtoul(const char* str, char** endptr, int base);
 
 /**
  * This function allocates the requested memory and returns a pointer to it.
@@ -77,7 +77,7 @@ unsigned long ng_strtoul (const char *str, char **endptr, int base);
  *
  * @return This function returns a pointer to the allocated memory, or NULL if the request fails.
  */
-void *ng_calloc (long unsigned int nitems, long unsigned int size);
+void* ng_calloc(long unsigned int nitems, long unsigned int size);
 
 /**
  * This function allocates the requested memory and returns a pointer to it.
@@ -86,7 +86,7 @@ void *ng_calloc (long unsigned int nitems, long unsigned int size);
  *
  * @return This function returns a pointer to the allocated memory, or NULL if the request fails.
  */
-void *ng_malloc (long unsigned int size);
+void* ng_malloc(long unsigned int size);
 
 /**
  * This function attempts to resize the memory block pointed to by ptr that was previously allocated with a call to malloc or calloc.
@@ -98,7 +98,7 @@ void *ng_malloc (long unsigned int size);
  *
  * @return This function returns a pointer to the newly allocated memory, or NULL if the request fails.
  */
-void *ng_realloc (void *ptr, long unsigned int size);
+void* ng_realloc(void* ptr, long unsigned int size);
 
 /**
  * This function deallocates the memory previously allocated by a call to calloc, malloc, or realloc.
@@ -106,10 +106,9 @@ void *ng_realloc (void *ptr, long unsigned int size);
  * @param ptr -- This is the pointer to a memory block previously allocated with malloc, calloc or realloc to be deallocated.
  * 					If a null pointer is passed as argument, no action occurs.
  */
-void ng_free (void *ptr);
+void ng_free(void* ptr);
 
-
-//string.h
+// string.h
 /**
  * This function copies n characters from memory area ptrSrc to memory area ptrDst.
  *
@@ -119,7 +118,7 @@ void ng_free (void *ptr);
  *
  * @return This function returns a pointer to destination, which is str1.
  */
-void *ng_memcpy (void *ptrDst, const void *ptrSrc, long unsigned int size);
+void* ng_memcpy(void* ptrDst, const void* ptrSrc, long unsigned int size);
 
 /**
  * This function compares the string pointed to, by ptrA to the string pointed to by ptrB.
@@ -132,7 +131,7 @@ void *ng_memcpy (void *ptrDst, const void *ptrSrc, long unsigned int size);
  * 			if Return value > 0 then it indicates ptrB is less than ptrA.
  * 			if Return value = 0 then it indicates ptrA is equal to ptrB.
  */
-int ng_strcmp (const char *ptrA, const char *ptrB);
+int ng_strcmp(const char* ptrA, const char* ptrB);
 
 /**
  * This function copies the string pointed to, by ptrSrc to ptrDst.
@@ -142,7 +141,7 @@ int ng_strcmp (const char *ptrA, const char *ptrB);
  *
  * @return This returns a pointer to the destination string dest.
  */
-char *ng_strcpy (char *ptrDst, const char *ptrSrc);
+char* ng_strcpy(char* ptrDst, const char* ptrSrc);
 
 /**
  * This function copies up to n characters from the string pointed to, by ptrSrc to ptrDst.
@@ -154,7 +153,7 @@ char *ng_strcpy (char *ptrDst, const char *ptrSrc);
  *
  * @return This function returns the final copy of the copied string.
  */
-char *ng_strncpy (char *ptrDst, const char *ptrSrc, long unsigned int n);
+char* ng_strncpy(char* ptrDst, const char* ptrSrc, long unsigned int n);
 
 /**
  * This function computes the length of the string str up to, but not including the terminating null character.
@@ -163,7 +162,7 @@ char *ng_strncpy (char *ptrDst, const char *ptrSrc, long unsigned int n);
  *
  * @return This function returns the length of string.
  */
-long unsigned int ng_strlen (const char *str);
+long unsigned int ng_strlen(const char* str);
 
 /**
  * This function appends the string pointed to by ptrSrc to the end of the string pointed to by ptrDst.
@@ -173,7 +172,7 @@ long unsigned int ng_strlen (const char *str);
  *
  * @return This function returns a pointer to the resulting string ptrDst.
  */
-char *ng_strcat (char *ptrDst, const char *ptrSrc);
+char* ng_strcat(char* ptrDst, const char* ptrSrc);
 
 /**
  * This function calculates the length of the initial segment of str1 which consists entirely of characters in str2.
@@ -183,7 +182,7 @@ char *ng_strcat (char *ptrDst, const char *ptrSrc);
  *
  * @return This function returns the number of characters in the initial segment of str1 which consist only of characters from str2.
  */
-long unsigned int ng_strspn (const char *str1, const char *str2);
+long unsigned int ng_strspn(const char* str1, const char* str2);
 
 /**
  * This function calculates the length of the initial segment of str1, which consists entirely of characters not in str2.
@@ -193,9 +192,9 @@ long unsigned int ng_strspn (const char *str1, const char *str2);
  *
  * @return This function returns the number of characters in the initial segment of string str1 which are not in the string str2.
  */
-long unsigned int ng_strcspn (const char *str1, const char *str2);
+long unsigned int ng_strcspn(const char* str1, const char* str2);
 
-//stdio.h
+// stdio.h
 
 /**
  * This function sends formatted output to stdout.
@@ -209,7 +208,7 @@ long unsigned int ng_strcspn (const char *str1, const char *str2);
  *
  * @return If successful, the total number of characters written is returned. On failure, a negative number is returned.
  */
-int ng_printf (const char *format, ...);
+int ng_printf(const char* format, ...);
 
 /**
  * This function sends formatted output to a string pointed to, by str.
@@ -225,14 +224,14 @@ int ng_printf (const char *format, ...);
  * @return If successful, the total number of characters written is returned excluding the null-character appended at the end of the string,
  * 			otherwise a negative number is returned in case of failure.
  */
-int ng_sprintf (char *str, const char *format, ...);
+int ng_sprintf(char* str, const char* format, ...);
 
 /**
  * This function returns the number of milliseconds since the system start up.
  *
  * @return The number of milliseconds.
  */
-double ng_GetTime ();
+double ng_GetTime();
 
 /**
  * This function sends Data through Ethernet stack.
@@ -240,7 +239,7 @@ double ng_GetTime ();
  * @param addr - Pointer to the beginning of the data to be sent.
  * @param size - This is the number of bytes to be sent.
  */
-void ng_EthernetSendData (void *addr, long long size, char *_Interface);
+void ng_EthernetSendData(void* addr, long long size, char* _Interface);
 
 /**
  * This function sends Data through Bluetooth stack.
@@ -248,5 +247,5 @@ void ng_EthernetSendData (void *addr, long long size, char *_Interface);
  * @param addr - Pointer to the beginning of the data to be sent.
  * @param size - This is the number of bytes to be sent.
  */
-void ng_BLESendData (char *addr, long long size);
+void ng_BLESendData(char* addr, long long size);
 #endif /* EPGS_WRAPPER_H_ */

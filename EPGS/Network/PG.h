@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis proxy gateway
-	Object:		PG
-	File:		PG.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis proxy gateway
+        Object:		PG
+        File:		PG.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -38,17 +38,17 @@
 #define ETHERNET_MAC_ADDR_FIELD_SIZE 6
 #define ETHERNET_TYPE_FIELD_SIZE 2
 
-//char NG_INTERFACE_NAME[]="";
+// char NG_INTERFACE_NAME[]="";
 
-void convertStrToMAC (char *macSTR, char **macBytes);
-int getNumberOfMessages (int msgSize);
+void convertStrToMAC(char* macSTR, char** macBytes);
+int getNumberOfMessages(int msgSize);
 
-int sendNGMessage (NgEPGS *ngEPGS, NgMessage *message, bool isBroadcast);
-int forwardNGMessageToPeer (NgEPGS *ngEPGS, int peerID, NgMessage *message);
-int newMessageReceived (struct _ng_epgs **ngEPGS, const char *message, int rcvdMsgSize);
+int sendNGMessage(NgEPGS* ngEPGS, NgMessage* message, bool isBroadcast);
+int forwardNGMessageToPeer(NgEPGS* ngEPGS, int peerID, NgMessage* message);
+int newMessageReceived(struct _ng_epgs** ngEPGS, const char* message, int rcvdMsgSize);
 
-int sendNGMessageThroughBLE (NgEPGS *ngEPGS, NgMessage *message);
-int forwardNGMessageToPeerThroughBLE (NgEPGS *ngEPGS, int peerID, NgMessage *message);
-int newMessageReceivedThroughBLE (struct _ng_epgs **ngEPGS, const char *message, int rcvdMsgSize);
+int sendNGMessageThroughBLE(NgEPGS* ngEPGS, NgMessage* message);
+int forwardNGMessageToPeerThroughBLE(NgEPGS* ngEPGS, int peerID, NgMessage* message);
+int newMessageReceivedThroughBLE(struct _ng_epgs** ngEPGS, const char* message, int rcvdMsgSize);
 
 #endif /* NG_PG_H_ */

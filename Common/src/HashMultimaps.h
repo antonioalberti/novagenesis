@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		HashMultimaps
-	Object:		HashMultimaps
-	File:		HashMultimaps.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		HashMultimaps
+        Object:		HashMultimaps
+        File:		HashMultimaps.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -51,27 +51,27 @@ using namespace __gnu_cxx;
 // For string
 // *****************************
 
-class HashString {
- public:
-
-  int operator() (std::string const &str) const
+class HashString
+{
+public:
+  int operator()(std::string const& str) const
   {
-	return __gnu_cxx::hash<char const *> () (str.c_str ());
+    return __gnu_cxx::hash<char const*>()(str.c_str());
   }
 };
 
 // This class' function operator() tests if two keys are equal
-class HashStringCompare {
- public:
-
-  bool operator() (string s1, string s2) const
+class HashStringCompare
+{
+public:
+  bool operator()(string s1, string s2) const
   {
-	return s1 == s2;
+    return s1 == s2;
   }
 };
 
 // Define the hash_multimap
-typedef hash_multimap <string, string, HashString, HashStringCompare> HashStringMultimap;
+typedef hash_multimap<string, string, HashString, HashStringCompare> HashStringMultimap;
 
 // Define an iterator for search the values behind a key
 typedef HashStringMultimap::iterator Iterator;
@@ -86,7 +86,7 @@ typedef pair<HashStringMultimap::iterator, HashStringMultimap::iterator> Iterato
 class Action;
 
 // Define the hash_multimap
-typedef hash_multimap<string, Action *, HashString, HashStringCompare> ActionsMultimap;
+typedef hash_multimap<string, Action*, HashString, HashStringCompare> ActionsMultimap;
 
 // Define an iterator for search the values behind a key
 typedef ActionsMultimap::iterator ActionsIterator;
@@ -95,9 +95,3 @@ typedef ActionsMultimap::iterator ActionsIterator;
 typedef pair<ActionsMultimap::iterator, ActionsMultimap::iterator> ActionsIteratorsPair;
 
 #endif
-
-
-
-
-
-

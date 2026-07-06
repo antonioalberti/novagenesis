@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGRunInitialization01
-	Object:		PGRunInitialization01
-	File:		PGRunInitialization01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGRunInitialization01
+        Object:		PGRunInitialization01
+        File:		PGRunInitialization01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -41,476 +41,467 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG
+// #define DEBUG
 
-#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+#define LOG(msg) PB->S << endl \
+                       << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
-PGRunInitialization01::PGRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PGRunInitialization01::PGRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-PGRunInitialization01::~PGRunInitialization01 ()
+PGRunInitialization01::~PGRunInitialization01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --initialization 0.1
-int
-PGRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
-  Message *StoringInitialBinds = 0;
+  Message* StoringInitialBinds = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *PSCNCL = 0;
-  PG *PPG = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  CommandLine* PSCNCL = 0;
+  PG* PPG = 0;
   string Offset = "                    ";
-  PGCS *PPGCS = 0;
+  PGCS* PPGCS = 0;
   string PeerPGSHID;
   string Parameter;
   string Value;
   double Temp;
   string MyIPAddress;
-  Message *RunPeriodic = 0;
+  Message* RunPeriodic = 0;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // ******************************************************
   // Load customized parameters if available
   // ******************************************************
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
 
-  PHTB = (Block *)PPG->PHT;
+  PHTB = (Block*)PPG->PHT;
 
-  PPGCS = (PGCS *)PPG->PP;
+  PPGCS = (PGCS*)PPG->PP;
 
-  PB->S << Offset << "(Loading customized parameters (if available) at " << PB->GetPath () << "PGCS.ini)" << endl;
+  PB->S << Offset << "(Loading customized parameters (if available) at " << PB->GetPath() << "PGCS.ini)" << endl;
 
   File F3;
 
-  F3.OpenInputFile ("PGCS.ini", PB->GetPath (), "DEFAULT");
+  F3.OpenInputFile("PGCS.ini", PB->GetPath(), "DEFAULT");
 
-  F3.seekg (0);
+  F3.seekg(0);
 
   char Line[512];
 
-  while (F3.getline (Line, sizeof (Line), '\n'))
-	{
-	  istringstream ins (Line);
+  while (F3.getline(Line, sizeof(Line), '\n'))
+  {
+    istringstream ins(Line);
 
-	  ins >> Parameter;
-	  ins >> Value;
+    ins >> Parameter;
+    ins >> Value;
 
-	  //PB->S << Offset <<  "(Parameter = "<<Parameter<<" )" << endl;
-	  //PB->S << Offset <<  "(Value = "<<Value<<" )" << endl;
+    // PB->S << Offset <<  "(Parameter = "<<Parameter<<" )" << endl;
+    // PB->S << Offset <<  "(Value = "<<Value<<" )" << endl;
 
-	  if (Parameter == "DelayBeforeRunPeriodic")
-		{
-		  Temp = PB->StringToDouble (Value);
+    if (Parameter == "DelayBeforeRunPeriodic")
+    {
+      Temp = PB->StringToDouble(Value);
 
-		  if (Temp > 0)
-			{
-			  PPG->DelayBeforeRunPeriodic = Temp;
+      if (Temp > 0)
+      {
+        PPG->DelayBeforeRunPeriodic = Temp;
 
-			  PB->S << Offset << "(DelayBeforeRunPeriodic is " << Temp << ")" << endl;
-			}
-		}
+        PB->S << Offset << "(DelayBeforeRunPeriodic is " << Temp << ")" << endl;
+      }
+    }
 
-	  if (Parameter == "DelayBetweenMessageEmissions")
-		{
-		  Temp = PB->StringToDouble (Value);
+    if (Parameter == "DelayBetweenMessageEmissions")
+    {
+      Temp = PB->StringToDouble(Value);
 
-		  if (Temp > 0)
-			{
-			  PPG->DelayBetweenMessageEmissions = Temp;
+      if (Temp > 0)
+      {
+        PPG->DelayBetweenMessageEmissions = Temp;
 
-			  PB->S << Offset << "(DelayBetweenMessageEmissions is " << Temp << ")" << endl;
-			}
+        PB->S << Offset << "(DelayBetweenMessageEmissions is " << Temp << ")" << endl;
+      }
+    }
 
-		}
+    // TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
+    //  E.g. DelayBetweenHellos01 = 10 means a new hello 0.1 after 10 x DelayBeforeRunPeriodic value. I.e. time between hello 0.1 is multiplied by 10 times
 
-	  //TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
-	  // E.g. DelayBetweenHellos01 = 10 means a new hello 0.1 after 10 x DelayBeforeRunPeriodic value. I.e. time between hello 0.1 is multiplied by 10 times
+    if (Parameter == "DelayBetweenHellos01")
+    {
+      Temp = PB->StringToDouble(Value);
 
-	  if (Parameter == "DelayBetweenHellos01")
-		{
-		  Temp = PB->StringToDouble (Value);
+      if (Temp > 0)
+      {
+        PPG->DelayBetweenHellos01 = Temp;
 
-		  if (Temp > 0)
-			{
-			  PPG->DelayBetweenHellos01 = Temp;
+        PB->S << Offset << "(DelayBetweenHellos01 is " << Temp << ")" << endl;
+      }
+    }
 
-			  PB->S << Offset << "(DelayBetweenHellos01 is " << Temp << ")" << endl;
-			}
+    if (Parameter == "DelayBetweenHellos02")
+    {
+      Temp = PB->StringToDouble(Value);
 
-		}
+      if (Temp > 0)
+      {
+        PPG->DelayBetweenHellos02 = Temp;
 
-	  if (Parameter == "DelayBetweenHellos02")
-		{
-		  Temp = PB->StringToDouble (Value);
+        PB->S << Offset << "(DelayBetweenHellos02 is " << Temp << ")" << endl;
+      }
+    }
 
-		  if (Temp > 0)
-			{
-			  PPG->DelayBetweenHellos02 = Temp;
+    if (Parameter == "StressTest")
+    {
+      if (Value == "1")
+      {
+        PPG->StressEnabled = true;
+        PB->S << Offset << "(StressTest is ENABLED)" << endl;
+      }
+      else
+      {
+        PPG->StressEnabled = false;
+        PB->S << Offset << "(StressTest is DISABLED)" << endl;
+      }
+    }
 
-			  PB->S << Offset << "(DelayBetweenHellos02 is " << Temp << ")" << endl;
-			}
-		}
+    if (Parameter == "StressInterval")
+    {
+      Temp = PB->StringToDouble(Value);
 
-	  if (Parameter == "StressTest")
-		{
-		  if (Value == "1")
-			{
-			  PPG->StressEnabled = true;
-			  PB->S << Offset << "(StressTest is ENABLED)" << endl;
-			}
-		  else
-			{
-			  PPG->StressEnabled = false;
-			  PB->S << Offset << "(StressTest is DISABLED)" << endl;
-			}
-		}
+      if (Temp > 0)
+      {
+        PPG->StressInterval = Temp;
 
-	  if (Parameter == "StressInterval")
-		{
-		  Temp = PB->StringToDouble (Value);
+        PB->S << Offset << "(StressInterval is " << Temp << ")" << endl;
+      }
+    }
 
-		  if (Temp > 0)
-			{
-			  PPG->StressInterval = Temp;
+    if (Parameter == "DelayBetweenExpositions")
+    {
+      Temp = PB->StringToDouble(Value);
 
-			  PB->S << Offset << "(StressInterval is " << Temp << ")" << endl;
-			}
-		}
+      if (Temp > 0)
+      {
+        PPG->DelayBetweenExpositions = Temp;
 
-	  if (Parameter == "DelayBetweenExpositions")
-		{
-		  Temp = PB->StringToDouble (Value);
+        PB->S << Offset << "(DelayBetweenExpositions is " << Temp << ")" << endl;
+      }
 
-		  if (Temp > 0)
-			{
-			  PPG->DelayBetweenExpositions = Temp;
+      break;
+    }
+  }
 
-			  PB->S << Offset << "(DelayBetweenExpositions is " << Temp << ")" << endl;
-			}
-
-		  break;
-		}
-	}
-
-  F3.CloseFile ();
+  F3.CloseFile();
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PHTB->GetSelfCertifyingName ());
+  Destinations.push_back(PHTB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, StoringInitialBinds);
+  PB->PP->NewMessage(GetTime(), 0, false, StoringInitialBinds);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBLNToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBLNToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPLNToHashPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPLNToHashPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashPLNToPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashPLNToPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashPLNToPID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashPLNToPID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToHashPLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToHashPLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromOSLNToHashOSLN("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromOSLNToHashOSLN("0.1",StoringInitialBinds,PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashOSLNToOSLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashOSLNToOSLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromOSIDToPID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToPID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHLNToHashHLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHLNToHashHLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashHLNToHLN ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashHLNToHLN("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromOSIDToHID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToHID("0.1", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHIDToOSID ("0.1", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHIDToOSID("0.1", StoringInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromHIDToPID("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromHIDToPID("0.1",StoringInitialBinds,PCL);
 
-  //PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
 
   // Legible names related
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 9, "Host", PB->PP
-	  ->GetHostSelfCertifyingName (), StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLNToSCN("0.1", 9, "Host", PB->PP->GetHostSelfCertifyingName(), StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, PB->PP
-	  ->GetHostSelfCertifyingName (), "Host", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineSCNToHashLN("0.1", 8, PB->PP->GetHostSelfCertifyingName(), "Host", StoringInitialBinds, PCL);
 
   // Limiters related
 
-  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter ("0.1", "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter("0.1", "Domain", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter ("0.1", "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter("0.1", "Domain", StoringInitialBinds, PCL);
 
   // **********************************************************************************
   //  The next two lines store a temporary domain name, while Domain Service is booting
   // **********************************************************************************
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN ("0.1", "Domain", PB->PP
-	  ->DSCN, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN("0.1", "Domain", PB->PP->DSCN, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter ("0.1", PB->PP
-	  ->DSCN, "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter("0.1", PB->PP->DSCN, "Domain", StoringInitialBinds, PCL);
 
   if (PPGCS->Stacks != NULL)
-	{
-	  // Legacy networking-related
-	  for (unsigned int i = 0; i < PPGCS->Stacks->size (); i++)
-		{
-		  // ************************** Adaptation Layer **************************
+  {
+    // Legacy networking-related
+    for (unsigned int i = 0; i < PPGCS->Stacks->size(); i++)
+    {
+      // ************************** Adaptation Layer **************************
 
-		  // First, get the host IP address
-		  // Second, creates the sockets as required
-		  // Third, creates a thread to deal with receptions
+      // First, get the host IP address
+      // Second, creates the sockets as required
+      // Third, creates a thread to deal with receptions
 
-		  PB->S << Offset << "(My stack is " << PPGCS->Stacks->at (i) << ")" << endl;
+      PB->S << Offset << "(My stack is " << PPGCS->Stacks->at(i) << ")" << endl;
 
-		  // If the Peer is UDP IP
-		  if (PPGCS->Stacks->at (i) == "IPv4_UDP")
-			{
-			  int CSID = 0;
+      // If the Peer is UDP IP
+      if (PPGCS->Stacks->at(i) == "IPv4_UDP")
+      {
+        int CSID = 0;
 
-			  // ################################
-			  // PUSH
-			  // ################################
+        // ################################
+        // PUSH
+        // ################################
 
-			  // Get IP address
-			  PPG->GetHostIPAddress (PPGCS->Stacks->at (i), PPGCS->Interfaces->at (i), MyIPAddress);
+        // Get IP address
+        PPG->GetHostIPAddress(PPGCS->Stacks->at(i), PPGCS->Interfaces->at(i), MyIPAddress);
 
-			  // Create a socket to sent datagram to a peer PGCS
-			  CSID = PPG->CreateUDPSocket ("PUSH", PPGCS->Identifiers->at (i));
+        // Create a socket to sent datagram to a peer PGCS
+        CSID = PPG->CreateUDPSocket("PUSH", PPGCS->Identifiers->at(i));
 
-			  PB->S << Offset << "(Created the push socket with CSID " << CSID << " to the address "
-					<< PPGCS->Identifiers->at (i) << ")" << endl;
+        PB->S << Offset << "(Created the push socket with CSID " << CSID << " to the address "
+              << PPGCS->Identifiers->at(i) << ")" << endl;
 
-			  // Binding TCP/IP address to SSID
-			  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", PPGCS->Identifiers
-				  ->at (i), CSID, StoringInitialBinds, PCL);
+        // Binding TCP/IP address to SSID
+        PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", PPGCS->Identifiers->at(i), CSID, StoringInitialBinds, PCL);
 
-			  // TODO: FIXP/Update - Added to deal with the case of PGCS -de initialization
-			  PPGCS->CSIDs->push_back (CSID);
+        // TODO: FIXP/Update - Added to deal with the case of PGCS -de initialization
+        PPGCS->CSIDs->push_back(CSID);
 
-			  if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread == false)
-				{
-				  int SSID = 0;
+        if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread == false)
+        {
+          int SSID = 0;
 
-				  // ################################
-				  // PULL
-				  // ################################
+          // ################################
+          // PULL
+          // ################################
 
-				  // Create a socket to receive datagram from a peer PGCS
-				  SSID = PPG->CreateUDPSocket ("PULL", MyIPAddress);
+          // Create a socket to receive datagram from a peer PGCS
+          SSID = PPG->CreateUDPSocket("PULL", MyIPAddress);
 
-				  PB->S << Offset << "(Created the pull socket with SSID " << SSID << " with address " << MyIPAddress
-						<< ")" << endl;
+          PB->S << Offset << "(Created the pull socket with SSID " << SSID << " with address " << MyIPAddress
+                << ")" << endl;
 
-				  // Binding TCP/IP socket to CSID
-				  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", MyIPAddress, SSID, StoringInitialBinds, PCL);
+          // Binding TCP/IP socket to CSID
+          PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", MyIPAddress, SSID, StoringInitialBinds, PCL);
 
-				  PPGCS->SSIDs->push_back (SSID);
+          PPGCS->SSIDs->push_back(SSID);
 
-				  PPGCS->Threads[i] = new tthread::thread (&PG::ReceiveFromAUDPSocketThreadWrapper, PPG);
+          PPGCS->Threads[i] = new tthread::thread(&PG::ReceiveFromAUDPSocketThreadWrapper, PPG);
 
-				  PB->S << Offset << "(Created a thread to pull messages to socket with SSID " << SSID << ")" << endl;
+          PB->S << Offset << "(Created a thread to pull messages to socket with SSID " << SSID << ")" << endl;
 
-				  PPGCS->NoT++;
+          PPGCS->NoT++;
 
-				  PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread = true;
-				}
-			}
+          PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread = true;
+        }
+      }
 
-		  // **********************************************************************
+      // **********************************************************************
 
-		  // ************************** Adaptation Layer **************************
+      // ************************** Adaptation Layer **************************
 
-		  // The following code is to support Ethernet and Wi-Fi interface.
-		  // First, verifies allowed interfaces for what MyMACAddress can be attributed by GetHostRawAddress
-		  // Second, creates the sockets as required
-		  // Third, creates a thread to deal with receptions
+      // The following code is to support Ethernet and Wi-Fi interface.
+      // First, verifies allowed interfaces for what MyMACAddress can be attributed by GetHostRawAddress
+      // Second, creates the sockets as required
+      // Third, creates a thread to deal with receptions
 
-		  // If the Peer is Ethernet or Wi-Fi
-		  if (PPGCS->Stacks->at (i) == "Ethernet" || PPGCS->Stacks->at (i) == "Wi-Fi")
-			{
-			  int CSID = 0;
-			  int SSID = 0;
-			  string MAC;
+      // If the Peer is Ethernet or Wi-Fi
+      if (PPGCS->Stacks->at(i) == "Ethernet" || PPGCS->Stacks->at(i) == "Wi-Fi")
+      {
+        int CSID = 0;
+        int SSID = 0;
+        string MAC;
 
-			  string _Interface = PPGCS->Interfaces->at (i);
+        string _Interface = PPGCS->Interfaces->at(i);
 
-			  PPG->GetHostRawAddress (PPGCS->Interfaces->at (i), MAC);
+        PPG->GetHostRawAddress(PPGCS->Interfaces->at(i), MAC);
 
-			  PPGCS->MyMACAddress = MAC;
+        PPGCS->MyMACAddress = MAC;
 
-			  LOG("MyMACAddress = " << MAC);
-			    LOG("Interface = " << _Interface);
+        LOG("MyMACAddress = " << MAC);
+        LOG("Interface = " << _Interface);
 
-			    // Create a socket to send frames to a peer PGCS
-			    if (PPG->CreateRawSocket (CSID) == OK)
-			    {
-			      LOG("(Created the client socket with CSID " << CSID << " for the peer PGCS with MAC "
-			          << PPGCS->Identifiers->at (i) << ")");
+        // Create a socket to send frames to a peer PGCS
+        if (PPG->CreateRawSocket(CSID) == OK)
+        {
+          LOG("(Created the client socket with CSID " << CSID << " for the peer PGCS with MAC "
+                                                      << PPGCS->Identifiers->at(i) << ")");
 
-				  // Binding Ethernet address to CSID
-				  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", PPGCS->Identifiers
-					  ->at (i), CSID, StoringInitialBinds, PCL);
+          // Binding Ethernet address to CSID
+          PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", PPGCS->Identifiers->at(i), CSID, StoringInitialBinds, PCL);
 
-				  // TODO: FIXP/Update - Added to deal with the case of PGCS -de initialization
-				  PPGCS->CSIDs->push_back (CSID);
-				}
-			  else
-				{
-				  Status = ERROR;
-				}
+          // TODO: FIXP/Update - Added to deal with the case of PGCS -de initialization
+          PPGCS->CSIDs->push_back(CSID);
+        }
+        else
+        {
+          Status = ERROR;
+        }
 
-			  if (PPG->CreateRawSocket (SSID) == OK)
-				{
-				  // Create a socket to receive frames from a peer PGCS
-				  if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingIEEEThread == false)
-					{
-					  LOG("(Created the server socket with SSID " << SSID << " at my MAC address "
-					      << PPGCS->MyMACAddress << ")");
+        if (PPG->CreateRawSocket(SSID) == OK)
+        {
+          // Create a socket to receive frames from a peer PGCS
+          if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingIEEEThread == false)
+          {
+            LOG("(Created the server socket with SSID " << SSID << " at my MAC address "
+                                                        << PPGCS->MyMACAddress << ")");
 
-					  PPGCS->SSIDs->push_back (SSID);
+            PPGCS->SSIDs->push_back(SSID);
 
-					  // Binding Ethernet address to SSID
-					  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", PPGCS
-						  ->MyMACAddress, SSID, StoringInitialBinds, PCL);
+            // Binding Ethernet address to SSID
+            PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", PPGCS->MyMACAddress, SSID, StoringInitialBinds, PCL);
 
-					  PPGCS->Threads[i * PPG
-						  ->Number_Of_Threads_At_Socket_Dispatcher] = new tthread::thread (&PG::EthernetWiFiSocketDispatcherThreadWrapper, PPG);
+            PPGCS->Threads[i * PPG
+                                   ->Number_Of_Threads_At_Socket_Dispatcher] = new tthread::thread(&PG::EthernetWiFiSocketDispatcherThreadWrapper, PPG);
 
-					  PB->S << Offset << "(Created a socket dispatcher thread to read messages from socket with SSID "
-							<< SSID << ")"
-							<< endl;
+            PB->S << Offset << "(Created a socket dispatcher thread to read messages from socket with SSID "
+                  << SSID << ")"
+                  << endl;
 
-					  // Sleep to allow thread creation without overlapping
-					  tthread::this_thread::sleep_for (tthread::chrono::milliseconds (100));
+            // Sleep to allow thread creation without overlapping
+            tthread::this_thread::sleep_for(tthread::chrono::milliseconds(100));
 
-					  for (unsigned int j = 0; j < PPG->Number_Of_Threads_At_Socket_Dispatcher; j++)
-						{
-						  PARAMETERS1 params;
+            for (unsigned int j = 0; j < PPG->Number_Of_Threads_At_Socket_Dispatcher; j++)
+            {
+              PARAMETERS1 params;
 
-						  params._PPG = PPG;
-						  params._Index = j;
+              params._PPG = PPG;
+              params._Index = j;
 
-						  PPGCS->Threads[i * PPG->Number_Of_Threads_At_Socket_Dispatcher + j
-										 + 1] = new tthread::thread (&PG::FinishReceivingThreadWrapper, &params);
+              PPGCS->Threads[i * PPG->Number_Of_Threads_At_Socket_Dispatcher + j + 1] = new tthread::thread(&PG::FinishReceivingThreadWrapper, &params);
 
-						  PB->S << Offset << "(Created thread number " << j << " to serve the dispatcher)"
-								<< endl;
+              PB->S << Offset << "(Created thread number " << j << " to serve the dispatcher)"
+                    << endl;
 
-						  // Sleep to allow thread creation without overlapping
-						  tthread::this_thread::sleep_for (tthread::chrono::milliseconds (100));
-						}
+              // Sleep to allow thread creation without overlapping
+              tthread::this_thread::sleep_for(tthread::chrono::milliseconds(100));
+            }
 
-					  PPGCS->NoT++;
+            PPGCS->NoT++;
 
-					  PPGCS->AlreadyCreatedPeerPGCSFrameReceivingIEEEThread = true;
-					}
-				}
-			  else
-				{
-				  Status = ERROR;
-				}
-			}
+            PPGCS->AlreadyCreatedPeerPGCSFrameReceivingIEEEThread = true;
+          }
+        }
+        else
+        {
+          Status = ERROR;
+        }
+      }
 
-		  // **********************************************************************
-		}
-	}
+      // **********************************************************************
+    }
+  }
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (StoringInitialBinds, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, StoringInitialBinds, PSCNCL);
+  PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PSCNCL);
 
   // Push the message to the GW input queue
-  PPG->PGW->PushToInputQueue (StoringInitialBinds);
+  PPG->PGW->PushToInputQueue(StoringInitialBinds);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Clear the temporary containers
-  Limiters.clear ();
-  Sources.clear ();
-  Destinations.clear ();
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
 
   // ******************************************************
   // Schedule a message to run periodic first time
   // ******************************************************
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + PPG->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
+  PB->PP->NewMessage(GetTime() + PPG->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
 
   // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PPG->PGW->PushToInputQueue (RunPeriodic);
+  PPG->PGW->PushToInputQueue(RunPeriodic);
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   if (Status == ERROR)
-	{
-	  PB->S << Offset
-			<< "(ERROR: Unable to create the sockets. Please verify your operating system, specially for the adequate privileges.)"
-			<< endl;
+  {
+    PB->S << Offset
+          << "(ERROR: Unable to create the sockets. Please verify your operating system, specially for the adequate privileges.)"
+          << endl;
 
-	  exit (1);
-	}
+    exit(1);
+  }
 
   return Status;
 }

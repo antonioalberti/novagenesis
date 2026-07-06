@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Proxy/Gateway Interhost Communication Hello version 0.2
-	Object:		PGHelloIHC02
-	File:		PGHelloIHC02.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.2
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Proxy/Gateway Interhost Communication Hello version 0.2
+        Object:		PGHelloIHC02
+        File:		PGHelloIHC02.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.2
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,28 +49,22 @@
 
 class Block;
 
-class PGHelloIHC02 : public Action {
- public:
-
+class PGHelloIHC02 : public Action
+{
+public:
   // Constructor
-  PGHelloIHC02 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PGHelloIHC02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PGHelloIHC02 ();
+  virtual ~PGHelloIHC02();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Original scheduling of hello name bindings
-  //TODO: FIXP/Oct2021 - This function has been modified to support self-discovered EPGS
-  int ScheduleStoreBindings ( string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack);
+  // TODO: FIXP/Oct2021 - This function has been modified to support self-discovered EPGS
+  int ScheduleStoreBindings(string _Case, vector<string>& _ReceivedElements, string _PeerIdentifier, string _PeerStack);
 };
 
 #endif
-
-
-
-
-
-

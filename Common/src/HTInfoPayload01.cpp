@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		HTInfoPayload01
-	Object:		HTInfoPayload01
-	File:		HTInfoPayload01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		HTInfoPayload01
+        Object:		HTInfoPayload01
+        File:		HTInfoPayload01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,109 +33,110 @@
 #include "HT.h"
 #endif
 
-//#define DEBUG
+// #define DEBUG
 
-#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+#define LOG(msg) PB->S << endl \
+                       << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
-HTInfoPayload01::HTInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+HTInfoPayload01::HTInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-HTInfoPayload01::~HTInfoPayload01 ()
+HTInfoPayload01::~HTInfoPayload01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -info --_Alternative _Version [ < n string _ValuesSize string S_1 ... S_ValuesSize > ]
-int
-HTInfoPayload01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int HTInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
   unsigned int NA = 0;
   vector<string> Values;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of arguments
-	  if (NA == 1)
-		{
-		  // Get received command line argument
-		  _PCL->GetArgument (0, Values);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of arguments
+    if (NA == 1)
+    {
+      // Get received command line argument
+      _PCL->GetArgument(0, Values);
 
-		  if (Values.size () > 0)
-			{
-			  // The additional information is related to the message payload
-			  if (_PCL->Alternative == "--payload")
-				{
-				  // Extract the payload from the received msg char array
-				  //_ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
+      if (Values.size() > 0)
+      {
+        // The additional information is related to the message payload
+        if (_PCL->Alternative == "--payload")
+        {
+          // Extract the payload from the received msg char array
+          //_ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
 
-				  // Verifies the payload flag
-				  if (_ReceivedMessage->GetHasPayloadFlag () == true)
-					{
-					  string PayloadPath = PB->GetPath ();
+          // Verifies the payload flag
+          if (_ReceivedMessage->GetHasPayloadFlag() == true)
+          {
+            string PayloadPath = PB->GetPath();
 
-					  LOG("(Received " << Values.at (0) << ")");
-					  				  //PB->S << Offset <<  "(Saving the payload on the path "<<PayloadPath<<")" << endl;
+            LOG("(Received " << Values.at(0) << ")");
+            // PB->S << Offset <<  "(Saving the payload on the path "<<PayloadPath<<")" << endl;
 
-					  _ReceivedMessage->SetPayloadFileName (Values.at (0));
-					  _ReceivedMessage->SetPayloadFilePath (PayloadPath);
-					  _ReceivedMessage->SetPayloadFileOption ("BINARY");
-					  _ReceivedMessage->ConvertPayloadFromCharArrayToFile ();
+            _ReceivedMessage->SetPayloadFileName(Values.at(0));
+            _ReceivedMessage->SetPayloadFilePath(PayloadPath);
+            _ReceivedMessage->SetPayloadFileOption("BINARY");
+            _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
 
-					  // Note: The payload is going to be saved as a file on the specified path
+            // Note: The payload is going to be saved as a file on the specified path
 
-					  /*
-					  PB->S << Offset <<  "(Testing payload integrity)" << endl;
+            /*
+            PB->S << Offset <<  "(Testing payload integrity)" << endl;
 
-					  long long int PayloadSize=0;
+            long long int PayloadSize=0;
 
-					  _ReceivedMessage->GetPayloadSize(PayloadSize);
+            _ReceivedMessage->GetPayloadSize(PayloadSize);
 
-					  File *F1=new File;
+            File *F1=new File;
 
-					  cout << " Opening original payload file. The status is (0=success, 1=fail) = " << F1->OpenInputFile("SOA4All in the Future Internet of Services.mp4",PayloadPath,"BINARY") << endl;
+            cout << " Opening original payload file. The status is (0=success, 1=fail) = " << F1->OpenInputFile("SOA4All in the Future Internet of Services.mp4",PayloadPath,"BINARY") << endl;
 
-					  char			*buffer;
-					  long			length=0;
+            char			*buffer;
+            long			length=0;
 
-					  length = F1->tellg();
+            length = F1->tellg();
 
-					  F1->seekg (0, ios::beg);
+            F1->seekg (0, ios::beg);
 
-					  buffer = new char [length];
+            buffer = new char [length];
 
-					  F1->read(buffer,length);
+            F1->read(buffer,length);
 
-					  F1->close();
+            F1->close();
 
-					  PB->S << "(Original            Received)" << endl;
+            PB->S << "(Original            Received)" << endl;
 
-					  for (unsigned int i=0;i<PayloadSize;i++)
-						  {
-							  printf("%i %d %c            ",i,(unsigned char)buffer[i],(unsigned char)buffer[i]);
+            for (unsigned int i=0;i<PayloadSize;i++)
+                    {
+                            printf("%i %d %c            ",i,(unsigned char)buffer[i],(unsigned char)buffer[i]);
 
-							  printf("%i %d %c",i,(unsigned char)_ReceivedMessage->Payload[i],(unsigned char)_ReceivedMessage->Payload[i]);
+                            printf("%i %d %c",i,(unsigned char)_ReceivedMessage->Payload[i],(unsigned char)_ReceivedMessage->Payload[i]);
 
-							  if (buffer[i] != _ReceivedMessage->Payload[i])
-								  {
-									  printf("%s ","                Error detected");
-								  }
+                            if (buffer[i] != _ReceivedMessage->Payload[i])
+                                    {
+                                            printf("%s ","                Error detected");
+                                    }
 
-							  printf("\n");
-						  }
-					  */
-					}
-				}
-			}
-		}
-	}
+                            printf("\n");
+                    }
+            */
+          }
+        }
+      }
+    }
+  }
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }

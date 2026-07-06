@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PSSubBind01
-	Object:		PSSubBind01
-	File:		PSSubBind01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PSSubBind01
+        Object:		PSSubBind01
+        File:		PSSubBind01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -41,68 +41,66 @@
 #include "PSS.h"
 #endif
 
-PSSubBind01::PSSubBind01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PSSubBind01::PSSubBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-PSSubBind01::~PSSubBind01 ()
+PSSubBind01::~PSSubBind01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -s --b _Version [ < 1 string _Category > < _SCNsSize string S_1 ... S_SCNsSize > ]
-int
-PSSubBind01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PSSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
   unsigned int NA = 0;
   vector<string> Category;
   vector<string> Key;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of arguments
-	  if (NA == 2)
-		{
-		  // Get received command line arguments
-		  if (_PCL->GetArgument (0, Category) == OK && _PCL->GetArgument (1, Key) == OK)
-			{
-			  if (Category.size () > 0 && Key.size () > 0)
-				{
-				  for (unsigned int i = 0; i < Key.size (); i++)
-					{
-					  // Change command line from ng -s --b to ng -g --b
-					  PMB->NewGetCommandLine ("0.2", PB->StringToInt (Category.at (0)), Key
-						  .at (i), InlineResponseMessage, PCL);
-					}
-				}
-			  else
-				{
-				  PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
-				}
-			}
-		  else
-			{
-			  PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
-			}
-		}
-	  else
-		{
-		  PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
-		}
-	}
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of arguments
+    if (NA == 2)
+    {
+      // Get received command line arguments
+      if (_PCL->GetArgument(0, Category) == OK && _PCL->GetArgument(1, Key) == OK)
+      {
+        if (Category.size() > 0 && Key.size() > 0)
+        {
+          for (unsigned int i = 0; i < Key.size(); i++)
+          {
+            // Change command line from ng -s --b to ng -g --b
+            PMB->NewGetCommandLine("0.2", PB->StringToInt(Category.at(0)), Key.at(i), InlineResponseMessage, PCL);
+          }
+        }
+        else
+        {
+          PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
+        }
+      }
+      else
+      {
+        PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+      }
+    }
+    else
+    {
+      PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+    }
+  }
   else
-	{
-	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
-	}
+  {
+    PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+  }
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
-

@@ -39,7 +39,8 @@
 
 // #define DEBUG
 
-#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+#define LOG(msg) PB->S << endl \
+                       << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
 GWHelloIPC02::GWHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -93,15 +94,14 @@ int GWHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 
         // Check if this peer is already known (Category 20: PID -> LN)
         vector<string>* ExistingLN = new vector<string>;
-        bool alreadyKnown = (PGW->GetHTBindingValues(20, ReceivedMessageSources.at(0), ExistingLN) == OK
-                             && ExistingLN->size() > 0);
+        bool alreadyKnown = (PGW->GetHTBindingValues(20, ReceivedMessageSources.at(0), ExistingLN) == OK && ExistingLN->size() > 0);
         delete ExistingLN;
 
         if (alreadyKnown)
         {
           // Peer already discovered — skip redundant store and logging
 #ifdef DEBUG
-          PB->S << Offset << "Already aware of the peer service: "<< ReceivedMessageSources.at(0) << endl;
+          PB->S << Offset << "Already aware of the peer service: " << ReceivedMessageSources.at(0) << endl;
 #endif
         }
         else

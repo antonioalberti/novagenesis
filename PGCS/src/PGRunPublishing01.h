@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		PGRunPublishing01
-	Object:		PGRunPublishing01
-	File:		PGRunPublishing01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		PGRunPublishing01
+        Object:		PGRunPublishing01
+        File:		PGRunPublishing01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -41,7 +41,7 @@
 #endif
 
 #ifndef _MESSAGEBUILDER_H
-#include "MessageBuilder.h" 
+#include "MessageBuilder.h"
 #endif
 
 #define ERROR 1
@@ -49,24 +49,18 @@
 
 class Block;
 
-class PGRunPublishing01 : public Action {
- public:
-
+class PGRunPublishing01 : public Action
+{
+public:
   // Constructor
-  PGRunPublishing01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PGRunPublishing01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PGRunPublishing01 ();
+  virtual ~PGRunPublishing01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

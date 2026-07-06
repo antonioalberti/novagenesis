@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		HTInfoPayload01
-	Object:		HTInfoPayload01
-	File:		HTInfoPayload01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		HTInfoPayload01
+        Object:		HTInfoPayload01
+        File:		HTInfoPayload01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,24 +49,18 @@
 
 class Block;
 
-class HTInfoPayload01 : public Action {
- public:
-
+class HTInfoPayload01 : public Action
+{
+public:
   // Constructor
-  HTInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  HTInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~HTInfoPayload01 ();
+  virtual ~HTInfoPayload01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

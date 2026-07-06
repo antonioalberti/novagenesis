@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Simple application process
-	Object:		App
-	File:		App.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Simple application process
+        Object:		App
+        File:		App.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -25,7 +25,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
- #ifndef _CONTENTAPP_H
+#ifndef _CONTENTAPP_H
 #define _APP_H
 
 #include "Process.h"
@@ -33,26 +33,20 @@
 #define ERROR 1
 #define OK 0
 
-class ContentApp : public Process {
- public:
-
+class ContentApp : public Process
+{
+public:
   // Application role ("Source" or "Repository")
   string Role;
 
   // Constructor
-  ContentApp (string _LN, string _Role, key_t _Key, string _Path);
+  ContentApp(string _LN, string _Role, key_t _Key, string _Path);
 
   // Destructor
-  ~ContentApp ();
+  ~ContentApp();
 
   // Allocate a new block based on a name and add a Block on Blocks container
-  int NewBlock (string _LN, Block *&_PB);
+  int NewBlock(string _LN, Block*& _PB);
 };
 
 #endif
-
-
-
-
-
-

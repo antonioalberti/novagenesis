@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS service acceptance
-	Object:		epgs_subServiceAcceptance
-	File:		epgs_subServiceAcceptance.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS service acceptance
+        Object:		epgs_subServiceAcceptance
+        File:		epgs_subServiceAcceptance.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -31,7 +31,6 @@
 #include "../DataStructures/epgs_structures.h"
 #include "../Common/ng_message.h"
 
-int
-ActionSubscriptionServiceAcceptance (NgNetInfo *hwInfo, NgNetInfo *pgcsSCNInf, NgScnIDInfo *pssSCNInfo, int seqNumber, char *key, NgMessage **subServiceAcceptanceMessage);
+int ActionSubscriptionServiceAcceptance(NgNetInfo* hwInfo, NgNetInfo* pgcsSCNInf, NgScnIDInfo* pssSCNInfo, int seqNumber, char* key, NgMessage** subServiceAcceptanceMessage);
 
-#endif /* SUB_SERVICE_ACCEPTANCE_H_ */ 
+#endif /* SUB_SERVICE_ACCEPTANCE_H_ */

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Embedded Proxy/Gateway Service ethernet simulator to run in Linux
-	Object:		EPGS_Simulation
-	File:		EPGS_Simulation.c
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		Embedded Proxy/Gateway Service ethernet simulator to run in Linux
+        Object:		EPGS_Simulation
+        File:		EPGS_Simulation.c
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -43,257 +43,254 @@
 
 char NG_INTERFACE_NAME[] = "";
 
-void *EthernetListener (void *ngInfo)
+void* EthernetListener(void* ngInfo)
 {
   int SID;
-  CreateRawSocket (&SID);
+  CreateRawSocket(&SID);
 
   while (true)
-	{
+  {
 
-	  void *mtu = (void *)malloc (2000);
-	  long long size;
+    void* mtu = (void*)malloc(2000);
+    long long size;
 
-	  ReceiveFromARawSocket (SID, &mtu, &size);
-	  newEthernetReceivedMessage (ngInfo, mtu, size);
-	  free (mtu);
-	}
+    ReceiveFromARawSocket(SID, &mtu, &size);
+    newEthernetReceivedMessage(ngInfo, mtu, size);
+    free(mtu);
+  }
 
   return 0;
 }
 
-double GetTime ()
+double GetTime()
 {
   struct timespec t;
 
-  clock_gettime (CLOCK_MONOTONIC, &t);
+  clock_gettime(CLOCK_MONOTONIC, &t);
 
   return ((t.tv_sec) + (double)(t.tv_nsec / 1e9));
 }
 
-int main (int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  ng_printf ("*************************\n* FIoT Test on Ethernet *\n* EPGS version 1.2      *\n*************************\n\n");
+  ng_printf("*************************\n* FIoT Test on Ethernet *\n* EPGS version 1.2      *\n*************************\n\n");
 
   if (argc >= 2)
-	{
-	  char *Address;
+  {
+    char* Address;
 
-	  char Alternative[] = "";
+    char Alternative[] = "";
 
-	  size_t S1 = sizeof (argv[1]);
+    size_t S1 = sizeof(argv[1]);
 
-	  strncpy (Alternative, argv[1], S1);
+    strncpy(Alternative, argv[1], S1);
 
-	  printf ("Using option %s\n", Alternative);
+    printf("Using option %s\n", Alternative);
 
-	  if (Alternative[1] == 'i') // Explicitly specify the interface to be used
-		{
-		  if (argc == 3)
-			{
-			  printf ("Explicitly specify the interface to be used\n");
+    if (Alternative[1] == 'i') // Explicitly specify the interface to be used
+    {
+      if (argc == 3)
+      {
+        printf("Explicitly specify the interface to be used\n");
 
-			  size_t S2 = sizeof (argv[2]);
+        size_t S2 = sizeof(argv[2]);
 
-			  strncpy (NG_INTERFACE_NAME, argv[2], S2);
-			}
-		  else
-			{
-			  printf ("Error: no Interface provided after -i option\n");
-			}
-		}
-	  else if (Alternative[1] == 'd') // Discover the interface to be used automatically
-		{
-		  printf ("Discover the interface to be used automatically. Select the first found.\n");
+        strncpy(NG_INTERFACE_NAME, argv[2], S2);
+      }
+      else
+      {
+        printf("Error: no Interface provided after -i option\n");
+      }
+    }
+    else if (Alternative[1] == 'd') // Discover the interface to be used automatically
+    {
+      printf("Discover the interface to be used automatically. Select the first found.\n");
 
-		  SelectInterface (&NG_INTERFACE_NAME);
-		}
-	  else if (Alternative[1] == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
-		{
-		  if (argc == 3)
-			{
-			  printf ("Discover the interface to be used automatically applying filter word %s to select the adequate one\n", argv[2]);
+      SelectInterface(&NG_INTERFACE_NAME);
+    }
+    else if (Alternative[1] == 's') // Discover the interface to be used automatically and uses a filter that have what is passed in second argument
+    {
+      if (argc == 3)
+      {
+        printf("Discover the interface to be used automatically applying filter word %s to select the adequate one\n", argv[2]);
 
-			  size_t S4 = sizeof (argv[2]);
+        size_t S4 = sizeof(argv[2]);
 
-			  char Filter[] = "";
+        char Filter[] = "";
 
-			  strncpy (Filter, argv[2], S4);
+        strncpy(Filter, argv[2], S4);
 
-			  if (SelectInterfaceWithFilter (&NG_INTERFACE_NAME, Filter) == 0)
-				{
-				  printf ("Error: unable to find an interface that satisfies the query. Exiting\n");
+        if (SelectInterfaceWithFilter(&NG_INTERFACE_NAME, Filter) == 0)
+        {
+          printf("Error: unable to find an interface that satisfies the query. Exiting\n");
 
-				  return 1;
-				}
-			}
-		  else
-			{
-			  printf ("Error: no Filter provided after -s option\n");
-			}
-		}
-	  else
-		{
-		  printf ("ERROR: command alternative does not exist.\n\n");
-		  return 0;
-		}
+          return 1;
+        }
+      }
+      else
+      {
+        printf("Error: no Filter provided after -s option\n");
+      }
+    }
+    else
+    {
+      printf("ERROR: command alternative does not exist.\n\n");
+      return 0;
+    }
 
-	  printf ("\nSelected Interface: %-8s\n", NG_INTERFACE_NAME);
+    printf("\nSelected Interface: %-8s\n", NG_INTERFACE_NAME);
 
+    if (GetHostRawAddress(NG_INTERFACE_NAME, &Address) == 1)
+    {
+      printf("EGPS initialization error! Error getting MAC address.\n");
+      return 0;
+    }
 
-	  if (GetHostRawAddress (NG_INTERFACE_NAME, &Address) == 1)
-		{
-		  printf ("EGPS initialization error! Error getting MAC address.\n");
-		  return 0;
-		}
+    printf("Selected Address: %s\n", Address);
 
-	  printf ("Selected Address: %s\n", Address);
+    NgEPGS* ngInfo = NULL;
 
-	  NgEPGS *ngInfo = NULL;
+    initEPGS(&ngInfo);
 
-	  initEPGS (&ngInfo);
+    char sPid[8];
+    int iPid = getpid();
+    sprintf(sPid, "%d", iPid);
 
-	  char sPid[8];
-	  int iPid = getpid ();
-	  sprintf (sPid, "%d", iPid);
+    // Set the interface to be used
+    ngInfo->Interface = NG_INTERFACE_NAME;
 
-	  // Set the interface to be used
-	  ngInfo->Interface = NG_INTERFACE_NAME;
+    struct utsname unameData;
+    uname(&unameData);
 
-	  struct utsname unameData;
-	  uname (&unameData);
+    char Z[sizeof(unameData.nodename) + sizeof(unameData.release) + sizeof(unameData.version) + sizeof(unameData.machine)] = "";
 
-	  char Z[sizeof (unameData.nodename) + sizeof (unameData.release) + sizeof (unameData.version)
-			 + sizeof (unameData.machine)] = "";
+    strcat(Z, unameData.nodename);
+    strcat(Z, unameData.release);
+    strcat(Z, unameData.version);
+    strcat(Z, unameData.machine);
 
-	  strcat (Z, unameData.nodename);
-	  strcat (Z, unameData.release);
-	  strcat (Z, unameData.version);
-	  strcat (Z, unameData.machine);
+    printf("Nodename: %s", unameData.nodename);
+    printf("\nRelease: %s", unameData.release);
+    printf("\nVersion: %s", unameData.version);
+    printf("\nMachine: %s", unameData.machine);
+    printf("\nHostname: %s\n", Z);
 
-	  printf ("Nodename: %s", unameData.nodename);
-	  printf ("\nRelease: %s", unameData.release);
-	  printf ("\nVersion: %s", unameData.version);
-	  printf ("\nMachine: %s", unameData.machine);
-	  printf ("\nHostname: %s\n", Z);
+    setHwConfigurations(&ngInfo, Z, unameData.version, sPid,
+                        "Ethernet", NG_INTERFACE_NAME, Address);
 
-	  setHwConfigurations (&ngInfo, Z, unameData.version, sPid,
-						   "Ethernet", NG_INTERFACE_NAME, Address);
+    free(Address);
 
-	  free (Address);
+    addKeyWords(&ngInfo, "Termômetro");
 
-	  addKeyWords (&ngInfo, "Termômetro");
+    addHwSensorFeature(&ngInfo, "sensorType", "Temperature");
+    addHwSensorFeature(&ngInfo, "sensorRangeMin", "-20");
+    addHwSensorFeature(&ngInfo, "sensorRangeMax", "100");
+    addHwSensorFeature(&ngInfo, "sensorResolution", "0.1");
+    addHwSensorFeature(&ngInfo, "sensorAccuracy", "0.2");
 
-	  addHwSensorFeature (&ngInfo, "sensorType", "Temperature");
-	  addHwSensorFeature (&ngInfo, "sensorRangeMin", "-20");
-	  addHwSensorFeature (&ngInfo, "sensorRangeMax", "100");
-	  addHwSensorFeature (&ngInfo, "sensorResolution", "0.1");
-	  addHwSensorFeature (&ngInfo, "sensorAccuracy", "0.2");
+    enablePeriodicHello(&ngInfo, true);
 
-	  enablePeriodicHello (&ngInfo, true);
+    pthread_t threads;
 
-	  pthread_t threads;
+    pthread_create(&threads, NULL, EthernetListener, (void*)&ngInfo);
 
-	  pthread_create (&threads, NULL, EthernetListener, (void *)&ngInfo);
+    int Count = 0;
 
-	  int Count = 0;
+    printf("Waiting for PGCS response...");
 
-	  printf ("Waiting for PGCS response...");
+    usleep(100000000);
 
-	  usleep (100000000);
+    while (true)
+    {
+      int dataPSize = 30;
 
-	  while (true)
-		{
-		  int dataPSize = 30;
+      char* dataP = (char*)malloc(sizeof(char) * dataPSize);
 
-		  char *dataP = (char *)malloc (sizeof (char) * dataPSize);
+      int Temperature = 20 + rand() % 10;
 
-		  int Temperature = 20 + rand () % 10;
+      char TempChar[sizeof(Temperature)];
 
-		  char TempChar[sizeof (Temperature)];
+      sprintf(TempChar, "%d", Temperature);
 
-		  sprintf (TempChar, "%d", Temperature);
+      char X[50] = "";
 
-		  char X[50] = "";
+      char charValue[10];
 
-		  char charValue[10];
+      sprintf(charValue, "%d", Count);
 
-		  sprintf(charValue, "%d", Count);
+      strcat(X, "{ Count: "); // 9
+      strcat(X, charValue);
+      strcat(X, ", Temperature: ");
+      strcat(X, TempChar);
+      strcat(X, " }");
 
-		  strcat (X, "{ Count: "); // 9
-		  strcat (X,  charValue);
-		  strcat (X, ", Temperature: ");
-		  strcat (X, TempChar);
-		  strcat (X, " }");
+      printf("\n Data = %s", X);
 
-		  printf("\n Data = %s",X);
+      strcpy(dataP, X);
 
-		  strcpy (dataP, X);
+      char Temp1[] = "Temperature_";
 
-		  char Temp1[] = "Temperature_";
+      char Temp2[SVN_SIZE + 1];
 
-		  char Temp2[SVN_SIZE + 1];
+      for (int i = 0; i < (SVN_SIZE + 1); i++)
+      {
+        Temp2[i] = ngInfo->MyNetInfo->PID[i];
+      }
 
-		  for (int i = 0; i < (SVN_SIZE + 1); i++)
-			{
-			  Temp2[i] = ngInfo->MyNetInfo->PID[i];
-			}
+      char Temp3[sizeof(Count)];
 
-		  char Temp3[sizeof (Count)];
+      sprintf(Temp3, "_%d", Count);
 
-		  sprintf (Temp3, "_%d", Count);
+      char Temp4[] = ".json";
 
-		  char Temp4[] = ".json";
+      char Name[sizeof(Temp1) + sizeof(Temp2) + sizeof(Temp3) + sizeof(Temp4)];
 
-		  char Name[sizeof (Temp1)+sizeof (Temp2)+sizeof (Temp3)+sizeof (Temp4)];
+      char A[sizeof(Temp1) + sizeof(Temp2)];
 
-		  char A[sizeof (Temp1)+sizeof (Temp2)];
+      char B[sizeof(Temp3) + sizeof(Temp4)];
 
-		  char B[sizeof (Temp3)+sizeof (Temp4)];
+      sprintf(&A, "%s%s", Temp1, Temp2);
 
-		  sprintf(&A, "%s%s", Temp1, Temp2);
+      sprintf(&B, "%s%s", Temp3, Temp4);
 
-		  sprintf(&B, "%s%s", Temp3, Temp4);
+      sprintf(&Name, "%s%s", A, B);
 
-		  sprintf(&Name, "%s%s", A, B);
+      printf("\n File = %s", Name);
 
-		  printf("\n File = %s",Name);
+      printf("\n");
 
-		  printf("\n");
+      setDataToPub(&ngInfo, Name, dataP, dataPSize);
 
-		  setDataToPub (&ngInfo, Name, dataP, dataPSize);
+      processLoop(&ngInfo);
 
-		  processLoop (&ngInfo);
+      enablePeriodicHello(&ngInfo, false);
 
-		  enablePeriodicHello (&ngInfo, false);
+      if (ngInfo->ngState == PUB_DATA)
+      {
+        double T = GetTime();
 
-		  if (ngInfo->ngState == PUB_DATA)
-			{
-			  double T = GetTime ();
+        setDataToPub(&ngInfo, Name, dataP, dataPSize);
 
-			  setDataToPub (&ngInfo, Name, dataP, dataPSize);
+        printf("Time = %f\n", GetTime() - T);
+      }
 
-			  printf ("Time = %f\n", GetTime () - T);
+      Count++;
 
-			}
+      ng_free(dataP);
 
-		  Count++;
+      usleep(2000000);
+    }
 
-		  ng_free (dataP);
-
-		  usleep (2000000);
-		}
-
-	  pthread_exit (NULL);
-	  destroy_NgEPGS (&ngInfo);
-	}
+    pthread_exit(NULL);
+    destroy_NgEPGS(&ngInfo);
+  }
   else
-	{
-	  printf ("ERROR: no alternative provided in EPGS command line.\n\n");
+  {
+    printf("ERROR: no alternative provided in EPGS command line.\n\n");
 
-	  printf ("Usage: sudo ./EPGS -i Interface    for example: sudo ./EPGS -i eth0\n");
-	  printf ("Usage: sudo ./EPGS -d              for example: sudo ./EPGS -d\n");
-	}
+    printf("Usage: sudo ./EPGS -i Interface    for example: sudo ./EPGS -i eth0\n");
+    printf("Usage: sudo ./EPGS -d              for example: sudo ./EPGS -d\n");
+  }
 
   return 1;
 }

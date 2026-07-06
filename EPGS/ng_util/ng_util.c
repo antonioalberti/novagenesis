@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis utilities
-	Object:		ng_util
-	File:		ng_util.c
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis utilities
+        Object:		ng_util
+        File:		ng_util.c
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -28,37 +28,35 @@
 #include "ng_util.h"
 #include "../epgs_wrapper.h"
 
-char *strtok_r (
-	char *str,
-	const char *delim,
-	char **nextp)
+char* strtok_r(
+    char* str,
+    const char* delim,
+    char** nextp)
 {
-  char *ret;
+  char* ret;
 
   if (str == NULL)
-	{
-	  str = *nextp;
-	}
+  {
+    str = *nextp;
+  }
 
-  str += ng_strspn (str, delim);
+  str += ng_strspn(str, delim);
 
   if (*str == '\0')
-	{
-	  return NULL;
-	}
+  {
+    return NULL;
+  }
 
   ret = str;
 
-  str += ng_strcspn (str, delim);
+  str += ng_strcspn(str, delim);
 
   if (*str)
-	{
-	  *str++ = '\0';
-	}
+  {
+    *str++ = '\0';
+  }
 
   *nextp = str;
 
   return ret;
 }
-
-

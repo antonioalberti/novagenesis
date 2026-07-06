@@ -219,16 +219,15 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
             // does NOT mark for delete on the success path, so without this
             // explicit mark the message stays in Process::Messages[] forever,
             // causing the +N msg/sec leak we observed in the log.
-      
+
             _ReceivedMessage->MarkToDelete();
 
             // Set Status
-              Status = OK;
-            
-#ifdef DEBUG
-            PB->S << Offset <<  "(Forwarding: The destination is the gateway)" << endl;
-#endif
+            Status = OK;
 
+#ifdef DEBUG
+            PB->S << Offset << "(Forwarding: The destination is the gateway)" << endl;
+#endif
           }
         }
         else
@@ -354,7 +353,7 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 
                 // Modified in 11th April 2021 to deal with parallel shared memories.
                 // Phase 2: Use SafePushToOutputQueue to avoid busy-wait and sem_open overhead
-                SafePushToOutputQueue(PGW,BindingValue, _ReceivedMessage, Offset, PB, Status);
+                SafePushToOutputQueue(PGW, BindingValue, _ReceivedMessage, Offset, PB, Status);
               }
               else
               {
@@ -415,7 +414,7 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 
       _ReceivedMessage->MarkToDelete();
 
-      Status=OK;
+      Status = OK;
     }
   }
   else
@@ -726,7 +725,8 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
 
 #ifdef DEBUG
 
-  PB->S << endl << Offset << "(Running the action " << this->GetLegibleName() << " at block " << PB->GetLegibleName() << ")"
+  PB->S << endl
+        << Offset << "(Running the action " << this->GetLegibleName() << " at block " << PB->GetLegibleName() << ")"
         << endl;
 
   PB->S << Offset << this->GetLegibleName() << endl;

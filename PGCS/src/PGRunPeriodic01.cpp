@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGRunPeriodic01
-	Object:		PGRunPeriodic01
-	File:		PGRunPeriodic01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGRunPeriodic01
+        Object:		PGRunPeriodic01
+        File:		PGRunPeriodic01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -43,39 +43,41 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG
+// #define DEBUG
 
-PGRunPeriodic01::PGRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PGRunPeriodic01::PGRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
   HelloCounter = 0;
-  ExpositionCounter=0;
-  StressCounter=0;
+  ExpositionCounter = 0;
+  StressCounter = 0;
 }
 
-PGRunPeriodic01::~PGRunPeriodic01 ()
+PGRunPeriodic01::~PGRunPeriodic01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --periodic _Version
-int
-PGRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PGRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
-  PG *PPG = 0;
-  CommandLine *PCL = 0;
-  Message *RunPeriodic = 0;
+  PG* PPG = 0;
+  CommandLine* PCL = 0;
+  Message* RunPeriodic = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
 
 #ifdef DEBUG
 
-  PB->S << endl << endl << Offset << this->GetLegibleName () << endl;
-  PB->S << Offset << "This PGCS has the SCN "<< PB->PP->GetSelfCertifyingName() << " and is running at host " << PB->PP->GetHostSelfCertifyingName() << endl;
+  PB->S << endl
+        << endl
+        << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << "This PGCS has the SCN " << PB->PP->GetSelfCertifyingName() << " and is running at host " << PB->PP->GetHostSelfCertifyingName() << endl;
 
 #endif
 
@@ -84,60 +86,60 @@ PGRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
   // ******************************************************
 
   // Check for NRNCS awareness
-  PSAwareness ();
+  PSAwareness();
 
   // Schedule a hello to the peer PGSs
-  HelloScheduling ();
+  HelloScheduling();
 
   // Expose learned core SCNs to the peer PGSs
-  ExpositionScheduling ();
+  ExpositionScheduling();
 
   // Publish PGCS data to NRNCS
-  PGCSPublishingScheduling ();
+  PGCSPublishingScheduling();
 
   // Schedule stress test messages to peer PGCSes
-  StresstestScheduling ();
+  StresstestScheduling();
 
   // Check for domain and upper level peer domain names
-  //DiscoverDomainNames();
+  // DiscoverDomainNames();
 
   // Check for domain names awareness
-  //DomainNamesAwareness();
+  // DomainNamesAwareness();
 
   // ******************************************************
   // Schedule a message to run periodic again
   // ******************************************************
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + PPG->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
+  PB->PP->NewMessage(GetTime() + PPG->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
 
   // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PPG->PGW->PushToInputQueue (RunPeriodic);
+  PPG->PGW->PushToInputQueue(RunPeriodic);
 
   // ******************************************************
   // Clean the messages container
@@ -145,25 +147,27 @@ PGRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl << endl << endl;
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 
   return Status;
 }
 
-int PGRunPeriodic01::PSAwareness ()
+int PGRunPeriodic01::PSAwareness()
 {
   int Status = ERROR;
   string Offset = "                    ";
   string Offset1 = "                              ";
-  vector<Tuple *> ProcessesTuples;
-  PG *PPG = 0;
+  vector<Tuple*> ProcessesTuples;
+  PG* PPG = 0;
   bool NewPSDetected = true;
-  PGCS *PPGCS = 0;
+  PGCS* PPGCS = 0;
 
-  PPG = (PG *)PB;
-  PPGCS = (PGCS *)PB->PP;
+  PPG = (PG*)PB;
+  PPGCS = (PGCS*)PB->PP;
 
 #ifdef DEBUG
 
@@ -171,142 +175,141 @@ int PGRunPeriodic01::PSAwareness ()
 
 #endif
 
-  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("PSS", "PS", ProcessesTuples, PB) == ERROR)
-	{
+  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", ProcessesTuples, PB) == ERROR)
+  {
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Not aware of any PSS.)" << endl;
+    PB->S << Offset1 << "(Not aware of any PSS.)" << endl;
 #endif
-	}
+  }
   else
-	{
-	  if (ProcessesTuples.size () > 0)
-		{
-		  for (unsigned int i = 0; i < ProcessesTuples.size (); i++)
-			{
-			  PPG->AwareOfAPS = true;
+  {
+    if (ProcessesTuples.size() > 0)
+    {
+      for (unsigned int i = 0; i < ProcessesTuples.size(); i++)
+      {
+        PPG->AwareOfAPS = true;
 
 #ifdef DEBUG
-			  PB->S << Offset1 << "(Aware of the PSS " << i << " )" << endl;
-			  PB->S << Offset1 << "(HID = " << ProcessesTuples[i]->Values[0] << ")" << endl;
-			  PB->S << Offset1 << "(OSID = " << ProcessesTuples[i]->Values[1] << ")" << endl;
-			  PB->S << Offset1 << "(PID = " << ProcessesTuples[i]->Values[2] << ")" << endl;
-			  PB->S << Offset1 << "(BID = " << ProcessesTuples[i]->Values[3] << ")" << endl;
+        PB->S << Offset1 << "(Aware of the PSS " << i << " )" << endl;
+        PB->S << Offset1 << "(HID = " << ProcessesTuples[i]->Values[0] << ")" << endl;
+        PB->S << Offset1 << "(OSID = " << ProcessesTuples[i]->Values[1] << ")" << endl;
+        PB->S << Offset1 << "(PID = " << ProcessesTuples[i]->Values[2] << ")" << endl;
+        PB->S << Offset1 << "(BID = " << ProcessesTuples[i]->Values[3] << ")" << endl;
 #endif
 
-			  for (unsigned int j = 0; j < PPG->PSTuples.size (); j++)
-				{
-				  if (ProcessesTuples[i]->Values[2] == PPG->PSTuples[j]->Values[2])
-					{
-					  // Change the flag
-					  NewPSDetected = false;
-					}
-				}
+        for (unsigned int j = 0; j < PPG->PSTuples.size(); j++)
+        {
+          if (ProcessesTuples[i]->Values[2] == PPG->PSTuples[j]->Values[2])
+          {
+            // Change the flag
+            NewPSDetected = false;
+          }
+        }
 
-			  if (NewPSDetected == true)
-				{
+        if (NewPSDetected == true)
+        {
 
 #ifdef DEBUG
-				  PB->S << Offset1 << "(A new PSS was discovered.)" << endl;
+          PB->S << Offset1 << "(A new PSS was discovered.)" << endl;
 #endif
 
-				  PPG->PSTuples.push_back (ProcessesTuples[i]);
+          PPG->PSTuples.push_back(ProcessesTuples[i]);
 
-				  if (PPGCS->HasCore == true)
-					{
-					  Block *PCoreB = NULL;
+          if (PPGCS->HasCore == true)
+          {
+            Block* PCoreB = NULL;
 
-					  PPGCS->GetBlock ("Core", PCoreB);
+            PPGCS->GetBlock("Core", PCoreB);
 
-					  Core *PCore = (Core *)PCoreB;
+            Core* PCore = (Core*)PCoreB;
 
-					  PCore->PSTuples.push_back (ProcessesTuples[i]);
-					}
-				}
-			}
-		}
-	}
+            PCore->PSTuples.push_back(ProcessesTuples[i]);
+          }
+        }
+      }
+    }
+  }
 
-  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("NRNCS", "NR", ProcessesTuples, PB)
-	  == ERROR)
-	{
+  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("NRNCS", "NR", ProcessesTuples, PB) == ERROR)
+  {
 
 #ifdef DEBUG
-	  PB->S << Offset1 << "(Not aware of any NRNCS.)" << endl;
+    PB->S << Offset1 << "(Not aware of any NRNCS.)" << endl;
 #endif
-	}
+  }
   else
-	{
-	  if (ProcessesTuples.size () > 0)
-		{
-		  for (unsigned int i = 0; i < ProcessesTuples.size (); i++)
-			{
-			  PPG->AwareOfAPS = true;
+  {
+    if (ProcessesTuples.size() > 0)
+    {
+      for (unsigned int i = 0; i < ProcessesTuples.size(); i++)
+      {
+        PPG->AwareOfAPS = true;
 
 #ifdef DEBUG
-			  PB->S << Offset1 << "(Aware of the NRNCS " << i << " )" << endl;
-			  PB->S << Offset1 << "(HID = " << ProcessesTuples[i]->Values[0] << ")" << endl;
-			  PB->S << Offset1 << "(OSID = " << ProcessesTuples[i]->Values[1] << ")" << endl;
-			  PB->S << Offset1 << "(PID = " << ProcessesTuples[i]->Values[2] << ")" << endl;
-			  PB->S << Offset1 << "(BID = " << ProcessesTuples[i]->Values[3] << ")" << endl;
+        PB->S << Offset1 << "(Aware of the NRNCS " << i << " )" << endl;
+        PB->S << Offset1 << "(HID = " << ProcessesTuples[i]->Values[0] << ")" << endl;
+        PB->S << Offset1 << "(OSID = " << ProcessesTuples[i]->Values[1] << ")" << endl;
+        PB->S << Offset1 << "(PID = " << ProcessesTuples[i]->Values[2] << ")" << endl;
+        PB->S << Offset1 << "(BID = " << ProcessesTuples[i]->Values[3] << ")" << endl;
 #endif
 
-			  for (unsigned int j = 0; j < PPG->PSTuples.size (); j++)
-				{
-				  if (ProcessesTuples[i]->Values[2] == PPG->PSTuples[j]->Values[2])
-					{
-					  // Change the flag
-					  NewPSDetected = false;
-					}
-				}
+        for (unsigned int j = 0; j < PPG->PSTuples.size(); j++)
+        {
+          if (ProcessesTuples[i]->Values[2] == PPG->PSTuples[j]->Values[2])
+          {
+            // Change the flag
+            NewPSDetected = false;
+          }
+        }
 
-			  if (NewPSDetected == true)
-				{
+        if (NewPSDetected == true)
+        {
 
 #ifdef DEBUG
-				  PB->S << Offset1 << "(A new NRNCS was discovered.)" << endl;
+          PB->S << Offset1 << "(A new NRNCS was discovered.)" << endl;
 #endif
 
-				  PPG->PSTuples.push_back (ProcessesTuples[i]);
+          PPG->PSTuples.push_back(ProcessesTuples[i]);
 
-				  if (PPGCS->HasCore == true)
-					{
-					  Block *PCoreB = NULL;
+          if (PPGCS->HasCore == true)
+          {
+            Block* PCoreB = NULL;
 
-					  PPGCS->GetBlock ("Core", PCoreB);
+            PPGCS->GetBlock("Core", PCoreB);
 
-					  Core *PCore = (Core *)PCoreB;
+            Core* PCore = (Core*)PCoreB;
 
-					  PCore->PSTuples.push_back (ProcessesTuples[i]);
-					}
-				}
-			}
-		}
-	}
+            PCore->PSTuples.push_back(ProcessesTuples[i]);
+          }
+        }
+      }
+    }
+  }
 
   return Status;
 }
 
 // Schedule a hello to the peer PGSs
-int PGRunPeriodic01::HelloScheduling ()
+int PGRunPeriodic01::HelloScheduling()
 {
   int Status = ERROR;
   string Offset = "                    ";
   string Offset1 = "                              ";
-  PG *PPG = 0;
-  Message *RunHello01 = 0;
-  Message *RunHello02 = 0;
-  Message *RunHello03 = 0;
+  PG* PPG = 0;
+  Message* RunHello01 = 0;
+  Message* RunHello02 = 0;
+  Message* RunHello03 = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  CommandLine *PCL = 0;
-  PGCS *PPGCS = 0;
+  CommandLine* PCL = 0;
+  PGCS* PPGCS = 0;
   static long long callCount = 0;
   static long long helloCount = 0;
 
-  PPG = (PG *)PB;
-  PPGCS = (PGCS *)PB->PP;
+  PPG = (PG*)PB;
+  PPGCS = (PGCS*)PB->PP;
   callCount++;
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
@@ -321,119 +324,118 @@ int PGRunPeriodic01::HelloScheduling ()
   // Schedule a message to run hello 0.1 for other NG PGCSs
   // ******************************************************
 
-
-
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
   if (HelloCounter % (int)PPG->DelayBetweenHellos01 == 0)
-	{
-	  	  helloCount++;
-	  #ifdef DEBUG
-	  	  std::cerr << std::endl << "[HELLO] call=" << callCount << " hello=" << helloCount
-	  		    << " HelloCounter=" << HelloCounter
-	  		    << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
-	  		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
-	  #endif
+  {
+    helloCount++;
+#ifdef DEBUG
+    std::cerr << std::endl
+              << "[HELLO] call=" << callCount << " hello=" << helloCount
+              << " HelloCounter=" << HelloCounter
+              << " DelayBetweenHellos01=" << PPG->DelayBetweenHellos01
+              << " PID=" << PPG->GetSelfCertifyingName() << std::endl
+              << std::endl;
+#endif
 
-	  #ifdef DEBUG
+#ifdef DEBUG
 
-	  PB->S << Offset << "(2. Scheduling a hello 0.1 message to the peer PGCS(s).)" << endl;
+    PB->S << Offset << "(2. Scheduling a hello 0.1 message to the peer PGCS(s).)" << endl;
 
 #endif
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 1, false, RunHello01);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 1, false, RunHello01);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunHello01, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunHello01, PCL);
 
-	  // Adding a ng -run --periodic command line
-	  RunHello01->NewCommandLine ("-run", "--hello", "0.1", PCL);
+    // Adding a ng -run --periodic command line
+    RunHello01->NewCommandLine("-run", "--hello", "0.1", PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (RunHello01, SCN);
+    // Generate the SCN
+    PB->GenerateSCNFromMessageBinaryPatterns(RunHello01, SCN);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, RunHello01, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunHello01, PCL);
 
-	  // Push the message to the GW input queue
-	  PPG->PGW->PushToInputQueue (RunHello01);
-	}
+    // Push the message to the GW input queue
+    PPG->PGW->PushToInputQueue(RunHello01);
+  }
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
   if (PPGCS->HasCore == true && HelloCounter % (int)PPG->DelayBetweenHellos02 == 0)
-	{
-	  // ******************************************************
-	  // Schedule a message to run hello 0.2 for NG EPGSs
-	  // ******************************************************
+  {
+    // ******************************************************
+    // Schedule a message to run hello 0.2 for NG EPGSs
+    // ******************************************************
 
 #ifdef DEBUG
 
-	  PB->S << Offset << "(2. Scheduling a hello 0.2 message to the peer PGCS(s).)" << endl;
+    PB->S << Offset << "(2. Scheduling a hello 0.2 message to the peer PGCS(s).)" << endl;
 
 #endif
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 1, false, RunHello02);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 1, false, RunHello02);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunHello02, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunHello02, PCL);
 
-	  // Adding a ng -run --periodic command line
-	  RunHello02->NewCommandLine ("-run", "--hello", "0.2", PCL);
+    // Adding a ng -run --periodic command line
+    RunHello02->NewCommandLine("-run", "--hello", "0.2", PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (RunHello02, SCN);
+    // Generate the SCN
+    PB->GenerateSCNFromMessageBinaryPatterns(RunHello02, SCN);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, RunHello02, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunHello02, PCL);
 
-	  // Push the message to the GW input queue
-	  PPG->PGW->PushToInputQueue (RunHello02);
-	}
+    // Push the message to the GW input queue
+    PPG->PGW->PushToInputQueue(RunHello02);
+  }
 
   if (PPGCS->Role == "Inter_Domain")
-	{
+  {
 
-	  // ******************************************************
-	  // Schedule a message to run hello 0.3 for NG EPGSs
-	  // ******************************************************
+    // ******************************************************
+    // Schedule a message to run hello 0.3 for NG EPGSs
+    // ******************************************************
 
 #ifdef DEBUG
 
-	  PB->S << Offset << "(2. Scheduling a hello 0.3 message to the peer PGCS(s).)" << endl;
+    PB->S << Offset << "(2. Scheduling a hello 0.3 message to the peer PGCS(s).)" << endl;
 
 #endif
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 1, false, RunHello03);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 1, false, RunHello03);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunHello03, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunHello03, PCL);
 
-	  // Adding a ng -run --periodic command line
-	  RunHello03->NewCommandLine ("-run", "--hello", "0.3", PCL);
+    // Adding a ng -run --periodic command line
+    RunHello03->NewCommandLine("-run", "--hello", "0.3", PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (RunHello03, SCN);
+    // Generate the SCN
+    PB->GenerateSCNFromMessageBinaryPatterns(RunHello03, SCN);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, RunHello03, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunHello03, PCL);
 
-	  // Push the message to the GW input queue
-	  PPG->PGW->PushToInputQueue (RunHello03);
-
-	}
+    // Push the message to the GW input queue
+    PPG->PGW->PushToInputQueue(RunHello03);
+  }
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 
@@ -443,19 +445,19 @@ int PGRunPeriodic01::HelloScheduling ()
 }
 
 // Expose learned core SCNs to the peer PGSs
-int PGRunPeriodic01::ExpositionScheduling ()
+int PGRunPeriodic01::ExpositionScheduling()
 {
   int Status = ERROR;
   string Offset = "                    ";
   string Offset1 = "                              ";
-  Message *RunExposition = 0;
+  Message* RunExposition = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  CommandLine *PCL = 0;
-  PG *PPG = 0;
+  CommandLine* PCL = 0;
+  PG* PPG = 0;
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
 
 #ifdef DEBUG
 
@@ -464,217 +466,221 @@ int PGRunPeriodic01::ExpositionScheduling ()
 #endif
 
   if (ExpositionCounter % (int)PPG->DelayBetweenExpositions == 0)
-	{
+  {
 
-	  // ******************************************************
-	  // Schedule a message to run exposition
-	  // ******************************************************
+    // ******************************************************
+    // Schedule a message to run exposition
+    // ******************************************************
 
-	  // Setting up the process SCN as the space limiter
-	  Limiters.push_back (PB->PP->Intra_Process);
+    // Setting up the process SCN as the space limiter
+    Limiters.push_back(PB->PP->Intra_Process);
 
-	  // Setting up the block SCN as the source SCN
-	  Sources.push_back (PB->GetSelfCertifyingName ());
+    // Setting up the block SCN as the source SCN
+    Sources.push_back(PB->GetSelfCertifyingName());
 
-	  // Setting up the block SCN as the destination SCN
-	  Destinations.push_back (PB->GetSelfCertifyingName ());
+    // Setting up the block SCN as the destination SCN
+    Destinations.push_back(PB->GetSelfCertifyingName());
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 1, false, RunExposition);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 1, false, RunExposition);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
 
-	// Adding a ng -run --periodic command line
-	RunExposition->NewCommandLine ("-run", "--exposition", "0.1", PCL);
+    // Adding a ng -run --periodic command line
+    RunExposition->NewCommandLine("-run", "--exposition", "0.1", PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (RunExposition, SCN);
+    // Generate the SCN
+    PB->GenerateSCNFromMessageBinaryPatterns(RunExposition, SCN);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, RunExposition, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunExposition, PCL);
 
-	  // Push the message to the GW input queue
-	  PPG->PGW->PushToInputQueue (RunExposition);
-	}
+    // Push the message to the GW input queue
+    PPG->PGW->PushToInputQueue(RunExposition);
+  }
 
-	ExpositionCounter++;
+  ExpositionCounter++;
 
   return Status;
 }
 
 // Publish PGCS data to NRNCS
-int PGRunPeriodic01::PGCSPublishingScheduling ()
+int PGRunPeriodic01::PGCSPublishingScheduling()
 {
   int Status = ERROR;
   string Offset = "                    ";
   string Offset1 = "                              ";
-  PG *PPG = 0;
-  Message *RunPublishing = 0;
+  PG* PPG = 0;
+  Message* RunPublishing = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   static long long callCount = 0;
   static long long publishCount = 0;
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
   callCount++;
 
-  if (PPG->AlreadyPublishedBasicBindings == false && PPG-> AwareOfAPS == true)
-	{
-	  	  publishCount++;
-	  #ifdef DEBUG
-	  	  std::cerr << std::endl << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
-	  		    << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
-	  		    << " AwareOfAPS=" << PPG->AwareOfAPS
-	  		    << " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
-	  #endif
-	  // ******************************************************
-	  // Schedule a message to run publishing names to NRNCS
-	  // ******************************************************
+  if (PPG->AlreadyPublishedBasicBindings == false && PPG->AwareOfAPS == true)
+  {
+    publishCount++;
+#ifdef DEBUG
+    std::cerr << std::endl
+              << "[PGCS_PUBLISH] call=" << callCount << " publish=" << publishCount
+              << " AlreadyPub=" << PPG->AlreadyPublishedBasicBindings
+              << " AwareOfAPS=" << PPG->AwareOfAPS
+              << " PID=" << PPG->GetSelfCertifyingName() << std::endl
+              << std::endl;
+#endif
+    // ******************************************************
+    // Schedule a message to run publishing names to NRNCS
+    // ******************************************************
 
 #ifdef DEBUG
 
-	  PB->S << Offset << "(5. Publishing PGCS name bindings to the NRNCS.)" << endl;
+    PB->S << Offset << "(5. Publishing PGCS name bindings to the NRNCS.)" << endl;
 
 #endif
 
-	  // Setting up the process SCN as the space limiter
-	  Limiters.push_back (PB->PP->Intra_Process);
+    // Setting up the process SCN as the space limiter
+    Limiters.push_back(PB->PP->Intra_Process);
 
-	  // Setting up the block SCN as the source SCN
-	  Sources.push_back (PB->GetSelfCertifyingName ());
+    // Setting up the block SCN as the source SCN
+    Sources.push_back(PB->GetSelfCertifyingName());
 
-	  // Setting up the block SCN as the destination SCN
-	  Destinations.push_back (PB->GetSelfCertifyingName ());
+    // Setting up the block SCN as the destination SCN
+    Destinations.push_back(PB->GetSelfCertifyingName());
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 1, false, RunPublishing);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 1, false, RunPublishing);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPublishing, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPublishing, PCL);
 
-	  // Adding a ng -run --periodic command line
-	  RunPublishing->NewCommandLine ("-run", "--publishing", "0.1", PCL);
+    // Adding a ng -run --periodic command line
+    RunPublishing->NewCommandLine("-run", "--publishing", "0.1", PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (RunPublishing, SCN);
+    // Generate the SCN
+    PB->GenerateSCNFromMessageBinaryPatterns(RunPublishing, SCN);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, RunPublishing, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunPublishing, PCL);
 
-	  // Push the message to the GW input queue
-	  PPG->PGW->PushToInputQueue (RunPublishing);
+    // Push the message to the GW input queue
+    PPG->PGW->PushToInputQueue(RunPublishing);
 
-	  PPG->AlreadyPublishedBasicBindings = true;
-	}
+    PPG->AlreadyPublishedBasicBindings = true;
+  }
 
   return Status;
 }
 
 // Schedule stress test messages to peer PGCSes
-int PGRunPeriodic01::StresstestScheduling ()
+int PGRunPeriodic01::StresstestScheduling()
 {
   int Status = ERROR;
   string Offset = "                    ";
-  PG *PPG = 0;
-  Message *RunStresstest = 0;
+  PG* PPG = 0;
+  Message* RunStresstest = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   static long long callCount = 0;
   static long long sendCount = 0;
 
-  PPG = (PG *)PB;
+  PPG = (PG*)PB;
   callCount++;
 
 #ifdef DEBUG
-  PB->S << Offset << "(StresstestScheduling: StressEnabled=" << PPG->StressEnabled 
-        << " PGCSTuples.size=" << PPG->PGCSTuples.size() 
-        << " StressCounter=" << StressCounter 
+  PB->S << Offset << "(StresstestScheduling: StressEnabled=" << PPG->StressEnabled
+        << " PGCSTuples.size=" << PPG->PGCSTuples.size()
+        << " StressCounter=" << StressCounter
         << " StressInterval=" << PPG->StressInterval << ")" << endl;
 #endif
 
   if (!PPG->StressEnabled)
-    {
+  {
 #ifdef DEBUG
-      PB->S << Offset << "(StresstestScheduling: StressTest DISABLED — exiting)" << endl;
+    PB->S << Offset << "(StresstestScheduling: StressTest DISABLED — exiting)" << endl;
 #endif
-      return Status;
-    }
+    return Status;
+  }
 
   // Only send if peers have been discovered (PGCSTuples is populated by PGHelloIHC01)
   if (PPG->PGCSTuples.size() == 0)
-    {
+  {
 #ifdef DEBUG
-      PB->S << Offset << "(StresstestScheduling: No peers discovered yet — exiting)" << endl;
+    PB->S << Offset << "(StresstestScheduling: No peers discovered yet — exiting)" << endl;
 #endif
-      return Status;
-    }
+    return Status;
+  }
 
   if (PPG->StressInterval > 0.0)
+  {
+    int MessagesPerPeriod = (int)(PPG->DelayBeforeRunPeriodic / PPG->StressInterval);
+
+    if (MessagesPerPeriod < 1)
+      MessagesPerPeriod = 1;
+
+    sendCount += MessagesPerPeriod;
+#ifdef DEBUG
+    std::cerr << std::endl
+              << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
+              << " totalSent=" << sendCount
+              << " StressEnabled=" << PPG->StressEnabled
+              << " PGCSTuples=" << PPG->PGCSTuples.size()
+              << " PID=" << PPG->GetSelfCertifyingName() << std::endl
+              << std::endl;
+#endif
+
+#ifdef DEBUG
+    PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod
+          << " messages this period. DelayBeforeRunPeriodic=" << PPG->DelayBeforeRunPeriodic
+          << " StressInterval=" << PPG->StressInterval << ")" << endl;
+#endif
+
+    for (int i = 0; i < MessagesPerPeriod; i++)
     {
-      int MessagesPerPeriod = (int)(PPG->DelayBeforeRunPeriodic / PPG->StressInterval);
+      Message* RunStresstest = 0;
+      CommandLine* PCL = 0;
+      vector<string> Limiters;
+      vector<string> Sources;
+      vector<string> Destinations;
+      string SCN;
 
-      if (MessagesPerPeriod < 1) MessagesPerPeriod = 1;
+      // Setting up the process SCN as the space limiter
+      Limiters.push_back(PB->PP->Intra_Process);
 
-      sendCount += MessagesPerPeriod;
-#ifdef DEBUG
-      std::cerr << std::endl << "[STRESS] call=" << callCount << " sending=" << MessagesPerPeriod
-		<< " totalSent=" << sendCount
-		<< " StressEnabled=" << PPG->StressEnabled
-		<< " PGCSTuples=" << PPG->PGCSTuples.size()
-		<< " PID=" << PPG->GetSelfCertifyingName() << std::endl << std::endl;
-#endif
+      // Setting up the block SCN as the source SCN
+      Sources.push_back(PB->GetSelfCertifyingName());
 
-#ifdef DEBUG
-      PB->S << Offset << "(StresstestScheduling: Sending " << MessagesPerPeriod
-            << " messages this period. DelayBeforeRunPeriodic=" << PPG->DelayBeforeRunPeriodic
-            << " StressInterval=" << PPG->StressInterval << ")" << endl;
-#endif
+      // Setting up the block SCN as the destination SCN
+      Destinations.push_back(PB->GetSelfCertifyingName());
 
-      for (int i = 0; i < MessagesPerPeriod; i++)
-        {
-          Message *RunStresstest = 0;
-          CommandLine *PCL = 0;
-          vector<string> Limiters;
-          vector<string> Sources;
-          vector<string> Destinations;
-          string SCN;
+      // Creating a new message
+      PB->PP->NewMessage(GetTime(), 1, false, RunStresstest);
 
-          // Setting up the process SCN as the space limiter
-          Limiters.push_back(PB->PP->Intra_Process);
+      // Creating the ng -cl -m command line
+      PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunStresstest, PCL);
 
-          // Setting up the block SCN as the source SCN
-          Sources.push_back(PB->GetSelfCertifyingName());
+      // Adding a ng -run --stresstest command line
+      RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
 
-          // Setting up the block SCN as the destination SCN
-          Destinations.push_back(PB->GetSelfCertifyingName());
+      // Generate the SCN
+      PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
 
-          // Creating a new message
-          PB->PP->NewMessage(GetTime(), 1, false, RunStresstest);
+      // Creating the ng -scn --s command line
+      PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
 
-          // Creating the ng -cl -m command line
-          PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunStresstest, PCL);
-
-          // Adding a ng -run --stresstest command line
-          RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
-
-          // Generate the SCN
-          PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
-
-          // Creating the ng -scn --s command line
-          PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
-
-          // Push the message to the GW input queue
-          PPG->PGW->PushToInputQueue(RunStresstest);
-        }
+      // Push the message to the GW input queue
+      PPG->PGW->PushToInputQueue(RunStresstest);
     }
+  }
 
   StressCounter++;
 
   return Status;
 }
-

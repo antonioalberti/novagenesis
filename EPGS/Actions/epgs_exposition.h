@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS exposition
-	Object:		epgs_exposition
-	File:		epgs_exposition.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS exposition
+        Object:		epgs_exposition
+        File:		epgs_exposition.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -31,6 +31,6 @@
 #include "../DataStructures/epgs_structures.h"
 #include "../Common/ng_message.h"
 
-int actionExpostion (NgEPGS *ngEPGS, NgMessage **expositionMessage);
+int actionExpostion(NgEPGS* ngEPGS, NgMessage** expositionMessage);
 
 #endif /* ACTIONS_EPGS_EXPOSITION_H_ */

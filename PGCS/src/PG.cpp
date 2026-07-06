@@ -122,7 +122,8 @@
 // #define DEBUG5  // Details of each segment sent
 // #define DEBUG6 // TODO - FIXP/Update - Created a new debug only for child thread transfer
 
-#define PG_LOG(msg) S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+#define PG_LOG(msg) S << endl \
+                      << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 #define STATISTICS
 
 union ethframe

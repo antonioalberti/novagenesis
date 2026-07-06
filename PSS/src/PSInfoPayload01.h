@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		PSInfoPayload01
-	Object:		PSInfoPayload01
-	File:		PSInfoPayload01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		PSInfoPayload01
+        Object:		PSInfoPayload01
+        File:		PSInfoPayload01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,24 +49,18 @@
 
 class Block;
 
-class PSInfoPayload01 : public Action {
- public:
-
+class PSInfoPayload01 : public Action
+{
+public:
   // Constructor
-  PSInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PSInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PSInfoPayload01 ();
+  virtual ~PSInfoPayload01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

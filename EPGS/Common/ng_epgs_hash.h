@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis hash
-	Object:		ng_epgs_hash
-	File:		ng_epgs_hash.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis hash
+        Object:		ng_epgs_hash
+        File:		ng_epgs_hash.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -30,6 +30,6 @@
 
 #include "MurmurHash3.h"
 
-extern int GenerateSCNFromCharArrayBinaryPatterns4Bytes(const char *_Input, int _Size, char** ret);
+extern int GenerateSCNFromCharArrayBinaryPatterns4Bytes(const char* _Input, int _Size, char** ret);
 
 #endif /* _NG_EPGS_HASH_H */

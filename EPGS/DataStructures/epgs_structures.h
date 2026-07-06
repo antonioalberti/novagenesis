@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis data structures
-	Object:		epgs_structures
-	File:		epgs_structures.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis data structures
+        Object:		epgs_structures
+        File:		epgs_structures.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -30,7 +30,8 @@
 
 #include "../epgs_defines.h"
 
-enum ng_states {
+enum ng_states
+{
   HELLO = 1,
   WAIT_HELLO_PGCS,
   EXPOSITION,
@@ -42,7 +43,8 @@ enum ng_states {
 };
 typedef enum ng_states States;
 
-struct _ng_net_info {
+struct _ng_net_info
+{
 
   // LIMITER
   char LIMITER[SVN_SIZE + 1];
@@ -63,25 +65,25 @@ struct _ng_net_info {
   // CORE_BID_SCN
   char CORE_BID_SCN[SVN_SIZE + 1];
   // Stack
-  char *Stack;                // "Ethernet"
+  char* Stack; // "Ethernet"
   // Interface
-  char *Interface;            // "eth0"
+  char* Interface; // "eth0"
   // Identifier
-  char *Identifier;            // "00:12:34:AB:CD:EF"
-
+  char* Identifier; // "00:12:34:AB:CD:EF"
 };
 
-struct _ng_hw_descriptor {
+struct _ng_hw_descriptor
+{
   int keyWordsCounter;
-  char **keyWords;
+  char** keyWords;
 
   int featureCounter;
-  char **sensorFeatureName;    // "Accuracy; Resolution"
-  char **sensorFeatureValue;    // "0.1; 0.1"
-
+  char** sensorFeatureName;  // "Accuracy; Resolution"
+  char** sensorFeatureValue; // "0.1; 0.1"
 };
 
-struct _ng_pgcs_info {
+struct _ng_pgcs_info
+{
 
   // GW_SCN
   char GW_SCN[SVN_SIZE + 1];
@@ -90,15 +92,15 @@ struct _ng_pgcs_info {
   // CORE_BID_SCN
   char CORE_BID_SCN[SVN_SIZE + 1];
   // Stack
-  char *Stack;                // "wi-fi"
+  char* Stack; // "wi-fi"
   // Interface
-  char *Interface;            // "eth0"
+  char* Interface; // "eth0"
   // Identifier
-  char *Identifier;            // "00:12:34:AB:CD:EF"
-
+  char* Identifier; // "00:12:34:AB:CD:EF"
 };
 
-struct _ng_scn_id_info {
+struct _ng_scn_id_info
+{
 
   // HID
   char HID[SVN_SIZE + 1];
@@ -108,10 +110,10 @@ struct _ng_scn_id_info {
   char PID[SVN_SIZE + 1];
   // BID
   char BID[SVN_SIZE + 1];
-
 };
 
-struct _ng_received_msg {
+struct _ng_received_msg
+{
 
   unsigned msg_id;
 
@@ -121,29 +123,31 @@ struct _ng_received_msg {
 
   int frames_read;
 
-  char *buffer;
+  char* buffer;
 };
 
-struct _ng_data_to_pub {
-  char *pubDataFileName;
-  char *pubData;
+struct _ng_data_to_pub
+{
+  char* pubDataFileName;
+  char* pubData;
   int pubDataSize;
 };
 
-struct _ng_epgs {
+struct _ng_epgs
+{
   // Descriptors and identifiers
-  struct _ng_net_info *MyNetInfo;
-  struct _ng_net_info *PGCSInfo;
-  struct _ng_scn_id_info *PSSScnIDInfo;
-  struct _ng_scn_id_info *APPScnIDInfo;
-  struct _ng_hw_descriptor *HwDescriptor;
+  struct _ng_net_info* MyNetInfo;
+  struct _ng_net_info* PGCSInfo;
+  struct _ng_scn_id_info* PSSScnIDInfo;
+  struct _ng_scn_id_info* APPScnIDInfo;
+  struct _ng_hw_descriptor* HwDescriptor;
 
   // Message Relay - Peer's information
   int PeersNetInfoCount;
-  struct _ng_net_info **PeersNetInfo;
+  struct _ng_net_info** PeersNetInfo;
 
   // Information about received messages
-  struct _ng_received_msg *ReceivedMsg;
+  struct _ng_received_msg* ReceivedMsg;
 
   // State of the EPGS
   States ngState;
@@ -155,18 +159,18 @@ struct _ng_epgs {
   int MessageCounter;
 
   // Key of the contract
-  char *key;
+  char* key;
 
   // Information about the data to publish
-  struct _ng_data_to_pub *DataToPub;
+  struct _ng_data_to_pub* DataToPub;
 
-  char *pubDataFileName;
-  char *pubData;
+  char* pubDataFileName;
+  char* pubData;
   int pubDataSize;
 
   // This Interface was added in June 2018 to avoid a static declaration in EPGS_Emulator
   // It avoids the usage of NG_INTERFACE_NAME[]
-  char *Interface;
+  char* Interface;
 };
 
 typedef struct _ng_net_info NgNetInfo;
@@ -176,11 +180,11 @@ typedef struct _ng_scn_id_info NgScnIDInfo;
 typedef struct _ng_received_msg NgReceivedMsg;
 typedef struct _ng_epgs NgEPGS;
 
-void destroy_NgNetInfo (struct _ng_net_info **ngHWInfo);
-void destroy_NgHwDescriptor (struct _ng_hw_descriptor **ngHwDescriptor);
-void destroy_NgPGCSInfo (struct _ng_pgcs_info **ngPeerInfo);
-void destroy_NgScnIDInfo (struct _ng_scn_id_info **ngScnIDInfo);
-void destroy_NgReceivedMsg (struct _ng_received_msg **ngReceivedMsg);
-void destroy_NgEPGS (struct _ng_epgs **ngEPGS);
+void destroy_NgNetInfo(struct _ng_net_info** ngHWInfo);
+void destroy_NgHwDescriptor(struct _ng_hw_descriptor** ngHwDescriptor);
+void destroy_NgPGCSInfo(struct _ng_pgcs_info** ngPeerInfo);
+void destroy_NgScnIDInfo(struct _ng_scn_id_info** ngScnIDInfo);
+void destroy_NgReceivedMsg(struct _ng_received_msg** ngReceivedMsg);
+void destroy_NgEPGS(struct _ng_epgs** ngEPGS);
 
 #endif /* DATASTRUCTURES_EPGS_STRUCTURES_H_ */

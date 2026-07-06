@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGHelloIHC01
-	Object:		PGHelloIHC01
-	File:		PGHelloIHC01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGHelloIHC01
+        Object:		PGHelloIHC01
+        File:		PGHelloIHC01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -37,214 +37,214 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG
+// #define DEBUG
 
-#define LOG(msg) PB->S << endl << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+#define LOG(msg) PB->S << endl \
+                       << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
 
-PGHelloIHC01::PGHelloIHC01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PGHelloIHC01::PGHelloIHC01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-PGHelloIHC01::~PGHelloIHC01 ()
+PGHelloIHC01::~PGHelloIHC01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -hello --ihc _Version [ < HID OSID PGCS_PID PG_BID GW_SCN HT_SCN _Stack _Interface _Identifier > ... < HID OSID PGCS_PID PG_BID GW_SCN HT_SCN _Stack _Interface _Identifier > ]
-int
-PGHelloIHC01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
-//TODO: FIXP/Update - You should replace all the implementation of this function
+int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
+// TODO: FIXP/Update - You should replace all the implementation of this function
 {
   int Status = OK;
-  PG *PPGB = 0;
+  PG* PPGB = 0;
   string HID;
   string PID;
   string BID;
   vector<string> ReceivedElements;
   string Offset = "                    ";
-  string MyStack;            // The local stack
-  string MyInterface;        // The local interface
-  string MyPeerIdentifier;    // The local address
-  string PeerStack;            // The peer stack
-  string PeerInterface;        // The peer interface
-  string PeerIdentifier;    // The peer address
+  string MyStack;          // The local stack
+  string MyInterface;      // The local interface
+  string MyPeerIdentifier; // The local address
+  string PeerStack;        // The peer stack
+  string PeerInterface;    // The peer interface
+  string PeerIdentifier;   // The peer address
   string Peer;
-  PGCS *PPGCS = 0;
+  PGCS* PPGCS = 0;
   bool StoreNewPGCS1 = true;
   bool StoreNewPGCS2 = true;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *PSCNCL = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  CommandLine* PSCNCL = 0;
   unsigned int NoA = 0;
 
-  PPGCS = (PGCS *)PB->PP;
-  PPGB = (PG *)PB;
-  PHTB = (Block *)PPGB->PHT;
+  PPGCS = (PGCS*)PB->PP;
+  PPGB = (PG*)PB;
+  PHTB = (Block*)PPGB->PHT;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
-  if (_PCL->GetNumberofArguments (NoA) == OK)
-	{
-	  for (unsigned int k = 0; k < NoA; k++)
-		{
-		  _PCL->GetArgument (k, ReceivedElements);
+  if (_PCL->GetNumberofArguments(NoA) == OK)
+  {
+    for (unsigned int k = 0; k < NoA; k++)
+    {
+      _PCL->GetArgument(k, ReceivedElements);
 
-		  // *****************************************************************************
-		  // Check if there is a compatible local tuple <stack, interface, identifier>
-		  // *****************************************************************************
-		  for (unsigned int i = 0; i < PPGCS->Stacks->size (); i++)
-			{
-			  MyStack = PPGCS->Stacks->at (i);
+      // *****************************************************************************
+      // Check if there is a compatible local tuple <stack, interface, identifier>
+      // *****************************************************************************
+      for (unsigned int i = 0; i < PPGCS->Stacks->size(); i++)
+      {
+        MyStack = PPGCS->Stacks->at(i);
 
-			  MyInterface = PPGCS->Interfaces->at (i);
+        MyInterface = PPGCS->Interfaces->at(i);
 
-			  MyPeerIdentifier = PPGCS->Identifiers->at (i);
+        MyPeerIdentifier = PPGCS->Identifiers->at(i);
 
-			  PeerStack = ReceivedElements.at (6);
+        PeerStack = ReceivedElements.at(6);
 
-			  PeerInterface = ReceivedElements.at (7);
+        PeerInterface = ReceivedElements.at(7);
 
-			  PeerIdentifier = ReceivedElements.at (8);
+        PeerIdentifier = ReceivedElements.at(8);
 
 #ifdef DEBUG
-			  PB->S << endl << Offset << "Index = " << i << endl;
-			  PB->S << Offset << "(Check if this stack " << MyStack << " is equal to the hello stack " << PeerStack
-					<< ")" << endl;
-			  PB->S << Offset << "(Check if this identifier " << MyPeerIdentifier
-					<< " is equal to the hello identifier " << PeerIdentifier << ")" << endl;
-			  PB->S << Offset << "MyInterface = " << MyInterface << endl;
-			  PB->S << Offset << "PeerInterface = " << PeerInterface << endl;
+        PB->S << endl
+              << Offset << "Index = " << i << endl;
+        PB->S << Offset << "(Check if this stack " << MyStack << " is equal to the hello stack " << PeerStack
+              << ")" << endl;
+        PB->S << Offset << "(Check if this identifier " << MyPeerIdentifier
+              << " is equal to the hello identifier " << PeerIdentifier << ")" << endl;
+        PB->S << Offset << "MyInterface = " << MyInterface << endl;
+        PB->S << Offset << "PeerInterface = " << PeerInterface << endl;
 #endif
-			  if (MyStack == PeerStack)
-				{
-				  if (PeerIdentifier == MyPeerIdentifier)
-					{
+        if (MyStack == PeerStack)
+        {
+          if (PeerIdentifier == MyPeerIdentifier)
+          {
 #ifdef DEBUG
-					  PB->S << Offset << "Going to check this previous informed PGCS" << endl;
+            PB->S << Offset << "Going to check this previous informed PGCS" << endl;
 #endif
-					  // ******************************************************
-					  // Check to record the new peer data
-					  // ******************************************************
+            // ******************************************************
+            // Check to record the new peer data
+            // ******************************************************
 
-					  for (unsigned int j = 0; j < PPGB->PGCSTuples.size (); j++)
-						{
-						  if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
-							{
-							  StoreNewPGCS1 = false;
+            for (unsigned int j = 0; j < PPGB->PGCSTuples.size(); j++)
+            {
+              if (ReceivedElements.at(2) == PPGB->PGCSTuples[j]->Values[2])
+              {
+                StoreNewPGCS1 = false;
 
-							  break;
-							}
-						}
+                break;
+              }
+            }
 
-					  if (StoreNewPGCS1 == true
-						  && ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
-						{
-						  LOG("(A new peer PGCS was registered via point to point: "
-						      << ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")");
+            if (StoreNewPGCS1 == true && ReceivedElements.at(0) != PB->PP->GetHostSelfCertifyingName()) // Just one PGCS per host
+            {
+              LOG("(A new peer PGCS was registered via point to point: "
+                  << ReceivedElements.at(2) << " at the node identified by " << PeerIdentifier << ")");
 
-						  Tuple *PeerPGCS = new Tuple;
+              Tuple* PeerPGCS = new Tuple;
 
-						  PeerPGCS->Values.push_back (ReceivedElements.at (0));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (1));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (2));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (3));
+              PeerPGCS->Values.push_back(ReceivedElements.at(0));
+              PeerPGCS->Values.push_back(ReceivedElements.at(1));
+              PeerPGCS->Values.push_back(ReceivedElements.at(2));
+              PeerPGCS->Values.push_back(ReceivedElements.at(3));
 
-						  PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
-						  PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
-						  PB->S << Offset << "(PID = " << ReceivedElements.at (2) << ")" << endl;
-						  PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
+              PB->S << Offset << "(HID = " << ReceivedElements.at(0) << ")" << endl;
+              PB->S << Offset << "(OSID = " << ReceivedElements.at(1) << ")" << endl;
+              PB->S << Offset << "(PID = " << ReceivedElements.at(2) << ")" << endl;
+              PB->S << Offset << "(BID = " << ReceivedElements.at(3) << ")" << endl;
 
-						  // Store the peer PGCS tuple for future use
-						  PPGB->PGCSTuples.push_back (PeerPGCS);
+              // Store the peer PGCS tuple for future use
+              PPGB->PGCSTuples.push_back(PeerPGCS);
 
-						  StoreNewPGCS1 = false;
+              StoreNewPGCS1 = false;
 
-						  ScheduleStoreBindings ("-p", ReceivedElements, PeerIdentifier, PeerStack);
-						}
-					}
-				  else
-					{
+              ScheduleStoreBindings("-p", ReceivedElements, PeerIdentifier, PeerStack);
+            }
+          }
+          else
+          {
 
-					  // ****************************************************************************************
-					  // Added in April 22th, 2016; Updated in 26th August 2021
-					  // ****************************************************************************************
-
-#ifdef DEBUG
-					  PB->S << Offset << "This PGCS is unknown" << endl;
-#endif
-
-					  // ******************************************************
-					  // Record the new peer data
-					  // ******************************************************
-
-					  for (unsigned int j = 0; j < PPGB->PGCSTuples.size (); j++)
-						{
-						  if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
-							{
-							  StoreNewPGCS2 = false;
-
-							  break;
-							}
-						}
+            // ****************************************************************************************
+            // Added in April 22th, 2016; Updated in 26th August 2021
+            // ****************************************************************************************
 
 #ifdef DEBUG
-					  PB->S << Offset << "Trying to store the discovered peer = " <<StoreNewPGCS2<< endl;
+            PB->S << Offset << "This PGCS is unknown" << endl;
 #endif
 
-					  if (StoreNewPGCS2 == true
-						  && ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
-						{
-						  PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
-								<< ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")"
-								<< endl;
+            // ******************************************************
+            // Record the new peer data
+            // ******************************************************
 
-						  Tuple *PeerPGS = new Tuple;
+            for (unsigned int j = 0; j < PPGB->PGCSTuples.size(); j++)
+            {
+              if (ReceivedElements.at(2) == PPGB->PGCSTuples[j]->Values[2])
+              {
+                StoreNewPGCS2 = false;
 
-						  PeerPGS->Values.push_back (ReceivedElements.at (0));
-						  PeerPGS->Values.push_back (ReceivedElements.at (1));
-						  PeerPGS->Values.push_back (ReceivedElements.at (2));
-						  PeerPGS->Values.push_back (ReceivedElements.at (3));
+                break;
+              }
+            }
 
-						  PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
-						  PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
-						  PB->S << Offset << "(PID = " << ReceivedElements.at (2) << ")" << endl;
-						  PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
+#ifdef DEBUG
+            PB->S << Offset << "Trying to store the discovered peer = " << StoreNewPGCS2 << endl;
+#endif
 
-						  // Store the peer PGCS tuple for future use
-						  PPGB->PGCSTuples.push_back (PeerPGS);
+            if (StoreNewPGCS2 == true && ReceivedElements.at(0) != PB->PP->GetHostSelfCertifyingName()) // Just one PGCS per host
+            {
+              PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
+                    << ReceivedElements.at(2) << " at the node identified by " << PeerIdentifier << ")"
+                    << endl;
 
-						  ScheduleStoreBindings ("-de", ReceivedElements, PeerIdentifier, PeerStack);
-						}
-					  else
-						{
-						  //PB->S << Offset << "(Warning: Peer already registered or it is this PGCS itself)"<<endl;
+              Tuple* PeerPGS = new Tuple;
 
-						  StoreNewPGCS2 = true;
-						}
-					}
-				}
-			}
+              PeerPGS->Values.push_back(ReceivedElements.at(0));
+              PeerPGS->Values.push_back(ReceivedElements.at(1));
+              PeerPGS->Values.push_back(ReceivedElements.at(2));
+              PeerPGS->Values.push_back(ReceivedElements.at(3));
 
-		  ReceivedElements.clear ();
-		}
-	}
+              PB->S << Offset << "(HID = " << ReceivedElements.at(0) << ")" << endl;
+              PB->S << Offset << "(OSID = " << ReceivedElements.at(1) << ")" << endl;
+              PB->S << Offset << "(PID = " << ReceivedElements.at(2) << ")" << endl;
+              PB->S << Offset << "(BID = " << ReceivedElements.at(3) << ")" << endl;
+
+              // Store the peer PGCS tuple for future use
+              PPGB->PGCSTuples.push_back(PeerPGS);
+
+              ScheduleStoreBindings("-de", ReceivedElements, PeerIdentifier, PeerStack);
+            }
+            else
+            {
+              // PB->S << Offset << "(Warning: Peer already registered or it is this PGCS itself)"<<endl;
+
+              StoreNewPGCS2 = true;
+            }
+          }
+        }
+      }
+
+      ReceivedElements.clear();
+    }
+  }
 
   Status = OK;
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
 
-int PGHelloIHC01::ScheduleStoreBindings (string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack)
+int PGHelloIHC01::ScheduleStoreBindings(string _Case, vector<string>& _ReceivedElements, string _PeerIdentifier, string _PeerStack)
 {
   int Status = OK;
 
-  PG *PPGB = 0;
+  PG* PPGB = 0;
   unsigned int Category;
   string Key;
   vector<string> Values;
@@ -255,10 +255,10 @@ int PGHelloIHC01::ScheduleStoreBindings (string _Case, vector<string> &_Received
   string HashPG;
   string HashGW;
   string HashHT;
-  PGCS *PPGCS = 0;
+  PGCS* PPGCS = 0;
 
-  PPGCS = (PGCS *)PB->PP;
-  PPGB = (PG *)PB;
+  PPGCS = (PGCS*)PB->PP;
+  PPGB = (PG*)PB;
 
   // SPEC-008 Rev2: Store bindings directly in the HT to eliminate
   // race condition between message queue processing and
@@ -475,22 +475,21 @@ int PGHelloIHC01::ScheduleStoreBindings (string _Case, vector<string> &_Received
   // ******************************************************
   // -de mode: associate client socket with CSID
   // ******************************************************
-  if (_Case == "-de" && PPGCS->CSIDs->size () > 0)
-	{
-	  PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at (0)
-			<< " for the peer PGCS with MAC "
-			<< _PeerIdentifier << ")" << endl;
+  if (_Case == "-de" && PPGCS->CSIDs->size() > 0)
+  {
+    PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at(0)
+          << " for the peer PGCS with MAC "
+          << _PeerIdentifier << ")" << endl;
 
-	  // Cat[15] Peer Identifier -> CSID
-	  Category = 15;
-	  Key = _PeerIdentifier;
-	  Values.clear();
-	  	  Values.push_back(PB->IntToString(PPGCS->CSIDs->at(0)));
-	  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
-	}
+    // Cat[15] Peer Identifier -> CSID
+    Category = 15;
+    Key = _PeerIdentifier;
+    Values.clear();
+    Values.push_back(PB->IntToString(PPGCS->CSIDs->at(0)));
+    PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+  }
 
   Status = OK;
 
   return Status;
 }
-

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		PS revoke a published bind
-	Object:		PSRevokeBind01
-	File:		PSRevokeBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		5/2016
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		PS revoke a published bind
+        Object:		PSRevokeBind01
+        File:		PSRevokeBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		5/2016
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,24 +61,18 @@
 
 class Block;
 
-class PSRevokeBind01 : public Action {
- public:
-
+class PSRevokeBind01 : public Action
+{
+public:
   // Constructor
-  PSRevokeBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PSRevokeBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PSRevokeBind01 ();
+  virtual ~PSRevokeBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

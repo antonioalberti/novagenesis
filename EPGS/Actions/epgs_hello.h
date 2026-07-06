@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS hello
-	Object:		epgs_hello
-	File:		epgs_hello.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS hello
+        Object:		epgs_hello
+        File:		epgs_hello.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -31,6 +31,6 @@
 #include "../DataStructures/epgs_structures.h"
 #include "../Common/ng_message.h"
 
-int ActionRunHello (NgEPGS *ngEPGS, NgMessage **helloMessage);
+int ActionRunHello(NgEPGS* ngEPGS, NgMessage** helloMessage);
 
-#endif /* RUN_HELLO_H_ */ 
+#endif /* RUN_HELLO_H_ */

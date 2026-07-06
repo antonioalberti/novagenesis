@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		EPGS novagenesis hash table
-	Object:		ng_hash_table
-	File:		ng_hash_table.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		EPGS novagenesis hash table
+        Object:		ng_hash_table
+        File:		ng_hash_table.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -28,22 +28,24 @@
 #ifndef COMMON_NG_HASH_TABLE_H_
 #define COMMON_NG_HASH_TABLE_H_
 
-struct _ng_hash_entry {
-	// Command Name
-	char*	Name;  // ng -msg
-	int nameSize;
+struct _ng_hash_entry
+{
+  // Command Name
+  char* Name; // ng -msg
+  int nameSize;
 
-	// Command Alternative
-	char*	Value; // --cl
-	int valueSize;
+  // Command Alternative
+  char* Value; // --cl
+  int valueSize;
 };
 
 typedef struct _ng_hash_entry NgHashEntry;
 
-struct _ng_hash_table {
-	struct _ng_hash_entry **entries;
-	int category;
-	int entriesCount;
+struct _ng_hash_table
+{
+  struct _ng_hash_entry** entries;
+  int category;
+  int entriesCount;
 };
 
 typedef struct _ng_hash_entry NgHashEntry;
@@ -51,10 +53,10 @@ typedef struct _ng_hash_table NgHashTable;
 
 void ng_hash_table_create(int category, NgHashTable** ngHashTable);
 
-int ng_hash_table_get_position(NgHashTable *ngHashTable, char* Name);
+int ng_hash_table_get_position(NgHashTable* ngHashTable, char* Name);
 
-int ng_hash_table_put(NgHashTable *ngHashTable, char* Name, int nameSize, char* Value, int valueSize);
+int ng_hash_table_put(NgHashTable* ngHashTable, char* Name, int nameSize, char* Value, int valueSize);
 
-int ng_hash_table_get(NgHashTable *ngHashTable, char* Name, char** Value);
+int ng_hash_table_get(NgHashTable* ngHashTable, char* Name, char** Value);
 
 #endif /* COMMON_NG_HASH_TABLE_H_ */

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGRunHello02
-	Object:		PGRunHello02
-	File:		PGRunHello02.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGRunHello02
+        Object:		PGRunHello02
+        File:		PGRunHello02.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -45,206 +45,202 @@
 #include "PGCS.h"
 #endif
 
-PGRunHello02::PGRunHello02 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PGRunHello02::PGRunHello02(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-PGRunHello02::~PGRunHello02 ()
+PGRunHello02::~PGRunHello02()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --hello 0.2
-int
-PGRunHello02::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PGRunHello02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
-  PG *PPG = 0;
-  PGCS *PPGCS = 0;
-  Message *PGIHCHello = 0;
+  PG* PPG = 0;
+  PGCS* PPGCS = 0;
+  Message* PGIHCHello = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  CommandLine *PCL;
-  string MyStack;        // The local stack
-  string MyIdentifier;    // The local address
-  string MyInterface;    // The local interface
+  CommandLine* PCL;
+  string MyStack;      // The local stack
+  string MyIdentifier; // The local address
+  string MyInterface;  // The local interface
 
-  PPG = (PG *)PB;
-  PPGCS = (PGCS *)PB->PP;
+  PPG = (PG*)PB;
+  PPGCS = (PGCS*)PB->PP;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   if (PB->StopProcessingMessage == false)
-	{
-	  // **************************************************************
-	  // Sending a Hello message to the PGCS::PG at another hosts
-	  // **************************************************************
-	  if (PPGCS->Stacks != NULL && PPGCS->Stacks->size () > 0 && PPGCS->Roles->size () > 0)
-		{
-		  if (PPG->PSTuples.size () > 0)
-			{
-			  //PB->S << Offset <<"(This PGCS has "<<PPGCS->Stacks->size()<<" network interfaces.)"<< endl;
+  {
+    // **************************************************************
+    // Sending a Hello message to the PGCS::PG at another hosts
+    // **************************************************************
+    if (PPGCS->Stacks != NULL && PPGCS->Stacks->size() > 0 && PPGCS->Roles->size() > 0)
+    {
+      if (PPG->PSTuples.size() > 0)
+      {
+        // PB->S << Offset <<"(This PGCS has "<<PPGCS->Stacks->size()<<" network interfaces.)"<< endl;
 
-			  // Looping over the Peer PGCS identifiers
-			  for (unsigned int i = 0; i < PPGCS->Stacks->size (); i++)
-				{
-				  // ****************************************************************
-				  // Check for the peer role
-				  // ****************************************************************
+        // Looping over the Peer PGCS identifiers
+        for (unsigned int i = 0; i < PPGCS->Stacks->size(); i++)
+        {
+          // ****************************************************************
+          // Check for the peer role
+          // ****************************************************************
 
-				  if (PPGCS->Roles->at (i) == "Intra_Domain")
-					{
-					  // Creating a new message
-					  PB->PP->NewMessage (GetTime () + (i / 10), 0, false, PGIHCHello);
+          if (PPGCS->Roles->at(i) == "Intra_Domain")
+          {
+            // Creating a new message
+            PB->PP->NewMessage(GetTime() + (i / 10), 0, false, PGIHCHello);
 
-					  // Clean the vectors first
-					  Limiters.clear ();
+            // Clean the vectors first
+            Limiters.clear();
 
-					  Sources.clear ();
+            Sources.clear();
 
-					  Destinations.clear ();
+            Destinations.clear();
 
-					  // Setting up the OS SCN as the space limiter
-					  Limiters.push_back (PB->PP->Intra_Domain);
+            // Setting up the OS SCN as the space limiter
+            Limiters.push_back(PB->PP->Intra_Domain);
 
-					  // **************
-					  // Source SCNs
-					  // **************
+            // **************
+            // Source SCNs
+            // **************
 
-					  // Setting up this HID as the 1st source SCN
-					  Sources.push_back (PB->PP->GetHostSelfCertifyingName ());
+            // Setting up this HID as the 1st source SCN
+            Sources.push_back(PB->PP->GetHostSelfCertifyingName());
 
-					  // Setting up this OSID as the 2nd source SCN
-					  Sources.push_back (PB->PP->GetOperatingSystemSelfCertifyingName ());
+            // Setting up this OSID as the 2nd source SCN
+            Sources.push_back(PB->PP->GetOperatingSystemSelfCertifyingName());
 
-					  // Setting up this PID as the 3rd source SCN
-					  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+            // Setting up this PID as the 3rd source SCN
+            Sources.push_back(PB->PP->GetSelfCertifyingName());
 
-					  // Setting up the PG block SCN (this BID) as the fourth source SCN
-					  Sources.push_back (PB->GetSelfCertifyingName ());
+            // Setting up the PG block SCN (this BID) as the fourth source SCN
+            Sources.push_back(PB->GetSelfCertifyingName());
 
-					  // **************
-					  // Destination SCNs
-					  // **************
+            // **************
+            // Destination SCNs
+            // **************
 
-					  // Setting up the destination HID as empty
-					  Destinations.push_back ("FFFFFFFF");
+            // Setting up the destination HID as empty
+            Destinations.push_back("FFFFFFFF");
 
-					  // Setting up the destination OSID as empty
-					  Destinations.push_back ("FFFFFFFF");
+            // Setting up the destination OSID as empty
+            Destinations.push_back("FFFFFFFF");
 
-					  // Setting up the destination PID as empty
-					  Destinations.push_back ("FFFFFFFF");
+            // Setting up the destination PID as empty
+            Destinations.push_back("FFFFFFFF");
 
-					  // Setting up the destination BID as empty
-					  Destinations.push_back ("FFFFFFFF");
+            // Setting up the destination BID as empty
+            Destinations.push_back("FFFFFFFF");
 
-					  // ******************************************************
-					  // Create the first command line
-					  // ******************************************************
+            // ******************************************************
+            // Create the first command line
+            // ******************************************************
 
-					  // Creating the ng -cl -m command line
-					  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, PGIHCHello, PCL);
+            // Creating the ng -cl -m command line
+            PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, PGIHCHello, PCL);
 
-					  // ******************************************************
-					  // Create the second command line
-					  // ******************************************************
+            // ******************************************************
+            // Create the second command line
+            // ******************************************************
 
-					  MyStack = PPGCS->Stacks->at (i);
+            MyStack = PPGCS->Stacks->at(i);
 
-					  MyInterface = PPGCS->Interfaces->at (i);
+            MyInterface = PPGCS->Interfaces->at(i);
 
-					  if (MyStack == "Ethernet" || MyStack == "Wi-Fi")
-						{
-						  MyIdentifier = PPGCS->MyMACAddress;
-						}
+            if (MyStack == "Ethernet" || MyStack == "Wi-Fi")
+            {
+              MyIdentifier = PPGCS->MyMACAddress;
+            }
 
-					  Block *PCoreB = NULL;
+            Block* PCoreB = NULL;
 
-					  PPGCS->GetBlock ("Core", PCoreB);
+            PPGCS->GetBlock("Core", PCoreB);
 
-					  Core *PCore = (Core *)PCoreB;
+            Core* PCore = (Core*)PCoreB;
 
-					  //PB->S << Offset <<"(GW =  "<<PPG->PGW->GetSelfCertifyingName()<<")"<< endl;
-					  //PB->S << Offset <<"(HT =  "<<PPG->PHT->GetSelfCertifyingName()<<")"<< endl;
-					  //PB->S << Offset <<"(Core =  "<<PCore->GetSelfCertifyingName()<<")"<< endl;
+            // PB->S << Offset <<"(GW =  "<<PPG->PGW->GetSelfCertifyingName()<<")"<< endl;
+            // PB->S << Offset <<"(HT =  "<<PPG->PHT->GetSelfCertifyingName()<<")"<< endl;
+            // PB->S << Offset <<"(Core =  "<<PCore->GetSelfCertifyingName()<<")"<< endl;
 
+            PMB->NewIHCHelloCommandLine("--ihc",
+                                        "0.2",
+                                        PPG->PGW->GetSelfCertifyingName(),
+                                        PPG->PHT->GetSelfCertifyingName(),
+                                        PCore->GetSelfCertifyingName(),
+                                        MyStack,
+                                        MyInterface,
+                                        MyIdentifier,
+                                        PPG->PSTuples[0]->Values[0],
+                                        PPG->PSTuples[0]->Values[1],
+                                        PPG->PSTuples[0]->Values[2],
+                                        PPG->PSTuples[0]->Values[3],
+                                        PGIHCHello, PCL);
 
-					  PMB->NewIHCHelloCommandLine ("--ihc",
-												   "0.2",
-												   PPG->PGW->GetSelfCertifyingName (),
-												   PPG->PHT->GetSelfCertifyingName (),
-												   PCore->GetSelfCertifyingName (),
-												   MyStack,
-												   MyInterface,
-												   MyIdentifier,
-												   PPG->PSTuples[0]->Values[0],
-												   PPG->PSTuples[0]->Values[1],
-												   PPG->PSTuples[0]->Values[2],
-												   PPG->PSTuples[0]->Values[3],
-												   PGIHCHello, PCL);
+            // ******************************************************
+            // Setting up the SCN command line
+            // ******************************************************
 
-					  // ******************************************************
-					  // Setting up the SCN command line
-					  // ******************************************************
+            // Generate the SCN
+            PB->GenerateSCNFromMessageBinaryPatterns(PGIHCHello, SCN);
 
-					  // Generate the SCN
-					  PB->GenerateSCNFromMessageBinaryPatterns (PGIHCHello, SCN);
+            // Creating the ng -scn --s command line
+            PMB->NewSCNCommandLine("0.1", SCN, PGIHCHello, PCL);
 
-					  // Creating the ng -scn --s command line
-					  PMB->NewSCNCommandLine ("0.1", SCN, PGIHCHello, PCL);
+            // PB->S << Offset <<"(Sending a ng -hello --ihc to the peer at the interface "<<PPGCS->Interfaces->at(i)<<" "<<PPGCS->Identifiers->at(i)<<".)"<< endl;
 
-					  //PB->S << Offset <<"(Sending a ng -hello --ihc to the peer at the interface "<<PPGCS->Interfaces->at(i)<<" "<<PPGCS->Identifiers->at(i)<<".)"<< endl;
+            // PB->S << "(" << endl << *PGIHCHello << ")"<< endl;
 
-					  //PB->S << "(" << endl << *PGIHCHello << ")"<< endl;
+            if (PPGCS->Stacks->at(i) == "IPv4_UDP")
+            {
+              // Put here the code to send the message to the other PGSs
+              PPG->SendToAUDPSocket(PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
+            }
 
-					  if (PPGCS->Stacks->at (i) == "IPv4_UDP")
-						{
-						  // Put here the code to send the message to the other PGSs
-						  PPG->SendToAUDPSocket (PPGCS->Identifiers->at (i), PPGCS->Sizes->at (i), PGIHCHello);
-						}
+            if (PPGCS->Stacks->at(i) == "Ethernet" || PPGCS->Stacks->at(i) == "Wi-Fi")
+            {
 
-					  if (PPGCS->Stacks->at (i) == "Ethernet" || PPGCS->Stacks->at (i) == "Wi-Fi")
-						{
+              // PB->S << Offset << "(Interface = "<<PPGCS->Interfaces->at(i)<<".)"<< endl;
+              // PB->S << Offset << "(Identifier = "<<PPGCS->Identifiers->at(i)<<".)"<< endl;
+              // PB->S << Offset << "(Size = "<<PPGCS->Sizes->at(i)<<".)"<< endl;
 
-						  //PB->S << Offset << "(Interface = "<<PPGCS->Interfaces->at(i)<<".)"<< endl;
-						  //PB->S << Offset << "(Identifier = "<<PPGCS->Identifiers->at(i)<<".)"<< endl;
-						  //PB->S << Offset << "(Size = "<<PPGCS->Sizes->at(i)<<".)"<< endl;
+              // Send the message to the other PGSs
+              PPG->SendToARawSocket(PPGCS->Interfaces->at(i), PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
+            }
 
-						  // Send the message to the other PGSs
-						  PPG->SendToARawSocket (PPGCS->Interfaces->at (i), PPGCS->Identifiers->at (i), PPGCS->Sizes
-							  ->at (i), PGIHCHello);
-						}
+            PGIHCHello->MarkToDelete();
 
-					  PGIHCHello->MarkToDelete ();
+            // Stop processing the other command lines of the message.
+            PB->StopProcessingMessage = true;
 
-					  // Stop processing the other command lines of the message.
-					  PB->StopProcessingMessage = true;
+            MyIdentifier = "";
+          }
 
-					  MyIdentifier = "";
-
-					}
-
-				  Status = OK;
-				}
-			}
-		  else
-			{
-			  PB->S << Offset << "(Warning: The PGCS is not aware of any NRNCS. Skipping hello.)" << endl;
-			}
-		}
-	}
+          Status = OK;
+        }
+      }
+      else
+      {
+        PB->S << Offset << "(Warning: The PGCS is not aware of any NRNCS. Skipping hello.)" << endl;
+      }
+    }
+  }
   else
-	{
-	  PB->S << Offset << "(ERROR: The stop message processing flag is true)" << endl;
+  {
+    PB->S << Offset << "(ERROR: The stop message processing flag is true)" << endl;
 
-	  Status = ERROR;
-	}
+    Status = ERROR;
+  }
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
-

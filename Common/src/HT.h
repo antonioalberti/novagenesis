@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Hash Table
-	Object:		HT
-	File:		HT.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Hash Table
+        Object:		HT
+        File:		HT.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -68,54 +68,52 @@ using namespace std;
 
 class Process;
 
-class HT : public Block {
- private:
-
+class HT : public Block
+{
+private:
   // Hash multimap container pointer
-  HashStringMultimap *Bindings;
+  HashStringMultimap* Bindings;
 
- public:
-
+public:
   // Constructor
-  HT (string _LN, Process *_PP, unsigned int _Index, string _Path);
+  HT(string _LN, Process* _PP, unsigned int _Index, string _Path);
 
   // Destructor
-  ~HT ();
+  ~HT();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary flag (to reduce size of status messages, 6th November 2017)
   // ------------------------------------------------------------------------------------------------------------------------------
   bool HaveOneStatusCL;
 
-
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Core functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Store a binding in the Bindings container at category _Cat
-  int StoreBinding (unsigned int _Cat, const string _Key, vector<string> *_Values);
+  int StoreBinding(unsigned int _Cat, const string _Key, vector<string>* _Values);
 
   // Get a binding from the Bindings container at category _Cat
-  int GetBinding (unsigned int _Cat, const string _Key, vector<string> *&_Values);
+  int GetBinding(unsigned int _Cat, const string _Key, vector<string>*& _Values);
 
   // Get all keys from the Bindings container at category _Cat
-  int GetBindingKeys (unsigned int _Cat, vector<string> &_Keys);
+  int GetBindingKeys(unsigned int _Cat, vector<string>& _Keys);
 
   // Revoke (remove) a binding from the Bindings container at category _Cat
-  int RevokeBinding (unsigned int _Cat, const string _Key);
+  int RevokeBinding(unsigned int _Cat, const string _Key);
 
   // Delays
   double DelayBeforeRunPeriodic;
@@ -133,9 +131,3 @@ class HT : public Block {
 };
 
 #endif
-
-
-
-
-
-

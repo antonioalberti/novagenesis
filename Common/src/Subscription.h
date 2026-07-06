@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Auxiliary subscription object
-	Object:		Subscription
-	File:		Subscription.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Auxiliary subscription object
+        Object:		Subscription
+        File:		Subscription.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -38,40 +38,33 @@
 
 class Subscription
 {
-	public:
+public:
+  // The publisher LN
+  string LN;
 
-		// The publisher LN
-		string				LN;
+  // The publisher ULN
+  string ULN;
 
-		// The publisher ULN
-		string				ULN;
+  // The category pf the bindings being subscribed
+  unsigned int Category;
 
-		// The category pf the bindings being subscribed
-		unsigned int		Category;
+  // The keys being subscribed
+  string Key;
 
-		// The keys being subscribed
-		string				Key;
+  // The publisher of the bindings being subscribed
+  Tuple Publisher;
 
-		// The publisher of the bindings being subscribed
-		Tuple				Publisher;
+  // Auxiliary flag for associated -info --payload
+  bool HasContent;
 
-		// Auxiliary flag for associated -info --payload
-		bool				HasContent;
+  // Associated payload file
+  string FileName;
 
-		// Associated payload file
-		string				FileName;
+  // The subscription status
+  string Status;
 
-		// The subscription status
-		string 				Status;
-
-		// Timestamp for subscription performance
-		double				Timestamp;
+  // Timestamp for subscription performance
+  double Timestamp;
 };
 
 #endif
-
-
-
-
-
-

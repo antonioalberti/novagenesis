@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Embedded Proxy/Gateway Service ethernet support to run in Linux
-	Object:		epgs_ethernet
-	File:		epgs_ethernet.h
-	Author:		Vâner José Magalhães
-	Date:		05/2021
-	Version:	0.1
+        Name:		Embedded Proxy/Gateway Service ethernet support to run in Linux
+        Object:		epgs_ethernet
+        File:		epgs_ethernet.h
+        Author:		Vâner José Magalhães
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Vâner José Magalhães
+        Copyright (C) 2021  Vâner José Magalhães
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -28,11 +28,11 @@
 #ifndef EPGS_ETHERNET_H_
 #define EPGS_ETHERNET_H_
 
-int GetHostRawAddress (char *_Interface, char **_Address);
-int CreateRawSocket (int *SID);
-int SendToARawSocket (int SID, char *Interface, void *mtu, long long size);
-void ReceiveFromARawSocket (int SID, void **mtu, long long *size);
-int SelectInterface (char *_Interface);
-int SelectInterfaceWithFilter (char *_Interface, char *_Filter);
+int GetHostRawAddress(char* _Interface, char** _Address);
+int CreateRawSocket(int* SID);
+int SendToARawSocket(int SID, char* Interface, void* mtu, long long size);
+void ReceiveFromARawSocket(int SID, void** mtu, long long* size);
+int SelectInterface(char* _Interface);
+int SelectInterfaceWithFilter(char* _Interface, char* _Filter);
 
 #endif /* EPGS_ETHERNET_H_ */

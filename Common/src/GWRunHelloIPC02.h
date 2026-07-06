@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWRunHelloIPC02
-	Object:		GWRunHelloIPC02
-	File:		GWRunHelloIPC02.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2026
-	Version:	0.2
+        Name:		GWRunHelloIPC02
+        Object:		GWRunHelloIPC02
+        File:		GWRunHelloIPC02.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2026
+        Version:	0.2
 
    Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -51,9 +51,9 @@ class Block;
 
 using namespace std;
 
-class GWRunHelloIPC02 : public Action {
- public:
-
+class GWRunHelloIPC02 : public Action
+{
+public:
   // Constructor
   GWRunHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB);
 

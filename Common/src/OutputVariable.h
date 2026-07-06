@@ -1,14 +1,14 @@
-/*	
-	NovaGenesis
-	
-	Name:		OutputVariable
-	Object:		OutputVariable
-	File:		OutputVariable.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.4
+/*
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		OutputVariable
+        Object:		OutputVariable
+        File:		OutputVariable.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.4
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -39,9 +39,9 @@ using namespace std;
 
 class Block;
 
-class OutputVariable {
- private:
-
+class OutputVariable
+{
+private:
   // To be exposed to users
   string Name;
   string Type;
@@ -52,107 +52,148 @@ class OutputVariable {
   double S1;
   double t_1;
   double v_1;
-  double Mean;                // Sample Mean
+  double Mean; // Sample Mean
   double Sqr;
   double S2;
-  double Sigma;                // Sample Standard Deviation
-  double SE;                    // Standard Error
-  double ME;                    // Margin of Error
-  double Lower;                // Mean - Margin of Error
-  double Up;                    // Mean + Margin of Error
+  double Sigma; // Sample Standard Deviation
+  double SE;    // Standard Error
+  double ME;    // Margin of Error
+  double Lower; // Mean - Margin of Error
+  double Up;    // Mean + Margin of Error
   unsigned int Samples_Number;
   double Offset;
 
   // Interface
-  Block *Owner;
+  Block* Owner;
 
   // Output file data
   File Results;
   int Option;
 
- public:
-
-  OutputVariable (Block *Owner_);
-  ~OutputVariable ();
+public:
+  OutputVariable(Block* Owner_);
+  ~OutputVariable();
 
   // Set functions
-  void SetName (string Name_)
-  { Name = Name_; }
-  void SetType (string Type_)
-  { Type = Type_; }
-  void SetDescription (string Description_)
-  { Description = Description_; }
-  void SetOption (int Option_)
-  { Option = Option_; }
-  void Initialization (string Name_, string Type_, string Description_, int Option_);
+  void SetName(string Name_)
+  {
+    Name = Name_;
+  }
+  void SetType(string Type_)
+  {
+    Type = Type_;
+  }
+  void SetDescription(string Description_)
+  {
+    Description = Description_;
+  }
+  void SetOption(int Option_)
+  {
+    Option = Option_;
+  }
+  void Initialization(string Name_, string Type_, string Description_, int Option_);
 
   // Get functions
-  string GetName ()
-  { return Name; }
-  string GetType ()
-  { return Type; }
-  string GetDescription ()
-  { return Description; }
-  int GetOption ()
-  { return Option; }
+  string GetName()
+  {
+    return Name;
+  }
+  string GetType()
+  {
+    return Type;
+  }
+  string GetDescription()
+  {
+    return Description;
+  }
+  int GetOption()
+  {
+    return Option;
+  }
 
   // Instantaneous value functions
-  void Sample (double Value_)
+  void Sample(double Value_)
   {
-	Value = Value_;
-	v_1 = Value;
+    Value = Value_;
+    v_1 = Value;
   }
-  double GetLastSample ()
-  { return Value; }
-  void SampleAsAnIncrement ()
+  double GetLastSample()
   {
-	Value++;
-	v_1 = Value;
+    return Value;
   }
-  void SampleAsADecrement ()
+  void SampleAsAnIncrement()
   {
-	Value--;
-	v_1 = Value;
+    Value++;
+    v_1 = Value;
+  }
+  void SampleAsADecrement()
+  {
+    Value--;
+    v_1 = Value;
   }
 
   // Mean related functions
-  void SetInitialMean (double InitialMean_)
-  { Mean = InitialMean_; }
-  void CalculateArithmetic ();
-  void CalculateWeighted (double Time);
-  double GetMean ()
-  { return Mean; }
-  double GetSigma ()
-  { return Sigma; }
-  double GetSE ()
-  { return SE; }
-  double GetME ()
-  { return ME; }
-  double GetLower ()
-  { return Lower; }
-  double GetUp ()
-  { return Up; }
+  void SetInitialMean(double InitialMean_)
+  {
+    Mean = InitialMean_;
+  }
+  void CalculateArithmetic();
+  void CalculateWeighted(double Time);
+  double GetMean()
+  {
+    return Mean;
+  }
+  double GetSigma()
+  {
+    return Sigma;
+  }
+  double GetSE()
+  {
+    return SE;
+  }
+  double GetME()
+  {
+    return ME;
+  }
+  double GetLower()
+  {
+    return Lower;
+  }
+  double GetUp()
+  {
+    return Up;
+  }
 
   // Owner related functions
-  void SetOwner (Block *Owner_)
-  { Owner = Owner_; }
+  void SetOwner(Block* Owner_)
+  {
+    Owner = Owner_;
+  }
 
   // Reset the statistics - continue to sample to file
-  void Reset ();
-  void ResetButKeepLastValue ();
+  void Reset();
+  void ResetButKeepLastValue();
 
   // Output file related functions
-  void SetFileName (string File_Name_)
-  { Results.SetName (File_Name_); }
-  void SetFilePath (string File_Path_)
-  { Results.SetPath (File_Path_); }
-  string GetFileName ()
-  { return Results.GetName (); }
-  string GetFilePath ()
-  { return Results.GetPath (); }
+  void SetFileName(string File_Name_)
+  {
+    Results.SetName(File_Name_);
+  }
+  void SetFilePath(string File_Path_)
+  {
+    Results.SetPath(File_Path_);
+  }
+  string GetFileName()
+  {
+    return Results.GetName();
+  }
+  string GetFilePath()
+  {
+    return Results.GetPath();
+  }
 
   // Sampling function
-  void SampleToFile (double Time);
+  void SampleToFile(double Time);
 };
 
 #endif

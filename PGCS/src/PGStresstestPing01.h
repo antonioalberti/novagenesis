@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGStresstestPing01
-	Object:		PGStresstestPing01
-	File:		PGStresstestPing01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGStresstestPing01
+        Object:		PGStresstestPing01
+        File:		PGStresstestPing01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,18 +61,18 @@
 
 class Block;
 
-class PGStresstestPing01 : public Action {
- public:
-
+class PGStresstestPing01 : public Action
+{
+public:
   // Constructor
-  PGStresstestPing01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PGStresstestPing01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PGStresstestPing01 ();
+  virtual ~PGStresstestPing01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
