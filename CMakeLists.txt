@@ -110,6 +110,14 @@ add_library(Common
         Common/src/MessageReceiving.h
         Common/src/MurmurHash3.cpp
         Common/src/MurmurHash3.h
+        Common/src/MurmurHash3Strategy.cpp
+        Common/src/MurmurHash3Strategy.h
+        Common/src/NameGenerator.cpp
+        Common/src/NameGenerator.h
+        Common/src/NameStrategy.h
+        Common/src/DefaultNameStrategy.cpp
+        Common/src/DefaultNameStrategy.h
+        Common/src/HashFunction.h
         Common/src/OutputVariable.cpp
         Common/src/OutputVariable.h
         Common/src/Process.cpp
