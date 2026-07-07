@@ -37,6 +37,10 @@
 #include "Process.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 #define LOG(msg) PB->S << endl \
@@ -154,7 +158,7 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
 
   PGW = (GW*)PB;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns(_PeerLN, HashLegiblePeerProcessName);
+  HashLegiblePeerProcessName = NameGenerator::GetInstance().GenerateFromString(_PeerLN);
 
   // ******************************************************
   // Binding: PeerPID -> LegibleName (Category 20)
@@ -234,7 +238,7 @@ int GWHelloIPC02::StorePeerBindings(Message* _ReceivedMessage, CommandLine* _PCL
   if (!_PeerHTBID.empty())
   {
     string HashHT;
-    PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
+    HashHT = NameGenerator::GetInstance().GenerateFromString("HT");
 
     Category = 2;
     Key = HashHT;

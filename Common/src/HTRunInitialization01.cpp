@@ -33,6 +33,10 @@
 #include "HT.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 HTRunInitialization01::HTRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -76,7 +80,7 @@ int HTRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   // cout << "MyBlockSCN = "<< MyBlockSCN << endl;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns("Process", ProcessLegibleNameSCN);
+  ProcessLegibleNameSCN = NameGenerator::GetInstance().GenerateFromString("Process");
 
   // cout << "ProcessLegibleNameSCN = "<< ProcessLegibleNameSCN << endl;
 
@@ -88,7 +92,7 @@ int HTRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   PHT = (HT*)PB;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns(PB->GetLegibleName(), HashBlockLegibleName);
+  HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString(PB->GetLegibleName());
 
   // PB->S << Offset <<  "(HashBlockLegibleName = " << HashBlockLegibleName << ")" <<endl;
 

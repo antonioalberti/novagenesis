@@ -41,6 +41,8 @@
 #include "PGCS.h"
 #endif
 
+#include "NameGenerator.h"
+
 ////#define DEBUG
 
 PGRunHello01::PGRunHello01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -318,10 +320,10 @@ void PGRunHello01::AddLearnedPeersPhysical(CommandLine* _PCL)
 
   PPGCS = (PGCS*)PB->PP;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns("PGCS", HashPGCS);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("GW", HashGW);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("PG", HashPG);
+  HashPGCS = NameGenerator::GetInstance().GenerateFromString("PGCS");
+  HashGW = NameGenerator::GetInstance().GenerateFromString("GW");
+  HashHT = NameGenerator::GetInstance().GenerateFromString("HT");
+  HashPG = NameGenerator::GetInstance().GenerateFromString("PG");
 
 #ifdef DEBUG
   PB->S << "(Reading data from already learned peers)" << endl;

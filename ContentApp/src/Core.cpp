@@ -105,6 +105,10 @@
 #include "CoreRunPublish03.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG // To follow message processing
 
 Core::Core(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path)
@@ -544,7 +548,7 @@ void Core::DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, ve
       {
         for (unsigned int i = 0; i < _Cat2Keywords->size(); i++)
         {
-          GenerateSCNFromCharArrayBinaryPatterns(_Cat2Keywords->at(i), Hash);
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat2Keywords->at(i));
 
           NewPairCommandLineArgument(2, Hash, PCL);
 
@@ -556,7 +560,7 @@ void Core::DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, ve
       {
         for (unsigned int j = 0; j < _Cat9Keywords->size(); j++)
         {
-          GenerateSCNFromCharArrayBinaryPatterns(_Cat9Keywords->at(j), Hash);
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat9Keywords->at(j));
 
           NewPairCommandLineArgument(9, Hash, PCL);
 
@@ -693,10 +697,10 @@ int Core::Exposition(string _Limiter, vector<Message*> ScheduledMessages)
         Hint2 = "Repository";
       }
 
-      GenerateSCNFromCharArrayBinaryPatterns("ContentApp", HashProcessLegibleName);
-      GenerateSCNFromCharArrayBinaryPatterns("Core", HashBlockLegibleName);
-      GenerateSCNFromCharArrayBinaryPatterns(Hint1, HashHint1);
-      GenerateSCNFromCharArrayBinaryPatterns(Hint2, HashHint2);
+      HashProcessLegibleName = NameGenerator::GetInstance().GenerateFromString("ContentApp");
+      HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString("Core");
+      HashHint1 = NameGenerator::GetInstance().GenerateFromString(Hint1);
+      HashHint2 = NameGenerator::GetInstance().GenerateFromString(Hint2);
 
       // Publish binding < Hash("ContentApp"), App PID >
       NewTernaCommandLineArgument(2, HashProcessLegibleName, PP->GetSelfCertifyingName(), PCL);
@@ -911,7 +915,7 @@ int Core::GetFileContentHash(string FileName, string& _SCN)
 
     F1.read(Payload, PayloadSize);
 
-    GenerateSCNFromCharArrayBinaryPatterns(Payload, PayloadSize, _SCN);
+    _SCN = NameGenerator::GetInstance().GenerateFromCharArray(Payload, PayloadSize);
 
     delete[] Payload;
 

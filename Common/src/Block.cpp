@@ -37,6 +37,10 @@
 #include "Process.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // To follow message processing
 
 Block::Block(string _LN, Process* _PP, unsigned int _Index, string _Path)

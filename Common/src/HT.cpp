@@ -81,6 +81,10 @@
 #include "HTRunPeriodic01.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 HT::HT(string _LN, Process* _PP, unsigned int _Index, string _Path)
     : Block(_LN, _PP, _Index, _Path)
 {
@@ -133,7 +137,7 @@ HT::HT(string _LN, Process* _PP, unsigned int _Index, string _Path)
 
   BID = GetSelfCertifyingName();
 
-  GenerateSCNFromCharArrayBinaryPatterns("Process", ProcessLegibleNameSCN);
+  ProcessLegibleNameSCN = NameGenerator::GetInstance().GenerateFromString("Process");
 
   // cout << "ProcessLegibleNameSCN = "<< ProcessLegibleNameSCN << endl;
 
@@ -143,7 +147,7 @@ HT::HT(string _LN, Process* _PP, unsigned int _Index, string _Path)
 
   // cout << "MyBlockIndexString = "<< MyBlockIndexString << endl;
 
-  GenerateSCNFromCharArrayBinaryPatterns(GetLegibleName(), HashBlockLegibleName);
+  HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString(GetLegibleName());
 
   S << Offset << "(Hash\"HT\" = " << HashBlockLegibleName << ")" << endl;
 

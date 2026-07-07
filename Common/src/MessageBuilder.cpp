@@ -41,6 +41,10 @@
 #include "MurmurHash3.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 MessageBuilder::MessageBuilder(Process* _PP)
 {
   PP = _PP;
@@ -600,7 +604,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashLNToSCN(string _Version, u
   vector<string> Values;
   string HashLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_LN, HashLN);
+  HashLN = NameGenerator::GetInstance().GenerateFromString(_LN);
 
   Values.push_back(_SCN);
 
@@ -616,7 +620,7 @@ int MessageBuilder::NewStoreBindingCommandLineSCNToHashLN(string _Version, unsig
   vector<string> Values;
   string HashLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_LN, HashLN);
+  HashLN = NameGenerator::GetInstance().GenerateFromString(_LN);
 
   Values.push_back(HashLN);
 
@@ -637,7 +641,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromBLNToHashBLN(string _Version, 
   vector<string> Values;
   string HashBLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_PB->GetLegibleName(), HashBLN);
+  HashBLN = NameGenerator::GetInstance().GenerateFromString(_PB->GetLegibleName());
 
   Values.push_back(HashBLN);
 
@@ -654,7 +658,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashBLNToBLN(string _Version, 
   vector<string> Values;
   string HashBLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_PB->GetLegibleName(), HashBLN);
+  HashBLN = NameGenerator::GetInstance().GenerateFromString(_PB->GetLegibleName());
 
   Values.push_back(_PB->GetLegibleName());
 
@@ -671,7 +675,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashBLNToBID(string _Version, 
   vector<string> Values;
   string HashBLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_PB->GetLegibleName(), HashBLN);
+  HashBLN = NameGenerator::GetInstance().GenerateFromString(_PB->GetLegibleName());
 
   Values.push_back(_PB->GetSelfCertifyingName());
 
@@ -688,7 +692,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromBIDToHashBLN(string _Version, 
   vector<string> Values;
   string HashBLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_PB->GetLegibleName(), HashBLN);
+  HashBLN = NameGenerator::GetInstance().GenerateFromString(_PB->GetLegibleName());
 
   Values.push_back(HashBLN);
 
@@ -737,7 +741,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromPLNToHashPLN(string _Version, 
   vector<string> Values;
   string HashPLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetLegibleName(), HashPLN);
+  HashPLN = NameGenerator::GetInstance().GenerateFromString(PP->GetLegibleName());
 
   Values.push_back(HashPLN);
 
@@ -754,7 +758,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashPLNToPLN(string _Version, 
   vector<string> Values;
   string HashPLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetLegibleName(), HashPLN);
+  HashPLN = NameGenerator::GetInstance().GenerateFromString(PP->GetLegibleName());
 
   Values.push_back(PP->GetLegibleName());
 
@@ -771,7 +775,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashPLNToPID(string _Version, 
   vector<string> Values;
   string HashPLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetLegibleName(), HashPLN);
+  HashPLN = NameGenerator::GetInstance().GenerateFromString(PP->GetLegibleName());
 
   Values.push_back(PP->GetSelfCertifyingName());
 
@@ -788,7 +792,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromPIDToHashPLN(string _Version, 
   vector<string> Values;
   string HashPLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetLegibleName(), HashPLN);
+  HashPLN = NameGenerator::GetInstance().GenerateFromString(PP->GetLegibleName());
 
   Values.push_back(HashPLN);
 
@@ -854,7 +858,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromOSLNToHashOSLN(string _Version
   vector<string> Values;
   string HashOSLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetOperatingSystemLegibleName(), HashOSLN);
+  HashOSLN = NameGenerator::GetInstance().GenerateFromString(PP->GetOperatingSystemLegibleName());
 
   Values.push_back(HashOSLN);
 
@@ -871,7 +875,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashOSLNToOSLN(string _Version
   vector<string> Values;
   string HashOSLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetOperatingSystemLegibleName(), HashOSLN);
+  HashOSLN = NameGenerator::GetInstance().GenerateFromString(PP->GetOperatingSystemLegibleName());
 
   Values.push_back(PP->GetOperatingSystemLegibleName());
 
@@ -929,7 +933,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHLNToHashHLN(string _Version, 
   vector<string> Values;
   string HashHLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetHostLegibleName(), HashHLN);
+  HashHLN = NameGenerator::GetInstance().GenerateFromString(PP->GetHostLegibleName());
 
   Values.push_back(HashHLN);
 
@@ -946,7 +950,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashHLNToHLN(string _Version, 
   vector<string> Values;
   string HashHLN;
 
-  GenerateSCNFromCharArrayBinaryPatterns(PP->GetHostLegibleName(), HashHLN);
+  HashHLN = NameGenerator::GetInstance().GenerateFromString(PP->GetHostLegibleName());
 
   Values.push_back(PP->GetHostLegibleName());
 
@@ -1021,7 +1025,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromLimiterToHashLimiter(string _V
   vector<string> Values;
   string HashLimiter;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_Limiter, HashLimiter);
+  HashLimiter = NameGenerator::GetInstance().GenerateFromString(_Limiter);
 
   Values.push_back(HashLimiter);
 
@@ -1037,7 +1041,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashLimiterToLimiter(string _V
   vector<string> Values;
   string HashLimiter;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_Limiter, HashLimiter);
+  HashLimiter = NameGenerator::GetInstance().GenerateFromString(_Limiter);
 
   Values.push_back(_Limiter);
 
@@ -1053,7 +1057,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN
   vector<string> Values;
   string HashLimiter;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_Limiter, HashLimiter);
+  HashLimiter = NameGenerator::GetInstance().GenerateFromString(_Limiter);
 
   Values.push_back(_RepresentativeSCN);
 
@@ -1069,7 +1073,7 @@ int MessageBuilder::NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter
   vector<string> Values;
   string HashLimiter;
 
-  GenerateSCNFromCharArrayBinaryPatterns(_Limiter, HashLimiter);
+  HashLimiter = NameGenerator::GetInstance().GenerateFromString(_Limiter);
 
   Values.push_back(HashLimiter);
 
