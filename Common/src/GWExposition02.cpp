@@ -37,6 +37,10 @@
 #include "Process.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 GWExposition02::GWExposition02(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -273,7 +277,7 @@ int GWExposition02::ExposePeers()
         PMB->NewIPCHelloCommandLine("--ipc", Version, peerKey, exposedLN, FreshHello, FreshPCL);
 
         string FSCN = "FFFFFFFF";
-        PB->GenerateSCNFromMessageBinaryPatterns(FreshHello, FSCN);
+        FSCN = NameGenerator::GetInstance().GenerateFromMessage(FreshHello);
         PMB->NewSCNCommandLine("0.1", FSCN, FreshHello, FreshPCL);
 
 #ifdef DEBUG
@@ -403,7 +407,7 @@ int GWExposition02::ExposePeers()
       PMB->NewIPCHelloCommandLine("--ipc", "2.0", selfKey, selfLN, selfHTBID, SelfHello, SelfPCL);
 
       string SelfSCN = "FFFFFFFF";
-      PB->GenerateSCNFromMessageBinaryPatterns(SelfHello, SelfSCN);
+      SelfSCN = NameGenerator::GetInstance().GenerateFromMessage(SelfHello);
       PMB->NewSCNCommandLine("0.1", SelfSCN, SelfHello, SelfPCL);
 
 #ifdef DEBUG
@@ -451,7 +455,7 @@ void GWExposition02::SelfReschedule(Message* _ReceivedMessage)
 
   // Generate the SCN
   string SCN = "FFFFFFFF";
-  PB->GenerateSCNFromMessageBinaryPatterns(SelfMsg, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(SelfMsg);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, SelfMsg, PCL);

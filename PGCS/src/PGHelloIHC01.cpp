@@ -37,6 +37,10 @@
 #include "PGCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 #define LOG(msg) PB->S << endl \
@@ -267,12 +271,12 @@ int PGHelloIHC01::ScheduleStoreBindings(string _Case, vector<string>& _ReceivedE
   // which stored in the same HT.
 
   // Generate hash keys
-  PB->GenerateSCNFromCharArrayBinaryPatterns("Host", HashHost);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("OS", HashOS);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("PGCS", HashPGCS);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("PG", HashPG);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("GW", HashGW);
-  PB->GenerateSCNFromCharArrayBinaryPatterns("HT", HashHT);
+  HashHost = NameGenerator::GetInstance().GenerateFromString("Host");
+  HashOS = NameGenerator::GetInstance().GenerateFromString("OS");
+  HashPGCS = NameGenerator::GetInstance().GenerateFromString("PGCS");
+  HashPG = NameGenerator::GetInstance().GenerateFromString("PG");
+  HashGW = NameGenerator::GetInstance().GenerateFromString("GW");
+  HashHT = NameGenerator::GetInstance().GenerateFromString("HT");
 
   // ******************************************************
   // Cat[6] HID -> OSID
@@ -451,7 +455,7 @@ int PGHelloIHC01::ScheduleStoreBindings(string _Case, vector<string>& _ReceivedE
 
   // Cat[8] HID -> Peer Stack Hash
   string HashPeerStack;
-  PB->GenerateSCNFromCharArrayBinaryPatterns(_PeerStack, HashPeerStack);
+  HashPeerStack = NameGenerator::GetInstance().GenerateFromString(_PeerStack);
   Category = 8;
   Key = _ReceivedElements.at(0);
   Values.clear();

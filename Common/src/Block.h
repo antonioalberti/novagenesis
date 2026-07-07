@@ -189,45 +189,6 @@ public:
   // Convert unsigned int to string
   string UnsignedIntToString(unsigned int _Int);
 
-  // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns4Bytes(Block* _PB, string& _SCN);
-
-  // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns16Bytes(Block* _PB, string& _SCN);
-
-  // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns32Bytes(Block* _PB, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns4Bytes(Message* _M, string& _SCN);
-
-  // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns16Bytes(Message* _M, string& _SCN);
-
-  // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromBlockBinaryPatterns(Block* _PB, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a message object ostream
-  int GenerateSCNFromMessageBinaryPatterns(Message* _M, string& _SCN);
-
   // Return the current time in seconds
   double GetTime();
 

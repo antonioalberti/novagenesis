@@ -37,6 +37,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CoreRunPublish01::CoreRunPublish01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -244,7 +248,7 @@ int CoreRunPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
           // ******************************************************
 
           // Generate the SCN
-          PB->GenerateSCNFromMessageBinaryPatterns(Publish, SCN);
+          SCN = NameGenerator::GetInstance().GenerateFromMessage(Publish);
 
           // Creating the ng -scn --s command line
           PMB->NewSCNCommandLine("0.1", SCN, Publish, PCL);

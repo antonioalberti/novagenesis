@@ -41,6 +41,10 @@
 #include "GIRS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG
 ////#define DEBUG1 // To see the messages stored in memory at girs periodically
 
@@ -128,7 +132,7 @@ int IRRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
@@ -243,7 +247,7 @@ int IRRunPeriodic01::Exposition()
   PMB->NewStoreBindingCommandLineSCNToHashLN("0.1", 3, PB->GetSelfCertifyingName(), "IR", ExposingInitialBinds, PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(ExposingInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, ExposingInitialBinds, PCL);
@@ -308,12 +312,12 @@ int IRRunPeriodic01::DiscoveryFirst()
   string Key5;
   string Key6;
 
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN1, Key1);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN2, Key2);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN3, Key3);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN4, Key4);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN5, Key5);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN6, Key6);
+  Key1 = NameGenerator::GetInstance().GenerateFromString(LN1);
+  Key2 = NameGenerator::GetInstance().GenerateFromString(LN2);
+  Key3 = NameGenerator::GetInstance().GenerateFromString(LN3);
+  Key4 = NameGenerator::GetInstance().GenerateFromString(LN4);
+  Key5 = NameGenerator::GetInstance().GenerateFromString(LN5);
+  Key6 = NameGenerator::GetInstance().GenerateFromString(LN6);
 
   // ***************************************************
   // Prepare the first command line
@@ -362,7 +366,7 @@ int IRRunPeriodic01::DiscoveryFirst()
   // ******************************************************
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(Discovery, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);
@@ -478,7 +482,7 @@ int IRRunPeriodic01::DiscoverySecond()
     // ******************************************************
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(Discovery, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);
@@ -669,7 +673,7 @@ int IRRunPeriodic01::Operational()
     PMB->NewGetCommandLine("0.1", 19, PIR->HTSTuples[0]->Values[2], IPCUpdate, PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(IPCUpdate, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(IPCUpdate);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, IPCUpdate, PCL);

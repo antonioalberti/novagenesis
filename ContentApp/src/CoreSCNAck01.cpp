@@ -37,6 +37,10 @@
 #include "Core.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 #define LOG(msg) PB->S << endl \
@@ -154,7 +158,7 @@ int CoreSCNAck01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
       if (Run != 0)
       {
         // Generate the SCN
-        PB->GenerateSCNFromMessageBinaryPatterns(Run, SCN);
+        SCN = NameGenerator::GetInstance().GenerateFromMessage(Run);
 
         // Creating the ng -scn --s command line
         PMB->NewSCNCommandLine("0.1", SCN, Run, PCL);
@@ -180,7 +184,7 @@ int CoreSCNAck01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
     // PB->S << Offset <<  "(There is an inline storage message)" << endl;
 
     // Generate the ng -scn -seq
-    PB->GenerateSCNFromMessageBinaryPatterns(InlineResponseMessage, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, InlineResponseMessage, PCL);

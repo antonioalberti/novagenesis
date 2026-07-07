@@ -35,6 +35,10 @@
 
 //]////#define DEBUG
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 IRSCNSeq02::IRSCNSeq02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -113,8 +117,8 @@ int IRSCNSeq02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
             PM = ScheduledMessages.at(i);
 
             // Generate the new SCN
-            // PB->GenerateSCNFromMessageBinaryPatterns(InlineResponseMessage,NewSCN);
-            PB->GenerateSCNFromMessageBinaryPatterns(PM, NewSCN);
+            // NewSCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
+            NewSCN = NameGenerator::GetInstance().GenerateFromMessage(PM);
 
             // Add the SCN to the message
             // PMB->NewSCNCommandLine("0.1",NewSCN,InlineResponseMessage,PCL);

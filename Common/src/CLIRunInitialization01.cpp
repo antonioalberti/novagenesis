@@ -33,6 +33,10 @@
 #include "CLI.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CLIRunInitialization01::CLIRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -91,7 +95,7 @@ int CLIRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, ve
   PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, StoringInitialBinds, PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoringInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PSCNCL);

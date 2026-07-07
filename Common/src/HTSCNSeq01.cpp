@@ -33,6 +33,10 @@
 #include "HT.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 HTSCNSeq01::HTSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -72,7 +76,7 @@ int HTSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
       if (ReceivedSCN != "")
       {
         // Generate the SCN for the InlineResponseMessage
-        PB->GenerateSCNFromMessageBinaryPatterns(InlineResponseMessage, NewSCN);
+        NewSCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
 
         PMB->NewSCNCommandLine("0.1", NewSCN, ReceivedSCN, InlineResponseMessage, PCL);
 

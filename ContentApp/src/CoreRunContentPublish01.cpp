@@ -37,6 +37,10 @@
 #include "Core.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // To follow message processing
 
 #define LOG(msg) PB->S << endl \
@@ -290,7 +294,7 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
   RunPhotoPublish->NewCommandLine("-run", "--contentpublish", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPhotoPublish, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPhotoPublish);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPhotoPublish, PCL);
@@ -625,7 +629,7 @@ void CoreRunContentPublish01::CreatePublishMessage(double _Time, string _FileNam
       // ******************************************************
 
       // Generate the SCN
-      PB->GenerateSCNFromMessageBinaryPatterns(Publish, SCN);
+      SCN = NameGenerator::GetInstance().GenerateFromMessage(Publish);
 
       // Creating the ng -scn --s command line
       PMB->NewSCNCommandLine("0.1", SCN, Publish, PCL);

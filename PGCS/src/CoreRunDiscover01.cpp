@@ -37,6 +37,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CoreRunDiscover01::CoreRunDiscover01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -183,7 +187,7 @@ int CoreRunDiscover01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             // ******************************************************
 
             // Generate the SCN
-            PB->GenerateSCNFromMessageBinaryPatterns(Discovery, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
             // Creating the ng -scn --s command line
             PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);
@@ -325,7 +329,7 @@ int CoreRunDiscover01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             PCL->SetArgumentElement(0, 0, PB->IntToString(PCore->GetSequenceNumber()));
 
             // Generate the SCN
-            PB->GenerateSCNFromMessageBinaryPatterns(Discovery, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
             // Creating the ng -scn --s command line
             PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);

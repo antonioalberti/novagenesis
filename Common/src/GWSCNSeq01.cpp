@@ -33,6 +33,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 GWSCNSeq01::GWSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -83,7 +87,7 @@ int GWSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
           if (GWStatusS01Msg != 0)
           {
             // Generate the SCN for the GWStatusS01Msg
-            PB->GenerateSCNFromMessageBinaryPatterns(GWStatusS01Msg, NewSCN);
+            NewSCN = NameGenerator::GetInstance().GenerateFromMessage(GWStatusS01Msg);
 
             PMB->NewSCNCommandLine("0.1", NewSCN, ReceivedSCN, GWStatusS01Msg, PCL);
 

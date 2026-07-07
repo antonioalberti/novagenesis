@@ -37,6 +37,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // To follow message processing
 // #define DEBUG1 // To follow message processing for flow control
 
@@ -269,7 +273,7 @@ int CoreNotifyS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
             // Generate the SCN
             // ******************************************************
 
-            PB->GenerateSCNFromMessageBinaryPatterns(SubscriptionM, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(SubscriptionM);
 
             // Creating the ng -scn --s command line
             PMB->NewSCNCommandLine("0.1", SCN, SubscriptionM, PCL);

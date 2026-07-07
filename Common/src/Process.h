@@ -331,36 +331,6 @@ public:
   // Initiate Command Line Prompt for users
   void RunPrompt();
 
-  // Generate process self-certified name from its binary patterns
-  void GenerateSCNFromProcessBinaryPatterns4Bytes(Process* _PP, string& _SCN);
-
-  // Generate process self-certified name from its binary patterns
-  void GenerateSCNFromProcessBinaryPatterns16Bytes(Process* _PP, string& _SCN);
-
-  // Generate process self-certified name from its binary patterns
-  void GenerateSCNFromProcessBinaryPatterns32Bytes(Process* _PP, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(string _Input, string& _SCN);
-
-  // Generate block self-certified name from its binary patterns
-  void GenerateSCNFromProcessBinaryPatterns(Process* _PP, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(string _Input, string& _SCN);
-
   // *************************************************************************************
   // Functions to access HT data directly. Should be removed on future
   // *************************************************************************************

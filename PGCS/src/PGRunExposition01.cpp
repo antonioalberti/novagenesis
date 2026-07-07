@@ -41,6 +41,10 @@
 #include "PGCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // This debug is important to follow PGCS running
 
 PGRunExposition01::PGRunExposition01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -358,7 +362,7 @@ int PGRunExposition01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               // ******************************************************
 
               // Generate the SCN
-              PB->GenerateSCNFromMessageBinaryPatterns(Exposition, SCN);
+              SCN = NameGenerator::GetInstance().GenerateFromMessage(Exposition);
 
               // Creating the ng -scn --s command line
               PMB->NewSCNCommandLine("0.1", SCN, Exposition, PCL);

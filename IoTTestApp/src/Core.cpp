@@ -49,6 +49,10 @@
 #include "CoreRunDiscover01.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 #ifndef _CORERUNINVITE01_H
 #include "CoreRunInvite01.h"
 #endif
@@ -519,7 +523,7 @@ void Core::DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, ve
       {
         for (unsigned int i = 0; i < _Cat2Keywords->size(); i++)
         {
-          GenerateSCNFromCharArrayBinaryPatterns(_Cat2Keywords->at(i), Hash);
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat2Keywords->at(i));
 
           NewPairCommandLineArgument(2, Hash, PCL);
 
@@ -531,7 +535,7 @@ void Core::DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, ve
       {
         for (unsigned int j = 0; j < _Cat9Keywords->size(); j++)
         {
-          GenerateSCNFromCharArrayBinaryPatterns(_Cat9Keywords->at(j), Hash);
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat9Keywords->at(j));
 
           NewPairCommandLineArgument(9, Hash, PCL);
 
@@ -782,7 +786,7 @@ int Core::GetFileContentHash(string FileName, string& _SCN)
 
     F1.read(Payload, PayloadSize);
 
-    GenerateSCNFromCharArrayBinaryPatterns(Payload, PayloadSize, _SCN);
+    _SCN = NameGenerator::GetInstance().GenerateFromCharArray(Payload, PayloadSize);
 
     delete[] Payload;
 
@@ -815,7 +819,7 @@ void Core::SetKeywordsAndTheirHashes()
   {
     string Hash;
 
-    GenerateSCNFromCharArrayBinaryPatterns(Keywords[i], Hash);
+    Hash = NameGenerator::GetInstance().GenerateFromString(Keywords[i]);
 
     KeywordHashes.push_back(Hash);
   }

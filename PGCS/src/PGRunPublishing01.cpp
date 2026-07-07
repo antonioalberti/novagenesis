@@ -35,6 +35,10 @@
 
 #include <iostream>
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 #define LOG(msg) PB->S << endl \
@@ -125,14 +129,14 @@ int PGRunPublishing01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
       // ***************************************************
       Values.push_back(PB->PP->GetSelfCertifyingName());
 
-      PMB->GenerateSCNFromCharArrayBinaryPatterns("PGCS", HashProcessLegibleName);
+      HashProcessLegibleName = NameGenerator::GetInstance().GenerateFromString("PGCS");
 
       PMB->NewCommonCommandLine("-p", "--b", "0.1", 2, HashProcessLegibleName, &Values, Publish, PCL);
 
       // ***************************************************
       // Generate the SCN
       // ***************************************************
-      PB->GenerateSCNFromMessageBinaryPatterns(Publish, SCN);
+      SCN = NameGenerator::GetInstance().GenerateFromMessage(Publish);
 
       // Creating the ng -scn --s command line
       PMB->NewSCNCommandLine("0.1", SCN, Publish, PCL);

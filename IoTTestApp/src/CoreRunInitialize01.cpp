@@ -37,6 +37,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CoreRunInitialize01::CoreRunInitialize01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -133,7 +137,7 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
   // PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoringInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PCL);
@@ -173,7 +177,7 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
@@ -284,7 +288,7 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
   RunPublishSSData->NewCommandLine("-run", "--publishssdata", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPublishSSData, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPublishSSData);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPublishSSData, PCL);
@@ -306,7 +310,7 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
   RunGetInfo->NewCommandLine("-run", "--getinfo", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunGetInfo, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunGetInfo);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunGetInfo, PCL);

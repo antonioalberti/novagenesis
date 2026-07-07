@@ -41,6 +41,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -242,7 +246,7 @@ int CoreRunEvaluate01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               PMB->NewGetCommandLine("0.1", 19, PCore->PSTuples[0]->Values[2], IPCUpdate, PCL);
 
               // Generate the SCN
-              PB->GenerateSCNFromMessageBinaryPatterns(IPCUpdate, SCN);
+              SCN = NameGenerator::GetInstance().GenerateFromMessage(IPCUpdate);
 
               // Creating the ng -scn --s command line
               PMB->NewSCNCommandLine("0.1", SCN, IPCUpdate, PCL);

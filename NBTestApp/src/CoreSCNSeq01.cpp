@@ -33,6 +33,10 @@
 #include "Core.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CoreSCNSeq01::CoreSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -98,7 +102,7 @@ int CoreSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
         // ***************************************************
         // Generate the ng -scn --seq
         // ***************************************************
-        PB->GenerateSCNFromMessageBinaryPatterns(Run, SCN);
+        SCN = NameGenerator::GetInstance().GenerateFromMessage(Run);
 
         // Creating the ng -scn --s command line
         PMB->NewSCNCommandLine("0.1", SCN, Run, PCL);

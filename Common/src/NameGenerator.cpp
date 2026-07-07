@@ -31,6 +31,7 @@
 #include "MurmurHash3Strategy.h"
 #include "DefaultNameStrategy.h"
 #include "MurmurHash3.h"
+#include "Message.h"
 
 #include <sstream>
 #include <iomanip>
@@ -331,6 +332,28 @@ string NameGenerator::GenerateFromCharArray(const char* _Input, long long _Size)
 
         return "";
     }
+}
+
+// ============================================================================
+// GenerateFromMessage
+//
+// EXACT copy of Block::GenerateSCNFromMessageBinaryPatterns4Bytes.
+// Serialises the Message via operator<< and hashes the resulting string.
+// ============================================================================
+string NameGenerator::GenerateFromMessage(Message* _M)
+{
+    stringstream ss;
+
+    ss << *_M;
+
+    string Temp = ss.str();
+
+    if (Temp.size() > 0)
+    {
+        return GenerateFromString(Temp);
+    }
+
+    return "";
 }
 
 // ============================================================================

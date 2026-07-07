@@ -43,6 +43,10 @@
 #include "PGCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 PGRunPeriodic01::PGRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -129,7 +133,7 @@ int PGRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
@@ -363,7 +367,7 @@ int PGRunPeriodic01::HelloScheduling()
     RunHello01->NewCommandLine("-run", "--hello", "0.1", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunHello01, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunHello01);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunHello01, PCL);
@@ -396,7 +400,7 @@ int PGRunPeriodic01::HelloScheduling()
     RunHello02->NewCommandLine("-run", "--hello", "0.2", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunHello02, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunHello02);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunHello02, PCL);
@@ -428,7 +432,7 @@ int PGRunPeriodic01::HelloScheduling()
     RunHello03->NewCommandLine("-run", "--hello", "0.3", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunHello03, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunHello03);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunHello03, PCL);
@@ -491,7 +495,7 @@ int PGRunPeriodic01::ExpositionScheduling()
     RunExposition->NewCommandLine("-run", "--exposition", "0.1", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunExposition, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunExposition);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunExposition, PCL);
@@ -563,7 +567,7 @@ int PGRunPeriodic01::PGCSPublishingScheduling()
     RunPublishing->NewCommandLine("-run", "--publishing", "0.1", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunPublishing, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPublishing);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunPublishing, PCL);
@@ -670,7 +674,7 @@ int PGRunPeriodic01::StresstestScheduling()
       RunStresstest->NewCommandLine("-run", "--stresstest", "0.1", PCL);
 
       // Generate the SCN
-      PB->GenerateSCNFromMessageBinaryPatterns(RunStresstest, SCN);
+      SCN = NameGenerator::GetInstance().GenerateFromMessage(RunStresstest);
 
       // Creating the ng -scn --s command line
       PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);

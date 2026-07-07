@@ -37,6 +37,10 @@
 #include "Core.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 CoreRunPeriodic01::CoreRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -121,7 +125,7 @@ int CoreRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
@@ -151,7 +155,7 @@ int CoreRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
   RunEvaluate->NewCommandLine("-run", "--evaluate", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunEvaluate, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunEvaluate);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunEvaluate, PCL);

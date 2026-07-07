@@ -41,6 +41,10 @@
 #include "PSS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 PSPubNotify01::PSPubNotify01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -160,7 +164,7 @@ int PSPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
                   // ***************************************************
 
                   // Generate the SCN
-                  PB->GenerateSCNFromMessageBinaryPatterns(Notify, SCN);
+                  SCN = NameGenerator::GetInstance().GenerateFromMessage(Notify);
 
                   // Creating the ng -scn --s command line
                   PMB->NewSCNCommandLine("0.1", SCN, Notify, PCL);

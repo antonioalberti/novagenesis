@@ -345,24 +345,6 @@ public:
 
   // Return the current time in seconds
   double GetTime();
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns4Bytes(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns16Bytes(string _Input, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(const char* _Input, long long _Size, string& _SCN);
-
-  // Generate a self-certified name from a char array
-  int GenerateSCNFromCharArrayBinaryPatterns(string _Input, string& _SCN);
 };
 
 #endif

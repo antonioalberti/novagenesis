@@ -37,6 +37,10 @@
 #include "HT.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 IRStatusS01::IRStatusS01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -172,8 +176,8 @@ int IRStatusS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
 
                                                                                                                   PMB->NewStoreBindingCommandLineSCNToHashLN("0.1",3,PB->GetSelfCertifyingName(),"IR",ExposingInitialBinds,PCL);
 
-                                                                                                                  // Generate the SCN
-                                                                                                                  PB->GenerateSCNFromMessageBinaryPatterns(ExposingInitialBinds,SCN);
+                                                                                                                  SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
+                                                                                                                  SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
 
                                                                                                                   // Creating the ng -scn --s command line
                                                                                                                   PMB->NewSCNCommandLine("0.1",SCN,ExposingInitialBinds,PCL);
@@ -233,12 +237,12 @@ int IRStatusS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                                                                                                                   string Key5;
                                                                                                                   string Key6;
 
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN1,Key1);
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN2,Key2);
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN3,Key3);
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN4,Key4);
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN5,Key5);
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns(LN6,Key6);
+                                                                                                                  Key1 = NameGenerator::GetInstance().GenerateFromString(LN1);
+                                                                                                                  Key2 = NameGenerator::GetInstance().GenerateFromString(LN2);
+                                                                                                                  Key3 = NameGenerator::GetInstance().GenerateFromString(LN3);
+                                                                                                                  Key4 = NameGenerator::GetInstance().GenerateFromString(LN4);
+                                                                                                                  Key5 = NameGenerator::GetInstance().GenerateFromString(LN5);
+                                                                                                                  Key6 = NameGenerator::GetInstance().GenerateFromString(LN6);
 
                                                                                                                   // ***************************************************
                                                                                                                   // Prepare the first command line
@@ -280,7 +284,7 @@ int IRStatusS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                                                                                                                   // ******************************************************
 
                                                                                                                   // Generate the SCN
-                                                                                                                  PB->GenerateSCNFromMessageBinaryPatterns(Discovery,SCN);
+                                                                                                                  SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
                                                                                                                   // Creating the ng -scn --s command line
                                                                                                                   PMB->NewSCNCommandLine("0.1",SCN,Discovery,PCL);
@@ -412,12 +416,12 @@ int IRStatusS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                                                                                                                   // ***************************************************
                                                                                                                   Values.push_back(PB->PP->GetSelfCertifyingName());
 
-                                                                                                                  PMB->GenerateSCNFromCharArrayBinaryPatterns("GIRS",HashProcessLegibleName);
+                                                                                                                  HashProcessLegibleName = NameGenerator::GetInstance().GenerateFromString("GIRS");
 
                                                                                                                   PMB->NewCommonCommandLine("-p","--b","0.1",2,HashProcessLegibleName,&Values,Publish,PCL);
 
                                                                                                                   // Generate the SCN
-                                                                                                                  PB->GenerateSCNFromMessageBinaryPatterns(Publish,SCN);
+                                                                                                                  SCN = NameGenerator::GetInstance().GenerateFromMessage(Publish);
 
                                                                                                                   // Creating the ng -scn --s command line
                                                                                                                   PMB->NewSCNCommandLine("0.1",SCN,Publish,PCL);
@@ -475,7 +479,7 @@ int IRStatusS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                                                                                                                                   PMB->NewGetCommandLine("0.1",13,PIR->HTSTuples[0]->Values[2],IPCUpdate,PCL);
 
                                                                                                                                   // Generate the SCN
-                                                                                                                                  PB->GenerateSCNFromMessageBinaryPatterns(IPCUpdate,SCN);
+                                                                                                                                  SCN = NameGenerator::GetInstance().GenerateFromMessage(IPCUpdate);
 
                                                                                                                                   // Creating the ng -scn --s command line
                                                                                                                                   PMB->NewSCNCommandLine("0.1",SCN,IPCUpdate,PCL);

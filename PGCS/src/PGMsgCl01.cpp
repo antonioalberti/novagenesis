@@ -37,6 +37,10 @@
 #include "PG.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 #include <iostream>
 
 // #define DEBUG
@@ -51,11 +55,11 @@ PGMsgCl01::PGMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)
   // Self-verifying names (SVNes) used to classify supported adaptation layers
 
   // Set auxiliary hash of natural language keywords
-  PB->GenerateSCNFromCharArrayBinaryPatterns("Ethernet", HashEthernet);
+  HashEthernet = NameGenerator::GetInstance().GenerateFromString("Ethernet");
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns("Wi-Fi", HashWiFi);
+  HashWiFi = NameGenerator::GetInstance().GenerateFromString("Wi-Fi");
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns("IPv4_UDP", HashIPv4_UDP);
+  HashIPv4_UDP = NameGenerator::GetInstance().GenerateFromString("IPv4_UDP");
 
   // **********************************************************************
 }
@@ -319,7 +323,7 @@ int PGMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
                   for (unsigned int w=0; w<PPGCS->Stacks->size(); w++)
                           {
                                   // Calculate the hash of the stack
-                                  PB->GenerateSCNFromCharArrayBinaryPatterns(PPGCS->Stacks->at(w),HashStack);
+                                  HashStack = NameGenerator::GetInstance().GenerateFromString(PPGCS->Stacks->at(w));
 
 
 

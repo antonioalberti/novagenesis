@@ -41,6 +41,10 @@
 #include "HTS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 DHTDeliveryBind01::DHTDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -111,7 +115,7 @@ int DHTDeliveryBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             PMB->NewCommonCommandLine("-sr", "--b", "0.1", 13, Key.at(0), &Values, StoreBindings, PCL);
 
             // Generate the new SCN
-            PB->GenerateSCNFromMessageBinaryPatterns(StoreBindings, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(StoreBindings);
 
             // Add the SCN to the message
             PMB->NewSCNCommandLine("0.1", SCN, StoreBindings, PCL);

@@ -37,6 +37,10 @@
 #include "PGCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 #define LOG(msg) PB->S << endl \
@@ -535,7 +539,7 @@ int PGHelloIHC02::ScheduleStoreBindings(string _Case, vector<string>& _ReceivedE
   // ******************************************************
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(StoreBind01Msg, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoreBind01Msg);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, StoreBind01Msg, StoreBind01);

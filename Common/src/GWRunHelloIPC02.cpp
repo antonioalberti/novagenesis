@@ -33,6 +33,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 GWRunHelloIPC02::GWRunHelloIPC02(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -111,7 +115,7 @@ int GWRunHelloIPC02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
 
   // Generate the SCN
   string SCN = "FFFFFFFF";
-  PB->GenerateSCNFromMessageBinaryPatterns(IPCHello, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(IPCHello);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, IPCHello, PCL);

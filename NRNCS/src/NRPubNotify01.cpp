@@ -41,6 +41,10 @@
 #include "NRNCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // TODO: FIXP/Update - Added this debug control
 // #define DEBUG
 
@@ -163,7 +167,7 @@ int NRPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
                   // ***************************************************
 
                   // Generate the SCN
-                  PB->GenerateSCNFromMessageBinaryPatterns(Notify, SCN);
+                  SCN = NameGenerator::GetInstance().GenerateFromMessage(Notify);
 
                   // Creating the ng -scn --s command line
                   PMB->NewSCNCommandLine("0.1", SCN, Notify, PCL);

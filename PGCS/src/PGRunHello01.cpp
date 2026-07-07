@@ -235,7 +235,7 @@ int PGRunHello01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
           // ******************************************************
 
           // Generate the SCN
-          PB->GenerateSCNFromMessageBinaryPatterns(PGIHCHello, SCN);
+          SCN = NameGenerator::GetInstance().GenerateFromMessage(PGIHCHello);
 
           // Creating the ng -scn --s command line
           PMB->NewSCNCommandLine("0.1", SCN, PGIHCHello, PCL);

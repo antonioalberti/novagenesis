@@ -37,6 +37,7 @@ class HashFunction;
 class NameStrategy;
 class Process;
 class Block;
+class Message;
 
 /// Global singleton responsible for ALL name (SCN/BID/PID) generation.
 ///
@@ -76,6 +77,10 @@ public:
 
     /// Generate a name from a Block object. (To be implemented in E4.6)
     string GenerateFromBlock(Block* _PB);
+
+    /// Generate a 4-byte (32-bit) SCN from a Message object.
+    /// EXACT copy of Block::GenerateSCNFromMessageBinaryPatterns4Bytes.
+    string GenerateFromMessage(Message* _M);
 
     // -----------------------------------------------------------------------
     // Strategy management

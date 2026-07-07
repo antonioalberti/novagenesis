@@ -37,6 +37,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG
 
 PSRunInitialization01::PSRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -127,7 +131,7 @@ int PSRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
   // PMB->NewStoreBindingCommandLineFromPIDToHID("0.1",StoringInitialBinds,PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoringInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PSCNCL);
@@ -254,7 +258,7 @@ int PSRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);

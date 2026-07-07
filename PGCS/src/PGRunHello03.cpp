@@ -45,6 +45,10 @@
 #include "PGCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG
 
 PGRunHello03::PGRunHello03(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -116,10 +120,9 @@ int PGRunHello03::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
             Destinations.clear();
 
             // Set up the domain name hash
-            PB->GenerateSCNFromCharArrayBinaryPatterns(PPG->MyDomainName, PPG->HashOfMyDomainName);
+            PPG->HashOfMyDomainName = NameGenerator::GetInstance().GenerateFromString(PPG->MyDomainName);
 
-            PB->GenerateSCNFromCharArrayBinaryPatterns(PPG->MyUpperLevelDomainName, PPG
-                                                                                        ->HashOfMyUpperLevelDomainName);
+            PPG->HashOfMyUpperLevelDomainName = NameGenerator::GetInstance().GenerateFromString(PPG->MyUpperLevelDomainName);
 
             // Setting up the OS SCN as the space limiter
             Limiters.push_back(PB->PP->Inter_Domain);
@@ -215,7 +218,7 @@ int PGRunHello03::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
             // ******************************************************
 
             // Generate the SCN
-            PB->GenerateSCNFromMessageBinaryPatterns(PGIHCHello, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(PGIHCHello);
 
             // Creating the ng -scn --s command line
             PMB->NewSCNCommandLine("0.1", SCN, PGIHCHello, PCL);

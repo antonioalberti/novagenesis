@@ -41,6 +41,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 
 PGRunStresstest01::PGRunStresstest01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -141,7 +145,7 @@ int PGRunStresstest01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
     StressPing->SetPayloadFromCharArray(TimeStr, strlen(TimeStr));
 
     // Generate SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(StressPing, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(StressPing);
 
     // Create SCN command line
     PMB->NewSCNCommandLine("0.1", SCN, StressPing, PCL);

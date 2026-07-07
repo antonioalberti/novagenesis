@@ -33,6 +33,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 GWRunInitialization01::GWRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -177,7 +181,7 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
   // ******************************************************
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(StoringInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoringInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PCL);
@@ -211,7 +215,7 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
     RunExposition->NewCommandLine("-run", "--exposition", "0.2", PCL);
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(RunExposition, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunExposition);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, RunExposition, PCL);
@@ -252,7 +256,7 @@ int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
   RunHelloIPC->NewCommandLine("-run", "--helloIPC", "0.2", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunHelloIPC, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunHelloIPC);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunHelloIPC, PCL);

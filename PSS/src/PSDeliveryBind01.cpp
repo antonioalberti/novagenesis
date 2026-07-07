@@ -41,6 +41,10 @@
 #include "PSS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG
 
 PSDeliveryBind01::PSDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -117,7 +121,7 @@ int PSDeliveryBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
             PMB->NewCommonCommandLine("-sr", "--b", "0.1", 13, Key.at(0), &Values, StoreBindings, PCL);
 
             // Generate the new SCN
-            PB->GenerateSCNFromMessageBinaryPatterns(StoreBindings, SCN);
+            SCN = NameGenerator::GetInstance().GenerateFromMessage(StoreBindings);
 
             // Add the SCN to the message
             PMB->NewSCNCommandLine("0.1", SCN, StoreBindings, PCL);

@@ -41,6 +41,10 @@
 #include "NRNCS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // This debug is important to follow NRNCS running
 
 NRRunPeriodic01::NRRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -113,7 +117,7 @@ int NRRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
@@ -220,7 +224,7 @@ int NRRunPeriodic01::Exposition()
   PMB->NewStoreBindingCommandLineSCNToHashLN("0.1", 3, PB->GetSelfCertifyingName(), "NR", ExposingInitialBinds, PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(ExposingInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
 
   // Creating the ng -scn --s command line
   PMB->NewSCNCommandLine("0.1", SCN, ExposingInitialBinds, PCL);

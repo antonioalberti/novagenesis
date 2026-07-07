@@ -41,6 +41,10 @@
 #include "GW.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -612,7 +616,7 @@ int CoreRunEvaluate01::PublishData()
     PB->S << Offset1 << "(c. Generating SCN.)" << endl;
 
     // Generate the SCN
-    PB->GenerateSCNFromMessageBinaryPatterns(PLCData, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(PLCData);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, PLCData, PCL);
@@ -667,7 +671,7 @@ int CoreRunEvaluate01::ScheduleASubscription(Subscription* _PS, vector<Message*>
   PCL->SetArgumentElement(1, 0, _PS->Key);
 
   // Create SCN
-  PB->GenerateSCNFromMessageBinaryPatterns(SubData, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(SubData);
   PMB->NewSCNCommandLine("0.1", SCN, SubData, PCL);
 
   // Push to input queue
@@ -894,7 +898,7 @@ int CoreRunEvaluate01::ProcessJsonFile(string _Publisher_LN, string _FileName, s
     // Generate the SCN
     // ******************************************************
 
-    PB->GenerateSCNFromMessageBinaryPatterns(Revoke, SCN);
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(Revoke);
 
     // Creating the ng -scn --s command line
     PMB->NewSCNCommandLine("0.1", SCN, Revoke, PCL);

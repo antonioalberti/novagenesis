@@ -33,6 +33,10 @@
 #include "NR.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 NRSCNSeq01::NRSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -76,7 +80,7 @@ int NRSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
         }
 
         // Generate the SCN
-        PB->GenerateSCNFromMessageBinaryPatterns(InlineResponseMessage, NewSCN);
+        NewSCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
 
         // Add the SCN to the message
         PMB->NewSCNCommandLine("0.1", NewSCN, InlineResponseMessage, PCL);
