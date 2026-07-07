@@ -53,6 +53,10 @@
 #include "MurmurHash3.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 // #define DEBUG
 // #define DEBUG1
 // #define DEBUG3
@@ -105,7 +109,7 @@ Process::Process(string _LN, key_t _Key, string _Path)
   GenerateSCNFromProcessBinaryPatterns(this, SCN);
 
   // Generate the hash of the LN for the process
-  GenerateSCNFromCharArrayBinaryPatterns(LN, HASH_SCN);
+  HASH_SCN = NameGenerator::GetInstance().GenerateFromString(LN);
 
   cout << "(The process legible name is " << LN << ")" << endl;
 
@@ -145,13 +149,13 @@ Process::Process(string _LN, key_t _Key, string _Path)
 
     cout << "(The host legible name is " << HLN << ")" << endl;
 
-    GenerateSCNFromCharArrayBinaryPatterns(OSLN, OSSCN);
+    OSSCN = NameGenerator::GetInstance().GenerateFromString(OSLN);
 
     // OSSCN=OSSCN+"_OSID";
 
     cout << "(The operating system self-certifying name is = " << OSSCN << ")" << endl;
 
-    GenerateSCNFromCharArrayBinaryPatterns(HLN, HSCN);
+    HSCN = NameGenerator::GetInstance().GenerateFromString(HLN);
 
     // HSCN=HSCN+"_HID";
 
@@ -179,34 +183,34 @@ Process::Process(string _LN, key_t _Key, string _Path)
 
   DLN = "Unnamed";
 
-  GenerateSCNFromCharArrayBinaryPatterns(DLN, DSCN);
+  DSCN = NameGenerator::GetInstance().GenerateFromString(DLN);
 
   // ************************************************************
   // New limiters scheme. March 2016
   // ************************************************************
 
   // Generate a SCN from the "Process" word
-  GenerateSCNFromCharArrayBinaryPatterns("Intra_Process", Intra_Process);
+  Intra_Process = NameGenerator::GetInstance().GenerateFromString("Intra_Process");
 
   cout << "(Intra_Process = " << Intra_Process << ")" << endl;
 
   // Generate a SCN from the "Operating System" word
-  GenerateSCNFromCharArrayBinaryPatterns("Intra_OS", Intra_OS);
+  Intra_OS = NameGenerator::GetInstance().GenerateFromString("Intra_OS");
 
   cout << "(Intra_OS = " << Intra_OS << ")" << endl;
 
   // Generate a SCN from the "Domain" word
-  GenerateSCNFromCharArrayBinaryPatterns("Intra_Node", Intra_Node);
+  Intra_Node = NameGenerator::GetInstance().GenerateFromString("Intra_Node");
 
   cout << "(Intra_Node = " << Intra_Node << ")" << endl;
 
   // Generate a SCN from the "Domain" word
-  GenerateSCNFromCharArrayBinaryPatterns("Intra_Domain", Intra_Domain);
+  Intra_Domain = NameGenerator::GetInstance().GenerateFromString("Intra_Domain");
 
   cout << "(Intra_Domain = " << Intra_Domain << ")" << endl;
 
   // Generate a SCN from the "Domain" word
-  GenerateSCNFromCharArrayBinaryPatterns("Inter_Domain", Inter_Domain);
+  Inter_Domain = NameGenerator::GetInstance().GenerateFromString("Inter_Domain");
 
   cout << "(Inter_Domain = " << Inter_Domain << ")" << endl;
 
@@ -1149,9 +1153,9 @@ void Process::GenerateSCNFromProcessBinaryPatterns16Bytes(Process* _PP, string& 
     // with ASLR and realloc. We hash each stable field into a
     // short hex string and use a stable integer fold of it.
     string hashLN, hashPath, hashDLN;
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->LN, hashLN);
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->Path, hashPath);
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->DLN, hashDLN);
+    hashLN = NameGenerator::GetInstance().GenerateFromString(_PP->LN);
+    hashPath = NameGenerator::GetInstance().GenerateFromString(_PP->Path);
+    hashDLN = NameGenerator::GetInstance().GenerateFromString(_PP->DLN);
 
     // Stable integer fold: take last 8 hex chars (32 bits) of each hash
     auto hexToInt = [](const string& h) -> int
@@ -1262,10 +1266,10 @@ void Process::GenerateSCNFromProcessBinaryPatterns32Bytes(Process* _PP, string& 
     // varied with ASLR and realloc. Hash each stable field into
     // a hex string and fold it to a stable long long.
     string hashLN, hashPath, hashDLN, hashSCN;
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->LN, hashLN);
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->Path, hashPath);
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->DLN, hashDLN);
-    GenerateSCNFromCharArrayBinaryPatterns(_PP->SCN, hashSCN);
+    hashLN = NameGenerator::GetInstance().GenerateFromString(_PP->LN);
+    hashPath = NameGenerator::GetInstance().GenerateFromString(_PP->Path);
+    hashDLN = NameGenerator::GetInstance().GenerateFromString(_PP->DLN);
+    hashSCN = NameGenerator::GetInstance().GenerateFromString(_PP->SCN);
 
     // Stable long long fold: parse first 16 hex chars of each hash.
     // If shorter, treat missing digits as zero.
@@ -2104,7 +2108,7 @@ int Process::DiscoverHomonymsEntitiesIDsFromLN(unsigned int _Cat, string _LN, ve
   {
     PHT = (HT*)PHTB;
 
-    GenerateSCNFromCharArrayBinaryPatterns(_LN, HashLN);
+    HashLN = NameGenerator::GetInstance().GenerateFromString(_LN);
 
     if (PHT->GetBinding(_Cat, HashLN, _Values) == OK)
     {
@@ -2135,7 +2139,7 @@ int Process::DiscoverHomonymsEntitiesIDsFromLN(unsigned int _Cat, string _LN, Bl
   {
     PHT = (HT*)PHTB;
 
-    GenerateSCNFromCharArrayBinaryPatterns(_LN, HashLN);
+    HashLN = NameGenerator::GetInstance().GenerateFromString(_LN);
 
     if (PHT->GetBinding(_Cat, HashLN, Values) == OK)
     {
@@ -2183,7 +2187,7 @@ int Process::DiscoverHomonymsBlocksBIDsFromPID(string _PID, string _BlockLN, vec
       if (BottomUpBIDs->size() > 0)
       {
         // Generate a SCN from the received block name
-        GenerateSCNFromCharArrayBinaryPatterns(_BlockLN, HashBlockLegibleName);
+        HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString(_BlockLN);
 
         // Setting up the category
         Category = 2;
@@ -2288,8 +2292,8 @@ int Process::DiscoverHomonymsProcessesPIDsFromOSID(string _OSID, string _Process
     {
       if (BottomUpPIDs->size() > 0)
       {
-        // Generate a SCN from the received block name
-        GenerateSCNFromCharArrayBinaryPatterns(_ProcessLN, HashProcessLegibleName);
+        // Generate a SCN from the received process name
+        HashProcessLegibleName = NameGenerator::GetInstance().GenerateFromString(_ProcessLN);
 
         // Setting up the category
         Category = 2;
@@ -2386,7 +2390,7 @@ int Process::DiscoverHomonymsBlocksBIDsFromProcessLegibleName(string _ProcessLN,
   // ***************************************************
 
   // Generate a SCN from the received process name
-  GenerateSCNFromCharArrayBinaryPatterns(_ProcessLN, HashProcessLegibleName);
+  HashProcessLegibleName = NameGenerator::GetInstance().GenerateFromString(_ProcessLN);
 
   // Setting up the category
   Category = 2;
@@ -2431,7 +2435,7 @@ int Process::DiscoverHomonymsBlocksBIDsFromProcessLegibleName(string _ProcessLN,
             if (BottomUpBIDs->size() > 0)
             {
               // Generate a SCN from the received block name
-              GenerateSCNFromCharArrayBinaryPatterns(_BlockLN, HashBlockLegibleName);
+              HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString(_BlockLN);
 
               // Setting up the category
               Category = 2;
