@@ -1,9 +1,9 @@
 # SPEC-013 — NovaGenesis Adaptation Layer (NGAL)
 
-**Version:** v0.1
+**Version:** v0.2
 **Date:** 2026-07-07
 **Author:** (derived from analysis)
-**Status:** Proposal
+**Status:** Proposal (revised — v0.2 incorporates critical review findings F1–F12)
 
 ---
 
@@ -22,7 +22,7 @@ This structure has five concrete problems:
 | # | Problem | Evidence |
 |---|---------|----------|
 | P1 | **Massive duplication between RAW and UDP send paths** | `SendToARawSocket` (394 linhas) vs `SendToAUDPSocket` (333 linhas) share ~80% of code — serialisation, size header, segmentation loop, all identical |
-| P2 | **Massive duplication between RAW and UDP receive paths** | `SocketDispatcher3` (474 linhas) vs `ReceiveFromAUDPSocket` (386 linhas) share ~70% of reassembly logic — `MessageReceiving` buffer, stop criteria, timeout |
+| P2 | **Massive duplication between RAW and UDP receive paths** | `SocketDispatcher3` (474 linhas) vs `ReceiveFromAUDPSocket` (~394 linhas) share ~70% of reassembly logic — `MessageReceiving` buffer, stop criteria, timeout |
 | P3 | **Single-function overload: `SocketDispatcher3` does 3 jobs** | Frame reception + child-thread dispatch (~120 linhas de semáforo/retry) + timeout cleanup |
 | P4 | **Unnecessary SHM hop for intra-process message delivery** | `FinishReceivingThread` writes to SHM, GW reads from SHM, GW calls `PushToInputQueue` — but `PushToInputQueue` is already thread-safe (mutex + CV). Comment in PG.cpp:2191 confirms: *"Obviously, this should be replaced in future."* |
 | P5 | **UDP transport implementation is obsolete** | No active use. When needed, must be rewritten from scratch aligned with NGAL, not patched. |
@@ -80,11 +80,15 @@ Every NG message sent over a network transport is encapsulated in an **NGAL-PDU*
 ```
 
 Where:
-- **Size Header** (8 bytes): `TotalSize = NG_Message_Size + 8`. Big-endian, 64-bit. Used by the receiver to allocate the reassembly buffer.
+- **Size Header** (8 bytes): `TotalSize = MessageSize + 8`. Big-endian, 64-bit. Here `MessageSize` is the serialised NG message size (command lines + payload, obtained via `M->GetMessageSize()`). The `+8` accounts for the Size Header itself. Used by the receiver to allocate the reassembly buffer.
 - **Segmentation Header** (8 bytes): `MN` (Message Number, 4 bytes) + `SN` (Sequence Number, 4 bytes). Big-endian.
   - `MN`: Random 32-bit identifier for this message. Used to correlate fragments.
   - `SN`: Fragment index within the message (0, 1, 2...). `NoS = ceil((8+MessageSize)/BlockSize)`.
 - **NG Message**: Serialised form of the Message object (command lines + payload). Size = `TotalSize - 8`.
+
+> **Note (F5):** The code at PG.cpp:576-583 writes `MessageSize` (not `MessageSize + 8`) into the Size Header bytes. The `+8` refers to the total PDU length used by the receiver for buffer allocation, not to the value written into the header field. The receiver reads the Size Header to get `MessageSize`, then allocates `MessageSize + 8` for the full SDU.
+
+> **Note (F6):** The NG protocol type is `0x1234` on the wire. In the code, `SocketDispatcher3` checks `saddrll.sll_protocol == 13330` (which is `0x3412` — `0x1234` in little-endian host byte order for `sll_protocol`). When creating the socket (PG.cpp:442,485), `proto = 0x1234` is passed to `htons()`. Any future NGAL-T implementation must preserve this byte-order handling.
 
 **NGAL-PDU header insertion** (send path):
 ```
@@ -115,7 +119,7 @@ Where:
 | **`SendToARawSocket`** | **394** | **NGAL-SAR + NGAL-T (RAW)** | **Gigante. ~80% é NGAL-SAR (comum a RAW+UDP). ~20% é NGAL-T RAW (sendto)** |
 | **`SendToAUDPSocket`** | **333** | **NGAL-SAR + NGAL-T (UDP)** | **Gigante. ~80% é NGAL-SAR (idêntico a RAW). ~20% é NGAL-T UDP** |
 | **`SocketDispatcher3`** | **474** | **NGAL-T (RAW) + NGAL-SAR + NGAL-CS** | **Faz 3 jobs: recv RAW, reassembly SAR, child-thread dispatch CS** |
-| **`ReceiveFromAUDPSocket`** | **386** | **NGAL-T (UDP) + NGAL-SAR + NGAL-CS** | **~70% NGAL-SAR idêntico a SocketDispatcher3** |
+|| `ReceiveFromAUDPSocket` | **~394** | **NGAL-T (UDP) + NGAL-SAR + NGAL-CS** | **~70% NGAL-SAR idêntico a SocketDispatcher3** |
 | **`FinishReceivingThread`** | **102** | **NGAL-CS** | **Convergence → SHM. Será substituída por PushToInputQueue directo** |
 | **`WriteToSharedMemory3`** | **270** | **NGAL-CS (IPC)** | **Intra-process: será eliminado (directo). Inter-process: mantém** |
 | `OpenHeaderMessageSizeField` | 33 | NGAL-SAR | Header parsing. Deve ir para NGAL |
@@ -153,22 +157,35 @@ GW::Run(PM)                  ← processamento
 
 ### E2.3 — Current data flow (raw socket send)
 
+> **Correction (F1):** The intra-process send path does **NOT** go through SHM. `SendToARawSocket` is called directly from PG action code (PGRunHello01, PGMsgCl01, PGRunHello02, PGRunHello03) running on the GW thread. The `GW::PushToOutputQueue → ReadFromOutputQueue → WriteToSharedMemory3` path is for **inter-process** delivery only (e.g. PGCS GW writes to SHM so that a peer process like NRNCS can read via `GW::ReadFromSharedMemory3`).
+
+**Intra-process send path (actual):**
 ```
-GW::PushToOutputQueue(OQS, M) ← bloco origem
+GW::Run(PM)                  ← GW thread processes message
+    │ PG::Run(...) → action code (PGRunHello01, PGMsgCl01, ...)
+    ▼
+PG::SendToARawSocket()        ← Same GW thread
+    │ NGAL-SAR: serialise, segment
+    │ NGAL-T: sendto() on Ethernet frame
+    ▼
+RAW socket                    ← network output
+```
+
+**Inter-process send path (via OutputQueue → SHM):**
+```
+GW::PushToOutputQueue(OQS, M) ← block origin
     │
     ▼
-ReadFromOutputQueue thread    ← GW thread
-    │ WriteToSharedMemory3()
+GW::ReadFromOutputQueue thread ← GW output thread
+    │ WriteToSharedMemory3(OQS, M)
     ▼
-Shared Memory (key X+z)
+Shared Memory (key OQS+z)
     │
     ▼
-PG::SendToARawSocket()        ← PG thread
-    │ NGAL-SAR: serializa, segmenta
-    │ NGAL-T: sendto() em Ethernet frame
-    ▼
-RAW socket                    ← saída de rede
+Peer process GW::ReadFromSharedMemory3() ← different process
 ```
+
+**Key insight:** The SHM hop on the **send** side only exists for inter-process delivery. For intra-process sends, `SendToARawSocket` is already called directly — no SHM to eliminate.
 
 ---
 
@@ -242,13 +259,18 @@ private:
 
 ### E3.3 — NGAL_CS class design
 
+> **Revision (F2):** `DeliverToGateway` must NOT call `NewMessage()` from the receiver thread (data race on `Controls[]`). Instead, it pushes the raw char buffer to a thread-safe queue, and the GW thread does `NewMessage` + deserialisation + `PushToInputQueue`.
+
 ```cpp
 // Common/src/NGAL_CS.h
 class NGAL_CS {
 public:
-  // Deliver a completed Message to the local GW's input queue (intra-process)
-  // Thread-safe: calls GW::PushToInputQueue() internally
-  static int DeliverToGateway(GW* PGW, Message* PM);
+  // Push a completed message's raw serialised buffer to the GW's
+  // intermediate receive queue (thread-safe). The GW thread will
+  // later call NewMessage + SetMessageFromCharArray + PushToInputQueue.
+  static int DeliverToGateway(GW* PGW,
+                              char* MessageCharArray,
+                              long long MessageSize);
 
   // Write a message to a peer process's SHM (inter-process IPC)
   // Keeps existing WriteToSharedMemory3 semantics
@@ -256,6 +278,16 @@ public:
                           GW* PGW, int shm_key, size_t MaxSegmentSize);
 };
 ```
+
+The GW class needs a new intermediate queue for raw char buffers:
+```cpp
+// Added to GW.h
+std::queue<std::pair<char*, long long>> NetworkReceiveQueue;
+std::mutex NetworkReceiveQueueMutex;
+std::condition_variable NetworkReceiveQueueCV;
+```
+
+The GW thread's `Gateway()` loop must drain `NetworkReceiveQueue` (alongside `InputQueue` and `ReadFromSharedMemory3`), calling `NewMessage` + `SetMessageFromCharArray` + `PushToInputQueue` for each entry.
 
 ### E3.4 — NGAL_Transport_RAW class design
 
@@ -284,7 +316,7 @@ private:
 
 ```
 RAW socket
-    │ recvfrom()
+    │ recvfrom() [non-blocking or per-socket poll()]
     ▼
 NGAL_Transport_RAW::ReceiveDispatcher()   ← NGAL-T (RAW) — APENAS recv + dispatch
     │ NGAL_SAR::ReceiveFragment()          ← NGAL-SAR — reassembly
@@ -300,20 +332,40 @@ GW::Run(PM)                               ← processamento
 
 **SHM removido** do caminho intra-process receive. SHM mantém-se APENAS para IPC inter-processos (PGCS↔NRNCS).
 
+> **Warning (F2):** `Process::NewMessage()` is NOT thread-safe — it accesses `Controls[]`, `Messages[]`, `NoM`, `MessageCounter` without a mutex. The current code avoids races because only the GW thread calls `NewMessage()`. After this change, the ReceiveDispatcher thread will also need to allocate Message objects. `NGAL_CS::DeliverToGateway()` must therefore either: (a) pass the raw char buffer to the GW thread (via a thread-safe queue) and let the GW thread do `NewMessage` + deserialisation, or (b) add a mutex to `Process::NewMessage()`. Option (a) is preferred — it keeps the GW thread as the sole allocator and matches the existing pattern.
+
+> **Note (F3):** The current `SocketDispatcher3` uses blocking `recvfrom()` and iterates over multiple SSIDs in a single loop. Eliminating child threads introduces a latency risk: heavy traffic on one socket starves the others. The proposed `ReceiveDispatcher` should use non-blocking `recvfrom()` + `poll()` on all SSIDs, or accept the latency regression as documented.
+
 ### E3.6 — New data flow (raw socket send) — PROPOSED
 
+> **Correction (F1):** The intra-process send path already calls `SendToARawSocket` directly from the GW thread. No SHM elimination is needed here. The refactoring changes how the SAR+T logic is invoked, not the inter-thread communication.
+
+**Intra-process send path (refactored):**
 ```
-GW::PushToOutputQueue(OQS, M)             ← bloco origem
-    │
+GW::Run(PM)                             ← GW thread processes message
+    │ PG::Run(...) → action code
+    │   PG::SendToARawSocket(Interface, Identifier, Size, M)
+    │     → NGAL_SAR::SendSegmented(M, BlockSize, ..., transport_callback)
+    │       onde transport_callback = NGAL_Transport_RAW::SendFragment()
     ▼
-ReadFromOutputQueue thread                ← GW thread
-    │ NGAL_SAR::SendSegmented(M, BlockSize, ..., transport_callback)
-    │   onde transport_callback = NGAL_Transport_RAW::SendFragment()
-    ▼
-RAW socket                                ← saída de rede
+RAW socket                              ← network output
 ```
 
-**SHM removido** do caminho intra-process send. A thread `ReadFromOutputQueue` chama directamente o `NGAL_SAR::SendSegmented` com callback RAW.
+**Inter-process send path (unchanged):**
+```
+GW::PushToOutputQueue(OQS, M)           ← block origin
+    │
+    ▼
+GW::ReadFromOutputQueue thread          ← GW output thread
+    │ GW::WriteToSharedMemory3(OQS, M)
+    ▼
+Shared Memory (key OQS+z)               ← IPC inter-process — unchanged
+    │
+    ▼
+Peer process GW::ReadFromSharedMemory3()
+```
+
+> **Note (F8):** `PG::MessageNumber`, `PG::SequenceNumber`, `PG::MessageCounter` (PG.h:238-244) are instance variables with no mutex protection. They are currently only accessed from the GW thread. If `NGAL_SAR::SendSegmented()` were ever called from multiple threads, these would need a mutex or must be passed as local variables per invocation (not instance state). The proposed design keeps them as instance state on the PG object — this is safe only because all callers run on the GW thread.
 
 ---
 
@@ -341,10 +393,12 @@ UDP (`SendToAUDPSocket`, `ReceiveFromAUDPSocket`, `CreateUDPSocket`, `get_in_add
 | Acção | Justificação |
 |-------|-------------|
 | Manter `CreateUDPSocket` em PG.cpp | Inócua, ~26 linhas, sem custo de manutenção |
-| Manter `get_in_addr` em PG.cpp | Utilitário genérico, sem custo |
+| **Remover** `get_in_addr` (9 linhas) | Obsoleto — só usado por UDP. Recuperar do git se necessário |
 | Remover `SendToAUDPSocket` (333 linhas) | Obsoleto, duplicado com RAW. Recuperar do git quando necessário |
-| Remover `ReceiveFromAUDPSocket` (386 linhas) | Obsoleto, duplicado. Recuperar do git quando necessário |
+| Remover `ReceiveFromAUDPSocket` (~394 linhas) | Obsoleto, duplicado. Recuperar do git quando necessário |
 | Remover `ReceiveFromAUDPSocketThreadWrapper` | Obsoleto |
+
+> **Note (F7):** This table supersedes the earlier E4.3 note suggesting "keep `get_in_addr`". Since `get_in_addr` is only used by the UDP receive path, and that path is being removed, `get_in_addr` should also be removed. If UDP is re-introduced in the future, both `get_in_addr` and the full UDP receive path can be recovered from git.
 
 ---
 
@@ -371,23 +425,35 @@ void GW::PushToInputQueue(Message* M) {
 
 ### E5.2 — Condição de segurança
 
+> **Critical correction (F2):** The original analysis claimed `Process::NewMessage()` is safe because it "only allocates on the heap." This is **wrong**. `Process::NewMessage()` (Process.cpp:542-567) accesses shared state without any mutex: `Controls[]`, `Messages[]`, `NoM`, `MessageCounter`. If the ReceiveDispatcher thread calls `DeliverToGateway()` → `NewMessage()`, it races with the GW thread which also calls `NewMessage()`. The SHM hop was inadvertently protecting against this race by serialising access through the GW thread only.
+
 | Operação | Thread | Recurso partilhado | Protecção |
 |----------|--------|-------------------|-----------|
-| `NewMessage()` | Receiver thread | Heap | Nenhum — só aloca |
-| `SetMessageFromCharArray()` | Receiver thread | Message object | Nenhum — objecto novo |
+| `NewMessage()` | **GW thread AND Receiver thread (after change)** | `Controls[]`, `Messages[]`, `NoM`, `MessageCounter` | **NONE — DATA RACE if both threads call it** |
+| `SetMessageFromCharArray()` | Receiver thread | Message object | Nenhum — objecto novo (safe) |
 | `PushToInputQueue()` | Receiver thread | InputQueue | `InputQueueMutex` + CV |
 | `InputQueue.top()/pop()` | GW thread | InputQueue | `InputQueueMutex` |
 | `Run(PM)` | GW thread | Message object | Exclusivo — só GW processa |
+| `MessageNumber`, `SequenceNumber`, `MessageCounter` | GW thread | PG instance vars | Nenhum — mas só uma thread acede (safe na proposta actual) |
 
-**Conclusão:** O hop SHM é desnecessário para o caminho intra-processo. Pode ser eliminado com segurança.
+**Condição de segurança para eliminação do SHM hop:**
+
+`NGAL_CS::DeliverToGateway()` must NOT call `Process::NewMessage()` from the receiver thread. Instead, it should:
+1. Push the raw serialised char buffer + size to a thread-safe intermediate queue (using the same `InputQueueMutex` + CV pattern)
+2. Let the GW thread pop from that queue, call `NewMessage()`, `SetMessageFromCharArray()`, `ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()`, and then `PushToInputQueue()`
+
+This keeps `NewMessage()` single-threaded (GW thread only) and avoids the data race entirely. The intermediate queue replaces the SHM hop with a much cheaper mutex+CV hop (no `shmat`/`shmdt` syscalls).
 
 ### E5.3 — Impacto
 
+> **Correction (F1):** The original impact table listed both PG::WriteToSharedMemory3 and GW::ReadFromSharedMemory3 as eliminated. This was based on the mistaken belief that the send path also used SHM. In reality, only the **receive** path uses SHM intra-process. The send path SHM (GW::WriteToSharedMemory3 for inter-process) stays unchanged.
+
 | Antes | Depois |
 |-------|--------|
-| `WriteToSharedMemory3(F1, data, size)` (SHM syscall: shmat, sem_trywait, memcpy, sem_post, shmdt) | `NGAL_CS::DeliverToGateway(PGW, PM)` (mutex lock, push, CV notify) |
-| GW: `ReadFromSharedMemory3()` (shmat, sem_trywait, memcpy, NewMessage, sem_post, PushToInputQueue, shmdt) | Eliminado — GW não precisa ler SHM para mensagens de rede |
-| ~570 linhas (WriteToSharedMemory3 + ReadFromSharedMemory3 inline) | ~20 linhas (DeliverToGateway) |
+| `PG::WriteToSharedMemory3(F1, data, size)` (SHM syscall: shmat, sem_trywait, memcpy, sem_post, shmdt) on the **receive** path | `NGAL_CS::DeliverToGateway(PGW, PM)` → push char buffer to intermediate queue → GW thread calls `NewMessage` + `PushToInputQueue` (mutex lock, push, CV notify) |
+| GW: `ReadFromSharedMemory3()` (shmat, sem_trywait, memcpy, NewMessage, sem_post, PushToInputQueue, shmdt) for intra-process receive messages | Eliminado — GW reads from the intermediate queue instead of SHM for intra-process network messages |
+| GW: `WriteToSharedMemory3(OQS, M)` on the **send** path (inter-process IPC) | **Unchanged** — remains for PGCS↔NRNCS/ContentApp IPC |
+| ~270 lines (PG::WriteToSharedMemory3 receive usage) + inline SHM in FinishReceivingThread | ~30 lines (DeliverToGateway + intermediate queue) |
 
 ### E5.4 — Onde a SHM se MANTÉM
 
@@ -456,24 +522,34 @@ E1 (NGAL_SAR.h)
 
 #### E4 — Criar `Common/src/NGAL_CS.h/.cpp`
 
-- Implementar `DeliverToGateway(GW* PGW, Message* PM)`:
-  - `PP->NewMessage(GetTime(), 0, false, PM_copy)` (se necessário)
-  - `PM_copy->SetMessageFromCharArray(payload, size)`
-  - `PM_copy->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()`
-  - `PGW->PushToInputQueue(PM_copy)`
+- Implementar `DeliverToGateway(GW* PGW, char* MessageCharArray, long long MessageSize)`:
+  - `lock_guard(NetworkReceiveQueueMutex)` → `NetworkReceiveQueue.push({MessageCharArray, MessageSize})` → `NetworkReceiveQueueCV.notify_one()`
+  - **NOT** call `NewMessage()` or `PushToInputQueue()` — those run on the GW thread only
 - Implementar `DeliverToSHM()` como wrapper para `WriteToSharedMemory3` (mantendo semântica actual)
-- Incluir em `CMakeLists.txt`
+- Add `NetworkReceiveQueue`, `NetworkReceiveQueueMutex`, `NetworkReceiveQueueCV` to `GW.h`
+- Modify `GW::Gateway()` loop to drain `NetworkReceiveQueue` alongside `InputQueue` and `ReadFromSharedMemory3`
+- Incluir em `CMakeLists.txt` — add `NGAL_CS.h/.cpp` to the explicit file list in `add_library(Common ...)`
 
-**Ficheiros:** `Common/src/NGAL_CS.h`, `Common/src/NGAL_CS.cpp`, `CMakeLists.txt`
-**Linhas:** ~60 + 80
+**Ficheiros:** `Common/src/NGAL_CS.h`, `Common/src/NGAL_CS.cpp`, `Common/src/GW.h`, `Common/src/GW.cpp`, `CMakeLists.txt`
+**Linhas:** ~40 (NGAL_CS.h/.cpp) + ~20 (GW changes) + ~5 (CMake)
 
 #### E5 — Criar `PGCS/src/NGAL_Transport_RAW.h`
 
 - Declarar `NGAL_Transport_RAW` class
 - `CreateRawSocket(int&)`
 - `SendFragment(int SSID, int ifindex, unsigned char* SrcMAC, unsigned char* DstMAC, unsigned char* data, unsigned int size)`
-- `ReceiveDispatcher(PG*)` — thread principal
-- `ChildReceiver(PG*, unsigned int Index)` — thread worker
+- `ReceiveDispatcher(PG*)` — main dispatcher thread (replaces SocketDispatcher3)
+- ~~`ChildReceiver(PG*, unsigned int Index)`~~ — **Removed** (no child threads; dispatcher does reassembly + delivery directly)
+
+> **Note (F9):** The `NGAL_SAR::SendSegmented` callback signature is `std::function<int(char*, unsigned int, unsigned int)>` (data, size, fragment_index). `NGAL_Transport_RAW::SendFragment` has a different signature (includes SSID, ifindex, MACs). The binding is done via a lambda capture in `PG::SendToARawSocket`:
+> ```cpp
+> auto callback = [this, SSID, ifindex, &SourceMAC, &DestMAC]
+>   (char* data, unsigned int size, unsigned int) -> int {
+>   return NGAL_Transport_RAW::SendFragment(SSID, ifindex, SourceMAC, DestMAC,
+>                                           (unsigned char*)data, size);
+> };
+> ```
+> This must be documented in the header file.
 
 **Ficheiros:** `PGCS/src/NGAL_Transport_RAW.h`
 **Linhas:** ~40
@@ -493,20 +569,21 @@ E1 (NGAL_SAR.h)
 #### E7 — Implementar receive path em `PGCS/src/NGAL_Transport_RAW.cpp`
 
 - `ReceiveDispatcher()`:
-  - Loop: `recvfrom()` → verificar protocolo (0x1234) → `NGAL_SAR::ReceiveFragment()` → se Message* completo → `NGAL_CS::DeliverToGateway()`
-  - Eliminar child-thread dispatch (`TemporaryBuffers` + semáforo `EthernetWiFi_*`)
+  - Loop: `recvfrom()` → verificar protocolo (`sll_protocol == 13330` / `0x3412`, which is `0x1234` in host byte order) → `NGAL_SAR::ReceiveFragment()` → if complete message → `NGAL_CS::DeliverToGateway(PGW, TheMessage, MessageSize)` (pushes char buffer to `NetworkReceiveQueue`)
+  - Eliminar child-thread dispatch (`TemporaryBuffers1` + semáforo `EthernetWiFi_*`)
   - Recepção directa no dispatcher, sem dispatch para child threads
-- `ChildReceiver()`:
-  - **Eliminado.** Não há mais child threads para este caminho. O dispatcher faz reassembly + entrega directa.
+  - **Use `poll()` on all SSIDs** instead of blocking `recvfrom()` in a sequential loop to avoid socket starvation (see F3)
+- ~~`ChildReceiver()`~~ — **Eliminado.** Não há mais child threads para este caminho. O dispatcher faz reassembly + entrega directa.
 
 **Justificação da eliminação do child-thread dispatch:**
-- O dispatch para child threads foi introduzido para paralelizar processamento quando a SHM era o bottleneck. Com entrega directa (`PushToInputQueue`),
+- O dispatch para child threads foi introduzido para paralelizar processamento quando a SHM era o bottleneck. Com entrega directa via `NetworkReceiveQueue`,
 a thread do dispatcher chama `NGAL_SAR::ReceiveFragment()` (rápido: memcpy + buffer management) e depois `NGAL_CS::DeliverToGateway()` (rápido: mutex lock + CV notify).
 - O semáforo `EthernetWiFi_*` com random-retry era uma solução para contenção no `TemporaryBuffers` — desaparece com a eliminação do child-thread dispatch.
 - Se no futuro for necessário paralelismo no receive path, introduz-se um pool de threads NGAL-T, não um esquema ad-hoc de semáforos.
+- **Latency trade-off (F3):** Without child threads, the single dispatcher thread must reassemble + deliver each message before reading the next frame. Under burst traffic, this adds latency compared to the current parallel scheme. The `poll()` approach mitigates this by ensuring all sockets are served fairly.
 
 **Ficheiros:** `PGCS/src/NGAL_Transport_RAW.cpp`
-**Linhas:** ~120
+**Linhas:** ~140
 
 #### E8 — Integrar NGAL em PG.cpp
 
@@ -515,8 +592,9 @@ Modificações em PG.cpp:
 1. **Constructor (linhas 139–237):** Sem alterações — as Actions e timers mantêm-se
 2. **Destructor (linhas 239–293):** Sem alterações — cleanup de vectores mantém-se
 3. **`SendToARawSocket` (linhas 465–858):**
-   - Substituir corpo por delegação para `NGAL_SAR::SendSegmented()` com callback `NGAL_Transport_RAW::SendFragment()`
-   - Manter assinatura para compatibilidade com callers existentes
+   - Substituir corpo por delegação para `NGAL_SAR::SendSegmented()` com callback lambda que captures `SSID`, `ifindex`, `SourceMAC`, `DestMAC` and calls `NGAL_Transport_RAW::SendFragment()`
+   - Manter assinatura `(string _Interface, string _Identifier, unsigned int _Size, Message* M)` para compatibilidade com callers existentes (PGRunHello01, PGMsgCl01, PGRunHello02, PGRunHello03)
+   - The SAR state (`MessageNumber`, `SequenceNumber`, `MessageCounter`) stays on the PG instance — safe because all callers run on the GW thread (F8)
 4. **`SocketDispatcher3` (linhas 861–1334):**
    - Substituir corpo por delegação para `NGAL_Transport_RAW::ReceiveDispatcher()`
    - Ou eliminar e chamar ReceiveDispatcher directamente do código de lançamento de threads
@@ -551,7 +629,7 @@ Remover de PG.cpp:
 | `GetAction` | 2627–2631 (5 linhas) | Stub morto (sempre ERROR) |
 | `DeleteAction` | 2634–2638 (5 linhas) | Stub morto (sempre ERROR) |
 | `ResetStatistics` | 2678–2681 (4 linhas) | Stub morto (vazio) |
-| `get_in_addr` | 2667–2675 (9 linhas) | Obsoleto (só UDP usava) |
+| `get_in_addr` | 2667–2675 (9 linhas) | Obsoleto — só UDP usava. Remover (F7 resolved) |
 
 **Total removido:** ~748 linhas.
 
@@ -582,16 +660,20 @@ Remover de PG.cpp:
 | `NGAL_SAR.h/.cpp` | — | ~250 linhas | +250 |
 | `NGAL_CS.h/.cpp` | — | ~140 linhas | +140 |
 | `NGAL_Transport_RAW.h/.cpp` | — | ~240 linhas | +240 |
-| **Total** | **2695** | **~1830** | **−865** |
+| GW.cpp (NetworkReceiveQueue) | — | ~30 linhas | +30 |
+| **Total** | **2695** | **~1860** | **−835** |
+
+> **Note (F10):** The line reduction from PG.cpp includes ~600 lines of SAR logic that is **moved** (not deleted) to `NGAL_SAR.cpp`, plus ~748 lines of dead code (UDP + stubs) that is genuinely deleted. The net reduction accounts for both movement and deletion.
 
 ### E7.2 — Responsabilidades clarificadas
 
 | Antes | Depois |
 |-------|--------|
-| PG.cpp: 5 responsabilidades (send, recv, SAR, dispatch, IPC) | PG.cpp: 1 responsabilidade (bloco PG — coordenação) |
-| SHM: 2 papéis (barreira concorrência intra-processo + IPC inter-processo) | SHM: 1 papel (IPC inter-processo apenas) |
+| PG.cpp: 5 responsabilidades (send, recv, SAR, dispatch, IPC) | PG.cpp: 1 responsabilidade (bloco PG — coordenação + delegação) |
+| SHM receive: 2 papéis (barreira concorrência intra-processo + IPC inter-processo) | SHM receive: 1 papel (IPC inter-processo apenas). Intra-process: `NetworkReceiveQueue` (mutex+CV) |
+| SHM send: inter-process IPC only (was never intra-process) | SHM send: unchanged (inter-process IPC only) |
 | SAR: duplicado 4× (RAW send, RAW recv, UDP send, UDP recv) | SAR: 1 implementação (NGAL_SAR) |
-| Child-thread dispatch: ad-hoc com semáforos | Transporte directo via PushToInputQueue |
+| Child-thread dispatch: ad-hoc com semáforos | Single dispatcher thread + `NetworkReceiveQueue` → GW thread |
 
 ### E7.3 — Ficheiros alterados vs criados
 
@@ -604,18 +686,23 @@ Remover de PG.cpp:
 | `PGCS/src/NGAL_Transport_RAW.h` | **CRIAR** |
 | `PGCS/src/NGAL_Transport_RAW.cpp` | **CRIAR** |
 | `PGCS/src/PG.cpp` | **ALTERAR** (remover ~1500 linhas, adicionar ~30) |
-| `PGCS/src/PG.h` | **ALTERAR** (remover declarações de funções eliminadas) |
-| `CMakeLists.txt` | **ALTERAR** (adicionar NGAL_SAR, NGAL_CS) |
+| `PGCS/src/PG.h` | **ALTERAR** (remover declarações de funções eliminadas, remover `TemporaryBuffers1`, `BufferStatus`, `Number_Of_Threads_At_Socket_Dispatcher`) |
+| `Common/src/GW.h` | **ALTERAR** (adicionar `NetworkReceiveQueue`, `NetworkReceiveQueueMutex`, `NetworkReceiveQueueCV`) |
+| `Common/src/GW.cpp` | **ALTERAR** (drain `NetworkReceiveQueue` in `Gateway()` loop) |
+| `CMakeLists.txt` | **ALTERAR** (adicionar `NGAL_SAR.h/.cpp`, `NGAL_CS.h/.cpp` to `add_library(Common ...)` file list; adicionar `NGAL_Transport_RAW.h/.cpp` to `add_executable(PGCS ...)` file list) |
 
 ### E7.4 — Perguntas em aberto (Q&A)
 
 | # | Questão | Opções |
 |---|---------|--------|
-| Q1 | Manter `WriteToSharedMemory3` em PG.cpp ou mover para `NGAL_CS::DeliverToSHM`? | Mover para NGAL_CS — coeso com a subcamada de convergência |
+| Q1 | Manter `WriteToSharedMemory3` em PG.cpp ou mover para `NGAL_CS::DeliverToSHM`? | Mover para NGAL_CS — coeso com a subcamada de convergência. **Revised:** `PG::WriteToSharedMemory3` stays in PG.cpp for now (receive-path elimination) — only its *usage* in FinishReceivingThread is removed. `NGAL_CS::DeliverToSHM` is a wrapper that calls `PG::WriteToSharedMemory3`. `GW::WriteToSharedMemory3(OQS, M)` (inter-process send) stays in GW.cpp unchanged. |
 | Q2 | `EthernetWiFiSemaphoreName` desaparece com child threads? | Sim — eliminado. Se paralelismo for necessário no futuro, fazer com thread pool NGAL-T |
 | Q3 | O `ethframe` union (linha 129) fica em NGAL_Transport_RAW ou mantém-se em PG.cpp? | Mover para NGAL_Transport_RAW — é específico RAW |
 | Q4 | `PGRunExposition01` (que coexiste com GWExposition02) também usa NGAL? | Não — PGRunExposition01 é todo intra-processo. Mantém-se |
-| Q5 | UDP: manter código ou remover completamente? | **Remover.** Recuperar do git se necessário no futuro |
+| Q5 | UDP: manter código ou remover completamente? | **Remover.** Recuperar do git se necessário no futuro. `get_in_addr` também removido (F7) |
+| Q6 | How does `SendToARawSocket(Interface, Identifier, Size, M)` delegate to `NGAL_SAR::SendSegmented(Message*, BlockSize, MN, SN, MC, callback)`? (F9) | `SendToARawSocket` body becomes: `NGAL_SAR::SendSegmented(M, BlockSize, MessageNumber, SequenceNumber, MessageCounter, [this, Interface, Identifier](char* data, unsigned int size, unsigned int idx) { return NGAL_Transport_RAW::SendFragment(...); })`. The Interface/Identifier are captured in the lambda closure. |
+| Q7 | CMake: how exactly are new files added? (F12) | `NGAL_SAR.h/.cpp` and `NGAL_CS.h/.cpp` are added to `add_library(Common ...)` file list. `NGAL_Transport_RAW.h/.cpp` are added to `add_executable(PGCS ...)` file list. PGCS already links Common (`target_link_libraries(PGCS LINK_PRIVATE Common)`), so `NGAL_SAR`/`NGAL_CS` are available to PGCS via that link. |
+| Q8 | Should `Process::NewMessage()` get a mutex? (F2) | **No.** Keep `NewMessage()` single-threaded (GW thread only). `NGAL_CS::DeliverToGateway` pushes raw buffer to `NetworkReceiveQueue`; GW thread does `NewMessage`+deser+`PushToInputQueue`. |
 
 ---
 
