@@ -36,8 +36,8 @@
 #include <string>
 #endif
 
-#ifndef _NETINET_IF_ETHER_H
-#include <netinet/if_ether.h>
+#ifndef _LINUX_IF_ETHER_H
+#include <linux/if_ether.h>
 #endif
 
 #ifndef _LINUX_IF_PACKET_H
