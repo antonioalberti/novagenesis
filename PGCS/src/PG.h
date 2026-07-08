@@ -196,9 +196,6 @@ public:
   // Kept as a thin wrapper for backward compatibility
   void SocketDispatcher3();
 
-  // Create a UDP socket
-  int CreateUDPSocket(string _Type, string _URI);
-
   // ********************************************************************** // Adaptation
 
   // Finish the reception of a message via SHM (inter-process IPC)

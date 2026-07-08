@@ -307,29 +307,8 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
         PPG->GetHostIPAddress(PPGCS->Stacks->at(i), PPGCS->Interfaces->at(i), MyIPAddress);
 
         // Create a socket to sent datagram to a peer PGCS
-        CSID = PPG->CreateUDPSocket("PUSH", PPGCS->Identifiers->at(i));
-
-        PB->S << Offset << "(Created the push socket with CSID " << CSID << " to the address "
-              << PPGCS->Identifiers->at(i) << ")" << endl;
-
-        // Binding TCP/IP address to SSID
-        PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", PPGCS->Identifiers->at(i), CSID, StoringInitialBinds, PCL);
-
-        // TODO: FIXP/Update - Added to deal with the case of PGCS -de initialization
-        PPGCS->CSIDs->push_back(CSID);
-
-        if (PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread == false)
-        {
-          int SSID = 0;
-
-          // UDP sockets removed with NGAL migration — receive is handled by NGAL_Transport_RAW::ReceiveDispatcher
-
-          PB->S << Offset << "(Created a thread to pull messages to socket with SSID " << SSID << ")" << endl;
-
-          PPGCS->NoT++;
-
-          PPGCS->AlreadyCreatedPeerPGCSFrameReceivingUDPThread = true;
-        }
+        // UDP push socket removed with NGAL migration
+        PPGCS->CSIDs->push_back(0);
       }
 
       // **********************************************************************

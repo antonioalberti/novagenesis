@@ -553,35 +553,6 @@ void PG::SocketDispatcher3()
   NGAL_Transport_RAW::ReceiveDispatcher(this);
 }
 
-int PG::CreateUDPSocket(string _Type, string _URI)
-{
-  string Offset = "                    ";
-  PGCS* PPGCS = 0;
-  int Index = 0;
-
-  PPGCS = (PGCS*)PP;
-
-  // ************************** Adaptation Layer **************************
-
-  // Creates Traditional UDP Sockets
-
-  if (_Type == "PULL")
-  {
-    Index = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  }
-
-  if (_Type == "PUSH")
-  {
-    Index = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  }
-
-  // **********************************************************************
-
-  return Index;
-}
-
-// Obviously, this should be replaced in future.
-
 // Modified in 9th April 2021 to deal with parallel shared memories.
 int PG::WriteToSharedMemory3(File* _PF, char* _MessageCharArray, long long _MessageSize)
 {
