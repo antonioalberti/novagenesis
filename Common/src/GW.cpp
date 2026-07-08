@@ -587,6 +587,34 @@ void GW::Gateway()
       RunFlag = false;
     }
 
+    // Step 3 : NGAL: drain the NetworkReceiveQueue
+    // The ReceiveDispatcher pushes raw char buffers here. The GW thread
+    // does NewMessage + deserialisation + PushToInputQueue.
+    {
+      std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
+      while (!NetworkReceiveQueue.empty())
+      {
+        auto entry = NetworkReceiveQueue.front();
+        NetworkReceiveQueue.pop();
+
+        char* buffer = entry.first;
+        long long size = entry.second;
+
+        if (buffer != 0 && size > 0)
+        {
+          Message* PM = NULL;
+          if (PP->NewMessage(0, 0, false, PM) == OK)
+          {
+            PM->SetMessageFromCharArray(buffer, size);
+            PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+            PushToInputQueue(PM);
+          }
+        }
+
+        delete[] buffer;
+      }
+    }
+
     // Step 4 : Read OS IPC — poll shared memory for messages from other processes
     // Phase 2: rate limit to 100ms when no due messages to process (idle or waiting for future messages)
     {

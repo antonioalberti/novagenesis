@@ -271,7 +271,7 @@ int PGMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
                                     << HashIPv4_UDP << ")" << endl;
 #endif
                               // Send the message using the UDP socket
-                              PPG->SendToAUDPSocket(Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
+                              PPG->SendToARawSocket(PPGCS->Interfaces->at(y), Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
 
                               // The message was already sent, so mark it to be deleted
                               _ReceivedMessage->MarkToDelete();
@@ -518,7 +518,7 @@ int PGMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
                                     << HashIPv4_UDP << ")" << endl;
 #endif
                               // Send the message using the ZMQ socket
-                              PPG->SendToAUDPSocket(Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
+                              PPG->SendToARawSocket(PPGCS->Interfaces->at(y), Identifier, PPGCS->Sizes->at(y), _ReceivedMessage);
 
                               // The message was already sent, so mark it to be deleted
                               _ReceivedMessage->MarkToDelete();

@@ -145,22 +145,15 @@
 
 using namespace std;
 
-struct TBuffer1
-{
-  long long MessageSize;
-  char* TheMessage;
-};
-
 class PG : public Block
 {
-private:
-  // Gateway pointer
+public:
+  // Gateway pointer (public for NGAL access)
   GW* PGW;
 
   // HT pointer
   HT* PHT;
 
-public:
   // Define the maximum segment size on shared memory
   size_t MaxSegmentSize;
 
@@ -180,12 +173,6 @@ public:
   // Stores the informed peer PGCS tuples
   vector<Tuple*> PGCSTuples;
 
-  // Container to temporarily store content received in a socket
-  map<std::string, vector<TBuffer1*>> TemporaryBuffers1;
-
-  // Container to store status of a thread reading process. True=congested at source; false=not congested
-  bool BufferStatus[NUMBER_OF_THREADS_AT_SOCKET_DISPATCHER]; //
-
   // ------------------------------------------------------------------------------------------------------------------------------
   // Main functions
   // ------------------------------------------------------------------------------------------------------------------------------
@@ -198,32 +185,23 @@ public:
   // Get the host MAC address
   void GetHostRawAddress(string _Interface, string& _Address);
 
-  // Create an Raw socket
+  // Create a Raw socket
   int CreateRawSocket(int& _SID);
 
   // Send a message to another machine using a Raw socket
+  // Delegates to NGAL_SAR + NGAL_Transport_RAW internally
   int SendToARawSocket(string _Interface, string _Identifier, unsigned int _Size, Message* M);
 
+  // Socket dispatcher — replaced by NGAL_Transport_RAW::ReceiveDispatcher
+  // Kept as a thin wrapper for backward compatibility
   void SocketDispatcher3();
-
-  // Receive a message from another machine using a Raw socket. Multi thread implementation done in April 2021
-  void ReceiveFromARawSocketThread(unsigned int Index, unsigned int BlockSize);
-
-  // Receive a message from another machine using a Raw socket. Multi thread implementation done in April 2021
-  void FinishReceivingThread(unsigned int Index);
 
   // Create a UDP socket
   int CreateUDPSocket(string _Type, string _URI);
 
-  // Send a message to another machine using a UDP socket
-  int SendToAUDPSocket(string _Identifier, unsigned int _Size, Message* M);
-
-  // Receive a message from another machine using a UDP socket.
-  void ReceiveFromAUDPSocket();
-
   // ********************************************************************** // Adaptation
 
-  // Finish the reception of a message
+  // Finish the reception of a message via SHM (inter-process IPC)
   int WriteToSharedMemory3(File* _PF, char* _MessageCharArray, long long _MessageSize);
 
   long long int OpenHeaderMessageSizeField(unsigned char* _Buffer);
@@ -250,12 +228,6 @@ public:
   // Allocate and add an Action on Actions container
   void NewAction(const string _LN, Action*& _PA);
 
-  // Get an Action
-  int GetAction(string _LN, Action*& _PA);
-
-  // Delete an Action
-  int DeleteAction(string _LN);
-
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary
   // ------------------------------------------------------------------------------------------------------------------------------
@@ -269,14 +241,11 @@ public:
   // Auxiliary variable to avoid publishing more than once PGCS basic bindings at NRNCS
   bool AlreadyPublishedBasicBindings;
 
-  // Wrapper function for ReceiveFromAnIPv4UDPSocket() thread
-  static void ReceiveFromAUDPSocketThreadWrapper(void* _PPG);
+  // Wrapper function for ReceiveDispatcher() thread (NGAL)
+  static void ReceiveDispatcherWrapper(void* _PPG);
 
   // Wrapper function for EthernetWiFiSocketDispatcher() thread
   static void EthernetWiFiSocketDispatcherThreadWrapper(void* _PPG);
-
-  // Wrapper function for ReceiveFromARawSocketThread() thread
-  static void FinishReceivingThreadWrapper(void* _Param);
 
   // Get IP address function
   void* get_in_addr(struct sockaddr* sa);
@@ -301,7 +270,7 @@ public:
   // ------------------------------------------------------------------------------------------------------------------------------
   double DelayBeforeRunPeriodic;
   double DelayBetweenMessageEmissions;
-  double DelayBetweenHellos01; // TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
+  double DelayBetweenHellos01;
   double DelayBetweenHellos02;
   double DelayBetweenExpositions;
 
@@ -318,12 +287,6 @@ public:
   File StressStats;
   OutputVariable* DelayStats;
   OutputVariable* Loss;
-
-  // ------------------------------------------------------------------------------------------------------------------------------
-  // Statistic variables and functions
-  // ------------------------------------------------------------------------------------------------------------------------------
-
-  void ResetStatistics();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

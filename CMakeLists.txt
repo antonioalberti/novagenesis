@@ -114,6 +114,10 @@ add_library(Common
         Common/src/MurmurHash3Strategy.h
         Common/src/NameGenerator.cpp
         Common/src/NameGenerator.h
+        Common/src/NGAL_SAR.cpp
+        Common/src/NGAL_SAR.h
+        Common/src/NGAL_CS.cpp
+        Common/src/NGAL_CS.h
         Common/src/NameStrategy.h
         Common/src/DefaultNameStrategy.cpp
         Common/src/DefaultNameStrategy.h
@@ -359,6 +363,8 @@ add_executable(PGCS
         PGCS/src/PGHelloIHC02.h
         PGCS/src/PGHelloIHC03.cpp
         PGCS/src/PGHelloIHC03.h
+        PGCS/src/NGAL_Transport_RAW.cpp
+        PGCS/src/NGAL_Transport_RAW.h
         PGCS/src/PGMsgCl01.cpp
         PGCS/src/PGMsgCl01.h
         PGCS/src/PGRunExposition01.cpp

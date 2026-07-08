@@ -206,7 +206,7 @@ int PGRunHello02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
             if (PPGCS->Stacks->at(i) == "IPv4_UDP")
             {
               // Put here the code to send the message to the other PGSs
-              PPG->SendToAUDPSocket(PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
+              PPG->SendToARawSocket(PPGCS->Interfaces->at(i), PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
             }
 
             if (PPGCS->Stacks->at(i) == "Ethernet" || PPGCS->Stacks->at(i) == "Wi-Fi")

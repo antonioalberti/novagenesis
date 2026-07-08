@@ -253,7 +253,7 @@ int PGRunHello01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
             try
             {
               // Put here the code to send the message to the other PGSs
-              PPG->SendToAUDPSocket(PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
+              PPG->SendToARawSocket(PPGCS->Interfaces->at(i), PPGCS->Identifiers->at(i), PPGCS->Sizes->at(i), PGIHCHello);
             }
             catch (std::exception& e)
             {

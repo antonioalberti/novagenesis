@@ -120,6 +120,10 @@
 #include <atomic>
 #endif
 
+#ifndef _UTILITY_H
+#include <utility>
+#endif
+
 #ifndef _TINYTHREAD_H
 #include "tinythread.h"
 #endif
@@ -176,6 +180,18 @@ private:
   // Mutex and condition variable for input queue synchronization
   std::mutex InputQueueMutex;
   std::condition_variable InputQueueCV;
+
+  // ── NGAL: Network Receive Queue ──
+  // Thread-safe intermediate queue for raw char buffers from the NGAL
+  // ReceiveDispatcher. The GW thread drains this queue in Gateway().
+  // These are public so that NGAL_CS::DeliverToGateway() can access them.
+  // Marked as public: but contained within the private: section above.
+public:
+  std::queue<std::pair<char*, long long>> NetworkReceiveQueue;
+  std::mutex NetworkReceiveQueueMutex;
+  std::condition_variable NetworkReceiveQueueCV;
+  // ⚠ Access returns to private for everything below ⚠
+private:
 
   // Mutex and condition variable for output queue synchronization
   std::mutex OutputQueueMutex;

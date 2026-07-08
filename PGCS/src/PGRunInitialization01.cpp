@@ -322,22 +322,7 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
         {
           int SSID = 0;
 
-          // ################################
-          // PULL
-          // ################################
-
-          // Create a socket to receive datagram from a peer PGCS
-          SSID = PPG->CreateUDPSocket("PULL", MyIPAddress);
-
-          PB->S << Offset << "(Created the pull socket with SSID " << SSID << " with address " << MyIPAddress
-                << ")" << endl;
-
-          // Binding TCP/IP socket to CSID
-          PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", MyIPAddress, SSID, StoringInitialBinds, PCL);
-
-          PPGCS->SSIDs->push_back(SSID);
-
-          PPGCS->Threads[i] = new tthread::thread(&PG::ReceiveFromAUDPSocketThreadWrapper, PPG);
+          // UDP sockets removed with NGAL migration — receive is handled by NGAL_Transport_RAW::ReceiveDispatcher
 
           PB->S << Offset << "(Created a thread to pull messages to socket with SSID " << SSID << ")" << endl;
 
@@ -402,31 +387,18 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
             // Binding Ethernet address to SSID
             PMB->NewStoreBindingCommandLineFromIdentifierToSID("0.1", PPGCS->MyMACAddress, SSID, StoringInitialBinds, PCL);
 
+            // Create a single ReceiveDispatcher thread (replaces old SocketDispatcher3 + N child threads)
             PPGCS->Threads[i * PPG
-                                   ->Number_Of_Threads_At_Socket_Dispatcher] = new tthread::thread(&PG::EthernetWiFiSocketDispatcherThreadWrapper, PPG);
+                                   ->Number_Of_Threads_At_Socket_Dispatcher] = new tthread::thread(&PG::ReceiveDispatcherWrapper, PPG);
 
-            PB->S << Offset << "(Created a socket dispatcher thread to read messages from socket with SSID "
+            PB->S << Offset << "(Created NGAL ReceiveDispatcher thread to receive messages from socket with SSID "
                   << SSID << ")"
                   << endl;
 
             // Sleep to allow thread creation without overlapping
             tthread::this_thread::sleep_for(tthread::chrono::milliseconds(100));
 
-            for (unsigned int j = 0; j < PPG->Number_Of_Threads_At_Socket_Dispatcher; j++)
-            {
-              PARAMETERS1 params;
-
-              params._PPG = PPG;
-              params._Index = j;
-
-              PPGCS->Threads[i * PPG->Number_Of_Threads_At_Socket_Dispatcher + j + 1] = new tthread::thread(&PG::FinishReceivingThreadWrapper, &params);
-
-              PB->S << Offset << "(Created thread number " << j << " to serve the dispatcher)"
-                    << endl;
-
-              // Sleep to allow thread creation without overlapping
-              tthread::this_thread::sleep_for(tthread::chrono::milliseconds(100));
-            }
+            // No child threads needed — ReceiveDispatcher handles reassembly + delivery directly
 
             PPGCS->NoT++;
 
