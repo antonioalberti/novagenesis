@@ -91,7 +91,10 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             _ReceivedMessage->SetPayloadFileName(Values.at(0));
             _ReceivedMessage->SetPayloadFilePath(PayloadPath);
             _ReceivedMessage->SetPayloadFileOption("BINARY");
-            _ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
+            // SPEC-015: Removed ExtractPayloadCharArrayFromMessageCharArray() — redundant call that
+            // re-parses Msg using stringstream::getline(), corrupting binary payloads (e.g. JPG).
+            // The GW already correctly extracted Payload via ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2().
+            //_ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
             _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
 
             // Update related Subscription
