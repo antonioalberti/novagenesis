@@ -120,6 +120,10 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
 
                 PS->FileName = Values.at(0);
 
+                // SPEC-017: break after updating the first matching subscription.
+                // Each -info --payload corresponds to exactly one delivery.
+                break;
+
 #ifdef DEBUG
                 PCore->Debug.OpenOutputFile();
 

@@ -117,6 +117,10 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
                              << ". Status of the subscription is " << PS->Status << endl;
 
                 PCore->Debug.CloseFile();
+
+                // SPEC-017: break after updating the first matching subscription.
+                // Each -info --payload corresponds to exactly one delivery.
+                break;
               }
             }
 
