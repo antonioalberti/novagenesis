@@ -29,8 +29,20 @@
 #include "NGAL_SAR.h"
 #endif
 
+#ifndef _MESSAGE_H
+#include "Message.h"
+#endif
+
+#ifndef _PROCESS_H
+#include "Process.h"
+#endif
+
 #ifndef _GLIBCXX_CMATH
 #include <cmath>
+#endif
+
+#ifndef _CTIME_H
+#include <ctime>
 #endif
 
 #ifndef _STDIO_H
@@ -234,19 +246,20 @@ int NGAL_SAR::SendSegmented(Message* M,
 
   return Status;
 }
-
 // ── Receive SAR ──
 // Process one frame from transport.
 // Manages reassembly buffer internally.
-// Returns completed Message* via output parameter when reassembly finishes.
 // Returns 0 (OK) when a message is completed, 1 (ERROR) otherwise.
+// On completion, CompletedBuffer/CompletedSize are set — CALLER must delete[] CompletedBuffer.
+// Does NOT call NewMessage/ConvertMessage — that is the GW's job (Finding F2).
 int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
                               unsigned int numbytes,
                               unsigned int BlockSize,
-                              Process* PP,
-                              Message*& CompletedMessage)
+                              char*& CompletedBuffer,
+                              long long& CompletedSize)
 {
-  CompletedMessage = 0;
+  CompletedBuffer = 0;
+  CompletedSize = 0;
 
   unsigned int MN = 0;
   unsigned int SN = 0;
@@ -299,8 +312,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     FB->Buffer = new char[static_cast<size_t>(MessageSize)];
     FB->ReceivedSoFar = 0;
     FB->SegmentsSoFar = 0;
-    FB->Timestamp = 0;
     FB->ContinueReceiving = true;
+    FB->Timestamp = static_cast<double>(time(0));
 
     // Copy payload from this segment (skip SegHeader(8) + SizeHeader(8) = 16 bytes)
     unsigned int payload_bytes = (numbytes > 16) ? (numbytes - 16) : 0;
@@ -312,7 +325,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     FB->ReceivedSoFar = static_cast<long long>(payload_bytes);
     FB->SegmentsSoFar = 1;
-    FB->Timestamp = 0;
+    FB->Timestamp = static_cast<double>(time(0));
 
     ReassemblyBuffers.push_back(FB);
     BufferIndex = static_cast<unsigned int>(ReassemblyBuffers.size() - 1);
@@ -343,6 +356,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     FB->ReceivedSoFar += static_cast<long long>(h);
     FB->SegmentsSoFar++;
+    FB->Timestamp = static_cast<double>(time(0));
   }
 
   // Check stop criteria
@@ -354,15 +368,16 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     {
       FB->ContinueReceiving = false;
 
-      // Create the completed Message from the reassembled buffer
-      if (PP->NewMessage(0, 0, false, CompletedMessage) == 0) // 0 = OK
-      {
-        CompletedMessage->SetMessageFromCharArray(FB->Buffer, FB->MessageSize);
-        CompletedMessage->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
-      }
+      // Transfer ownership of the reassembly buffer to the caller.
+      // The caller (NGAL_Transport_RAW::ReceiveDispatcher) will pass it
+      // to NGAL_CS::DeliverToGateway, and the GW thread will do
+      // NewMessage + SetMessageFromCharArray + ConvertMessage.
+      CompletedBuffer = FB->Buffer;
+      CompletedSize = FB->MessageSize;
 
-      // Clean up the fragment buffer
-      delete[] FB->Buffer;
+      // Don't delete FB->Buffer — it's now owned by the caller.
+      // Only delete the FragmentBuffer struct itself.
+      FB->Buffer = 0; // prevent double-free in destructor
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + BufferIndex);
 

@@ -49,22 +49,6 @@
 #include "GW.h"
 #endif
 
-#ifndef _STRING_H
-#include <string>
-#endif
-
-#ifndef _IOSTREAM_H
-#include <iostream>
-#endif
-
-#ifndef _STDIO_H
-#include <stdio.h>
-#endif
-
-#ifndef _GLIBCXX_IOMANIP
-#include <iomanip>
-#endif
-
 #ifndef _SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -214,7 +198,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
       if (poll_result == 0)
       {
         // Timeout — cleanup timed-out reassembly buffers and continue
-        SAR.CleanupTimedOut(0);
+        SAR.CleanupTimedOut(PPGCS->GetTime());
         continue;
       }
 
@@ -257,27 +241,22 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         }
 
         // Feed to NGAL_SAR for reassembly
-        Message* CompletedMessage = 0;
+        char* CompletedBuffer = 0;
+        long long CompletedSize = 0;
         int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
-                                              PPG->PP, CompletedMessage);
+                                              CompletedBuffer, CompletedSize);
 
-        if (sar_status == 0 && CompletedMessage != 0)
+        if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
         {
-          // Message reassembled — deliver to GW via NGAL_CS
-          // Get the serialised char array from the completed message
-          char* MessageCharArray = 0;
-          long long MessageSize = 0;
+          // Message reassembled — deliver raw char buffer to GW via NGAL_CS.
+          // The GW thread will do NewMessage + SetMessageFromCharArray +
+          // ConvertMessage (Finding F2 — no NewMessage in receiver thread).
+          NGAL_CS::DeliverToGateway(PPG->PGW, CompletedBuffer, CompletedSize);
 
-          CompletedMessage->GetMessageFromCharArray(MessageCharArray);
-
-          if (CompletedMessage->GetMessageSize(MessageSize) == 0 && MessageSize > 0 && MessageCharArray != 0)
-          {
-            NGAL_CS::DeliverToGateway(PPG->PGW, MessageCharArray, MessageSize);
-          }
-
-          // The message was created by Process::NewMessage(). Mark for deletion
-          // after processing (the GW thread will delete it via DeleteMarkedMessages).
-          CompletedMessage->MarkToDelete();
+          // The caller owns the completed buffer (returned by ReceiveFragment).
+          // DeliverToGateway makes a copy for the queue, so we must delete
+          // our copy now.
+          delete[] CompletedBuffer;
         }
 
         delete[] TempBuffer;

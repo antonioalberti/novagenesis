@@ -36,10 +36,6 @@
 #include <functional>
 #endif
 
-#ifndef _PROCESS_H
-#include "Process.h"
-#endif
-
 #ifndef _MATH_H
 #include <math.h>
 #endif
@@ -60,15 +56,10 @@
 #include <cstdlib>
 #endif
 
-#ifndef _MESSAGE_H
-#include "Message.h"
-#endif
-
-#ifndef _MESSAGERECEIVING_H
-#include "MessageReceiving.h"
-#endif
-
 using namespace std;
+
+// Forward declaration — Message is fully defined in Message.h (included in .cpp)
+class Message;
 
 class NGAL_SAR
 {
@@ -90,14 +81,15 @@ public:
 
   // ── Receive SAR ──
   // Process one frame from transport. Manages reassembly buffer internally.
-  // Returns completed Message* via output parameter when reassembly finishes.
-  // Returns nullptr if more fragments needed.
-  // The caller owns the returned Message* if non-null.
+  // Returns the reassembled char buffer and its size via output parameters
+  // when reassembly finishes. The CALLER owns the returned buffer (must delete[] it).
+  // Returns 0 (OK) when a message is completed, 1 (ERROR) otherwise.
+  // This function does NOT call NewMessage/ConvertMessage — that is the GW's job.
   int ReceiveFragment(unsigned char* TempBuffer,
                       unsigned int numbytes,
                       unsigned int BlockSize,
-                      Process* PP,
-                      Message*& CompletedMessage);
+                      char*& CompletedBuffer,
+                      long long& CompletedSize);
 
   // ── Header helpers (static) ──
   static long long OpenHeaderMessageSizeField(unsigned char* _Buffer);

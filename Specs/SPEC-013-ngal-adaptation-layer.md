@@ -723,3 +723,47 @@ Remover de PG.cpp:
 ---
 
 *Fim de SPEC-013.*
+
+---
+
+## E9 — Post-implementation: F2 Violation Detection & Fix (SPEC-014)
+
+**Descoberto em:** 09/07/2026 (teste runtime pós-implementação)
+
+### Problema
+
+A implementação inicial da SPEC-013 violou o Finding F2: `NGAL_SAR::ReceiveFragment()` chamava `PP->NewMessage()` na thread do `ReceiveDispatcher`, criando um **data race** com o GW thread que também chama `NewMessage()` no mesmo Process. Isto causava hash mismatch em TODAS as fotos recebidas no ContentApp Repository.
+
+### Causa raiz
+
+```pipeline
+PIPELINE COM BUG — 2 deserializações + data race:
+  ReceiveDispatcher thread:
+    NGAL_SAR::ReceiveFragment → PP->NewMessage() ← RACE!
+      + SetMessageFromCharArray + ConvertMessage → Message* completo
+    GetMessageFromCharArray → DeliverToGateway (queue de char buffers)
+  GW thread:
+    NewMessage + SetMessageFromCharArray + ConvertMessage → PushToInputQueue
+```
+
+### Correcção (SPEC-014)
+
+| Ficheiro | Mudança |
+|----------|---------|
+| `Common/src/NGAL_SAR.h` | `ReceiveFragment(Process*, Message*&)` → `ReceiveFragment(char*&, long long&)`. Sem dependência de Message/Process no header. |
+| `Common/src/NGAL_SAR.cpp` | Devolve `FB->Buffer` + `FB->MessageSize` em vez de `NewMessage + SetMessageFromCharArray + ConvertMessage + MarkToDelete`. |
+| `PGCS/src/NGAL_Transport_RAW.cpp` | Chama `DeliverToGateway(CompletedBuffer, CompletedSize)` directamente com buffer bruto. |
+
+### Pipeline corrigido
+
+```pipeline
+PIPELINE CORRIGIDO — 1 deserialização, sem data race:
+  ReceiveDispatcher thread:
+    NGAL_SAR::ReceiveFragment → devolve char* buffer + size (sem NewMessage!)
+    NGAL_CS::DeliverToGateway(buffer, size) → queue de char buffers
+    delete[] buffer
+  GW thread:
+    NewMessage + SetMessageFromCharArray + ConvertMessage → PushToInputQueue
+```
+
+Ver **SPEC-014** (`Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`) para diagnóstico completo.
