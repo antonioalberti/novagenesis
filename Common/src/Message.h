@@ -333,6 +333,10 @@ public:
   // Set *Payload from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
   int SetPayloadFromCharArray(char* _Value, long long _Size);
 
+  // SPEC-018: Reset payload state so a new payload can be loaded on a reused Message.
+  // Frees the existing Payload array and resets PayloadSize/DeletePayloadArray/HasPayloadFlag.
+  void ResetPayload();
+
   // Set *Msg from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
   int SetMessageFromCharArray(char* _Value, long long _Size);
 

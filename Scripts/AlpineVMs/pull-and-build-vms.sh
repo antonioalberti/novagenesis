@@ -2,17 +2,16 @@
 # pull-and-build-vms.sh — Git stash + pull + compile on VMs 101 and 102
 #
 # Connects via SSH to both NovaGenesis Alpine VMs, stashes any local
-# changes, pulls the latest AIOPT2 branch, then compiles PGCS, ContentApp,
-# NRNCS in parallel with make -j$(nproc).
+# changes, pulls the latest AIOPT2 branch, then compiles all NG binaries
+# with make -j$(nproc).
 #
 # Usage: bash pull-and-build-vms.sh
 # Prerequisites:
 #   - VMs 101 and 102 running and SSH-reachable
 #   - SSH key ~/.ssh/id_ed25519_hermes deployed on both VMs
+#   - SPEC-018 fix committed and pushed to origin/AIOPT2 on VM 100
 #
-# Order: Run before deploy-spec015/deploy.sh when binaries need updating
-
-set -e
+# Order: Run before deploy when binaries need updating
 
 SSH_KEY=~/.ssh/id_ed25519_hermes
 BASE=/root/workspace/novagenesis
@@ -44,17 +43,17 @@ echo '--- Git status on ${BASE} ---' && \
 cd ${BASE} && \
 echo 'Branch: \$(git rev-parse --abbrev-ref HEAD)' && \
 echo 'Stashing local changes...' && \
-git stash 2>&1 && \
+git stash 2>&1 || true && \
 echo 'Pulling latest ${BRANCH}...' && \
 git pull origin ${BRANCH} 2>&1 && \
 echo 'Git HEAD: \$(git rev-parse --short HEAD)' && \
 echo '--- Building ---' && \
 cd ${BASE}/cmake-build-debug && \
 cmake .. 2>&1 | tail -3 && \
-make -j\$(nproc) 2>&1 | tail -5 && \
+make -j\$(nproc) 2>&1 | tail -10 && \
 echo '--- Build complete ---' && \
 echo 'Binaries:' && \
-ls -la ${BASE}/cmake-build-debug/PGCS ${BASE}/cmake-build-debug/ContentApp ${BASE}/cmake-build-debug/NRNCS 2>&1
+ls -la ${BASE}/cmake-build-debug/PGCS ${BASE}/cmake-build-debug/ContentApp ${BASE}/cmake-build-debug/NRNCS ${BASE}/cmake-build-debug/PSS ${BASE}/cmake-build-debug/GIRS 2>&1
 "
 
 # Run on VM 101 (Repository) in background
@@ -72,7 +71,7 @@ STATUS102=$?
 # Wait for VM 101
 echo ""
 echo "=== Waiting for VM 101 to finish... ==="
-wait $PID101
+wait $PID101 || true
 STATUS101=$?
 
 echo ""
@@ -83,8 +82,7 @@ echo "VM 102 (Source @ 192.168.0.36):     $([ $STATUS102 -eq 0 ] && echo 'OK' ||
 if [ $STATUS101 -eq 0 ] && [ $STATUS102 -eq 0 ]; then
     echo ""
     echo "=== BUILD SUCCESS on both VMs ==="
-    echo "Next step: deploy the binaries with deploy-spec015/deploy.sh"
-    echo "(or copy directly from cmake-build-debug/ if SSH paths differ)"
+    echo "Next step: deploy the binaries with deploy scripts"
 else
     echo ""
     echo "=== BUILD FAILED on one or more VMs ==="

@@ -83,6 +83,9 @@ int IRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
               // Check for error
               if (Payload != 0)
               {
+                // SPEC-018: Reset payload from any previous response on this reused InlineResponseMessage
+                InlineResponseMessage->ResetPayload();
+
                 // Copy the payload from received message *Payload array to the new message
                 InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);
 

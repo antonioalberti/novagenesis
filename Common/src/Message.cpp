@@ -813,6 +813,21 @@ int Message::SetHeaderFromCharArray(char* _Value, long _Size)
 }
 */
 
+// SPEC-018: Reset payload state so a new payload can be loaded on a reused Message.
+// Frees the existing Payload array and resets the flags that prevent re-loading.
+void Message::ResetPayload()
+{
+  if (DeletePayloadArray == true && Payload != 0 && PayloadSize > 0)
+  {
+    delete[] Payload;
+  }
+
+  Payload = 0;
+  PayloadSize = 0;
+  DeletePayloadArray = false;
+  HasPayloadFlag = false;
+}
+
 // Set *Payload from char array. A copy of the char array is done.
 int Message::SetPayloadFromCharArray(char* _Value, long long _Size)
 {

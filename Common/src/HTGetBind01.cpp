@@ -131,6 +131,9 @@ int HTGetBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                         InlineResponseMessage
                             ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
 
+                        // SPEC-018: Reset payload from any previous GetBind response on this reused InlineResponseMessage
+                        InlineResponseMessage->ResetPayload();
+
                         InlineResponseMessage->ConvertPayloadFromFileToCharArray();
 
                         // Adding only the ng -info --payload 01 command line
