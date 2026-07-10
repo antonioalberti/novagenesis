@@ -128,11 +128,11 @@ int HTGetBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
 
                         ThePath = PB->GetPath();
 
-                        InlineResponseMessage
-                            ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
-
                         // SPEC-018: Reset payload from any previous GetBind response on this reused InlineResponseMessage
                         InlineResponseMessage->ResetPayload();
+
+                        InlineResponseMessage
+                            ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
 
                         InlineResponseMessage->ConvertPayloadFromFileToCharArray();
 
