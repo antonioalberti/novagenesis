@@ -33,6 +33,10 @@
 #include "NR.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "../../Common/src/NameGenerator.h"
+#endif
+
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -84,6 +88,16 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
               {
                 // SPEC-018: Reset payload from any previous response on this reused InlineResponseMessage
                 InlineResponseMessage->ResetPayload();
+
+                // SPEC-019: Log payload hash at NRNCS for traceability
+                {
+                  string PayloadHash;
+                  unsigned char* payload_bytes = (unsigned char*)Payload;
+                  // Use NameGenerator which wraps MurmurHash3_x86_32 with seed 3571
+                  PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray((const char*)payload_bytes, Size);
+
+                  PB->S << Offset << "(NRNCS forwarding payload: file=" << Values.at(0) << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
+                }
 
                 // Copy the payload from received message *Payload array to the new message
                 InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);

@@ -37,6 +37,10 @@
 #include "HT.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "../../Common/src/NameGenerator.h"
+#endif
+
 ////#define DEBUG // To follow message processing
 
 CoreInfoPayload01::CoreInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -96,6 +100,27 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             // The GW already correctly extracted Payload via ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2().
             //_ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
             _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
+
+            // SPEC-019: Log payload hash at ContentApp for traceability
+            {
+              string PayloadHash;
+              // Read the file we just saved to compute hash
+              File F1;
+              F1.OpenInputFile(Values.at(0), PayloadPath, "BINARY");
+              F1.seekg(0, ios::end);
+              long long PayloadSize = F1.tellg();
+              F1.seekg(0);
+              if (PayloadSize > 0) {
+                char* payload_bytes = new char[PayloadSize];
+                F1.read(payload_bytes, PayloadSize);
+                // Use NameGenerator which wraps MurmurHash3_x86_32 with seed 3571
+                PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(payload_bytes, PayloadSize);
+                delete[] payload_bytes;
+              }
+              F1.CloseFile();
+
+              PB->S << Offset << "(ContentApp received payload: file=" << Values.at(0) << ", size=" << PayloadSize << " bytes, hash=" << PayloadHash << ")" << endl;
+            }
 
             // Update related Subscription
             for (unsigned int i = 0; i < PCore->Subscriptions.size(); i++)
