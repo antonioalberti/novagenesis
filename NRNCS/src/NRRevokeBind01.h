@@ -1,14 +1,14 @@
 /*
-        NovaGenesis
+	NovaGenesis
+	
+	Name:		NR revoke a published bind
+	Object:		NRRevokeBind01
+	File:		NRRevokeBind01.h
+	Author:		Antonio Marcos Alberti
+	Date:		5/2016
+	Version:	0.1
 
-        Name:		NR revoke a published bind
-        Object:		NRRevokeBind01
-        File:		NRRevokeBind01.h
-        Author:		Antonio Marcos Alberti
-        Date:		5/2016
-        Version:	0.1
-
-        Copyright (C) 2021  Antonio Marcos Alberti
+ 	Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,18 +61,24 @@
 
 class Block;
 
-class NRRevokeBind01 : public Action
-{
-public:
+class NRRevokeBind01 : public Action {
+ public:
+
   // Constructor
-  NRRevokeBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
+  NRRevokeBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
 
   // Destructor
-  virtual ~NRRevokeBind01();
+  virtual ~NRRevokeBind01 ();
 
   // Run the actions behind a received message
   virtual int
-  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
+  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
 };
 
 #endif
+
+
+
+
+
+

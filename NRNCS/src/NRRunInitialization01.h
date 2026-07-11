@@ -1,14 +1,14 @@
 /*
-        NovaGenesis
+	NovaGenesis
+	
+	Name:		NRRunInitialization01
+	Object:		NRRunInitialization01
+	File:		NRRunInitialization01.h
+	Author:		Antonio Marcos Alberti
+	Date:		05/2021
+	Version:	0.1
 
-        Name:		NRRunInitialization01
-        Object:		NRRunInitialization01
-        File:		NRRunInitialization01.h
-        Author:		Antonio Marcos Alberti
-        Date:		05/2021
-        Version:	0.1
-
-        Copyright (C) 2021  Antonio Marcos Alberti
+ 	Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,18 +61,24 @@
 
 class Block;
 
-class NRRunInitialization01 : public Action
-{
-public:
+class NRRunInitialization01 : public Action {
+ public:
+
   // Constructor
-  NRRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB);
+  NRRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB);
 
   // Destructor
-  virtual ~NRRunInitialization01();
+  virtual ~NRRunInitialization01 ();
 
   // Run the actions behind a received message
   virtual int
-  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
+  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
 };
 
 #endif
+
+
+
+
+
+

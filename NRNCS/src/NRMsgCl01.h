@@ -1,14 +1,14 @@
 /*
-        NovaGenesis
+	NovaGenesis
+	
+	Name:		NRMsgCl01
+	Object:		NRMsgCl01
+	File:		NRMsgCl01.h
+	Author:		Antonio Marcos Alberti
+	Date:		05/2021
+	Version:	0.1
 
-        Name:		NRMsgCl01
-        Object:		NRMsgCl01
-        File:		NRMsgCl01.h
-        Author:		Antonio Marcos Alberti
-        Date:		05/2021
-        Version:	0.1
-
-        Copyright (C) 2021  Antonio Marcos Alberti
+ 	Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -53,18 +53,24 @@
 
 class Block;
 
-class NRMsgCl01 : public Action
-{
-public:
+class NRMsgCl01 : public Action {
+ public:
+
   // Constructor
-  NRMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB);
+  NRMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB);
 
   // Destructor
-  virtual ~NRMsgCl01();
+  virtual ~NRMsgCl01 ();
 
   // Run the actions behind a received message
   virtual int
-  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
+  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
 };
 
 #endif
+
+
+
+
+
+

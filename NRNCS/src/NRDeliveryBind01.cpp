@@ -1,14 +1,14 @@
 /*
-        NovaGenesis
+	NovaGenesis
 
-        Name:		NRDeliveryBind01
-        Object:		NRDeliveryBind01
-        File:		NRDeliveryBind01.cpp
-        Author:		Antonio Marcos Alberti
-        Date:		05/2021
-        Version:	0.1
+	Name:		NRDeliveryBind01
+	Object:		NRDeliveryBind01
+	File:		NRDeliveryBind01.cpp
+	Author:		Antonio Marcos Alberti
+	Date:		05/2021
+	Version:	0.1
 
-        Copyright (C) 2021  Antonio Marcos Alberti
+ 	Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -45,20 +45,20 @@
 #include "NameGenerator.h"
 #endif
 
-// #define DEBUG
+#define DEBUG
 
-NRDeliveryBind01::NRDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
-    : Action(_LN, _PB, _PMB)
+NRDeliveryBind01::NRDeliveryBind01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
 {
 }
 
-NRDeliveryBind01::~NRDeliveryBind01()
+NRDeliveryBind01::~NRDeliveryBind01 ()
 {
 }
 
 // Run the actions behind a received command line
 // ng -d --b 0.1
-int NRDeliveryBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
+int
+NRDeliveryBind01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
@@ -66,101 +66,109 @@ int NRDeliveryBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
   vector<string> Category;
   vector<string> Key;
   vector<string> Values;
-  NR* PNR = 0;
-  Message* StoreBindings = 0;
-  CommandLine* PCL = 0;
+  NR *PNR = 0;
+  Message *StoreBindings = 0;
+  CommandLine *PCL = 0;
   vector<string> StoreBindingsLimiters;
   vector<string> StoreBindingsSources;
   vector<string> StoreBindingsDestinations;
-  Block* PHTB = 0;
+  Block *PHTB = 0;
   string SCN;
 
-  PNR = (NR*)PB;
+  PNR = (NR *)PB;
 
-  PHTB = (Block*)PNR->PHT;
+  PHTB = (Block *)PNR->PHT;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << this->GetLegibleName () << endl;
 
 #endif
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments(NA) == OK)
-  {
-    // Check the number of arguments
-    if (NA == 3)
-    {
-      // Get received command line arguments
-      if (_PCL->GetArgument(0, Category) == OK && _PCL->GetArgument(1, Key) == OK && _PCL->GetArgument(2, Values) == OK)
-      {
-        if (Category.size() > 0 && Key.size() > 0 && Values.size() > 0)
-        {
-          if (PB->State == "operational")
-          {
-            // ****************************************************
-            // Generate the ng -m --cl header for NRNCS::HT block
-            // ****************************************************
+  if (_PCL->GetNumberofArguments (NA) == OK)
+	{
+	  // Check the number of arguments
+	  if (NA == 3)
+		{
+		  // Get received command line arguments
+		  if (_PCL->GetArgument (0, Category) == OK && _PCL->GetArgument (1, Key) == OK
+			  && _PCL->GetArgument (2, Values) == OK)
+			{
+			  if (Category.size () > 0 && Key.size () > 0 && Values.size () > 0)
+				{
+#ifdef DEBUG
 
-            // Setting up the process SCN as the space limiter
-            StoreBindingsLimiters.push_back(PB->PP->Intra_Process);
+				  PB->S << Offset << "(Delivery: Category=" << Category.at (0)
+				        << ", Key=" << Key.at (0) << ", " << Values.size ()
+				        << " values)" << endl;
 
-            // Setting up the CLI block SCN as the source SCN
-            StoreBindingsSources.push_back(PB->GetSelfCertifyingName());
+#endif
 
-            // Setting up the HT block SCN as the destination SCN
-            StoreBindingsDestinations.push_back(PHTB->GetSelfCertifyingName());
+				  if (PB->State == "operational")
+					{
+					  // ****************************************************
+					  // Generate the ng -m --cl header for NRNCS::HT block
+					  // ****************************************************
 
-            // Creating a new message
-            PB->PP->NewMessage(GetTime(), 0, false, StoreBindings);
+					  // Setting up the process SCN as the space limiter
+					  StoreBindingsLimiters.push_back (PB->PP->Intra_Process);
 
-            // Creating the ng -cl -m command line
-            PMB->NewConnectionLessCommandLine("0.1", &StoreBindingsLimiters, &StoreBindingsSources, &StoreBindingsDestinations, StoreBindings, PCL);
+					  // Setting up the CLI block SCN as the source SCN
+					  StoreBindingsSources.push_back (PB->GetSelfCertifyingName ());
 
-            // Generate the ng -sr --b for the local HT
-            PMB->NewCommonCommandLine("-sr", "--b", "0.1", 13, Key.at(0), &Values, StoreBindings, PCL);
+					  // Setting up the HT block SCN as the destination SCN
+					  StoreBindingsDestinations.push_back (PHTB->GetSelfCertifyingName ());
 
-            // Generate the new SCN
-            SCN = NameGenerator::GetInstance().GenerateFromMessage(StoreBindings);
+					  // Creating a new message
+					  PB->PP->NewMessage (GetTime (), 0, false, StoreBindings);
 
-            // Add the SCN to the message
-            PMB->NewSCNCommandLine("0.1", SCN, StoreBindings, PCL);
+					  // Creating the ng -cl -m command line
+					  PMB->NewConnectionLessCommandLine ("0.1", &StoreBindingsLimiters, &StoreBindingsSources, &StoreBindingsDestinations, StoreBindings, PCL);
 
-            // ******************************************************
-            // Finish
-            // ******************************************************
+					  // Generate the ng -sr --b for the local HT
+					  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", 13, Key.at (0), &Values, StoreBindings, PCL);
 
-            // Push the message to the GW input queue
-            PNR->PGW->PushToInputQueue(StoreBindings);
-          }
-        }
-        else
-        {
-          PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
-        }
-      }
-      else
-      {
-        PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
-      }
-    }
-    else
-    {
-      PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
-    }
-  }
+					  // Generate the new SCN
+					            SCN = NameGenerator::GetInstance().GenerateFromMessage(StoreBindings);
+
+					  // Add the SCN to the message
+					  PMB->NewSCNCommandLine ("0.1", SCN, StoreBindings, PCL);
+
+					  // ******************************************************
+					  // Finish
+					  // ******************************************************
+
+					  // Push the message to the GW input queue
+					  PNR->PGW->PushToInputQueue (StoreBindings);
+					}
+				}
+			  else
+				{
+				  PB->S << Offset << "(ERROR: One or more argument is empty)" << endl;
+				}
+			}
+		  else
+			{
+			  PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+			}
+		}
+	  else
+		{
+		  PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+		}
+	}
   else
-  {
-    PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
-  }
+	{
+	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+	}
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl
-        << endl
-        << endl;
+  PB->S << Offset << "(Done)" << endl << endl << endl;
 
 #endif
 
   return Status;
 }
+

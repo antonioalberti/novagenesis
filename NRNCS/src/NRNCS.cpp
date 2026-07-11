@@ -1,14 +1,14 @@
 /*
-        NovaGenesis
+	NovaGenesis
 
-        Name:		Publish/Subscribe System
-        Object:		NRNCS
-        File:		NRNCS.h
-        Author:		Antonio Marcos Alberti
-        Date:		05/2021
-        Version:	0.1
+	Name:		Publish/Subscribe System
+	Object:		NRNCS
+	File:		NRNCS.h
+	Author:		Antonio Marcos Alberti
+	Date:		05/2021
+	Version:	0.1
 
-        Copyright (C) 2021  Antonio Marcos Alberti
+ 	Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,54 +33,70 @@
 #include "NR.h"
 #endif
 
-NRNCS::NRNCS(string _LN, key_t _Key, string _Path)
-    : Process(_LN, _Key, _Path)
+#define DEBUG
+
+NRNCS::NRNCS (string _LN, key_t _Key, string _Path) : Process (_LN, _Key, _Path)
 {
-  Block* PNRB = 0;
+  Block *PNRB = 0;
   string NRLN = "NR";
 
-  NewBlock(NRLN, PNRB);
+  NewBlock (NRLN, PNRB);
 
   // Run the base class GW
-  RunGateway();
+  RunGateway ();
+
+#ifdef DEBUG
+
+  cout << "[DEBUG] NRNCS process created, GW running" << endl;
+
+#endif
 }
 
-NRNCS::~NRNCS()
+NRNCS::~NRNCS ()
 {
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int NRNCS::NewBlock(string _LN, Block*& _PB)
+int NRNCS::NewBlock (string _LN, Block *&_PB)
 {
   if (_LN == "NR")
-  {
-    Block* PGWB = 0;
-    Block* PHTB = 0;
-    GW* PGW = 0;
-    HT* PHT = 0;
-    string GWLN = "GW";
-    string HTLN = "HT";
+	{
+	  Block *PGWB = 0;
+	  Block *PHTB = 0;
+	  GW *PGW = 0;
+	  HT *PHT = 0;
+	  string GWLN = "GW";
+	  string HTLN = "HT";
 
-    GetBlock(GWLN, PGWB);
+	  GetBlock (GWLN, PGWB);
 
-    PGW = (GW*)PGWB;
+	  PGW = (GW *)PGWB;
 
-    GetBlock(HTLN, PHTB);
+	  GetBlock (HTLN, PHTB);
 
-    PHT = (HT*)PHTB;
+	  PHT = (HT *)PHTB;
 
-    unsigned int Index = 0;
+	  unsigned int Index = 0;
 
-    Index = GetBlocksSize();
+	  Index = GetBlocksSize ();
 
-    NR* PNR = new NR(_LN, this, Index, PGW, PHT, GetPath());
+	  NR *PNR = new NR (_LN, this, Index, PGW, PHT, GetPath ());
 
-    _PB = (Block*)PNR;
+	  _PB = (Block *)PNR;
 
-    InsertBlock(_PB);
+	  InsertBlock (_PB);
 
-    return OK;
-  }
+#ifdef DEBUG
+
+	  cout << "[DEBUG] NR block created and inserted" << endl;
+
+#endif
+
+	  return OK;
+	}
 
   return ERROR;
 }
+
+
+
