@@ -41,6 +41,10 @@
 #include "PSS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H_
+#include "NameGenerator.h"
+#endif
+
 PSSubBind01::PSSubBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -121,6 +125,10 @@ int PSSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
             // Add ng -g --b for this key only
             PMB->NewGetCommandLine("0.2", PB->StringToInt(Category.at(0)), Key.at(i),
                                    GetBindMessage, GetBindCL);
+
+            // Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard
+            string SCN = NameGenerator::GetInstance().GenerateFromMessage(GetBindMessage);
+            PMB->NewSCNCommandLine("0.1", SCN, GetBindMessage, GetBindCL);
 
             // Push to GW input queue for processing by the HT
             PGW->PushToInputQueue(GetBindMessage);
