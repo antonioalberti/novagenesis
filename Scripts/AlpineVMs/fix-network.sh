@@ -18,9 +18,9 @@ HOSTNAME=$(cat /etc/hostname 2>/dev/null || echo "localhost")
 if [ -n "$IP_ARG" ]; then
     IP="$IP_ARG"
     echo "Using provided IP: $IP"
-elif [ "$HOSTNAME" = "alpine-ng-source" ]; then
+elif [ "$HOSTNAME" = "source36" ]; then
     IP="192.168.0.36"
-elif [ "$HOSTNAME" = "alpine-ng-repo" ]; then
+elif [ "$HOSTNAME" = "repo61" ]; then
     IP="192.168.0.61"
 else
     echo "ERROR: Unknown hostname '$HOSTNAME'"

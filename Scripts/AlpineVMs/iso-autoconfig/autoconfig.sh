@@ -8,10 +8,10 @@ VM_TYPE="$1"
 
 if [ "$VM_TYPE" = "source" ]; then
     IP="192.168.0.36"
-    HOSTNAME="alpine-ng-source"
+    HOSTNAME="source36"
 elif [ "$VM_TYPE" = "repo" ]; then
     IP="192.168.0.61"
-    HOSTNAME="alpine-ng-repo"
+    HOSTNAME="repo61"
 else
     echo "Usage: autoconfig.sh <source|repo>"
     exit 1

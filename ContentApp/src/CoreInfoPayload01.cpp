@@ -133,7 +133,7 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               PB->S << Offset << "(Subscription status is " << PS->Status << ")" << endl;
 #endif
 
-              if (PS->Status == "Waiting delivery" && !PS->HasContent)
+              if (PS->Status == "Waiting delivery")
               {
 #ifdef DEBUG
                 PB->S << Offset << "(Storing the file named " << Values.at(0) << " to this subscription)" << endl;

@@ -1,6 +1,6 @@
 #!/bin/ash
 # NovaGenesis Repository VM Setup Script
-# Run as root on alpine-ng-repo (192.168.0.61)
+# Run as root on repo61 (192.168.0.61)
 
 set -e
 

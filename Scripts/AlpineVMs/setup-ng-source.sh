@@ -1,6 +1,6 @@
 #!/bin/ash
 # NovaGenesis Source VM Setup Script
-# Run as root on alpine-ng-source (192.168.0.36)
+# Run as root on source36 (192.168.0.36)
 
 set -e
 

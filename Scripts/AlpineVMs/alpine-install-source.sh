@@ -7,7 +7,7 @@ echo 'KEYMAP="us"' > /etc/conf.d/keymaps
 rc-update add keymaps boot 2>/dev/null || true
 
 # Hostname
-setup-hostname alpine-ng-source
+setup-hostname source36
 
 # Network - STATIC IP on eth0 (permanent)
 cat > /etc/network/interfaces <<'EOF'

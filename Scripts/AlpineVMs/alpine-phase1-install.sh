@@ -13,10 +13,10 @@ fi
 
 if [ "$VM_TYPE" = "source" ]; then
     IP="192.168.0.36"
-    HOSTNAME="alpine-ng-source"
+    HOSTNAME="source36"
 else
     IP="192.168.0.61"
-    HOSTNAME="alpine-ng-repo"
+    HOSTNAME="repo61"
 fi
 
 # Detect network interface (first non-loopback) - BusyBox compatible
