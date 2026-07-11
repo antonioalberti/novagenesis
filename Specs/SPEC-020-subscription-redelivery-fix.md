@@ -79,26 +79,43 @@ if (PS->Status == "Waiting delivery" && !PS->HasContent)
 if (PS->Status == "Waiting delivery")
 ```
 
-### 3.2 Marcar "Delivered" explicitamente
+### 3.2 Manter "Processing required" — não forçar "Delivered"
 
-Após receber o payload, a subscription deve ser marcada como "Delivered" para que o `CoreRunPeriodic01` não re-submeta:
+O `CoreRunEvaluate01` (linha 501) depende de `Status == "Processing required"` para processar o acceptance. Se o SPEC-020 forçar `Status = "Delivered"` imediatamente, o acceptance nunca é gerado.
 
+**Correcção correcta:**
 ```cpp
 if (PS->Status == "Waiting delivery")
 {
-    PS->Status = "Processing required";
+    PS->Status = "Processing required";   // CoreRunEvaluate01 precisa disto
     PS->FileName = Values.at(0);
-    PS->HasContent = true;
-    PS->Status = "Delivered";
     break;  // SPEC-017: apenas uma subscription por mensagem
 }
 ```
 
-Nota: `PS->Status` é actualizado duas vezes. Primeiro para "Processing required" (lógica original), depois para "Delivered" (prevenir re-subscrição). O `break` (SPEC-017) garante que cada `-info --payload` afecta apenas UMA subscription.
+**Não fazer:**
+```cpp
+PS->HasContent = true;    // CoreDeliveryBind01 já o fez
+PS->Status = "Delivered"; // ❌ Mata o acceptance!
+```
 
-### 3.3 O `break` é essencial
+### 3.3 Porque não há re-delivery sem "Delivered"
 
-Sem o `break` (SPEC-017), todas as subscriptions com `Status == "Waiting delivery"` recebem o mesmo `FileName`, causando o bug de correlação conteúdo↔nome (documentado em SPEC-017).
+O `CoreRunPeriodic01` (linha 295) só re-submete se:
+```cpp
+if ((GetTime() - PS->Timestamp) > TIMEOUT && PS->Status == "Waiting delivery")
+```
+
+Com `Status == "Processing required"`, a condição **não** é satisfeita. O `CoreRunPeriodic01` nunca re-submete uma subscription que já está a ser processada. O "Delivered" é desnecessário para prevenir re-delivery.
+
+### 3.4 Ciclo completo
+
+```
+Waiting delivery ──CoreInfoPayload01──→ Processing required ──CoreRunEvaluate01──→ Delete
+    ↑                    (condição fix)        │                                      │
+CoreDeliveryBind01                              │ (cria acceptance,                     │
+(arruma HasContent)                             │  publica resposta)                    │
+                                                └── acceptance → Source ──→ contentpublish
 
 ## 4. Ficheiros Afectados
 

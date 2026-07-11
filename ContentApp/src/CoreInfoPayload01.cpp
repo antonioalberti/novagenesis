@@ -145,9 +145,13 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
 
                 PS->FileName = Values.at(0);
 
-                // Mark subscription as delivered to prevent re-subscription
-                PS->HasContent = true;
-                PS->Status = "Delivered";
+                // SPEC-020: Do NOT set Status = "Delivered" here.
+                // CoreRunEvaluate01 needs "Processing required" to trigger
+                // the acceptance flow. It will set Status = "Delete" after
+                // creating the Service_Accepted response.
+                // CoreDeliveryBind01 already set HasContent = true, so
+                // CoreRunPeriodic01 won't re-subscribe (it only re-subscribes
+                // when Status == "Waiting delivery").
 
                 // SPEC-017: break after updating the first matching subscription.
                 // Each -info --payload corresponds to exactly one delivery.
