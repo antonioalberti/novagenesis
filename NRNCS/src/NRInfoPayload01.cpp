@@ -33,8 +33,12 @@
 #include "NR.h"
 #endif
 
+#ifndef _GW_H
+#include "GW.h"
+#endif
+
 #ifndef _NAMEGENERATOR_H
-#include "../../Common/src/NameGenerator.h"
+#include "NameGenerator.h"
 #endif
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -55,7 +59,6 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   unsigned int NA = 0;
   vector<string> Values;
   char* Payload = 0;
-  CommandLine* PCL = 0;
   long long Size = 0;
 
   // PB->S << Offset <<  this->GetLegibleName() << endl;
@@ -99,14 +102,65 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                   PB->S << Offset << "(NRNCS forwarding payload: file=" << Values.at(0) << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
                 }
 
-                // Copy the payload from received message *Payload array to the new message
-                InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);
+                // SPEC-022: Create a SEPARATE message per file payload.
+                // Do NOT accumulate multiple -info --payload CLs in the same
+                // InlineResponseMessage — NG serialisation produces only ONE
+                // payload block. All -info --payload CLs in one message share
+                // that single payload. Fix: each file gets its own message
+                // with its own payload, pushed directly to the GW InputQueue.
 
-                // Copy the ng -info --payload to the new message
-                InlineResponseMessage->NewCommandLine(_PCL, PCL);
+                {
+                  NR* PNR = (NR*)PB;
+                  GW* PGW = PNR->PGW;
 
-                // Change to 0.2 version
-                PCL->Version = "0.1";
+                  // Create a new message for this file
+                  Message* PayloadMsg = NULL;
+                  PB->PP->NewMessage(GetTime(), 0, false, PayloadMsg);
+
+                  // Extract routing from the received message's -m --cl
+                  CommandLine* RoutedCL = NULL;
+                  _ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
+
+                  if (RoutedCL != NULL)
+                  {
+                    vector<string> Limiters;
+                    vector<string> Sources;
+                    vector<string> Destinations;
+                    RoutedCL->GetArgument(0, Limiters);
+                    RoutedCL->GetArgument(1, Sources);
+                    RoutedCL->GetArgument(2, Destinations);
+
+                    if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
+                    {
+                      CommandLine* RouteCL = NULL;
+                      PMB->NewConnectionLessCommandLine(RoutedCL->Version,
+                                                        &Limiters, &Sources, &Destinations,
+                                                        PayloadMsg, RouteCL);
+                    }
+                  }
+
+                  // Add -d --b delivery binding
+                  CommandLine* DeliveryCL = NULL;
+                  PMB->NewCommonCommandLine("-d", "--b", "0.1",
+                                            PB->StringToInt("18"), Values.at(0), &Values,
+                                            PayloadMsg, DeliveryCL);
+
+                  // Copy the payload
+                  PayloadMsg->SetPayloadFromCharArray(Payload, Size);
+
+                  // Copy the ng -info --payload CL
+                  CommandLine* InfoCL = NULL;
+                  PayloadMsg->NewCommandLine(_PCL, InfoCL);
+                  InfoCL->Version = "0.1";
+
+                  // Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard
+                  string SCN = NameGenerator::GetInstance().GenerateFromMessage(PayloadMsg);
+                  CommandLine* SCNCL = NULL;
+                  PMB->NewSCNCommandLine("0.1", SCN, PayloadMsg, SCNCL);
+
+                  // Push to GW input queue — the GW handles routing via -m --cl
+                  PGW->PushToInputQueue(PayloadMsg);
+                }
 
                 // PB->S <<"A new pub for the file "<<Values.at(0)<<" was received with size "<<Size<<" bytes"<<endl; // TODO: FIXP/Update - Added this line to follow files being published
               }
