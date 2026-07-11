@@ -107,7 +107,9 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                 // InlineResponseMessage — NG serialisation produces only ONE
                 // payload block. All -info --payload CLs in one message share
                 // that single payload. Fix: each file gets its own message
-                // with its own payload, pushed directly to the GW InputQueue.
+                // with its own routing and payload, pushed directly to the
+                // PGCS output queue (SHM key "11") so the message leaves the
+                // NR process and never re-enters the NR block's InputQueue.
 
                 {
                   NR* PNR = (NR*)PB;
@@ -153,13 +155,16 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                   PayloadMsg->NewCommandLine(_PCL, InfoCL);
                   InfoCL->Version = "0.1";
 
-                  // Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard
+                  // Add -scn --s for message identification
                   string SCN = NameGenerator::GetInstance().GenerateFromMessage(PayloadMsg);
                   CommandLine* SCNCL = NULL;
                   PMB->NewSCNCommandLine("0.1", SCN, PayloadMsg, SCNCL);
 
-                  // Push to GW input queue — the GW handles routing via -m --cl
-                  PGW->PushToInputQueue(PayloadMsg);
+                  // Push directly to the PGCS output queue (SHM key "11").
+                  // This bypasses the NR block's InputQueue entirely,
+                  // preventing NRInfoPayload01 from re-processing the
+                  // -info --payload CL and creating an infinite loop.
+                  PGW->PushToOutputQueue("11", PayloadMsg);
                 }
 
                 // PB->S <<"A new pub for the file "<<Values.at(0)<<" was received with size "<<Size<<" bytes"<<endl; // TODO: FIXP/Update - Added this line to follow files being published
