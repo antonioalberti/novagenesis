@@ -104,6 +104,7 @@ public:
   friend class NRDeliveryBind01;
   friend class NRRunPeriodic01;
   friend class NRRevokeBind01;
+  friend class NRSubBind01;
 };
 
 #endif

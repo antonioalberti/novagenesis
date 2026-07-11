@@ -109,6 +109,7 @@ public:
   friend class PSDeliveryBind01;
   friend class PSRunPeriodic01;
   friend class PSRevokeBind01;
+  friend class PSSubBind01;
 };
 
 #endif
