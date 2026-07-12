@@ -97,9 +97,7 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
 
 #ifdef DEBUG
 
-                PB->S << Offset << "(Forwarding payload: file=" << Values.at(0)
-                      << ", size=" << Size << " bytes)" << endl;
-
+                PB->S << Offset << "(InlineResponseMessage: Adding the payload: file=" << Values.at(0) << ", size=" << Size << " bytes)" << endl;
 #endif
               }
               else

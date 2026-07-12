@@ -42,6 +42,7 @@
 #endif
 
 // #define DEBUG // To follow message processing
+#define DEBUG1 // To follow inlineresponse message generation only
 
 Block::Block(string _LN, Process* _PP, unsigned int _Index, string _Path)
 {
@@ -357,6 +358,25 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
         // With the GWStatusS01Msg dead code eliminated from GWMsgCl01,
         // no action pushes to ScheduledMessages anymore. The vector is
         // always empty, making the cleanup loop unnecessary.
+
+#ifdef DEBUG1
+
+        // SPEC-DEBUG-HT: Log the InlineResponseMessage after processing ALL command lines
+        // so we can see the accumulated -d --b and -info --payload CLs with a single payload.
+        if (LN == "HT" && _InlineResponseMessage != 0)
+        {
+          unsigned int _dbgIRM_NCL = 0;
+          _InlineResponseMessage->GetNumberofCommandLines(_dbgIRM_NCL);
+          S << Offset << "(SPEC-DEBUG-HT: InlineResponseMessage after processing "
+            << NCL << " CL(s) — total CLs = " << _dbgIRM_NCL
+            << ", HasPayload = " << _InlineResponseMessage->HasPayloadFlag
+            << ", PayloadSize = " << _InlineResponseMessage->PayloadSize
+            << ")" << endl;
+          S << Offset << "(BEGIN InlineResponseMessage)" << endl;
+          S << *_InlineResponseMessage;
+          S << Offset << "(END InlineResponseMessage)" << endl;
+        }
+#endif
 
         StopProcessingMessage = false;
       }

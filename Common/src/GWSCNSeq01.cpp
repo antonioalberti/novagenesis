@@ -37,6 +37,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG
+
 GWSCNSeq01::GWSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -62,7 +64,11 @@ int GWSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
 
   PGW = (GW*)PB;
 
-  // PB->S << Offset <<  this->GetLegibleName() << endl;
+  #ifdef DEBUG
+
+    PB->S << Offset <<  this->GetLegibleName() << endl;
+
+  #endif
 
   // Load the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
@@ -78,7 +84,9 @@ int GWSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
 
       if (ReceivedSCN != "")
       {
-        // PB->S << Offset <<  "(ScheduledMessages size is "<<ScheduledMessages.size()<<")" << endl;
+#ifdef DEBUG
+        PB->S << Offset <<  "(The ScheduledMessages vector size at this GW is "<<ScheduledMessages.size()<<")" << endl;
+#endif
 
         if (ScheduledMessages.size() == 1)
         {
@@ -126,7 +134,9 @@ int GWSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
     PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
   }
 
-  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#ifdef DEBUG
+        PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#endif
 
   return Status;
 }

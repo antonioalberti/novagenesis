@@ -106,7 +106,7 @@ int NRMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
               if (PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, InlineResponseMessage, PCL) == OK)
               {
 #ifdef DEBUG
-                PB->S << Offset << "(InlineResponseMessage: This message is targeted to the block: "<<Destinations[3]<<" )" << endl;
+                PB->S << Offset << "(InlineResponseMessage: This message has the preconfigured destination target to: "<<Destinations[0]<<","<<Destinations[1]<<","<<Destinations[2]<<","<<Destinations[3]<<" )" << endl;
 #endif
                 Status = OK;
               }

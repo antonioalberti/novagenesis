@@ -60,8 +60,6 @@ int NRSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
   string Offset = "                    ";
   CommandLine* PCL = 0;
 
-  // PB->S << Offset <<  this->GetLegibleName() << endl;
-
 #ifdef DEBUG
 
   PB->S << Offset << this->GetLegibleName() << endl;
@@ -100,6 +98,14 @@ int NRSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
         // Add the SCN to the message
         PMB->NewSCNCommandLine("0.1", NewSCN, InlineResponseMessage, PCL);
 
+#ifdef DEBUG
+
+        PB->S << Offset << "(InlineResponseMessage: this is the current message:)"  << endl << endl;
+
+        PB->S << *InlineResponseMessage << endl;
+
+#endif
+
         Status = OK;
       }
       else
@@ -120,8 +126,6 @@ int NRSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message
   {
     PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
   }
-
-  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
 #ifdef DEBUG
 
