@@ -77,123 +77,113 @@ int HTGetBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
 
         PArguments.clear();
 
-        // Check valid category value
-        if (Category > 0 || Category < 18)
+        // Check the number of elements in second vector
+        if (_PCL->GetNumberofArgumentElements(1, NE[1]) == OK)
         {
-          // Check the number of elements in second vector
-          if (_PCL->GetNumberofArgumentElements(1, NE[1]) == OK)
+          // PB->S << Offset <<  "(The number of elements in second argument is = " << NE[1] << ")";
+
+          // Check the number of elements in the second argument
+          if (NE[1] == 1)
           {
-            // PB->S << Offset <<  "(The number of elements in second argument is = " << NE[1] << ")";
+            _PCL->GetArgument(1, PArguments);
 
-            // Check the number of elements in the second argument
-            if (NE[1] == 1)
+            Key = PArguments.at(0);
+
+            PArguments.clear();
+
+            // Check for invalid key
+            if (Key != " ")
             {
-              _PCL->GetArgument(1, PArguments);
-
-              Key = PArguments.at(0);
-
-              PArguments.clear();
-
-              // Check for invalid key
-              if (Key != " ")
+              // Check for HT block. The get bind command line only makes sense in an HT block
+              if (PB->GetLegibleName() == "HT")
               {
-                // Check for HT block. The get bind command line only makes sense in an HT block
-                if (PB->GetLegibleName() == "HT")
+                // Cast the owners block to a HT block
+                HT* PHT = (HT*)PB;
+
+                vector<string>* _Values = new vector<string>;
+
+                const string _Key = Key;
+
+                // Get the binding from the hash_multimap container
+                PHT->GetBinding(Category, _Key, _Values);
+
+                // Add a delivery command line to the in line response message
+                // ng -d --b 0.1 [ < 1 string Category > < 1 string Key > < n string S_1 ... S_n > ]
+                PMB->NewCommonCommandLine("-d", "--b", _PCL->Version, Category, _Key, _Values, InlineResponseMessage, NewHTDeliveryBind01);
+
+                // Note: The following code is an exception to the general storage rule. It adds a ng -info --payload cl
+                //		 to the message and carries the content associated to the subscription of the message.
+                //       In future versions, this will be revisited.
+
+                if (Category == 18)
                 {
-                  // Cast the owners block to a HT block
-                  HT* PHT = (HT*)PB;
-
-                  vector<string>* _Values = new vector<string>;
-
-                  const string _Key = Key;
-
-                  // Get the binding from the hash_multimap container
-                  PHT->GetBinding(Category, _Key, _Values);
-
-                  // Add a delivery command line to the in line response message
-                  // ng -d --b 0.1 [ < 1 string Category > < 1 string Key > < n string S_1 ... S_n > ]
-                  PMB->NewCommonCommandLine("-d", "--b", _PCL->Version, Category, _Key, _Values, InlineResponseMessage, NewHTDeliveryBind01);
-
-                  // Note: The following code is an exception to the general storage rule. It adds a ng -info --payload cl
-                  //		 to the message and carries the content associated to the subscription of the message.
-                  //       In future versions, this will be revisited.
-
-                  if (Category == 18)
+                  if (_Values != 0)
                   {
-                    if (_Values != 0)
+                    if (_Values->size() > 0)
                     {
-                      if (_Values->size() > 0)
-                      {
-                        string ThePath;
+                      string ThePath;
 
-                        ThePath = PB->GetPath();
+                      ThePath = PB->GetPath();
 
-                        // SPEC-018: Reset payload from any previous GetBind response on this reused InlineResponseMessage
-                        InlineResponseMessage->ResetPayload();
+                      // Reset payload from any previous GetBind response on this reused InlineResponseMessage
+                      InlineResponseMessage->ResetPayload();
 
-                        InlineResponseMessage
-                            ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
+                      InlineResponseMessage
+                          ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
 
-                        InlineResponseMessage->ConvertPayloadFromFileToCharArray();
+                      InlineResponseMessage->ConvertPayloadFromFileToCharArray();
 
-                        // Adding only the ng -info --payload 01 command line
-                        PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
-                      }
-                      else
-                      {
-                        PB->S << Offset << "(ERROR: The value under the key " << _Key
-                              << " is not here. Look somewhere else.)" << endl;
-                      }
+                      // Adding only the ng -info --payload 01 command line
+                      PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
                     }
                     else
                     {
-                      PB->S << Offset
-                            << "(ERROR: Unable to get the value stored under the informed key)"
-                            << endl;
+                      PB->S << Offset << "(ERROR: The value under the key " << _Key
+                            << " is not here. Look somewhere else.)" << endl;
                     }
                   }
-
-                  // Delete temporary values
-                  _Values->clear();
-
-                  delete _Values;
-
-                  Status = OK;
+                  else
+                  {
+                    PB->S << Offset
+                          << "(ERROR: Unable to get the value stored under the informed key)"
+                          << endl;
+                  }
                 }
-                else
-                {
-                  PB->S << Offset
-                        << "(ERROR: Unable to perfom the store. Wrong block! An HT block is required)"
-                        << endl;
 
-                  Status = ERROR;
-                }
+                // Delete temporary values
+                _Values->clear();
+
+                delete _Values;
+
+                Status = OK;
               }
               else
               {
                 PB->S << Offset
-                      << "(ERROR: Unable to read the binding key from the received command line)" << endl;
+                      << "(ERROR: Unable to perfom the store. Wrong block! An HT block is required)"
+                      << endl;
 
                 Status = ERROR;
               }
             }
             else
             {
-              PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+              PB->S << Offset
+                    << "(ERROR: Unable to read the binding key from the received command line)" << endl;
 
               Status = ERROR;
             }
           }
           else
           {
-            PB->S << Offset << "(ERROR: Wrong number of elements on second argument)" << endl;
+            PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
 
             Status = ERROR;
           }
         }
         else
         {
-          PB->S << Offset << "(ERROR: Invalid category)" << endl;
+          PB->S << Offset << "(ERROR: Wrong number of elements on second argument)" << endl;
 
           Status = ERROR;
         }

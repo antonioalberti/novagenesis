@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		NRRunPeriodic01
-	Object:		NRRunPeriodic01
-	File:		NRRunPeriodic01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		NRRunPeriodic01
+        Object:		NRRunPeriodic01
+        File:		NRRunPeriodic01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -47,36 +47,36 @@
 
 #define DEBUG
 
-NRRunPeriodic01::NRRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+NRRunPeriodic01::NRRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
   PGCSPID = "unknown";
 
   PGCSHT = "unknown";
 }
 
-NRRunPeriodic01::~NRRunPeriodic01 ()
+NRRunPeriodic01::~NRRunPeriodic01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --periodic _Version
-int
-NRRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int NRRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
-  NR *PNR = 0;
-  CommandLine *PCL = 0;
-  Message *RunPeriodic = 0;
+  NR* PNR = 0;
+  CommandLine* PCL = 0;
+  Message* RunPeriodic = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
 
-  PNR = (NR *)PB;
+  PNR = (NR*)PB;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
@@ -85,49 +85,49 @@ NRRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
   // ******************************************************
 
   if (PGCSPID == "unknown" && PGCSHT == "unknown")
-	{
-	  GetPGCSNames ();
-	}
+  {
+    GetPGCSNames();
+  }
 
   if (PGCSPID != "unknown" && PGCSHT != "unknown")
-	{
-	  Exposition ();
-	}
+  {
+    Exposition();
+  }
 
   // ******************************************************
   // Schedule a message to run periodic again
   // ******************************************************
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + PNR->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
+  PB->PP->NewMessage(GetTime() + PNR->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
 
   // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
   SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PNR->PGW->PushToInputQueue (RunPeriodic);
+  PNR->PGW->PushToInputQueue(RunPeriodic);
 
   // ******************************************************
   // Clean the messages container
@@ -135,53 +135,54 @@ NRRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl << endl << endl;
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 
   return Status;
 }
 
-int NRRunPeriodic01::GetPGCSNames ()
+int NRRunPeriodic01::GetPGCSNames()
 {
   int Status = ERROR;
   string Offset = "                    ";
-  vector<string> *PGCSBIDs = new vector<string>;
+  vector<string>* PGCSBIDs = new vector<string>;
 
-  if (PB->PP->DiscoverHomonymsBlocksBIDsFromProcessLegibleName ("PGCS", "HT", PGCSPID, PGCSBIDs, PB) == OK)
-	{
-	  if (PGCSBIDs->size () > 0)
-		{
-		  PGCSHT = PGCSBIDs->at (0);
+  if (PB->PP->DiscoverHomonymsBlocksBIDsFromProcessLegibleName("PGCS", "HT", PGCSPID, PGCSBIDs, PB) == OK)
+  {
+    if (PGCSBIDs->size() > 0)
+    {
+      PGCSHT = PGCSBIDs->at(0);
 
 #ifdef DEBUG
 
-		  PB->S << Offset << "(GetPGCSNames: PID=" << PGCSPID
-		        << ", HT BID=" << PGCSHT << ")" << endl;
+      PB->S << Offset << "(GetPGCSNames: PID=" << PGCSPID
+            << ", HT BID=" << PGCSHT << ")" << endl;
 
 #endif
-
-		}
-	}
+    }
+  }
 
   return Status;
 }
 
-int NRRunPeriodic01::Exposition ()
+int NRRunPeriodic01::Exposition()
 {
   int Status = ERROR;
   string Offset = "                    ";
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Message *ExposingInitialBinds = NULL;
-  NR *PNR = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
+  Message* ExposingInitialBinds = NULL;
+  NR* PNR = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
 
-  PNR = (NR *)PB;
+  PNR = (NR*)PB;
 
-  PHTB = (Block *)PNR->PHT;
+  PHTB = (Block*)PNR->PHT;
 
 #ifdef DEBUG
 
@@ -200,48 +201,47 @@ int NRRunPeriodic01::Exposition ()
   // ***************************************************
 
   // Setting up the OSID as the space limiter
-  Limiters.push_back (PB->PP->Intra_OS);
+  Limiters.push_back(PB->PP->Intra_OS);
 
   // Setting up the this process as the first source SCN
-  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+  Sources.push_back(PB->PP->GetSelfCertifyingName());
 
   // Setting up the IR block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the PGCS PID as the destination SCN
-  Destinations.push_back (PGCSPID);
+  Destinations.push_back(PGCSPID);
 
   // Setting up the PGCS::HT BID as the destination SCN
-  Destinations.push_back (PGCSHT);
+  Destinations.push_back(PGCSHT);
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, ExposingInitialBinds);
+  PB->PP->NewMessage(GetTime(), 0, false, ExposingInitialBinds);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, ExposingInitialBinds, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, ExposingInitialBinds, PCL);
 
   // ***************************************************
   // Generate the bindings to be store on PGCS
   // ***************************************************
 
-  PMB->NewStoreBindingCommandLineFromOSIDToPID ("0.1", ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToPID("0.1", ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PB, ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PHTB, ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PHTB, ExposingInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromPIDToBID("0.1",PGWB,ExposingInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromPIDToBID("0.1",PGWB,ExposingInitialBinds,PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "NR", PB
-	  ->GetSelfCertifyingName (), ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLNToSCN("0.1", 2, "NR", PB->GetSelfCertifyingName(), ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, PB->GetSelfCertifyingName (), "NR", ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineSCNToHashLN("0.1", 3, PB->GetSelfCertifyingName(), "NR", ExposingInitialBinds, PCL);
 
   // Generate the SCN
   SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, ExposingInitialBinds, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, ExposingInitialBinds, PCL);
 
   // ******************************************************
   // Finish
@@ -256,7 +256,7 @@ int NRRunPeriodic01::Exposition ()
 #endif
 
   // Push the message to the GW input queue
-  PNR->PGW->PushToInputQueue (ExposingInitialBinds);
+  PNR->PGW->PushToInputQueue(ExposingInitialBinds);
 
   Status = OK;
 

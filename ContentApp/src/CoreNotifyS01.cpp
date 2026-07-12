@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-// #define DEBUG // To follow message processing
+#define DEBUG  // To follow message processing
 // #define DEBUG1 // To follow message processing for flow control
 
 CoreNotifyS01::CoreNotifyS01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -100,7 +100,7 @@ int CoreNotifyS01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
         for (unsigned int b = 0; b < ReceivedKeys.size(); b++)
         {
 
-#ifdef DEBUG1
+#ifdef DEBUG
           PB->S << Offset << "(Checking a new notification with the key = " << ReceivedKeys.at(b) << ")" << endl;
 #endif
 

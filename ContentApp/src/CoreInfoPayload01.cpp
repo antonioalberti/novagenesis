@@ -41,7 +41,7 @@
 #include "../../Common/src/NameGenerator.h"
 #endif
 
-////#define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 CoreInfoPayload01::CoreInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

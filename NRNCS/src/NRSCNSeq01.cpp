@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		NRSCNSeq01
-	Object:		NRSCNSeq01
-	File:		NRSCNSeq01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		NRSCNSeq01
+        Object:		NRSCNSeq01
+        File:		NRSCNSeq01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -37,20 +37,20 @@
 #include "NameGenerator.h"
 #endif
 
-//#define DEBUG
+#define DEBUG
 
-NRSCNSeq01::NRSCNSeq01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+NRSCNSeq01::NRSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-NRSCNSeq01::~NRSCNSeq01 ()
+NRSCNSeq01::~NRSCNSeq01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -scn --seq 0.1 [ < 1 string SCN > ]
-int
-NRSCNSeq01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int NRSCNSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string ReceivedSCN;
@@ -58,74 +58,76 @@ NRSCNSeq01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *>
   unsigned int NA = 0;
   vector<string> PA;
   string Offset = "                    ";
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of argument
-	  if (NA == 1)
-		{
-		  // Get the fist argument
-		  _PCL->GetArgument (0, PA);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of argument
+    if (NA == 1)
+    {
+      // Get the fist argument
+      _PCL->GetArgument(0, PA);
 
-		  // Get received message SCN
-		  ReceivedSCN = PA.at (0);
-
-		  #ifdef DEBUG
-
-  PB->S << Offset << "(Received SCN=" << ReceivedSCN
-        << ", State=" << PB->State << ")" << endl;
-
-#endif
-
-  if (ReceivedSCN != "")
-			{
-			  if (PB->State == "operational")
-				{
-				  PMB->NewSCNCommandLine ("0.1", ReceivedSCN, InlineResponseMessage, PCL);
-				}
-
-			  // Generate the SCN
-			  NewSCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
-
-			  // Add the SCN to the message
-			  PMB->NewSCNCommandLine ("0.1", NewSCN, InlineResponseMessage, PCL);
-
-			  Status = OK;
-			}
-		  else
-			{
-			  PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
-
-			  Status = ERROR;
-			}
-		}
-	  else
-		{
-		  PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
-
-		  Status = ERROR;
-		}
-	}
-  else
-	{
-	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
-	}
-
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+      // Get received message SCN
+      ReceivedSCN = PA.at(0);
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl << endl << endl;
+      PB->S << Offset << "(Received SCN=" << ReceivedSCN
+            << ", State=" << PB->State << ")" << endl;
+
+#endif
+
+      if (ReceivedSCN != "")
+      {
+        if (PB->State == "operational")
+        {
+          PMB->NewSCNCommandLine("0.1", ReceivedSCN, InlineResponseMessage, PCL);
+        }
+
+        // Generate the SCN
+        NewSCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
+
+        // Add the SCN to the message
+        PMB->NewSCNCommandLine("0.1", NewSCN, InlineResponseMessage, PCL);
+
+        Status = OK;
+      }
+      else
+      {
+        PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+
+        Status = ERROR;
+      }
+    }
+    else
+    {
+      PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+
+      Status = ERROR;
+    }
+  }
+  else
+  {
+    PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+  }
+
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
+
+#ifdef DEBUG
+
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 
