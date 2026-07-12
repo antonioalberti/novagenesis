@@ -123,17 +123,44 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             }
 
             // Update related Subscription
+            // SPEC-023: Extract key from the -d --b in the received message
+            // and match subscription by key instead of picking first available.
+            string DeliveryKey = "";
+            CommandLine* DCL = NULL;
+            _ReceivedMessage->GetCommandLine("-d", "--b", DCL);
+            if (DCL != NULL)
+            {
+              vector<string> DArgs;
+              DCL->GetArgument(1, DArgs);  // Arg 1 = Key in -d --b [<cat> <key> <file>]
+              if (DArgs.size() > 0)
+              {
+                DeliveryKey = DArgs.at(0);
+              }
+            }
+
+#ifdef DEBUG
+            if (DeliveryKey != "")
+            {
+              PB->S << Offset << "(Delivery key extracted from -d --b: " << DeliveryKey << ")" << endl;
+            }
+            else
+            {
+              PB->S << Offset << "(WARNING: Could not extract delivery key from -d --b)" << endl;
+            }
+#endif
+
             for (unsigned int i = 0; i < PCore->Subscriptions.size(); i++)
             {
               Subscription* PS = PCore->Subscriptions[i];
 
 #ifdef DEBUG
               PB->S << Offset << "(Testing subscription " << i << ")" << endl;
-
+              PB->S << Offset << "(Subscription key is " << PS->Key << ")" << endl;
               PB->S << Offset << "(Subscription status is " << PS->Status << ")" << endl;
 #endif
 
-              if (PS->Status == "Waiting delivery")
+              // SPEC-023: Match by key from -d --b, not by first available
+              if (DeliveryKey != "" && PS->Key == DeliveryKey && PS->Status == "Waiting delivery")
               {
 #ifdef DEBUG
                 PB->S << Offset << "(Storing the file named " << Values.at(0) << " to this subscription)" << endl;
