@@ -77,6 +77,7 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
   string PayloadHash;
   bool PublicationStatus = true;
   unsigned int Counter = 0;
+  unsigned int StartingMem = 0;
   Tuple* PT = 0;
   vector<Tuple*> PubNotify;
   vector<Tuple*> SubNotify;
@@ -103,6 +104,16 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
     std::vector<std::string> FileNamesInThePath;
 
     FileNamesInThePath = read_directory(PB->GetPath());
+
+          // SPEC-023: Record starting message count for Delta calculation
+          StartingMem = PB->PP->GetNumberOfMessages();
+
+          PB->S << endl
+                << Offset << "[BURST] Starting. ContentBurstSize=" << PCore->ContentBurstSize
+                << " FilesInDir=" << FileNamesInThePath.size()
+                << " MessagesInMem=" << StartingMem
+                << " Content.size=" << PCore->Content.size()
+                << endl;
 
     for (int y = 0; y < FileNamesInThePath.size(); y++)
     {
@@ -166,6 +177,13 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
 #endif
 
           PCore->Content.push_back(PayloadHash);
+
+          // SPEC-023: Limitar tamanho do Content vector
+          if (PCore->Content.size() > 10000)
+          {
+            PCore->Content.erase(PCore->Content.begin(),
+                                 PCore->Content.begin() + (PCore->Content.size() - 10000));
+          }
 
 #ifdef DEBUG
           PB->S << Offset << "(The payload hash is = " << PayloadHash << ")" << endl;
@@ -235,7 +253,40 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
 #endif
           if ((Counter == PCore->ContentBurstSize) || (PB->PP->GetNumberOfMessages() >= (MAX_MESSAGES_IN_MEMORY - 200)))
           {
-            break;
+            // SPEC-023: Throttle preventivo + logging de diagnostico
+            unsigned int CurrentMem = PB->PP->GetNumberOfMessages();
+            const char* Reason = "";
+
+            if (Counter == PCore->ContentBurstSize)
+            {
+              Reason = "ContentBurstSize";
+            }
+            else if (CurrentMem >= (MAX_MESSAGES_IN_MEMORY - 200))
+            {
+              Reason = "HardLimit";
+            }
+            else if (CurrentMem >= (MAX_MESSAGES_IN_MEMORY * 0.5))
+            {
+              if (Counter > 0)
+              {
+                Reason = "MemThrottle";
+              }
+              else
+              {
+                // Se Counter==0, publica pelo menos 1 antes de pausar
+                Reason = "";
+              }
+            }
+
+            if (Reason[0] != '\0')
+            {
+              PB->S << Offset << "[BURST] Stopping. Counter=" << Counter
+                    << " Reason=" << Reason
+                    << " MessagesInMem=" << CurrentMem
+                    << " Delta=" << (CurrentMem - StartingMem)
+                    << endl;
+              break;
+            }
           }
         }
       }

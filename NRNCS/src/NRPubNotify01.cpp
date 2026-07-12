@@ -109,6 +109,23 @@ int NRPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
             PMB->NewCommonCommandLine("-sr", "--b", "0.1", PB->StringToInt(Category.at(0)), Key.at(0), &Values, InlineResponseMessage, PCL);
 
             // Get received pub/sub notification tuples
+
+            // SPEC-023: Count pubs for adaptive rate limiting
+            unsigned int PubCount = 0;
+            for (unsigned int tmp = 3; tmp < NA; tmp++)
+            {
+              _PCL->GetArgument(tmp, Notification);
+              if (Notification.size() == 5 && Notification.at(0) == "pub")
+                PubCount++;
+              Notification.clear();
+            }
+
+            double EffectiveDelay = PNR->DelayBeforeSendingANotification;
+            if (PubCount > 10)
+            {
+              EffectiveDelay = max(EffectiveDelay, 0.001 * PubCount);
+            }
+
             for (unsigned int i = 3; i < NA; i++)
             {
               _PCL->GetArgument(i, Notification);
@@ -158,7 +175,7 @@ int NRPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
 
                   // Creating a new message
                   PB->PP->NewMessage(
-                      GetTime() + PNR->DelayBeforeSendingANotification, 0, false, Notify);
+                      GetTime() + EffectiveDelay, 0, false, Notify);
 
                   // ***************************************************
                   // Generate the ng -m --cl command Line
