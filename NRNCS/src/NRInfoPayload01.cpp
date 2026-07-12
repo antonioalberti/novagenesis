@@ -33,6 +33,10 @@
 #include "NR.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 #define DEBUG
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -86,18 +90,66 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
               // Check for error
               if (Payload != 0)
               {
-                // Copy the payload from received message *Payload array to the new message
-                InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);
+                // SPEC-022: Create a SEPARATE message per -info --payload.
+                // A single NG message can carry only ONE payload. When the NR
+                // block processes multiple -info --payload in one message,
+                // all -info --payload CLs share the same payload — the last
+                // one loaded. Fix: create a dedicated message with its own
+                // payload and push it directly to the GW input queue.
 
-                // Copy the ng -info --payload to the new message
-                InlineResponseMessage->NewCommandLine(_PCL, PCL);
+                NR* PNR = (NR*)PB;
+                GW* PGW = PNR->PGW;
 
-                // Change to 0.1 version
+                // Extract routing from the received message's -m --cl
+                CommandLine* RoutedCL = NULL;
+                _ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
+
+                // Create a new message for THIS file
+                Message* PayloadMsg = NULL;
+                PB->PP->NewMessage(GetTime(), 0, false, PayloadMsg);
+
+                // Copy routing (-m --cl)
+                if (RoutedCL != NULL)
+                {
+                    vector<string> Limiters;
+                    vector<string> Sources;
+                    vector<string> Destinations;
+                    RoutedCL->GetArgument(0, Limiters);
+                    RoutedCL->GetArgument(1, Sources);
+                    RoutedCL->GetArgument(2, Destinations);
+
+                    if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
+                    {
+                        CommandLine* RouteCL = NULL;
+                        PMB->NewConnectionLessCommandLine(RoutedCL->Version,
+                                                          &Limiters, &Sources, &Destinations,
+                                                          PayloadMsg, RouteCL);
+                    }
+                }
+
+                // Add -d --b
+                PMB->NewCommonCommandLine("-d", "--b", "0.1",
+                                          PB->StringToInt("18"), Values.at(0), &Values,
+                                          PayloadMsg, PCL);
+
+                // Copy payload
+                PayloadMsg->SetPayloadFromCharArray(Payload, Size);
+
+                // Add -info --payload
+                PayloadMsg->NewCommandLine(_PCL, PCL);
                 PCL->Version = "0.1";
+
+                // Add -scn --s (passes NoCL > 2 guard)
+                string SCN = NameGenerator::GetInstance().GenerateFromMessage(PayloadMsg);
+                PMB->NewSCNCommandLine("0.1", SCN, PayloadMsg, PCL);
+
+                // Send to GW input queue
+                PGW->PushToInputQueue(PayloadMsg);
 
 #ifdef DEBUG
 
-                PB->S << Offset << "(InlineResponseMessage: Adding the payload: file=" << Values.at(0) << ", size=" << Size << " bytes)" << endl;
+                PB->S << Offset << "(NRNCS forwarding payload: file=" << Values.at(0) << ", size=" << Size << " bytes)" << endl;
+
 #endif
               }
               else

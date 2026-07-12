@@ -372,7 +372,7 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
             << ", HasPayload = " << _InlineResponseMessage->HasPayloadFlag
             << ", PayloadSize = " << _InlineResponseMessage->PayloadSize
             << ")" << endl;
-          S << Offset << "(BEGIN InlineResponseMessage)" << endl;
+          S << Offset << "(BEGIN InlineResponseMessage at "<<GetTime()<<" seconds)" << endl;
           S << *_InlineResponseMessage;
           S << Offset << "(END InlineResponseMessage)" << endl;
         }
