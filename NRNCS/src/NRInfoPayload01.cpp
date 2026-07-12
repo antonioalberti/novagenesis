@@ -108,7 +108,7 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                 Message* PayloadMsg = NULL;
                 PB->PP->NewMessage(GetTime(), 0, false, PayloadMsg);
 
-                // Copy routing (-m --cl)
+                // Copy routing (-m --cl) — SWAP sources/destinations for return path
                 if (RoutedCL != NULL)
                 {
                     vector<string> Limiters;
@@ -121,8 +121,10 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                     if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
                     {
                         CommandLine* RouteCL = NULL;
+                        // SWAP: the message came FROM Sources TO Destinations (us).
+                        // The response must go FROM us (Sources) TO the originator (Destinations).
                         PMB->NewConnectionLessCommandLine(RoutedCL->Version,
-                                                          &Limiters, &Sources, &Destinations,
+                                                          &Limiters, &Destinations, &Sources,
                                                           PayloadMsg, RouteCL);
                     }
                 }
