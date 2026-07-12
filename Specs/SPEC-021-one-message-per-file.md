@@ -208,6 +208,8 @@ A mudança acima é intrusiva: requer acesso ao PP e PGW dentro de HTGetBind01 (
 
 Em vez de adicionar todos os `ng -g --b` ao mesmo InlineResponseMessage, criar uma mensagem separada por key e enviá-la directamente ao HT via `PushToInputQueue`.
 
+**IMPORTANTE — Guarda `NoCL > 2` no PushToInputQueue:** O GW (`Common/src/GW.cpp:229`) verifica `if (NoCL > 2)` antes de aceitar uma mensagem na input queue. Cada mensagem separada precisa de pelo menos 3 CLs. A solução abaixo adiciona `-scn --seq` como terceira CL para satisfazer esta guarda.
+
 **Ficheiro:** `NRNCS/src/NRSubBind01.cpp`
 
 **Antes:**
@@ -224,44 +226,59 @@ for (unsigned int i = 0; i < Key.size(); i++)
 // SPEC-021: Create a SEPARATE message per subscription key.
 // A single NG message can carry only ONE payload. When the HT
 // processes multiple ng -g --b in one message, all -info --payload
-// CLs share the same payload. Fix: each key gets its own message
-// routed to the HT, so HTGetBind01 creates one InlineResponseMessage
-// per file — each with its own payload.
+// CLs share the same payload — the last one loaded. Fix: each key
+// gets its own message routed to the HT, so HTGetBind01 creates
+// one InlineResponseMessage per file — each with its own payload.
+//
+// SCN guard: GW::PushToInputQueue requires NoCL > 2. Each message
+// must have at least 3 CLs, so we add -scn --s as the third CL.
 
 NR* PNR = (NR*)PB;
 GW* PGW = PNR->PGW;
 Block* PHTB = (Block*)PNR->PHT;
 
+// Extract routing from the received message's -m --cl
+CommandLine* RoutedCL = NULL;
+_ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
+
+vector<string> RouteLimiters;
+vector<string> RouteSources;
+vector<string> RouteDestinations;
+
+if (RoutedCL != NULL)
+{
+    RoutedCL->GetArgument(0, RouteLimiters);
+    RoutedCL->GetArgument(1, RouteSources);
+    RoutedCL->GetArgument(2, RouteDestinations);
+}
+
 for (unsigned int i = 0; i < Key.size(); i++)
 {
     Message* GetBindMessage = NULL;
-    CommandLine* PCL = NULL;
-    CommandLine* RouteCL = NULL;
+    CommandLine* MsgCl = NULL;
+    CommandLine* GetBindCL = NULL;
 
     // Create a new message for this key
     PB->PP->NewMessage(GetTime(), 1, false, GetBindMessage);
 
-    // Add routing: -m --cl with destination = HT
-    vector<string> Limiters;
-    vector<string> Sources;
-    vector<string> Destinations;
+    // Add routing: -m --cl with destination = HT (copied from received message)
+    if (RoutedCL != NULL && RouteDestinations.size() == 4)
+    {
+        vector<string> DestCopy = RouteDestinations;
+        DestCopy[3] = PHTB->GetSelfCertifyingName();
 
-    Limiters.push_back(PB->PP->Intra_Domain);
-    Sources.push_back(PB->PP->GetHostSelfCertifyingName());
-    Sources.push_back(PB->PP->GetOperatingSystemSelfCertifyingName());
-    Sources.push_back(PB->PP->GetSelfCertifyingName());
-    Sources.push_back(PB->GetSelfCertifyingName());
-    Destinations.push_back(PB->PP->GetHostSelfCertifyingName());
-    Destinations.push_back(PB->PP->GetOperatingSystemSelfCertifyingName());
-    Destinations.push_back(PB->PP->GetSelfCertifyingName());
-    Destinations.push_back(PHTB->GetSelfCertifyingName());
+        PMB->NewConnectionLessCommandLine("0.1", &RouteLimiters, &RouteSources, &DestCopy,
+                                          GetBindMessage, MsgCl);
+    }
 
-    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations,
-                                      GetBindMessage, RouteCL);
-
-    // Add ng -g --b for this key
+    // Add ng -g --b for this key only
     PMB->NewGetCommandLine("0.2", PB->StringToInt(Category.at(0)), Key.at(i),
-                           GetBindMessage, PCL);
+                           GetBindMessage, GetBindCL);
+
+    // SPEC-021: Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard.
+    // Without this third CL, the message is silently discarded at GW.cpp:229.
+    string SCN = NameGenerator::GetInstance().GenerateFromMessage(GetBindMessage);
+    PMB->NewSCNCommandLine("0.1", SCN, GetBindMessage, GetBindCL);
 
     // Push to GW input queue for processing by the HT
     PGW->PushToInputQueue(GetBindMessage);
@@ -284,10 +301,10 @@ No NRNCS repo-side, `NRInfoPayload01` (linha 87-112) copia o payload da mensagem
 
 | Ficheiro | Mudança | Razão |
 |----------|---------|-------|
-| `NRNCS/src/NRSubBind01.cpp` | SPEC-021: Criar mensagem separada por key em vez de acumular no InlineResponseMessage | Cada payload precisa da sua própria mensagem |
-| `NRNCS/src/NRSubBind01.h` | Adicionar `#include "GW.h"` e `#include "NR.h"` para acesso ao PGW e PHT | Necessário para criar mensagens e encaminhar |
-| `PSS/src/PSSubBind01.cpp` | SPEC-021: Mesma mudança que NRNCS NRSubBind01 | O PSS tem a mesma lógica de loop |
-| `PSS/src/PSSubBind01.h` | Adicionar includes necessários | Idem |
+| `NRNCS/src/NRSubBind01.cpp` | SPEC-021: Criar mensagem separada por key em vez de acumular no InlineResponseMessage | Cada payload precisa da sua própria mensagem; adicionar `-scn --seq` como 3ª CL para NoCL > 2 guard |
+| `NRNCS/src/NRSubBind01.h` | Adicionar `#include "GW.h"`, `#include "NR.h"` e `#include "NameGenerator.h"` | Necessário para acesso ao PGW, PHT e geração de SCN |
+| `PSS/src/PSSubBind01.cpp` | SPEC-021: Mesma mudança que NRNCS NRSubBind01 (já implementada) | O PSS tem a mesma lógica de loop |
+| `PSS/src/PSSubBind01.h` | Adicionar includes necessários (já implementado) | Idem |
 | `Common/src/HTGetBind01.cpp` | Manter ResetPayload() (SPEC-018) — não alterar | Prevenção, mesmo que já não seja necessário para múltiplos gets |
 | `NRNCS/src/NRInfoPayload01.cpp` | Manter ResetPayload() (SPEC-018) — não alterar | Prevenção |
 
@@ -357,6 +374,7 @@ Após SPEC-021, o InlineResponseMessage gerado pelo `NRSubBind01` **já não tem
 
 1. **InlineResponseMessage vazio** — Após SPEC-021, o NR block não gera um InlineResponseMessage útil. O GW descarta-o (NoCL < 3). Isto é correcto.
 2. **Ordem de chegada** — As mensagens separadas chegam ao HT em ordem, mas o GW pode reordenar com base no tempo agendado. Isto não é problema — cada mensagem é independente.
-3. **Memory** — Mais mensagens em memória (100 em vez de 1). O `MAX_MESSAGES_IN_MEMORY` pode ser atingido se o ContentApp tentar subscrever demasiados ficheiros de uma vez. Verificar se o limiar de congestão (`MAX_MESSAGES_IN_MEMORY - 200`) no `CoreNotifyS01` é suficiente.
+3. **Memory** — Mais mensagens em memória N em vez de 1. O `MAX_MESSAGES_IN_MEMORY` pode ser atingido. Verificar se o limiar de congestão (`MAX_MESSAGES_IN_MEMORY - 200`) no `CoreNotifyS01` é suficiente.
 4. **SCN collisions** — Cada mensagem nova precisa de um SCN único. O `NameGenerator::GenerateFromMessage` gera um hash da mensagem, que será diferente para cada uma (diferentes CLs). Isto funciona correctamente.
 5. **Re-delivery timer** — O `CoreRunPeriodic01` re-submete subscrições "Waiting delivery" após timeout. Com SPEC-021, cada subscrição é servida por uma mensagem separada, pelo que o timer não dispara (a não ser que a mensagem se perca).
+6. **⚠️ Guarda `NoCL > 2` no PushToInputQueue** — O GW (`Common/src/GW.cpp:229`) rejeita mensagens com ≤ 2 CLs na input queue. As mensagens separadas criadas pelo `NRSubBind01` precisam de pelo menos 3 CLs (`-m --cl` + `-g --b` + `-scn --seq`). Sem a 3ª CL, as mensagens são descartadas silenciosamente e o Repository nunca recebe conteúdo. A implementação do PSSubBind01 já inclui esta correcção via `NewSCNCommandLine`.

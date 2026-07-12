@@ -61,7 +61,6 @@ int NRSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
   unsigned int NA = 0;
   vector<string> Category;
   vector<string> Key;
-  CommandLine* PCL = 0;
 
 #ifdef DEBUG
 
@@ -86,6 +85,35 @@ int NRSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
 
 #endif
 
+          // SPEC-021: Create a SEPARATE message per subscription key.
+          // A single NG message can carry only ONE payload. When the HT
+          // processes multiple ng -g --b in one message, all -info --payload
+          // CLs share the same payload — the last one loaded. Fix: each key
+          // gets its own message routed to the HT, so HTGetBind01 creates
+          // one InlineResponseMessage per file — each with its own payload.
+          //
+          // SCN guard: GW::PushToInputQueue requires NoCL > 2. Each message
+          // must have at least 3 CLs, so we add -scn --s as the third CL.
+
+          NR* PNR = (NR*)PB;
+          GW* PGW = PNR->PGW;
+          Block* PHTB = (Block*)PNR->PHT;
+
+          // Extract routing from the received message's -m --cl
+          CommandLine* RoutedCL = NULL;
+          _ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
+
+          vector<string> RouteLimiters;
+          vector<string> RouteSources;
+          vector<string> RouteDestinations;
+
+          if (RoutedCL != NULL)
+          {
+            RoutedCL->GetArgument(0, RouteLimiters);
+            RoutedCL->GetArgument(1, RouteSources);
+            RoutedCL->GetArgument(2, RouteDestinations);
+          }
+
           for (unsigned int i = 0; i < Key.size(); i++)
           {
 #ifdef DEBUG
@@ -93,8 +121,35 @@ int NRSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
             PB->S << Offset << "(Key[" << i << "]=" << Key.at(i) << ")" << endl;
 
 #endif
-            // Change command line from ng -s --b to ng -g --b
-            PMB->NewGetCommandLine("0.1", PB->StringToInt(Category.at(0)), Key.at(i), InlineResponseMessage, PCL);
+
+            Message* GetBindMessage = NULL;
+            CommandLine* MsgCl = NULL;
+            CommandLine* GetBindCL = NULL;
+
+            // Create a new message for this key
+            PB->PP->NewMessage(GetTime(), 1, false, GetBindMessage);
+
+            // Add routing: -m --cl with destination = HT (copied from received message)
+            if (RoutedCL != NULL && RouteDestinations.size() == 4)
+            {
+              vector<string> DestCopy = RouteDestinations;
+              DestCopy[3] = PHTB->GetSelfCertifyingName();
+
+              PMB->NewConnectionLessCommandLine("0.1", &RouteLimiters, &RouteSources, &DestCopy,
+                                                GetBindMessage, MsgCl);
+            }
+
+            // Add ng -g --b for this key only
+            PMB->NewGetCommandLine("0.2", PB->StringToInt(Category.at(0)), Key.at(i),
+                                   GetBindMessage, GetBindCL);
+
+            // SPEC-021: Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard.
+            // Without this third CL, the message is silently discarded at GW.cpp:229.
+            string SCN = NameGenerator::GetInstance().GenerateFromMessage(GetBindMessage);
+            PMB->NewSCNCommandLine("0.1", SCN, GetBindMessage, GetBindCL);
+
+            // Push to GW input queue for processing by the HT
+            PGW->PushToInputQueue(GetBindMessage);
           }
         }
         else

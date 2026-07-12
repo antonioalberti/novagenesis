@@ -102,6 +102,7 @@ public:
   friend class NRMsgCl01;
   friend class NRPubNotify01;
   friend class NRDeliveryBind01;
+  friend class NRSubBind01;
   friend class NRRunPeriodic01;
   friend class NRRevokeBind01;
 };

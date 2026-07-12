@@ -56,6 +56,14 @@
 #include <unistd.h>
 #endif
 
+#ifndef _NR_H
+#include "NR.h"
+#endif
+
+#ifndef _NAMEGENERATOR_H_
+#include "NameGenerator.h"
+#endif
+
 #define ERROR 1
 #define OK 0
 
