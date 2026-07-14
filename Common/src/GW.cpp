@@ -53,7 +53,7 @@
 #include "GWExposition02.h"
 #endif
 
-// #define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 #define LG(msg) S << endl \
                   << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl

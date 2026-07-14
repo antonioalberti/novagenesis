@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunPublish02::CoreRunPublish02(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -71,6 +73,11 @@ int CoreRunPublish02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
   PCore = (Core*)PB;
 
+#ifdef DEBUG
+  PB->S << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << "(NA = " << NA << ")" << endl;
+#endif
+
   // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
@@ -84,8 +91,12 @@ int CoreRunPublish02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
       if (FileName.size() == 1)
       {
-        // PB->S << Offset << "(Going to publish the file named " << FileName[0] << ".)" << endl;
-        // PB->S << Offset << "(Path = " << PB->GetPath() << ")" << endl;
+#ifdef DEBUG
+        PB->S << Offset << "(Going to publish the file named " << FileName[0] << ")" << endl;
+        PB->S << Offset << "(Path = " << PB->GetPath() << ")" << endl;
+        PB->S << Offset << "PeerServerAppTuples size = " << PCore->PeerServerAppTuples.size() << endl;
+        PB->S << Offset << "PeerClientAppTuples size = " << PCore->PeerClientAppTuples.size() << endl;
+#endif
 
         for (unsigned int i = 0; i < PCore->PeerServerAppTuples.size(); i++)
         {
@@ -123,7 +134,10 @@ int CoreRunPublish02::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
           // Copy the related Tuple pointer
           PT = PCore->PeerClientAppTuples[k];
 
+        #ifdef DEBUG
           PB->S << Offset << "(Source " << k << ")" << endl;
+        #endif
+          // PB->S << Offset << "(Source " << k << ")" << endl;
           // PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;
           // PB->S << Offset << "(OSID = " << PT->Values[1] << ")" << endl;
           // PB->S << Offset << "(PID = " << PT->Values[2] << ")" << endl;

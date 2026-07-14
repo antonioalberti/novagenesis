@@ -16,7 +16,7 @@
 
 SSH_KEY=~/.ssh/id_ed25519_hermes
 VM_IP=192.168.0.36
-PHOTOS=${1:-300}
+PHOTOS=${1:-20}
 WIDTH=${2:-800}
 HEIGHT=${3:-600}
 BASE=/root/workspace/novagenesis

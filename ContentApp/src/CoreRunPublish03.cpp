@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunPublish03::CoreRunPublish03(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -85,8 +87,10 @@ int CoreRunPublish03::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
       if (FileName.size() == 1)
       {
+#ifdef DEBUG
         PB->S << Offset << "(Going to publish the file named " << FileName[0] << ".)" << endl;
         PB->S << Offset << "(Path = " << PB->GetPath() << ")" << endl;
+#endif
 
         for (unsigned int i = 0; i < PCore->PeerServerAppTuples.size(); i++)
         {
@@ -97,12 +101,11 @@ int CoreRunPublish03::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
           // Copy the related Tuple pointer
           PT = PCore->PeerServerAppTuples[i];
-
-          PB->S << Offset << "(Repository " << i << ")" << endl;
-          // PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;
-          // PB->S << Offset << "(OSID = " << PT->Values[1] << ")" << endl;
-          // PB->S << Offset << "(PID = " << PT->Values[2] << ")" << endl;
           // PB->S << Offset << "(BID = " << PT->Values[3] << ")" << endl;
+
+#ifdef DEBUG
+          PB->S << Offset << "(Repository " << i << ")" << endl;
+#endif
 
           // Set the remaining elements on the tuple
           for (unsigned int j = 0; j < PT->Values.size(); j++)
@@ -150,9 +153,11 @@ int CoreRunPublish03::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
     PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
   }
 
+#ifdef DEBUG
   PB->S << Offset << "(Done)" << endl
         << endl
         << endl;
+#endif
 
   return Status;
 }
@@ -323,10 +328,12 @@ void CoreRunPublish03::CreatePublishMessage(string _FileName, vector<Tuple*>& _P
       // Stores the SCN on the Publication object for future reference
       PP->Key = SCN;
 
+#ifdef DEBUG
       PB->S << Offset << "(The following message was published to the peer)" << endl;
 
       PB->S << "(" << endl
             << *Publish << ")" << endl;
+#endif
 
       // long long xx=0;
 

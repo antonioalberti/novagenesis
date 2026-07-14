@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunSubscribe01::CoreRunSubscribe01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -69,6 +71,11 @@ int CoreRunSubscribe01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector
 
   PCore = (Core*)PB;
 
+#ifdef DEBUG
+  PB->S << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << "(NA = " << NA << ")" << endl;
+#endif
+
   // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
@@ -84,6 +91,11 @@ int CoreRunSubscribe01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector
       // Pairs=_PCL->Arguments.at(1);
       if (Category.size() > 0 && Keys.size())
       {
+#ifdef DEBUG
+        PB->S << Offset << "(Category = " << Category.at(0) << ")" << endl;
+        PB->S << Offset << "(Keys size = " << Keys.size() << ")" << endl;
+        PB->S << Offset << "(PSTuples size = " << PCore->PSTuples.size() << ")" << endl;
+#endif
 
         // April 2021, not scalable at all. Would be much better whether the keys were used to determine to which NRNCS the content has been submitted.
         for (unsigned int u = 0; u < PCore->PSTuples.size(); u++)

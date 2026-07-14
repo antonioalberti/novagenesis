@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunInitialize01::CoreRunInitialize01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -68,7 +70,9 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
   string Value;
   double Temp;
 
-  // PB->S << Offset <<  this->GetLegibleName() << endl;
+#ifdef DEBUG
+  PB->S << Offset << this->GetLegibleName() << endl;
+#endif
 
   PCore = (Core*)PB;
 
@@ -262,7 +266,11 @@ int CoreRunInitialize01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vecto
 
   // PCore->Debug.CloseFile();
 
-  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#ifdef DEBUG
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
+#endif
 
   return Status;
 }

@@ -2,20 +2,20 @@
 # pull-and-build-vms.sh — Git stash + pull + compile on VMs 101 and 102
 #
 # Connects via SSH to both NovaGenesis Alpine VMs, stashes any local
-# changes, pulls the latest AIOPT2 branch, then compiles all NG binaries
+# changes, pulls the latest AIOPT3 branch, then compiles all NG binaries
 # with make -j$(nproc).
 #
 # Usage: bash pull-and-build-vms.sh
 # Prerequisites:
 #   - VMs 101 and 102 running and SSH-reachable
 #   - SSH key ~/.ssh/id_ed25519_hermes deployed on both VMs
-#   - SPEC-018 fix committed and pushed to origin/AIOPT2 on VM 100
+#   - SPEC-018 fix committed and pushed to origin/AIOPT3 on VM 100
 #
 # Order: Run before deploy when binaries need updating
 
 SSH_KEY=~/.ssh/id_ed25519_hermes
 BASE=/root/workspace/novagenesis
-BRANCH=AIOPT2
+BRANCH=AIOPT3
 
 VM101="root@192.168.0.61"
 VM102="root@192.168.0.36"

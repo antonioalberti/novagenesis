@@ -33,6 +33,8 @@
 #include "Core.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 ContentApp::ContentApp(string _LN, string _Role, key_t _Key, string _Path)
     : Process(_LN, _Key, _Path)
 {

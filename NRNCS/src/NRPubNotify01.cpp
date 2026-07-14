@@ -45,7 +45,6 @@
 #include "NameGenerator.h"
 #endif
 
-// TODO: FIXP/Update - Added this debug control
 #define DEBUG
 
 NRPubNotify01::NRPubNotify01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -89,8 +88,6 @@ int NRPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
   PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
-
-  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
@@ -207,8 +204,7 @@ int NRPubNotify01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
 #ifdef DEBUG
                   PB->S << Offset << "(The following message was published to the peer)" << endl;
 
-                  PB->S << "(" << endl
-                        << *Notify << ")" << endl;
+                  PB->S << "(" << endl << *Notify << ")" << endl;
 #endif
                 }
               }

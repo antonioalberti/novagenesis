@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunInvite01::CoreRunInvite01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -77,6 +79,11 @@ int CoreRunInvite01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
 
   PCore = (Core*)PB;
 
+#ifdef DEBUG
+  PB->S << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << "(NA = " << NA << ")" << endl;
+#endif
+
   // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Load the number of arguments
@@ -100,6 +107,10 @@ int CoreRunInvite01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
           PT = PCore->PeerClientAppTuples[PB->StringToInt(PeerData.at(1))];
         }
 
+#ifdef DEBUG
+        PB->S << Offset << "(Inviting " << PeerData.at(0) << " index=" << PeerData.at(1) << ")" << endl;
+        PB->S << Offset << "(Offer file is " << OfferFileName << ")" << endl;
+#endif
         // PB->S << Offset << "(The peer is " << PeerData.at(0) << " " <<PeerData.at(1)<< ")" << endl;
         // PB->S << Offset << "(Its HID is = " << PT->Values[0] << ")" << endl;
         // PB->S << Offset << "(Its OSID is = " << PT->Values[1] << ")" << endl;

@@ -212,7 +212,7 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             }
           }
 #ifdef DEBUG
-        PB->S << "(The message does not have a payload)" << endl;
+        PB->S << Offset << "(The message does not have a payload)" << endl;
 #endif
         }
       }

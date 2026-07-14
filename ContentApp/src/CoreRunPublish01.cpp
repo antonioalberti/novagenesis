@@ -41,6 +41,8 @@
 #include "NameGenerator.h"
 #endif
 
+#define DEBUG // To follow message processing
+
 CoreRunPublish01::CoreRunPublish01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
 {
@@ -76,7 +78,10 @@ int CoreRunPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
   PCore = (Core*)PB;
 
+#ifdef DEBUG
   PB->S << Offset << this->GetLegibleName() << endl;
+  PB->S << Offset << "(NA = " << NA << ")" << endl;
+#endif
 
   // Load the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
@@ -99,12 +104,23 @@ int CoreRunPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
           PT = PCore->PeerClientAppTuples[PB->StringToInt(PeerData.at(1))];
         }
 
+#ifdef DEBUG
+        PB->S << Offset << "(Publishing to " << PeerData.at(0) << " index=" << PeerData.at(1) << ")" << endl;
+        if (PT != 0)
+        {
+          PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;
+          PB->S << Offset << "(OSID = " << PT->Values[1] << ")" << endl;
+          PB->S << Offset << "(PID = " << PT->Values[2] << ")" << endl;
+          PB->S << Offset << "(BID = " << PT->Values[3] << ")" << endl;
+        }
+#endif
         // PB->S << Offset << "(HID = " << PT->Values[0] << ")" << endl;
         // PB->S << Offset << "(OSID = " << PT->Values[1] << ")" << endl;
         // PB->S << Offset << "(PID = " << PT->Values[2] << ")" << endl;
         // PB->S << Offset << "(BID = " << PT->Values[3] << ")" << endl;
+#ifdef DEBUG
         PB->S << Offset << "(File = " << PeerData.at(2) << ")" << endl;
-        // PB->S << Offset << "(Path = " << PB->GetPath() << ")" << endl;
+#endif
 
         // Setting up the OSID as the space limiter
         Limiters.push_back(PB->PP->Intra_Domain);
@@ -169,8 +185,10 @@ int CoreRunPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
 
           // PCore->Debug.CloseFile();
 
+#ifdef DEBUG
           PB->S << endl
                 << Offset << "(The payload hash is " << PayloadHash << ")" << endl;
+#endif
 
           // Put the file name on the binding value
           Values.push_back(PeerData.at(2));
@@ -308,9 +326,11 @@ int CoreRunPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
     PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
   }
 
+#ifdef DEBUG
   PB->S << Offset << "(Done)" << endl
         << endl
         << endl;
+#endif
 
   return Status;
 }
