@@ -41,8 +41,9 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 // #define DEBUG1 // To follow inlineresponse message generation only
+// #define DEBUG2
 
 Block::Block(string _LN, Process* _PP, unsigned int _Index, string _Path)
 {
@@ -180,7 +181,7 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
     // Previously, these accessed _ReceivedMessage before verifying it
     // is still in Process::Messages[], causing use-after-free SIGSEGV
     // when a freed message pointer was dequeued from the InputQueue.
-#ifdef DEBUG
+#ifdef DEBUG2
     {
       unsigned int _dbgNCL = 0;
       _ReceivedMessage->GetNumberofCommandLines(_dbgNCL);
