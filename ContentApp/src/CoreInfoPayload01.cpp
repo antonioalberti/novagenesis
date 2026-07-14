@@ -211,6 +211,9 @@ int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               PCore->tsmiup1->SampleToFile(Time);
             }
           }
+#ifdef DEBUG
+        PB->S << "(The message does not have a payload)" << endl;
+#endif
         }
       }
     }

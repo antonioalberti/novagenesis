@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-// #define DEBUG // To follow message processing
+#define DEBUG // To follow message processing
 
 #define LOG(msg) PB->S << endl \
                        << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
@@ -129,7 +129,7 @@ int CoreRunContentPublish01::Run(Message* _ReceivedMessage, CommandLine* _PCL, v
       }
 
 #ifdef DEBUG
-      PB->S << Offset << "(Testing file number " << Jumping << ". Aware of " << PCore->Content.size()
+      PB->S << Offset << "(Testing file number " << y << ". Aware of " << PCore->Content.size()
             << " published photos)" << endl;
 #endif
       if (Extension != "" && Extension != "ini" && Extension != "txt" && Extension != "dat" && Extension != "sh" && Extension != "py" && Extension != "out")

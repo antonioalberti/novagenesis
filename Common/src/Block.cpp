@@ -42,7 +42,7 @@
 #endif
 
 // #define DEBUG // To follow message processing
-#define DEBUG1 // To follow inlineresponse message generation only
+// #define DEBUG1 // To follow inlineresponse message generation only
 
 Block::Block(string _LN, Process* _PP, unsigned int _Index, string _Path)
 {
