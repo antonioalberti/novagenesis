@@ -33,7 +33,7 @@
 #include "HT.h"
 #endif
 
-////#define DEBUG
+#define DEBUG
 
 HTDeliveryBind01::HTDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -96,7 +96,7 @@ int HTDeliveryBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<M
         PArguments.clear();
 
         // Check valid category value
-        if (Category >= 0 || Category <= 18)
+        if (Category >= 0 || Category <= 50)
         {
           // Check the number of elements in second vector
           if (_PCL->GetNumberofArgumentElements(1, NE[1]) == OK)

@@ -140,7 +140,7 @@ int NRSubBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
             }
 
             // Add ng -g --b for this key only
-            PMB->NewGetCommandLine("0.2", PB->StringToInt(Category.at(0)), Key.at(i),
+            PMB->NewGetCommandLine("0.1", PB->StringToInt(Category.at(0)), Key.at(i),
                                    GetBindMessage, GetBindCL);
 
             // SPEC-021: Add -scn --s to satisfy PushToInputQueue NoCL > 2 guard.
