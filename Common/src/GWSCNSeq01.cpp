@@ -37,7 +37,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 GWSCNSeq01::GWSCNSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

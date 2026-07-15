@@ -45,7 +45,7 @@
 #include "ContentApp.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 CoreStatusS01::CoreStatusS01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

@@ -33,7 +33,7 @@
 #include "NR.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 NRNCS::NRNCS(string _LN, key_t _Key, string _Path)
     : Process(_LN, _Key, _Path)

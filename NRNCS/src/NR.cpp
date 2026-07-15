@@ -69,7 +69,7 @@
 #include "NRRunPeriodic01.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 NR::NR(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path)
     : Block(_LN, _PP, _Index, _Path)

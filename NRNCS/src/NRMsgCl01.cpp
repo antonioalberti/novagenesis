@@ -37,7 +37,7 @@
 #include "NR.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 NRMsgCl01::NRMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

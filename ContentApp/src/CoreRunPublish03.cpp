@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 CoreRunPublish03::CoreRunPublish03(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

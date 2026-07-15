@@ -27,7 +27,7 @@
 
 #include "ContentApp.h"
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 #ifndef _TIME_H
 #include <time.h>

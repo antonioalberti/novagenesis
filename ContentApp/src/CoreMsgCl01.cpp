@@ -37,7 +37,7 @@
 #include "Core.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 CoreMsgCl01::CoreMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -69,7 +69,6 @@ int CoreMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
 #ifdef DEBUG
   PB->S << Offset << this->GetLegibleName() << endl;
   PB->S << Offset << "(Messages in memory = " << PB->PP->GetNumberOfMessages() << ")" << endl;
-  PB->S << Offset << "(MAX_MESSAGES_IN_MEMORY * 0.5 = " << (MAX_MESSAGES_IN_MEMORY * 0.5) << ")" << endl;
 #endif
 
   // PB->S << Offset <<  this->GetLegibleName() << endl;

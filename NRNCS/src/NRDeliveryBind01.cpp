@@ -45,7 +45,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 NRDeliveryBind01::NRDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

@@ -35,7 +35,7 @@
 #include <sys/time.h>
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 int main(int argc, char* argv[])
 {

@@ -41,7 +41,7 @@
 #include "ContentApp.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 #define LOG(msg) PB->S << endl \
                        << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl

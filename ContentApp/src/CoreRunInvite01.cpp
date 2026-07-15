@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 
 CoreRunInvite01::CoreRunInvite01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

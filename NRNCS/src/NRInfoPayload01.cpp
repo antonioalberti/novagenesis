@@ -41,7 +41,7 @@
 #include "File.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
