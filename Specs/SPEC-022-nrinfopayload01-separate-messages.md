@@ -1,267 +1,143 @@
-# SPEC-022: NRInfoPayload01 — Separate Message Per Payload (NRNCS Side)
+# SPEC-022: NRInfoPayload01 — Cache Local, Não Reencaminhar
 
-**Data:** 2026-07-12  
-**Estado:** Proposta  
-**Autor:** Hermes Agent  
-**Relacionada:** SPEC-021 (one message per key em NRSubBind01), SPEC-018 (ResetPayload)
-
----
-
-## 1. Problema
-
-Após SPEC-021, o `NRSubBind01` cria mensagens separadas por key. O HT responde com **uma mensagem por ficheiro**, cada uma com EXACTAMENTE UM `-info --payload` + UM payload. **Contudo, no NRNCS source-side, o `NRInfoPayload01` acumula todos os `-info --payload` no mesmo `InlineResponseMessage` — mesmo RC5/SPEC-021, novo local.**
-
-### 1.1 Log do NRNCS source (source36)
-
-```
-[11918.182s] (NRNCS forwarding payload: file=00003...)
-              (NRNCS forwarding payload: file=00004...)
-              (NRNCS forwarding payload: file=00005...)
-[11918.206s] (Received 00003...)
-```
-
-3 `-info --payload` processados no mesmo `Block::Run()`, todos no mesmo `InlineResponseMessage`.
-
-### 1.2 Log do ContentApp repo (repo61)
-
-```
-[11922.845s] file=00009 hash=6A17D369 ERROR: not same (got 59A88EAD)
-[11922.859s] file=00010 hash=DE17CDB4 ERROR: not same (got 59A88EAD)
-...
-```
-
-A partir de 00009, **TODOS** têm o hash `59A88EAD` (conteúdo de 00008). Subscription 0 (Key=59A88EAD) tem `HasContent=0` — 00008 nunca foi entregue, mas o seu payload contaminou todos os seguintes.
-
-### 1.3 Causa Raiz (RC6)
-
-`NRInfoPayload01::Run()` (linhas 89-96):
-
-```cpp
-// Copy the payload from received message *Payload array to the new message
-InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);
-
-// Copy the ng -info --payload to the new message
-InlineResponseMessage->NewCommandLine(_PCL, PCL);
-```
-
-Para CADA `-info --payload` na mensagem recebida:
-1. `SetPayloadFromCharArray()` carrega o novo payload (sobrescreve o anterior)
-2. `NewCommandLine()` copia o CL para o **mesmo** `InlineResponseMessage`
-
-Após N iterações, o `InlineResponseMessage` contém N CLs `-info --payload` mas **UM** payload — o último carregado. A serialização NG produz UM bloco de payload partilhado por todos os CLs.
-
-**Este é o exacto mesmo problema do RC5/SPEC-021, mas no `InlineResponseMessage` do NR block (não do HT).**
+**Data:** 2026-07-15
+**Estado:** Corrigida (modelo NG correcto)
+**Autor:** Hermes Agent + Antonio Alberti
+**Relacionada:** SPEC-021 (NRSubBind01), HTGetBind01 (cat=18)
 
 ---
 
-## 2. Fluxo Actual do Problema
+## 1. Problema Original (ANULADO)
+
+A versão anterior desta SPEC assumia que o `NRInfoPayload01` deveria criar uma mensagem separada com `-d --b` + payload e reencaminhá-la directamente para o destino. **Esta premissa estava errada** e viola o modelo pub/sub invertido do NovaGenesis.
+
+## 2. Modelo NG Correcto (Pub/Sub Invertido vs MQTT)
+
+No NovaGenesis, ao contrário do MQTT onde o broker faz push do conteúdo para os subscritores, o fluxo é:
 
 ```
-SOURCE VM (source36)                          REPO VM (repo61)
-────────────────────────                      ────────────────
-ContentApp Source publica 100 ficheiros
-     │
-     ▼
-NRNCS Source: NRSubBind01 (SPEC-021)
-  → 100 mensagens separadas ao HT
-  → HT responde INDIVIDUALMENTE
-  → Cada resposta chega ao NR block
-     │
-     ▼
-NRInfoPayload01 (BUG):
-  Block::Run() processa TODOS os -info --payload
-  de TODAS as 100 respostas do HT?
-  
-  NÃO — na verdade cada resposta individual do HT
-  tem APENAS 1 -info --payload. O bug é que
-  quando MÚLTIPLAS respostas do HT chegam juntas
-  (enfileiradas no InputQueue), cada uma é
-  processada separadamente com o SEU próprio
-  InlineResponseMessage.
-  
-  MAS — o que acontece é que o PGCS no source
-  entrega MÚLTIPLAS respostas do HT como UMA
-  só mensagem ao NRNCS → NR block processa
-  todos os -info --payload no mesmo Block::Run
-  → mesmo InlineResponseMessage → RC5.
-     │
-     ▼
-PGCS source → raw socket → PGCS repo
-     │
-     ▼
-ContentApp Repo recebe 1 mensagem com
-N× -info --payload + 1 payload (último ficheiro)
-→ hash mismatch em N-1 ficheiros
+Publicador (ContentApp Source)
+  │
+  ├─ 1. Publica conteúdo com -p --notify
+  │      O -p --notify inclui -info --payload com o payload
+  │
+  ▼
+NRNCS Source (caching node)
+  │
+  ├─ 2. NRPubNotify01: armazena binding (cat=18, hash→nome)
+  │      no HT local. Apenas o nome, NÃO o conteúdo.
+  │
+  ├─ 3. NRInfoPayload01: EXTRAI o Payload[] da mensagem
+  │      recebida e GUARDA EM DISCO no path do NRNCS
+  │      (IO/NRNCS/<nome_ficheiro>).
+  │      NÃO cria -d --b. NÃO reencaminha.
+  │      Apenas cache.
+  │
+  ├─ 4. NRPubNotify01: envia ng -notify ao Repo
+  │      informando que o conteúdo está disponível.
+  │
+  ▼
+Repo (subscritor)
+  │
+  ├─ 5. Recebe notificação → submete ng -s --b
+  │
+  ▼
+NRNCS Source (atende subscrição)
+  │
+  ├─ 6. NRSubBind01 → ng -g --b ao HT
+  │
+  ├─ 7. HTGetBind01 (cat=18):
+  │      ├─ Lê binding → obtém nome do ficheiro
+  │      ├─ Lê ficheiro do disco (IO/NRNCS/<nome>)
+  │      ├─ Cria InlineResponseMessage com:
+  │      │   - -d --b (delivery)
+  │      │   - -info --payload + payload
+  │      │   - -scn --seq (do -g --b)
+  │      └─ Devolve ao NRSubBind01
+  │
+  └─ 8. NRSubBind01 reencaminha para o Repo
 ```
 
-**A causa exacta do batching no PGCS ainda está por confirmar**, mas a solução é clara: o `NRInfoPayload01` NUNCA deve acumular no `InlineResponseMessage`. Cada `-info --payload` deve produzir a SUA própria mensagem, com o SEU próprio routing e o SEU próprio payload.
+**Princípio fundamental:** O `-info --payload` que chega no `-p --notify` serve **apenas para fazer cache local**. A entrega ao subscritor (`-d --b`) só acontece quando o subscritor faz `ng -s --b` e o `HTGetBind01` serve o conteúdo do cache.
 
----
+## 3. O Erro das SPECs Anteriores
 
-## 3. Correcção
+As SPECs 021 e 022 (versão anterior) foram escritas assumindo que:
+- O `NRInfoPayload01` deveria criar `-d --b` e reencaminhar
+- O `HTGetBind01` para cat=18 não era o caminho principal
 
-### 3.1 Princípio
+Isto quebrou o modelo NG porque:
+1. O conteúdo era reencaminhado antes de o subscritor subscrever
+2. O `HTGetBind01` (cat=18) tentava ler o ficheiro do disco mas o ficheiro nunca era guardado — resultando em `HasPayloadFlag=true` com `PayloadSize=0`
+3. O alarme "ficheiro não encontrado" nunca era emitido
 
-Cada `-info --payload` processado por `NRInfoPayload01` gera uma mensagem NOVA e INDEPENDENTE, com:
-- Routing extraído da mensagem recebida (`-m --cl`)
-- `-d --b` + `-info --payload` + payload
-- `-scn --s` (para passar o guard `NoCL > 2` do `PushToInputQueue`)
+## 4. Correcção
 
-A mensagem é enviada via `PGW->PushToInputQueue()` — o GW trata do routing naturalmente.
+### 4.1 NRInfoPayload01 — Cache em disco
 
-### 3.2 Código actual vs proposto
+Em `NRNCS/src/NRInfoPayload01.cpp`:
 
-**Ficheiro:** `NRNCS/src/NRInfoPayload01.cpp`
+| Antes (forwarding) | Depois (cache) |
+|---|---|
+| Extraía payload e criava nova msg com `-d --b` | Extrai payload e guarda em disco |
+| Usava `PGW->PushToInputQueue()` | Usa `ConvertPayloadFromCharArrayToFile()` |
+| Adicionava `-scn --s` | Apenas cache; sem CLs extra |
 
-**Antes (RC6 — acumula no InlineResponseMessage):**
+**Código implementado:**
 
 ```cpp
-// Copy the payload from received message *Payload array to the new message
-InlineResponseMessage->SetPayloadFromCharArray(Payload, Size);
+// Cache the payload to disk in the NRNCS path
+CachePath = PB->GetPath();
 
-// Copy the ng -info --payload to the new message
-InlineResponseMessage->NewCommandLine(_PCL, PCL);
-
-// Change to 0.1 version
-PCL->Version = "0.1";
-```
-
-**Depois (SPEC-022 — mensagem separada por ficheiro):**
-
-```cpp
-NR* PNR = (NR*)PB;
-GW* PGW = PNR->PGW;
-
-// Extrair routing da mensagem recebida
-CommandLine* RoutedCL = NULL;
-_ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
-
-// Criar nova mensagem para ESTE ficheiro
-Message* PayloadMsg = NULL;
-PB->PP->NewMessage(GetTime(), 0, false, PayloadMsg);
-
-// Copiar routing (-m --cl)
-if (RoutedCL != NULL)
+// Check if file already exists (idempotent)
+File F;
+if (F.OpenInputFile(Values.at(0), CachePath, "BINARY") == OK)
 {
-    vector<string> Limiters;
-    vector<string> Sources;
-    vector<string> Destinations;
-    RoutedCL->GetArgument(0, Limiters);
-    RoutedCL->GetArgument(1, Sources);
-    RoutedCL->GetArgument(2, Destinations);
-    
-    if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
-    {
-        CommandLine* RouteCL = NULL;
-        PMB->NewConnectionLessCommandLine(RoutedCL->Version,
-                                          &Limiters, &Sources, &Destinations,
-                                          PayloadMsg, RouteCL);
-    }
+    F.CloseFile();
+    // Already cached — skip
+    return Status;
 }
 
-// Adicionar -d --b
-PMB->NewCommonCommandLine("-d", "--b", "0.1",
-                          PB->StringToInt("18"), Values.at(0), &Values,
-                          PayloadMsg, PCL);
-
-// Copiar payload
-PayloadMsg->SetPayloadFromCharArray(Payload, Size);
-
-// Adicionar -info --payload
-PayloadMsg->NewCommandLine(_PCL, PCL);
-PCL->Version = "0.1";
-
-// Adicionar -scn --s (passa o guard NoCL > 2)
-string SCN = NameGenerator::GetInstance().GenerateFromMessage(PayloadMsg);
-PMB->NewSCNCommandLine("0.1", SCN, PayloadMsg, PCL);
-
-// Enviar para o GW
-PGW->PushToInputQueue(PayloadMsg);
+_ReceivedMessage->SetPayloadFileName(Values.at(0));
+_ReceivedMessage->SetPayloadFilePath(CachePath);
+_ReceivedMessage->SetPayloadFileOption("BINARY");
+_ReceivedMessage->ConvertPayloadFromCharArrayToFile();
 ```
 
-**Nota:** O `InlineResponseMessage` deixa de ser usado para transportar o payload. O NR block retorna com o InlineResponseMessage quase vazio (pode ter 0-1 CLs de outras acções). O `GWMsgCl01::ForwardMessageInsideProcess` descarta-o (`NoCL <= 2`). Isto é intencional — as mensagens reais estão no InputQueue via PushToInputQueue.
+### 4.2 HTGetBind01 — Alarme quando cache não existe
 
-### 3.3 Ficheiros afectados
+Em `Common/src/HTGetBind01.cpp` (cat=18, linhas 131-137):
+
+| Antes | Depois |
+|---|---|
+| Chamava `ConvertPayloadFromFileToCharArray()` sem verificar retorno | Verifica retorno; só adiciona `-info --payload` se OK |
+| Falha silenciosa quando ficheiro não existe | Emite ALARM se ficheiro não encontrado |
+
+```cpp
+if (InlineResponseMessage->ConvertPayloadFromFileToCharArray() == OK)
+{
+    PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
+}
+else
+{
+    PB->S << Offset << "(ALARM: Payload file " << _Values->at(0)
+          << " not found in cache at " << ThePath
+          << ". The NRInfoPayload01 on the source must cache it before the subscription arrives.)" << endl;
+}
+```
+
+## 5. Ficheiros Alterados
 
 | Ficheiro | Mudança |
 |----------|---------|
-| `NRNCS/src/NRInfoPayload01.cpp` | Criar mensagem separada por `-info --payload` em vez de acumular no InlineResponseMessage |
-| `NRNCS/src/NR.h` | Adicionar `friend class NRInfoPayload01;` para aceder a `PNR->PGW` |
+| `NRNCS/src/NRInfoPayload01.cpp` | Substituído forwarding por cache em disco |
+| `Common/src/HTGetBind01.cpp` | Alarme quando ficheiro não existe em cache |
 
-### 3.4 Includes já disponíveis
+## 6. Verificação
 
-O `NRInfoPayload01.cpp` já inclui:
-- `NRInfoPayload01.h` → `Action.h`
-- `NR.h` → contém `GW* PGW` como friend
-
-O header `NR.h` **NÃO** lista `NRInfoPayload01` como friend. **Precisamos de adicionar `friend class NRInfoPayload01;` em `NR.h`** para aceder a `PNR->PGW`.
-
----
-
-## 4. Impacto
-
-### 4.1 Routing preservado
-
-A mensagem nova herda o routing da mensagem recebida (`-m --cl`). O GW processa o routing naturalmente — a mensagem vai para o destino correcto (ContentApp via PGCS).
-
-### 4.2 Mensagens por ficheiro
-
-Cada ficheiro gera exactamente 1 mensagem com:
-- `-m --cl` (routing original)
-- `-d --b` (delivery binding)
-- `-info --payload` (metadados do ficheiro)
-- `-scn --s` (SCN)
-- payload (conteúdo do ficheiro)
-
-Total: 4 CLs + payload > 3 → passa `NoCL > 2` no GW. ✅
-
-### 4.3 InlineResponseMessage vazio
-
-O NR block retorna com InlineResponseMessage quase vazio (pode ter 0-1 CLs de outras acções). O `GWMsgCl01::ForwardMessageInsideProcess` descarta-o (`NoCL <= 2`). Isto é correcto — as mensagens reais estão no InputQueue via PushToInputQueue.
-
-### 4.4 Compatibilidade
-
-SPEC-022 é compatível com SPEC-014/015/017/018/019/020/021. Nenhuma destas é alterada ou quebrada.
-
----
-
-## 5. Verificação
-
-1. Aplicar SPEC-022 em `NRInfoPayload01.cpp`
-2. Adicionar `friend class NRInfoPayload01;` em `NR.h`
-3. Compilar: `cd build && make -j$(nproc)`
-4. Deploy para source36 via `git pull` + `make`
-5. Testar com `--publish 0.1` (100 ficheiros)
-6. Verificar: **ZERO** erros "hash of the file is not the same"
-7. Verificar: cada timestamp no NRNCS log mostra APENAS 1 "forwarding payload" (não 3-4 em lote)
-8. Verificar: ContentApp repo recebe 100/100 com hashes correctos
-
----
-
-## 6. Decisões
-
-| # | Decisão | Razão |
-|---|---------|-------|
-| D1 | Criar mensagem separada em vez de usar InlineResponseMessage | Mesmo padrão SPEC-021; NG só suporta 1 payload por mensagem |
-| D2 | Manter ResetPayload() (SPEC-018) | Prevenção, mesmo que já não necessário |
-| D3 | Usar PGW->PushToInputQueue em vez de OutputQueue | GW processa routing naturalmente; mensagem chega ao destino correcto |
-| D4 | Adicionar friend class NRInfoPayload01 em NR.h | Necessário para aceder a PNR->PGW |
-
----
-
-## 7. Pitfalls
-
-1. **InlineResponseMessage vazio** — Após SPEC-022, o NR block não gera InlineResponseMessage útil. O GW descarta-o (NoCL < 3). Isto é correcto.
-2. **Ordem de chegada** — As mensagens separadas chegam ao HT em ordem, mas o GW pode reordenar com base no tempo agendado. Não é problema — cada mensagem é independente.
-3. **Memory** — Mais mensagens em memória N em vez de 1. O `MAX_MESSAGES_IN_MEMORY` pode ser atingido. Verificar se o limiar de congestão (`MAX_MESSAGES_IN_MEMORY - 200`) no `CoreNotifyS01` é suficiente.
-4. **SCN collisions** — Cada mensagem nova precisa de um SCN único. O `NameGenerator::GenerateFromMessage` gera um hash da mensagem, que será diferente para cada uma (CLs diferentes). Funciona correctamente.
-5. **Re-delivery timer** — O `CoreRunPeriodic01` re-submete subscrições "Waiting delivery" após timeout. Com SPEC-022, cada subscrição é servida por uma mensagem separada, pelo que o timer não dispara (a não ser que a mensagem se perca).
-
----
-
-## 8. Referências
-
-- `references/subscription-ht-payload-flow.md` — fluxo completo subscription→HT→payload
-- `references/notification-path-bug.md` — segundo bug além do SPEC-021
-- `SPEC-021-one-message-per-file.md` — fix no NRSubBind01 (source side)
-- `SPEC-018-resetpayload.md` — ResetPayload em HTGetBind01
+1. Compilar: `cd build && cmake .. && make -j$(nproc) NRNCS`
+2. Deploy para source36 e repo61
+3. Source36: verificar `IO/NRNCS/` contém os ficheiros cacheados
+4. Repo61: verificar que recebe conteúdo com hash correcto
+5. Log: verificar `(Cached file: ...)` no NRNCS source
+6. Se faltar ficheiro em cache, verificar `(ALARM: Payload file ... not found in cache)`

@@ -37,6 +37,10 @@
 #include "NameGenerator.h"
 #endif
 
+#ifndef _FILE_H
+#include "File.h"
+#endif
+
 #define DEBUG
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -50,6 +54,12 @@ NRInfoPayload01::~NRInfoPayload01()
 
 // Run the actions behind a received command line
 // ng -info --payload _Version [ < n string _ValuesSize string S_1 ... S_ValuesSize > ]
+//
+// NG inverted pub/sub model:
+//   This action does NOT forward the content. It ONLY caches the payload
+//   to disk in the NRNCS cache path. The actual delivery (ng -d --b) is
+//   triggered later when the subscriber sends ng -s --b and the HT serves
+//   the cached file via HTGetBind01 (category 18).
 int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
@@ -57,8 +67,8 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   unsigned int NA = 0;
   vector<string> Values;
   char* Payload = 0;
-  CommandLine* PCL = 0;
   long long Size = 0;
+  string CachePath;
 
 #ifdef DEBUG
 
@@ -90,69 +100,41 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
               // Check for error
               if (Payload != 0)
               {
-                // SPEC-022: Create a SEPARATE message per -info --payload.
-                // A single NG message can carry only ONE payload. When the NR
-                // block processes multiple -info --payload in one message,
-                // all -info --payload CLs share the same payload — the last
-                // one loaded. Fix: create a dedicated message with its own
-                // payload and push it directly to the GW input queue.
+                // ============================================================
+                // Cache the payload to disk in the NRNCS path.
+                // The HTGetBind01 (category 18) will read this file later
+                // when the subscriber's ng -s --b triggers a ng -g --b.
+                // ============================================================
 
-                NR* PNR = (NR*)PB;
-                GW* PGW = PNR->PGW;
+                CachePath = PB->GetPath();
 
-                // Extract routing from the received message's -m --cl
-                CommandLine* RoutedCL = NULL;
-                _ReceivedMessage->GetCommandLine("-m", "--cl", RoutedCL);
-
-                // Create a new message for THIS file
-                Message* PayloadMsg = NULL;
-                PB->PP->NewMessage(GetTime(), 0, false, PayloadMsg);
-
-                // Copy routing (-m --cl) — SWAP sources/destinations for return path
-                if (RoutedCL != NULL)
+                // Check if file already exists (idempotent cache)
                 {
-                    vector<string> Limiters;
-                    vector<string> Sources;
-                    vector<string> Destinations;
-                    RoutedCL->GetArgument(0, Limiters);
-                    RoutedCL->GetArgument(1, Sources);
-                    RoutedCL->GetArgument(2, Destinations);
-
-                    if (Limiters.size() > 0 && Sources.size() > 0 && Destinations.size() > 0)
-                    {
-                        CommandLine* RouteCL = NULL;
-                        // SWAP: the message came FROM Sources TO Destinations (us).
-                        // The response must go FROM us (Sources) TO the originator (Destinations).
-                        PMB->NewConnectionLessCommandLine(RoutedCL->Version,
-                                                          &Limiters, &Destinations, &Sources,
-                                                          PayloadMsg, RouteCL);
-                    }
-                }
-
-                // Add -d --b
-                PMB->NewCommonCommandLine("-d", "--b", "0.1",
-                                          PB->StringToInt("18"), Values.at(0), &Values,
-                                          PayloadMsg, PCL);
-
-                // Copy payload
-                PayloadMsg->SetPayloadFromCharArray(Payload, Size);
-
-                // Add -info --payload
-                PayloadMsg->NewCommandLine(_PCL, PCL);
-                PCL->Version = "0.1";
-
-                // Add -scn --s (passes NoCL > 2 guard)
-                string SCN = NameGenerator::GetInstance().GenerateFromMessage(PayloadMsg);
-                PMB->NewSCNCommandLine("0.1", SCN, PayloadMsg, PCL);
-
-                // Send to GW input queue
-                PGW->PushToInputQueue(PayloadMsg);
+                  File F;
+                  if (F.OpenInputFile(Values.at(0), CachePath, "BINARY") == OK)
+                  {
+                    // File already cached — skip
+                    F.CloseFile();
+                    Status = OK;
 
 #ifdef DEBUG
-
-                PB->S << Offset << "(NRNCS forwarding payload: file=" << Values.at(0) << ", size=" << Size << " bytes)" << endl;
-
+                    PB->S << Offset << "(Cache hit: " << Values.at(0) << " already exists at " << CachePath << ")" << endl;
 #endif
+
+                    return Status;
+                  }
+                }
+
+                _ReceivedMessage->SetPayloadFileName(Values.at(0));
+                _ReceivedMessage->SetPayloadFilePath(CachePath);
+                _ReceivedMessage->SetPayloadFileOption("BINARY");
+                _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
+
+#ifdef DEBUG
+                PB->S << Offset << "(Cached file: " << Values.at(0) << ", size=" << Size << " bytes, at " << CachePath << ")" << endl;
+#endif
+
+                Status = OK;
               }
               else
               {

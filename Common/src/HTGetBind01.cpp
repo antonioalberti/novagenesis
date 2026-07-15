@@ -131,10 +131,17 @@ int HTGetBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                       InlineResponseMessage
                           ->SetMessage(GetTime(), 0, true, "Temp.txt", _Values->at(0), "Message.ngs", ThePath);
 
-                      InlineResponseMessage->ConvertPayloadFromFileToCharArray();
-
-                      // Adding only the ng -info --payload 01 command line
-                      PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
+                      if (InlineResponseMessage->ConvertPayloadFromFileToCharArray() == OK)
+                      {
+                        // Adding only the ng -info --payload 01 command line
+                        PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
+                      }
+                      else
+                      {
+                        PB->S << Offset << "(ALARM: Payload file " << _Values->at(0)
+                              << " not found in cache at " << ThePath
+                              << ". The NRInfoPayload01 on the source must cache it before the subscription arrives.)" << endl;
+                      }
                     }
                     else
                     {
