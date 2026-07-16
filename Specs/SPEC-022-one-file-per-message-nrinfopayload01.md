@@ -1,7 +1,7 @@
 # SPEC-022: One File Per Message — NRInfoPayload01 Não Acumular no InlineResponseMessage
 
 **Data:** 2026-07-11
-**Estado:** Proposta
+**Estado:** SUPERSEDED — ver SPEC-022-nrinfopayload01-separate-messages.md (cache local, modelo correcto)
 **Autor:** Hermes Agent
 **Relacionada:** SPEC-021 (one message per key em NRSubBind01), SPEC-018 (ResetPayload)
 

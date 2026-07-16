@@ -1,21 +1,23 @@
 # SPEC-017: Content-Name Correlation Bug — CoreInfoPayload01 Subscription Update Loop
 
-**Data:** 2026-07-09
-**Estado:** Fix proposta
-**Autor:** Hermes Agent
-**Relacionada:** SPEC-015 (RC2 — corrupção binária), SPEC-016 (verificação de hash)
+**Date:** 2026-07-09  
+**Status:** Superseded by SPEC-021 — Fix proposed, never implemented  
+**Author:** Hermes Agent  
+**Related:** SPEC-018 (ResetPayload), SPEC-020 (subscription re-delivery)
 
 ---
 
-## 1. Problema
+> **NOTICE:** The fix proposed in this SPEC was never implemented. The root cause (subscription loop without break) was addressed differently in SPEC-020 and SPEC-021. This SPEC is kept for historical reference.
 
-Após a SPEC-015 (remoção do `ExtractPayloadCharArrayFromMessageCharArray()`), o hash mismatch persiste em ~28/100 ficheiros. A SPEC-016 confirmou que em pelo menos 1 caso (`00091-alpine-ng-source.jpg`) o conteúdo binário recebido está correcto mas foi guardado com o nome errado. Isto é o **RC3 (Root Cause 3)**: bug de correlação conteúdo↔nome de ficheiro.
+## 1. Problem
 
-## 2. Causa Raiz
+After the fix in `CoreInfoPayload01` (removing the call to `ExtractPayloadCharArrayFromMessageCharArray()`), the hash mismatch persists in ~28/100 files. The fix confirmed that in at least 1 case (`00091-alpine-ng-source.jpg`) the binary content received is correct but was saved with the wrong name. This is **RC3 (Root Cause 3)**: content↔filename correlation bug.
 
-### 2.1 O loop sem `break`
+## 2. Root Cause
 
-Em `CoreInfoPayload01::Run()` (ContentApp e PGCS), o código que actualiza as subscrições percorre **todas** as subscrições e atribui o mesmo filename a todas que tenham `HasContent=true`:
+### 2.1 The loop without `break`
+
+In `CoreInfoPayload01::Run()` (ContentApp and PGCS), the code that updates subscriptions iterates **all** subscriptions and assigns the same filename to all that have `HasContent=true`:
 
 ```cpp
 // ContentApp/src/CoreInfoPayload01.cpp:100-131
@@ -32,69 +34,69 @@ for (unsigned int i = 0; i < PCore->Subscriptions.size(); i++)
 }
 ```
 
-### 2.2 Cenário de falha
+### 2.2 Failure scenario
 
-1. Duas entregas (`-info --payload`) chegam em mensagens separadas, uma para o ficheiro `00022` e outra para `00091`
-2. `CoreDeliveryBind01` processa dois `-d --b` e coloca `HasContent=true` nas subscrições de **ambos** os ficheiros
-3. `CoreInfoPayload01` processa o `-info --payload` de `00022`:
-   - Guarda o payload em `00022-alpine-ng-source.jpg` ✓
-   - Percorre subscrições → encontra AMBAS com `HasContent=true`
-   - Atribui `FileName = "00022-alpine-ng-source.jpg"` a **ambas** as subscrições ✗
-4. `CoreInfoPayload01` processa o `-info --payload` de `00091`:
-   - Guarda o payload em `00091-alpine-ng-source.jpg` (sobrepõe `00022`!)
-   - Atribui `FileName = "00091-alpine-ng-source.jpg"` a **ambas** ✗
-5. `CoreRunEvaluate01` verifica hash de `00022` → lê `00091-alpine-ng-source.jpg` (que tem conteúdo de `00091`) → hash mismatch
-6. O mesmo para `00091` → se leu o mesmo ficheiro, o hash também não corresponde
+1. Two deliveries (`-info --payload`) arrive in separate messages, one for file `00022` and another for `00091`
+2. `CoreDeliveryBind01` processes two `-d --b` and sets `HasContent=true` on subscriptions for **both** files
+3. `CoreInfoPayload01` processes the `-info --payload` for `00022`:
+   - Saves payload to `00022-alpine-ng-source.jpg` ✓
+   - Iterates subscriptions → finds BOTH with `HasContent=true`
+   - Assigns `FileName = "00022-alpine-ng-source.jpg"` to **both** subscriptions ✗
+4. `CoreInfoPayload01` processes the `-info --payload` for `00091`:
+   - Saves payload to `00091-alpine-ng-source.jpg` (overwrites `00022`!)
+   - Assigns `FileName = "00091-alpine-ng-source.jpg"` to **both** ✗
+5. `CoreRunEvaluate01` checks hash of `00022` → reads `00091-alpine-ng-source.jpg` (which has `00091` content) → hash mismatch
+6. Same for `00091` → if it reads the same file, hash also doesn't match
 
-### 2.3 Porque só afecta alguns ficheiros
+### 2.3 Why only some files affected
 
-O bug só ocorre quando duas ou mais entregas têm o `HasContent` definido antes do `CoreInfoPayload01` processar o `-info --payload` correspondente. Isto depende da ordem de chegada das mensagens `-info --payload` vs `-d --b`, que varia com o timing da rede NRNCS.
+The bug only occurs when two or more deliveries have `HasContent` set before `CoreInfoPayload01` processes the corresponding `-info --payload`. This depends on the arrival order of `-info --payload` vs `-d --b` messages, which varies with NRNCS network timing.
 
 ---
 
-## 3. Correcção Proposta
+## 3. Proposed Correction
 
-### 3.1 Adicionar `break` após actualizar a primeira subscrição
+### 3.1 Add `break` after updating the first subscription
 
-Cada mensagem `-info --payload` corresponde a **exactamente uma** entrega de ficheiro. O loop deve actualizar apenas **uma** subscrição e sair.
+Each `-info --payload` message corresponds to **exactly one** file delivery. The loop should update only **one** subscription and exit.
 
-**Ficheiro:** `ContentApp/src/CoreInfoPayload01.cpp` (linha 121)
-**Ficheiro:** `PGCS/src/CoreInfoPayload01.cpp` (linha 111)
+**File:** `ContentApp/src/CoreInfoPayload01.cpp` (line 121)  
+**File:** `PGCS/src/CoreInfoPayload01.cpp` (line 111)
 
 ```cpp
 if (PS->Status == "Waiting delivery" && PS->HasContent)
 {
     PS->Status = "Processing required";
     PS->FileName = Values.at(0);
-    break;  // SPEC-017: Apenas uma subscricao por mensagem -info --payload
+    break;  // SPEC-017: Only one subscription per -info --payload message
 }
 ```
 
-### 3.2 Justificação
+### 3.2 Justification
 
-- A ordem de subscrições no vector é a ordem de criação (primeiro a subscrever = primeiro no vector)
-- `CoreDeliveryBind01` processa os `-d --b` na ordem de chegada e marca `HasContent=true` na subscrição correspondente
-- A primeira subscrição com `HasContent=true` é a que corresponde à mensagem `-info --payload` actual
-- O `break` garante que cada `-info --payload` actualiza exactamente uma subscrição
+- Subscription order in vector is creation order (first to subscribe = first in vector)
+- `CoreDeliveryBind01` processes `-d --b` in arrival order and marks `HasContent=true` on the corresponding subscription
+- The first subscription with `HasContent=true` is the one matching the current `-info --payload` message
+- The `break` ensures each `-info --payload` updates exactly one subscription
 
-### 3.3 Segurança
+### 3.3 Safety
 
-Mesmo que a ordem de subscrições não corresponda à ordem de entregas (caso raro), o pior caso é uma subscrição ficar em "Waiting delivery" sem nunca ser actualizada — em vez de DUAS subscrições ficarem com o filename errado. O timeout do NRNCS irá re-entregar o conteúdo perdido.
-
----
-
-## 4. Ficheiros Afectados
-
-| Ficheiro | Linha | Mudança |
-|----------|-------|---------|
-| `ContentApp/src/CoreInfoPayload01.cpp` | 121 | Adicionar `break;` após `PS->FileName = Values.at(0);` |
-| `PGCS/src/CoreInfoPayload01.cpp` | 111 | Adicionar `break;` após `PS->FileName = Values.at(0);` |
+Even if subscription order doesn't match delivery order (rare case), the worst case is one subscription stays in "Waiting delivery" without being updated — instead of TWO subscriptions getting wrong filenames. The NRNCS timeout will re-deliver the missing content.
 
 ---
 
-## 5. Verificação
+## 4. Affected Files
 
-1. Aplicar a correcção (adicionar `break` em ambos os ficheiros)
+| File | Line | Change |
+|------|------|--------|
+| `ContentApp/src/CoreInfoPayload01.cpp` | 121 | Add `break;` after `PS->FileName = Values.at(0);` |
+| `PGCS/src/CoreInfoPayload01.cpp` | 111 | Add `break;` after `PS->FileName = Values.at(0);` |
+
+---
+
+## 5. Verification
+
+1. Apply correction (add `break` in both files)
 2. Compilar: `cd cmake-build-debug && make -j$(nproc)`
 3. Testar com `--publish 0.1`
 4. Verificar ZERO erros "hash of the file ... is not the same"

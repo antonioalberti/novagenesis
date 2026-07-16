@@ -1,9 +1,9 @@
 # SPEC-004 — ContentApp Performance Optimisation: Reducing Contraction Times
 
-**Status:** Approved 2026-06-23 — Level A only, pending implementation  
+**Status:** Implemented  
 **Date:** 2026-06-23  
 **Scope:** ContentApp timer configuration + discovery consolidation + GW.cpp SHM polling  
-**Codebase:** NovaGenesis, branch `AIOPT2`  
+**Codebase:** NovaGenesis, branch `AIOPT3`  
 **Stack:** C++20, g++ -O0 -g3, SHM IPC, System V semaphores  
 **Task:** NG-042-07  
 
@@ -257,7 +257,7 @@ Not included in this spec. Would involve:
 
 **Change:** None — verification only
 
-**Test:** Read `IO/Source1/App.ini` and `IO/Repository1/App.ini` to confirm current values. Read `Core.cpp` L117-L123 to confirm defaults. Confirm `git status` is clean on branch `AIOPT2`.
+**Test:** Read `IO/Source1/App.ini` and `IO/Repository1/App.ini` to confirm current values. Read `Core.cpp` L117-L123 to confirm defaults. Confirm `git status` is clean on branch `AIOPT3`.
 
 **Done when:** All 6 timer values documented and verified against code. Git working tree clean.
 
@@ -352,7 +352,7 @@ GW.cpp changes (SPEC-005):
 Ref: SPEC-004, SPEC-005, NG-042-07"
 ```
 
-**Done when:** Commit pushed to `AIOPT2` branch.
+**Done when:** Commit pushed to `AIOPT3` branch.
 
 ---
 
@@ -442,6 +442,6 @@ Ref: SPEC-004, SPEC-005, NG-042-07"
 - [ ] No SIGSEGV or memory errors
 - [ ] GW CPU < 20% per process (no busy-wait regression)
 - [ ] SHM message latency < 20ms
-- [ ] Commit pushed to `AIOPT2` branch (E4)
+- [ ] Commit pushed to `AIOPT3` branch (E4)
 - [ ] Dashboard updated (NG-042-07 progress)
 - [ ] Obsidian task file updated with results

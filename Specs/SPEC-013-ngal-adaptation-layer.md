@@ -1,9 +1,11 @@
 # SPEC-013 — NovaGenesis Adaptation Layer (NGAL)
 
-**Version:** v0.2
-**Date:** 2026-07-07
-**Author:** (derived from analysis)
-**Status:** Proposal (revised — v0.2 incorporates critical review findings F1–F12)
+**Version:** v1.0  
+**Date:** 2026-07-07  
+**Author:** (derived from analysis)  
+**Status:** Implemented  
+**Branch:** AIOPT3  
+**Implementation commit:** 164cc49+
 
 ---
 

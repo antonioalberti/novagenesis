@@ -1,9 +1,9 @@
 # SPEC-006 — Output Queue Semaphore Contention Fix
 
-**Status:** Draft — pending implementation  
+**Status:** Implemented  
 **Date:** 2026-06-23  
 **Scope:** GWMsgCl01.cpp `SafePushToOutputQueue` + GW.cpp `ReadFromOutputQueue` + GW.cpp constructor — remove redundant named semaphore "Output_Queue"  
-**Codebase:** NovaGenesis, branch `AIOPT2`  
+**Codebase:** NovaGenesis, branch `AIOPT3`  
 **Stack:** C++20, g++ -O0 -g3, POSIX named semaphores, std::mutex  
 **Task:** NG-042-07 (cross-ref SPEC-005)
 
@@ -551,7 +551,7 @@ git commit -m "fix(gw): remove redundant Output Queue named semaphore (SPEC-006)
 Ref: SPEC-006 v2.0, SPEC-005, NG-042-07"
 ```
 
-**Done when:** Commit pushed to `AIOPT2`.
+**Done when:** Commit pushed to `AIOPT3`.
 
 ---
 
@@ -632,4 +632,4 @@ There is only ONE lock. Deadlock requires at least two locks held in opposite or
 - [ ] All photos delivered with ~30ms latency
 - [ ] CPU < 20% per process
 - [ ] `/dev/shm/sem.Output_Queue` removed
-- [ ] Committed and pushed to `AIOPT2`
+- [ ] Committed and pushed to `AIOPT3`

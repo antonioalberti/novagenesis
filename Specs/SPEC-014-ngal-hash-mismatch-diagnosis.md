@@ -1,9 +1,11 @@
-# SPEC-014: NGAL Hash Mismatch — Diagnóstico e Correcção
+# SPEC-014: NGAL Hash Mismatch — Diagnosis and Correction
 
-**Autor:** Hermes Agent (consolidação da SPEC-014 v1 + análise própria)
-**Data:** 09/07/2026
-**Revisão:** 2
-**Estado:** In Progress — Correcção implementada, pendente teste
+**Author:** Hermes Agent (consolidation of SPEC-014 v1 + own analysis)  
+**Date:** 09/07/2026  
+**Revision:** 3  
+**Status:** Implemented — Pending E2E Test  
+**Branch:** AIOPT3  
+**Fix commit:** Pending (after test)
 
 ---
 

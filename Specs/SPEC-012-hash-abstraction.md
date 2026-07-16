@@ -1,9 +1,10 @@
 # SPEC-012 — Hash Abstraction & ID Generation Strategy
 
-**Version:** v0.2  
+**Version:** v0.3  
 **Date:** 2026-07-06  
 **Author:** (derived from analysis)  
-**Status:** Proposal — awaiting decisions (Q1-Q5 resolved, pending implementation)
+**Status:** Proposal — awaiting decisions (Q1-Q5 resolved, pending implementation)  
+**Branch:** AIOPT3
 
 ---
 
@@ -163,30 +164,30 @@ public:
 
 | Location | Current call | New call |
 |----------|-------------|----------|
-| L72 | `GenerateSCNFromBlockBinaryPatterns(this, SCN)` | `PGIDGenerator->GenerateIDFromBlock(this)` |
-| L447 | `GenerateSCNFromBlockBinaryPatterns4Bytes(...)` → `MurmurHash3_x86_32(...)` | `PGIDGenerator->GenerateID(...)` |
-| L539 | `GenerateSCNFromBlockBinaryPatterns16Bytes(...)` | `PGIDGenerator->SetOutputSize(BITS_128)->GenerateID(...)` |
-| L632 | `GenerateSCNFromBlockBinaryPatterns32Bytes(...)` | `PGIDGenerator->SetOutputSize(BITS_256)->GenerateID(...)` |
-| L726..L1354 | All `GenerateSCNFromCharArrayBinaryPatterns*` variants | `PGIDGenerator->GenerateIDFromString(...)` |
-| L1360..L1424 | `GenerateSCNFromMessageBinaryPatterns*` default wrappers | Remove — logic moves to IDGenerator |
+| L72 | `GenerateSCNFromBlockBinaryPatterns(this, SCN)` | `NameGenerator::GetInstance().GenerateIDFromBlock(this)` |
+| L447 | `GenerateSCNFromBlockBinaryPatterns4Bytes(...)` → `MurmurHash3_x86_32(...)` | `NameGenerator::GetInstance().GenerateID(...)` |
+| L539 | `GenerateSCNFromBlockBinaryPatterns16Bytes(...)` | `NameGenerator::GetInstance().SetOutputSize(BITS_128)->GenerateID(...)` |
+| L632 | `GenerateSCNFromBlockBinaryPatterns32Bytes(...)` | `NameGenerator::GetInstance().SetOutputSize(BITS_256)->GenerateID(...)` |
+| L726..L1354 | All `GenerateSCNFromCharArrayBinaryPatterns*` variants | `NameGenerator::GetInstance().GenerateIDFromString(...)` |
+| L1360..L1424 | `GenerateSCNFromMessageBinaryPatterns*` default wrappers | Remove — logic moves to NameGenerator |
 
 ### E3.2 — Process.cpp (49 call sites)
 
 | Location | Current call | New call |
 |----------|-------------|----------|
-| L105 | `GenerateSCNFromProcessBinaryPatterns(this, SCN)` | `PIDGenerator->GenerateIDFromProcess(this)` |
-| L108 | `GenerateSCNFromCharArrayBinaryPatterns(LN, HASH_SCN)` | `PIDGenerator->GenerateIDFromString(LN)` |
+| L105 | `GenerateSCNFromProcessBinaryPatterns(this, SCN)` | `NameGenerator::GetInstance().GenerateIDFromProcess(this)` |
+| L108 | `GenerateSCNFromCharArrayBinaryPatterns(LN, HASH_SCN)` | `NameGenerator::GetInstance().GenerateIDFromString(LN)` |
 | L148..209 | All domain/OS/process level SCNs | `PIDGenerator->GenerateIDFromString(...)` |
 | L1035..1414 | All variant bodies | Move to IDGenerator |
 
 ### E3.3 — MessageBuilder.cpp (~40 call sites)
 
 All call `PB->GenerateSCNFromCharArrayBinaryPatterns(...)` which delegates to Block.
-Migration path: MessageBuilder receives an IDGenerator reference, or uses the Block's generator.
+Migration path: MessageBuilder receives an NameGenerator reference, or uses the Block's generator.
 
 ### E3.4 — EPGS subsystem
 
-`ng_epgs_hash.c` → either share the C++ IDGenerator (if EPGS gets C++ linkage) or keep as a standalone C shim that calls into the IDGenerator via a C API.
+`ng_epgs_hash.c` → either share the C++ NameGenerator (if EPGS gets C++ linkage) or keep as a standalone C shim that calls into the NameGenerator via a C API.
 
 ---
 
@@ -194,37 +195,37 @@ Migration path: MessageBuilder receives an IDGenerator reference, or uses the Bl
 
 **Decision Q5:** Phased migration. Each step is a separate compilable commit, done sequentially E4.1→E4.8. No sweeping commit.
 
-### E4.1 — Create `IDGenerator` class (dedicated files)
+### E4.1 — Create `NameGenerator` class (dedicated files)
 
 ```
-Common/src/IDGenerator.h
-Common/src/IDGenerator.cpp
+Common/src/NameGenerator.h
+Common/src/NameGenerator.cpp
 Common/src/HashFunction.h          // abstract base
 Common/src/MurmurHash3Strategy.h   // wraps existing MurmurHash3 into HashFunction interface
-Common/src/IDStrategy.h            // abstract base
-Common/src/DefaultIDStrategy.h     // preserves current behaviour
+Common/src/NameStrategy.h          // abstract base
+Common/src/DefaultNameStrategy.h   // preserves current behaviour
 ```
 
 ### E4.2 — Implement `MurmurHash3Strategy`
 
 Wraps the existing `MurmurHash3_x86_32` call. Same seed, same algorithm.
 
-### E4.3 — Implement `DefaultIDStrategy`
+### E4.3 — Implement `DefaultNameStrategy`
 
 Preserves the current input-gathering logic exactly:
 - For Process: LN, Path, DLN, SCN (same binary pattern as `GenerateSCNFromProcessBinaryPatterns4Bytes`)
 - For Block: LN, block type info, parent process info
 - For string: the raw string bytes
 
-## E4.4 — Add NameGenerator to Process
+### E4.4 — Add NameGenerator to Process
 
 Not needed as a member — global singleton is called directly.
 
-## E4.5 — Migrate Process.cpp
+### E4.5 — Migrate Process.cpp
 
 Replace all `GenerateSCNFromCharArrayBinaryPatterns(LN, ...)` with `NameGenerator::GetInstance().GenerateFromString(LN)`. This is the bulk of changes (~40 lines).
 
-## E4.6 — Migrate Block.cpp
+### E4.6 — Migrate Block.cpp
 
 Remove duplicated hash methods from Block. Block calls `NameGenerator::GetInstance()` directly (no parent Process pointer needed).
 
@@ -338,7 +339,7 @@ Bytes 1..N: raw ID bytes (size determined by tag)
 | `Common/src/DefaultNameStrategy.h/.cpp` | Preserves current behaviour |
 | `Specs/SPEC-012-hash-abstraction.md` | This spec |
 
-## E9 — Files to modify
+## E8 — Files to modify
 
 | File | Change |
 |------|--------|
@@ -349,7 +350,7 @@ Bytes 1..N: raw ID bytes (size determined by tag)
 | `Common/src/MessageBuilder.h/.cpp` | Call `NameGenerator::GetInstance()` |
 | `CMakeLists.txt` | Add new source files |
 
-## E10 — Decisions taken
+## E9 — Decisions taken
 
 | # | Question | Decision |
 |---|----------|----------|
@@ -359,9 +360,9 @@ Bytes 1..N: raw ID bytes (size determined by tag)
 | Q4 | Tagged ID format: implement in v1 or defer? | **Defer to v2.** v1 focus is structural refactor only. Tagged IDs saved as proposal in §E6. |
 | Q5 | Remove old methods in one commit or phased? | **Phased** (E4.1→E4.8). Each step is an independent compilable commit. |
 
-## E11 — Alpine VM test plan (comparing hash sizes)
+## E10 — Alpine VM test plan (comparing hash sizes)
 
-### E11.1 — Objective
+### E10.1 — Objective
 
 Run the same 1core-1repo-1source scenario on Alpine VMs 101/102 with different hash sizes and measure:
 - Collision rate (if any)
@@ -369,7 +370,7 @@ Run the same 1core-1repo-1source scenario on Alpine VMs 101/102 with different h
 - Memory usage per binding entry
 - Startup time
 
-### E11.2 — Configurations to test
+### E10.2 — Configurations to test
 
 | Config | Output size | Hash function | Notes |
 |--------|------------|---------------|-------|
@@ -379,7 +380,7 @@ Run the same 1core-1repo-1source scenario on Alpine VMs 101/102 with different h
 | D | 256-bit (32B) | MurmurHash3 + SHA-256 | Future comparison |
 | E | 32-bit (4B) | Identity (no hash, raw LN→hex) | Tests non-hash ID strategy |
 
-### E11.3 — How to switch (after implementation)
+### E10.3 — How to switch (after implementation)
 
 ```bash
 # Via environment or config:
@@ -394,7 +395,7 @@ option(NG_NAME_SIZE "Name output size in bytes" 4)
 option(NG_HASH_FN "Hash function backend" "murmur3_x86_32")
 ```
 
-## E12 — Success criteria
+## E11 — Success criteria
 
 1. [ ] All 9 targets build with `NameGenerator` replacing old methods
 2. [ ] Alpine VM 1core-1repo-1source test passes identically to pre-refactor (baseline: 32-bit MurmurHash3)

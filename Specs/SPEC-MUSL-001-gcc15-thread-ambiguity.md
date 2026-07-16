@@ -1,8 +1,10 @@
 # SPEC-MUSL-001: GCC 15 Compatibility — Fix `thread` Ambiguity in Process.cpp
 
-**Autor:** Antonio Marcos Alberti
-**Data:** 25/06/2026
-**Estado:** Draft
+**Author:** Antonio Marcos Alberti  
+**Date:** 25/06/2026  
+**Status:** Implemented  
+**Branch:** AIOPT3  
+**Fix commit:** cd804a7
 
 ---
 

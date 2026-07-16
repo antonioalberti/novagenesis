@@ -1,10 +1,10 @@
 # SPEC-001: Comprehensive Debug Logging for NRNCS
 
-**Status:** Draft  
+**Status:** Implemented  
 **Author:** Antonio Marcos Alberti  
 **Date:** 2026-07-11  
-**Version:** 0.1  
-**Branch:** AIOPT2  
+**Version:** 1.0  
+**Branch:** AIOPT3  
 **Component:** NRNCS (`NRNCS/src/`)
 
 ---
@@ -581,11 +581,11 @@ This ensures zero runtime overhead when `DEBUG` is not defined.
 2. Run `./NRNCS /path/to/IO/` — must observe debug output showing entry/step/exit for each action processed
 3. Comment out all `#define DEBUG` lines — must produce no debug output (zero runtime overhead)
 
-## 8. Key Style Differences from Previous AIOPT2 Code
+## 8. Key Style Differences from Current AIOPT3 Code
 
-The master branch baseline uses different patterns than the AIOPT2 branch code that was previously analysed:
+The master branch baseline uses different patterns than the AIOPT3 branch code:
 
-| Aspect | Master branch | Previous AIOPT2 code |
+| Aspect | Master branch | Current AIOPT3 code |
 |--------|--------------|---------------------|
 | Indentation | Tabs | Spaces |
 | Function calls | `func ()` | `func()` |

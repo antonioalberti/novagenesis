@@ -1,9 +1,13 @@
-# SPEC-021: One Message Per File — Eliminar InlineResponseMessage com Múltiplos Payloads
+# SPEC-021: One Message Per File — Eliminate InlineResponseMessage with Multiple Payloads
 
-**Data:** 2026-07-11
-**Estado:** Proposta
-**Autor:** Hermes Agent
-**Relacionada:** SPEC-014 (data race), SPEC-015 (getline), SPEC-017 (break), SPEC-018 (ResetPayload), SPEC-020 (re-delivery)
+**Date:** 2026-07-11  
+**Status:** Superseded — Superseded by **SPEC-022-nrinfopayload01-separate-messages.md** (cache model)  
+**Author:** Hermes Agent  
+**Related:** SPEC-014 (data race), SPEC-017 (break), SPEC-018 (ResetPayload), SPEC-020 (re-delivery)
+
+---
+
+> **NOTICE:** This SPEC was written assuming the **forwarding model** for NRInfoPayload01. The correct NovaGenesis model is the **cache model** implemented in SPEC-022 (canonical). In the cache model, NRInfoPayload01 stores payloads to disk and does not forward them. Delivery happens via HTGetBind01 (cat=18) when subscribers request content. This SPEC is kept for historical reference only.
 
 ---
 
@@ -318,7 +322,7 @@ No NRNCS repo-side, `NRInfoPayload01` (linha 87-112) copia o payload da mensagem
 2. **Não altera a serialização/deserialização** — o formato da mensagem não muda
 3. **Não altera o HTGetBind01** — o código genérico Common/ permanece intacto
 4. **Não altera o PGCS** — o PGCS relay processa cada mensagem individualmente (como já faz)
-5. **Compatível com SPEC-015/017/018/019/020** — todas as correccções anteriores permanecem válidas
+5. **Compatible with SPEC-017/018/019/020** — all previous corrections remain valid
 
 ### 6.2 Desvantagens
 

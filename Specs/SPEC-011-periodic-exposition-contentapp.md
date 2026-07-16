@@ -124,7 +124,7 @@ Se o comportamento periódico causar problemas (ex.: flood de `-p --b` no NRNCS)
 
 ```bash
 git revert HEAD --no-edit
-git push origin AIOPT2
+git push origin AIOPT3
 ```
 
 Sintomas a vigiar nas primeiras 24h após aplicação:

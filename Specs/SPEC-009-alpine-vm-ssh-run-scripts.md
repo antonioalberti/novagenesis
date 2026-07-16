@@ -1,9 +1,9 @@
-# SPEC-009 — Alpine VM SSH Run Scripts (per-processo em terminal dedicado)
+# SPEC-009 — Alpine VM SSH Run Scripts (per-process in dedicated terminal)
 
-**Status:** aprovada 2026-06-26, scripts implementados (E1-E6)
-**Data:** 2026-06-26
-**Escopo:** NovaGenesis ContentApp — cenário 1core-1repo-1source em VMs Alpine
-**Stack:** Bash, SSH, gdb, PGCS/NRNCS/ContentApp (AIOPT2 branch)
+**Status:** Implemented (E1-E6 scripts created)  
+**Date:** 2026-06-26  
+**Scope:** NovaGenesis ContentApp — 1core-1repo-1source scenario on Alpine VMs  
+**Stack:** Bash, SSH, gdb, PGCS/NRNCS/ContentApp (AIOPT3 branch)
 **Autor:** Hermes Agent
 **Revisão:** v1.1
 
@@ -62,7 +62,7 @@ Novos scripts em `Scripts/AlpineVMs/`:
 | **PGCS Source → Repo** | `-p Ethernet Intra_Domain eth0 08:00:27:65:00:08 1200` |
 | **PGCS Repo → Source** | `-p Ethernet Intra_Domain eth0 08:00:27:79:bb:15 1200` |
 | **gdb disponível** | `/usr/bin/gdb` em ambas as VMs — verificado 2026-06-26 |
-| **Branch AIOPT2** | Commit `1e09a40` em ambas as VMs — verificado 2026-06-26 |
+|| **Branch AIOPT3** | Commit `cd804a7` em ambas as VMs — verificado 2026-07-16 |
 | **NRNCS presente na VM 102** | `cmake-build-debug/NRNCS` (5.5 MB) — verificado 2026-06-26. Apenas Source VM precisa de NRNCS. |
 | **SSH key** | `id_ed25519_hermes` em `~/.ssh/`, deployada em ambas as VMs — verificado |
 | **PGCS precisa de sudo** | PGCS usa SHM + raw sockets — necessita de root em ambas as VMs Alpine |
@@ -230,7 +230,7 @@ ssh -i ~/.ssh/id_ed25519_hermes root@192.168.0.36 "cd /root/workspace/novagenesi
 ssh -i ~/.ssh/id_ed25519_hermes root@192.168.0.61 "cd /root/workspace/novagenesis && git log --oneline -1"
 ```
 
-**Done when:** Ambas as VMs reportam AIOPT2 branch no commit `1e09a40`.
+**Done when:** Both VMs report AIOPT3 branch at commit `cd804a7`.
 
 ### Etapa E1: Criar `run_PGCS_on_Source_VM.sh`
 

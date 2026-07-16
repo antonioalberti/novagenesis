@@ -1,34 +1,35 @@
 # SPEC-010: ContentApp Bindings Alignment After Hello IPC 2.0
 
-**Autor:** Hermes Agent (Scalifax)
-**Data:** 05/07/2026
-**Revisão:** 1
-**Estado:** Draft
+**Author:** Hermes Agent (Scalifax)  
+**Date:** 05/07/2026  
+**Revision:** 1  
+**Status:** Draft  
+**Branch:** AIOPT3
 
 ---
 
-## 1. Problema
+## 1. Problem
 
-Após a introdução do **Hello IPC 2.0** (SPEC-001, alterações em `GWHelloIPC02.cpp`, `GWMsgCl01.cpp`, `GWRunInitialization01.cpp`), as categorias de bindings usadas para roteamento inter-processo foram alteradas:
+After the introduction of **Hello IPC 2.0** (SPEC-001, changes in `GWHelloIPC02.cpp`, `GWMsgCl01.cpp`, `GWRunInitialization01.cpp`), the binding categories used for inter-process routing were changed:
 
-- **Cat 13** — agora usada para lookup BID→BlockIndex (dentro do processo)
-- **Cat 19** — nova: PeerPID→IPC Key (roteamento SHM entre processos)
-- **Cat 20** — nova: PeerPID→LegibleName
+- **Cat 13** — now used for BID→BlockIndex lookup (within process)
+- **Cat 19** — new: PeerPID→IPC Key (SHM routing between processes)
+- **Cat 20** — new: PeerPID→LegibleName
 
-O `ContentApp/src/` nunca foi revisto após estas mudanças. Embora o ContentApp não use directamente Cat 13, 19 ou 20 (são internas ao GW), ele **depende** do correcto funcionamento do roteamento via GW para:
+The `ContentApp/src/` was never reviewed after these changes. Although ContentApp does not directly use Cat 13, 19, or 20 (they are internal to GW), it **depends** on correct GW routing for:
 
-1. Publicar bindings de exposição (`Core::Exposition`) através do NRNCS
-2. Descobrir pares (`CoreRunEvaluate01`) via Cat 2 e Cat 5
-3. Obter IPC key do NRNCS (`CoreRunPeriodic01` linha 294) via Cat 19
+1. Publishing exposition bindings (`Core::Exposition`) via NRNCS
+2. Discovering peers (`CoreRunEvaluate01`) via Cat 2 and Cat 5
+3. Getting NRNCS IPC key (`CoreRunPeriodic01` line 294) via Cat 19
 
-Sintoma actual nos logs:
+Current symptom in logs:
 
 ```
 (1. Check for NRNCS awareness.)
 (Aware of a NRNCS on Categories 2 and 9)
 ...
 (Not aware of any Repository)
-(Not aware of any Source)
+```
 ```
 
 O NRNCS é descoberto, mas os pares ContentApp (Source↔Repository) **não se descobrem mutuamente**.

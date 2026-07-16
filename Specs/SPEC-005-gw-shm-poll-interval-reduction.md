@@ -1,9 +1,9 @@
 # SPEC-005 — GW.cpp SHM Poll Interval Reduction
 
-**Status:** Approved 2026-06-23 — 10ms interval, pending implementation  
+**Status:** Implemented  
 **Date:** 2026-06-23  
 **Scope:** GW.cpp `Gateway()` SHM poll rate limiting  
-**Codebase:** NovaGenesis, branch `AIOPT2`  
+**Codebase:** NovaGenesis, branch `AIOPT3`  
 **Stack:** C++20, g++ -O0 -g3, SHM IPC, System V semaphores, std::condition_variable  
 **Task:** NG-042-07 (cross-ref SPEC-004)  
 
@@ -167,7 +167,7 @@ This sleeps for at most 10ms, ensuring SHM is polled at least every 10ms.
 
 **Change:** None
 
-**Test:** Verify `GW.cpp` L589-L608 and L458-L467 match the analysis in SPEC-005 §3. Confirm `git status` clean on `AIOPT2`.
+**Test:** Verify `GW.cpp` L589-L608 and L458-L467 match the analysis in SPEC-005 §3. Confirm `git status` clean on `AIOPT3`.
 
 **Done when:** Code verified, git clean.
 
@@ -221,7 +221,7 @@ git commit -m "perf(gw): reduce SHM poll interval from 100ms to 10ms (SPEC-005)
 - Ref: SPEC-005, NG-042-07"
 ```
 
-**Done when:** Commit pushed to `AIOPT2`.
+**Done when:** Commit pushed to `AIOPT3`.
 
 ---
 
@@ -289,5 +289,5 @@ git commit -m "perf(gw): reduce SHM poll interval from 100ms to 10ms (SPEC-005)
 - [ ] SHM message latency < 20ms
 - [ ] No functional regression (hello, discovery, offer, acceptance, publish all work)
 - [ ] No SIGSEGV or memory errors
-- [ ] Commit pushed to `AIOPT2` branch
+- [ ] Commit pushed to `AIOPT3` branch
 - [ ] Dashboard updated with SPEC-005 reference

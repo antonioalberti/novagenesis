@@ -1,45 +1,45 @@
-# SPEC-019: Payload Hash Logging para Traceabilidade
+# SPEC-019: Payload Hash Logging for Traceability
 
-**Data:** 2026-07-11
-**Estado:** Implementado — ContentApp e NRNCS
-**Autor:** Hermes Agent
-**Relacionada:** SPEC-014 (data race), SPEC-015 (getline corruption), SPEC-017 (loop sem break), SPEC-018 (ResetPayload), SPEC-020 (subscription re-delivery)
+**Date:** 2026-07-11  
+**Status:** Implemented — ContentApp and NRNCS  
+**Author:** Hermes Agent  
+**Related:** SPEC-014 (data race), SPEC-017 (loop without break), SPEC-018 (ResetPayload), SPEC-020 (subscription re-delivery), **SPEC-022-nrinfopayload01-separate-messages.md** (cache model)
 
 ---
 
-## 1. Objectivo
+## 1. Objective
 
-Adicionar logging do hash NG (MurmurHash3_x86_32, seed 3571) em cada ponto onde um payload é processado, para rastrear a integridade do conteúdo ao longo do pipeline sem precisar de verificação posterior.
+Add NG hash logging (MurmurHash3_x86_32, seed 3571) at every point where a payload is processed, to trace content integrity through the pipeline without post-hoc verification.
 
-## 2. Pipeline de Payload com Hash Logging
+## 2. Payload Pipeline with Hash Logging
 
 ```ascii
 Source (VM 102)                    Repo (VM 101)
 ───────────────                    ──────────────
 ContentApp Source
-  └─ Publica ficheiro (JPG, TXT)
+  └─ Publishes file (JPG, TXT)
        ↓ SHM via PGCS
 NRNCS (Source)
   └─ NRInfoPayload01.cpp
-     └─ (NRNCS forwarding payload: file=X, size=N, hash=H)  ← SPEC-019
+     └─ (NRNCS cached payload: file=X, size=N, hash=H)  ← SPEC-019
        ↓ NGAL raw socket
 NRNCS (Repo)
   └─ NRInfoPayload01.cpp
-     └─ ResetPayload() + SetPayloadFromCharArray()           ← SPEC-018
+     └─ ResetPayload() + SetPayloadFromCharArray()       ← SPEC-018
        ↓ SHM via PGCS
 ContentApp Repository
   └─ CoreInfoPayload01.cpp
      └─ (ContentApp received payload: file=X, size=N, hash=H)  ← SPEC-019
      └─ ConvertPayloadFromCharArrayToFile()
-     └─ Marca subscription como "Delivered"                    ← SPEC-020
+     └─ Marks subscription as "Delivered"                    ← SPEC-020
 ```
 
-## 3. Pontos de Logging
+## 3. Logging Points
 
-| Ponto | Ficheiro | Status | Output |
-|-------|----------|--------|--------|
-| NRNCS (forwarding) | `NRNCS/src/NRInfoPayload01.cpp` | ✅ Implementado | `(NRNCS forwarding payload: file=X, size=N, hash=H)` |
-| ContentApp (recebido) | `ContentApp/src/CoreInfoPayload01.cpp` | ✅ Implementado | `(ContentApp received payload: file=X, size=N, hash=H)` |
+| Point | File | Status | Output |
+|-------|------|--------|--------|
+| NRNCS (cached) | `NRNCS/src/NRInfoPayload01.cpp` | ✅ Implemented | `(NRNCS cached payload: file=X, size=N, hash=H)` |
+| ContentApp (received) | `ContentApp/src/CoreInfoPayload01.cpp` | ✅ Implemented | `(ContentApp received payload: file=X, size=N, hash=H)` |
 
 ## 4. Implementação
 
@@ -66,9 +66,9 @@ ContentApp Repository
 }
 ```
 
-Nota: Lê o ficheiro do disco **após** `ConvertPayloadFromCharArrayToFile()`. Isto verifica o que foi realmente escrito.
+Note: Reads file from disk **after** `ConvertPayloadFromCharArrayToFile()`. This verifies what was actually written.
 
-### 4.2 NRNCS (já implementado, linhas 92-100)
+### 4.2 NRNCS (already implemented, lines 92-100)
 
 ```cpp
 // SPEC-019: Log payload hash at NRNCS for traceability
@@ -77,20 +77,20 @@ Nota: Lê o ficheiro do disco **após** `ConvertPayloadFromCharArrayToFile()`. I
     unsigned char* payload_bytes = (unsigned char*)Payload;
     PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(
         (const char*)payload_bytes, Size);
-    PB->S << Offset << "(NRNCS forwarding payload: file=" << Values.at(0)
+    PB->S << Offset << "(NRNCS cached payload: file=" << Values.at(0)
           << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
 }
 ```
 
-Nota: Calcula hash do payload **in-memory** antes de copiar para o InlineResponseMessage. Não precisa de I/O.
+Note: Calculates hash of payload **in-memory** before copying to InlineResponseMessage. No I/O needed.
 
-## 5. Verificação nos Logs
+## 5. Log Verification
 
-Os logs do NRNCS e Repo confirmam que o hash logging funciona:
+NRNCS and Repo logs confirm hash logging works:
 
 **NRNCS (source36):**
 ```
-(NRNCS forwarding payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
+(NRNCS cached payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 ```
 
 **ContentApp (repo61):**
@@ -98,11 +98,11 @@ Os logs do NRNCS e Repo confirmam que o hash logging funciona:
 (ContentApp received payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 ```
 
-Hash `789703CA` consistente em ambos — o payload chega íntegro ao ContentApp.
+Hash `789703CA` consistent in both — payload arrives intact at ContentApp.
 
-## 6. Ficheiros Afectados
+## 6. Affected Files
 
-| Ficheiro | Acção | Razão |
-|----------|-------|-------|
-| `ContentApp/src/CoreInfoPayload01.cpp` | ✅ Já implementado | — |
-| `NRNCS/src/NRInfoPayload01.cpp` | ✅ Já implementado | — |
+| File | Action | Reason |
+|------|--------|--------|
+| `ContentApp/src/CoreInfoPayload01.cpp` | ✅ Already implemented | — |
+| `NRNCS/src/NRInfoPayload01.cpp` | ✅ Already implemented | — |

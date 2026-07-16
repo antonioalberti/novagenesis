@@ -1,9 +1,9 @@
 # SPEC-007 — ReadFromOutputQueue: Decouple SHM Write from Queue Lock
 
-**Status:** Draft — pending approval  
+**Status:** Implemented  
 **Date:** 2026-06-23  
 **Scope:** `Common/src/GW.cpp` `ReadFromOutputQueue()` — decouple `WriteToSharedMemory3` from `OutputQueueMutex`  
-**Codebase:** NovaGenesis, branch `AIOPT2`  
+**Codebase:** NovaGenesis, branch `AIOPT3`  
 **Stack:** C++20, g++ -O0 -g3, POSIX SHM IPC, System V semaphores, std::mutex  
 **Task:** NG-042-07 (cross-ref SPEC-005, SPEC-006)  
 
@@ -458,7 +458,7 @@ git commit -m "fix(gw): decouple WriteToSharedMemory3 from OutputQueueMutex (SPE
 - Ref: SPEC-007, NG-042-07"
 ```
 
-**Done when:** Commit pushed to `AIOPT2` branch.
+**Done when:** Commit pushed to `AIOPT3` branch.
 
 ---
 
@@ -525,6 +525,6 @@ git commit -m "fix(gw): decouple WriteToSharedMemory3 from OutputQueueMutex (SPE
 - [ ] No `(WARNING: Output Queue semaphore timeout)` messages
 - [ ] No SIGSEGV or memory errors
 - [ ] CPU < 20% per process
-- [ ] Commit pushed to `AIOPT2` branch
+- [ ] Commit pushed to `AIOPT3` branch
 - [ ] Dashboard updated with SPEC-007 reference
 - [ ] Obsidian task file updated with results

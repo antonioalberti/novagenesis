@@ -1,81 +1,81 @@
-# SPEC-023: ContentPublish Burst Throttling e PGCS Relay Congestion Control
+# SPEC-023: ContentPublish Burst Throttling and PGCS Relay Congestion Control
 
-**Data:** 2026-07-12
-**Estado:** Proposta
-**Autor:** Hermes Agent
-**Relacionada:** Docs/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md (diagnóstico), SPEC-021 (one message per key), SPEC-022 (NRInfoPayload01)
-
----
-
-## 1. Problema
-
-Após SPEC-021 (mensagens separadas por key em NRSubBind01/PSSubBind01), o volume de mensagens no pipeline ContentPublish aumentou significativamente. O PGCS relay (raw Ethernet socket + single-thread ReceiveDispatcher) não consegue processar bursts de 200 publicações sem congestão.
-
-### 1.1 Sintomas observados
-
-- Corrupção de payloads/hashes após ~278 notificações
-- PGCS relay raw socket buffer overflow (socket buffer ~212KB ≈ 152 frames de 1400 bytes)
-- Fragmentos NGAL_SAR perdidos → reassembly incompleto → dados corrompidos
-- PCore->Content vector cresce unbounded (nunca é limpo)
-- Ausência de feedback do repositório → perda silenciosa
-
-### 1.2 Causas Raiz
-
-| RC | Descrição | Ficheiro |
-|----|-----------|----------|
-| RC7 | PGCS relay raw socket congestion: single-thread dispatcher insuficiente para 200+ mensagens em burst | `NGAL_Transport_RAW.cpp` |
-| RC8 | Ausência de ACK/NACK entre ContentApp Source e Repository | `CoreRunContentPublish01.cpp` |
-| RC9 | PCore->Content sem limite — crescimento unbounded | `Core.h` |
+**Date:** 2026-07-12  
+**Status:** Proposal  
+**Author:** Hermes Agent  
+**Related:** Docs/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md (diagnosis), SPEC-021 (one message per key), **SPEC-022-nrinfopayload01-separate-messages.md** (NRInfoPayload01)
 
 ---
 
-## 2. Correcções
+## 1. Problem
 
-### 2.1 Reduzir ContentBurstSize para 20-30 (fix primário)
+After SPEC-021 (separate messages per key in NRSubBind01/PSSubBind01), the message volume in the ContentPublish pipeline increased significantly. The PGCS relay (raw Ethernet socket + single-thread ReceiveDispatcher) cannot process bursts of 200 publications without congestion.
 
-**Ficheiro:** `IO/Source1/App.ini` e `IO/Repository1/App.ini`
+### 1.1 Observed Symptoms
 
-**Problema:** ContentBurstSize=200 gera ~16400+ fragmentos NGAL_SAR num curto intervalo, excedendo a capacidade do raw socket (~212KB buffer ≈ 152 fragmentos) e do single-thread ReceiveDispatcher. O threshold de congestão observado é ~278 notificações.
+- Payload/hash corruption after ~278 notifications
+- PGCS relay raw socket buffer overflow (socket buffer ~212KB ≈ 152 frames of 1400 bytes)
+- NGAL_SAR fragments lost → incomplete reassembly → corrupted data
+- PCore->Content vector grows unbounded (never cleaned)
+- No ACK/NACK from repository → silent loss
 
-**Correcção:** Reduzir ContentBurstSize de 200 para **25** (valor inicial empírico):
+### 1.2 Root Causes
+
+| RC | Description | File |
+|----|-------------|------|
+| RC7 | PGCS relay raw socket congestion: single-thread dispatcher insufficient for 200+ messages in burst | `NGAL_Transport_RAW.cpp` |
+| RC8 | No ACK/NACK between ContentApp Source and Repository | `CoreRunContentPublish01.cpp` |
+| RC9 | PCore->Content unbounded — unbounded growth | `Core.h` |
+
+---
+
+## 2. Corrections
+
+### 2.1 Reduce ContentBurstSize to 20-30 (primary fix)
+
+**File:** `IO/Source1/App.ini` and `IO/Repository1/App.ini`
+
+**Problem:** ContentBurstSize=200 generates ~16400+ NGAL_SAR fragments in a short interval, exceeding raw socket capacity (~212KB buffer ≈ 152 fragments) and single-thread ReceiveDispatcher. Observed congestion threshold is ~278 notifications.
+
+**Correction:** Reduce ContentBurstSize from 200 to **25** (empirical starting value):
 
 ```ini
 ContentBurstSize 25
 ```
 
-**Porquê 25:**
-- 25 ficheiros × ~82 fragmentos JPG ≈ 2050 fragmentos Ethernet
-- A 152 fragmentos por buffer-cheio, o ReceiveDispatcher processa ~13 ciclos de buffer
-- Com poll() timeout de 100ms, 13 ciclos ≈ 1.3s — dentro do `DelayBeforeANewPhotoPublish` (10s)
-- Versus 200 ficheiros × 82 = 16400 fragmentos = 108 ciclos ≈ 10.8s — já no limite do timeout
+**Why 25:**
+- 25 files × ~82 JPG fragments ≈ 2050 Ethernet fragments
+- At 152 fragments per full buffer, ReceiveDispatcher processes ~13 buffer cycles
+- With poll() timeout of 100ms, 13 cycles ≈ 1.3s — within `DelayBeforeANewPhotoPublish` (10s)
+- Versus 200 files × 82 = 16400 fragments = 108 cycles ≈ 10.8s — already at timeout limit
 
-**Efeito:** Reduz a carga no raw socket em ~8×. Os 200 ficheiros demoram 8 bursts (25×8) = 80s em vez de 1 burst de 10s. A latência total aumenta, mas a fiabilidade é garantida.
+**Effect:** Reduces raw socket load by ~8×. 200 files take 8 bursts (25×8) = 80s instead of 1 burst of 10s. Total latency increases but reliability is guaranteed.
 
-**Nota:** Este valor é um ponto de partida. Após logging (secção 2.4), calibrar empiricamente.
+**Note:** This is a starting point. After logging (section 2.4), calibrate empirically.
 
-### 2.2 Threshold de memória: usar 50% de MAX_MESSAGES_IN_MEMORY (referência existente)
+### 2.2 Memory threshold: use 50% of MAX_MESSAGES_IN_MEMORY (existing reference)
 
-**Ficheiro:** `ContentApp/src/CoreRunContentPublish01.cpp`
+**File:** `ContentApp/src/CoreRunContentPublish01.cpp`
 
-**Problema:** O break condition na linha 236 só dispara com `MAX_MESSAGES_IN_MEMORY - 200` = 29800 mensagens — praticamente sistema cheio.
+**Problem:** The break condition at line 236 only triggers at `MAX_MESSAGES_IN_MEMORY - 200` = 29800 messages — practically system full.
 
-**Correcção:** Adicionar throttle preventivo usando o threshold de **50%** (15000), que já é usado noutro ponto do sistema (`PGCS/src/CoreMsgCl01.cpp:71`):
+**Correction:** Add preventive throttle using the **50%** threshold (15000), already used elsewhere in the system (`PGCS/src/CoreMsgCl01.cpp:71`):
 
 ```cpp
-// SPEC-023: Throttle preventivo.
-// Threshold: 50% de MAX_MESSAGES_IN_MEMORY (15000), mesma referência
-// usada no PGCS CoreMsgCl01.cpp:71 para controlo de congestão.
+// SPEC-023: Preventive throttle.
+// Threshold: 50% of MAX_MESSAGES_IN_MEMORY (15000), same reference
+// used in PGCS CoreMsgCl01.cpp:71 for congestion control.
 //
-// NOTA: Este threshold NÃO se relaciona directamente com o raw socket
-// buffer (~212KB). É uma heurística de segurança: se o Process já tem
-// 15000+ mensagens em memória, há mensagens acumuladas que o PGCS relay
-// ainda não escoou — parar o burst evita agravar a congestão.
+// NOTE: This threshold does NOT directly relate to the raw socket
+// buffer (~212KB). It is a safety heuristic: if the Process already has
+// 15000+ messages in memory, there are messages accumulated that the PGCS relay
+// hasn't drained yet — stopping the burst prevents worsening congestion.
 
 #define MEMORY_THROTTLE           (MAX_MESSAGES_IN_MEMORY * 0.5)  // 15000
 #define MEMORY_HARD_LIMIT         (MAX_MESSAGES_IN_MEMORY - 200)  // 29800
 ```
 
-**Antes (linha 236):**
+**Before (line 236):**
 ```cpp
 if ((Counter == PCore->ContentBurstSize) || (PB->PP->GetNumberOfMessages() >= (MAX_MESSAGES_IN_MEMORY - 200)))
 {
@@ -83,20 +83,20 @@ if ((Counter == PCore->ContentBurstSize) || (PB->PP->GetNumberOfMessages() >= (M
 }
 ```
 
-**Depois (SPEC-023):**
+**After (SPEC-023):**
 ```cpp
-// SPEC-023: Throttle preventivo
+// SPEC-023: Preventive throttle
 unsigned int CurrentMem = PB->PP->GetNumberOfMessages();
 
 if (Counter == PCore->ContentBurstSize)
 {
-    // Burst normal — publicou ContentBurstSize ficheiros
+    // Normal burst — published ContentBurstSize files
     break;
 }
 
 if (CurrentMem >= MEMORY_HARD_LIMIT)
 {
-    // Hard limit — memória crítica
+    // Hard limit — critical memory
     PB->S << Offset << "(WARNING: Hard memory limit. Breaking burst at Counter="
           << Counter << ". Messages=" << CurrentMem << ")" << endl;
     break;
@@ -104,14 +104,14 @@ if (CurrentMem >= MEMORY_HARD_LIMIT)
 
 if (CurrentMem >= MEMORY_THROTTLE)
 {
-    // Throttle preventivo — se já publicou pelo menos 1, pausa
+    // Preventive throttle — if already published at least 1, pause
     if (Counter > 0)
     {
         PB->S << Offset << "(THROTTLE: Memory throttle. Pausing burst at Counter="
               << Counter << ". Messages=" << CurrentMem << ")" << endl;
         break;
     }
-    // Se Counter == 0, publica pelo menos 1 antes de pausar
+    // If Counter == 0, publish at least 1 before pausing
 }
 ```
 
@@ -291,13 +291,13 @@ unsigned int StartingMem = PB->PP->GetNumberOfMessages();
 
 ---
 
-## 7. Dependências
+## 7. Dependencies
 
-| SPEC | Dependência | Notas |
-|------|-------------|-------|
-| SPEC-021 | Aplicado | Mensagens separadas por key — este problema foi exacerbado por SPEC-021 |
-| SPEC-022 | Aplicado (ou não) | Rate limiting é independente da correcção do NRInfoPayload01 |
-| SPEC-023 | Nenhuma | Pode ser aplicado sobre o estado actual |
+| SPEC | Dependency | Notes |
+|------|------------|-------|
+| SPEC-021 | Applied | Separate messages per key — this problem was exacerbated by SPEC-021 |
+| **SPEC-022-nrinfopayload01-separate-messages.md** | Applied (or not) | Rate limiting is independent of NRInfoPayload01 correction |
+| SPEC-023 | None | Can be applied on current state |
 
 ---
 

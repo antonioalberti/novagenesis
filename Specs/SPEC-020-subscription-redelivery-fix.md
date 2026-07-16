@@ -1,148 +1,149 @@
-# SPEC-020: Subscription Re-Delivery Bug — Root Cause e Correcção
+# SPEC-020: Subscription Re-Delivery Bug — Root Cause and Correction
 
-**Data:** 2026-07-11
-**Estado:** Consolidação — fix implementado no ContentApp, pendente PGCS
-**Autor:** Hermes Agent
-**Relacionada:** SPEC-014 (data race), SPEC-015 (getline corruption), SPEC-017 (loop sem break), SPEC-018 (ResetPayload), SPEC-019 (hash logging)
+**Date:** 2026-07-11  
+**Status:** Implemented  
+**Author:** Hermes Agent  
+**Related:** SPEC-014 (data race), SPEC-018 (ResetPayload), SPEC-019 (hash logging)
 
 ---
 
-## 1. Problema
+## 1. Problem
 
-O ContentApp Repository recebe correctamente o payload (hash confere) mas a subscription nunca é actualizada para "Delivered", causando re-subscrição infinita a cada ~60s.
+The ContentApp Repository receives the payload correctly (hash matches) but the subscription is never updated to "Delivered", causing infinite re-subscription every ~60s.
 
-**Log do repo61:**
+**Repo61 log:**
 ```
 (RTT from NRNCS was 0.0102803020 seconds for the key 789703CA)
 (ContentApp received payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 (Subscription 0 has Status Waiting delivery, Key = 789703CA, HasContent = 1, Time from subscription = 27.3s)
---- 60s depois ---
+--- 60s later ---
 (RTT from NRNCS was 87.3206969120 seconds for the key 789703CA)
 (ContentApp received payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 (Subscription 0 has Status Waiting delivery, Key = 789703CA, HasContent = 1, Time from subscription = 147.3s)
 ```
 
-O RTT aumenta 60s de cada vez — a subscription está a ser re-submetida num timer periódico.
+The RTT increases by 60s each time — the subscription is being re-submitted on a periodic timer.
 
-## 2. Causa Raiz
+## 2. Root Cause
 
-### 2.1 Três actores no ciclo de vida da subscription
+### 2.1 Three actors in subscription lifecycle
 
-| Actor | Ficheiro | Função |
-|-------|----------|--------|
-| **CoreDeliveryBind01** | `ContentApp/src/CoreDeliveryBind01.cpp` | Processa `-d --b` → marca `HasContent = true` |
-| **CoreInfoPayload01** | `ContentApp/src/CoreInfoPayload01.cpp` | Processa `-info --payload` → salva payload + marca "Delivered" |
-| **CoreRunPeriodic01** | `ContentApp/src/CoreRunPeriodic01.cpp` | Timer periódico: re-submete subscrições ainda "Waiting delivery" |
+| Actor | File | Function |
+|-------|------|----------|
+| **CoreDeliveryBind01** | `ContentApp/src/CoreDeliveryBind01.cpp` | Processes `-d --b` → marks `HasContent = true` |
+| **CoreInfoPayload01** | `ContentApp/src/CoreInfoPayload01.cpp` | Processes `-info --payload` → saves payload + marks "Delivered" |
+| **CoreRunPeriodic01** | `ContentApp/src/CoreRunPeriodic01.cpp` | Periodic timer: re-submits subscriptions still "Waiting delivery" |
 
-### 2.2 Ciclo de falha
+### 2.2 Failure cycle
 
 ```
-1. Inicialização:
+1. Initialization:
    Subscription[0].Status = "Waiting delivery"
    Subscription[0].HasContent = false
 
-2. CoreDeliveryBind01 processa "-d --b" (entrega anunciada):
-   Subscription[0].HasContent = true    ← ANTES do payload chegar
+2. CoreDeliveryBind01 processes "-d --b" (delivery announced):
+   Subscription[0].HasContent = true    ← BEFORE payload arrives
 
-3. CoreInfoPayload01 processa "-info --payload" (payload recebido):
-   if (PS->Status == "Waiting delivery" && !PS->HasContent)  ← CONDIÇÃO ANTIGA
-   → FALHA porque HasContent já é true
-   → Subscription[0].Status continua "Waiting delivery"
+3. CoreInfoPayload01 processes "-info --payload" (payload received):
+   if (PS->Status == "Waiting delivery" && !PS->HasContent)  ← OLD CONDITION
+   → FAILS because HasContent is already true
+   → Subscription[0].Status remains "Waiting delivery"
 
 4. CoreRunPeriodic01 (timer ~60s):
    if ((GetTime() - PS->Timestamp) > TIMEOUT && PS->Status == "Waiting delivery")
-   → Re-submete subscription para NRNCS
+   → Re-submits subscription to NRNCS
 
-5. NRNCS re-entrega o mesmo payload
-   → CoreInfoPayload01 recebe outra vez
-   → Mesma condição falha
-   → Loop infinito
+5. NRNCS re-delivers same payload
+   → CoreInfoPayload01 receives again
+   → Same condition fails
+   → Infinite loop
 ```
 
-### 2.3 Porque o RTT aumenta 60s de cada vez
+### 2.3 Why RTT increases by 60s each time
 
-Cada re-subscrição passa pelo NRNCS que mantém o payload em cache. O RTT reportado é o tempo desde a subscrição original, não o tempo desde a re-subscrição. O incremento de 60s é o intervalo do `TIMEOUT` em `CoreRunPeriodic01` (linha 295).
+Each re-subscription goes through NRNCS which keeps the payload cached. The reported RTT is the time since the original subscription, not since the re-subscription. The 60s increment is the `TIMEOUT` interval in `CoreRunPeriodic01` (line 295).
 
-## 3. Correcção (SPEC-020)
+## 3. Correction (SPEC-020)
 
-### 3.1 Remover o guard `!PS->HasContent`
+### 3.1 Remove the `!PS->HasContent` guard
 
-O `CoreDeliveryBind01` marca `HasContent = true` antes do `CoreInfoPayload01` processar o payload. Portanto, `!PS->HasContent` é sempre `false` quando o `CoreInfoPayload01` corre, bloqueando a actualização.
+`CoreDeliveryBind01` marks `HasContent = true` before `CoreInfoPayload01` processes the payload. Therefore, `!PS->HasContent` is always `false` when `CoreInfoPayload01` runs, blocking the update.
 
-**Condição antiga (BUG):**
+**Old condition (BUG):**
 ```cpp
 if (PS->Status == "Waiting delivery" && !PS->HasContent)
 ```
 
-**Condição correcta (SPEC-020):**
+**Correct condition (SPEC-020):**
 ```cpp
 if (PS->Status == "Waiting delivery")
 ```
 
-### 3.2 Manter "Processing required" — não forçar "Delivered"
+### 3.2 Keep "Processing required" — don't force "Delivered"
 
-O `CoreRunEvaluate01` (linha 501) depende de `Status == "Processing required"` para processar o acceptance. Se o SPEC-020 forçar `Status = "Delivered"` imediatamente, o acceptance nunca é gerado.
+`CoreRunEvaluate01` (line 501) depends on `Status == "Processing required"` to process the acceptance. If SPEC-020 forces `Status = "Delivered"` immediately, the acceptance is never generated.
 
-**Correcção correcta:**
+**Correct fix:**
 ```cpp
 if (PS->Status == "Waiting delivery")
 {
-    PS->Status = "Processing required";   // CoreRunEvaluate01 precisa disto
+    PS->Status = "Processing required";   // CoreRunEvaluate01 needs this
     PS->FileName = Values.at(0);
-    break;  // SPEC-017: apenas uma subscription por mensagem
+    break;  // SPEC-017: only one subscription per message
 }
 ```
 
-**Não fazer:**
+**Don't do:**
 ```cpp
-PS->HasContent = true;    // CoreDeliveryBind01 já o fez
-PS->Status = "Delivered"; // ❌ Mata o acceptance!
+PS->HasContent = true;    // CoreDeliveryBind01 already did this
+PS->Status = "Delivered"; // ❌ Kills the acceptance!
 ```
 
-### 3.3 Porque não há re-delivery sem "Delivered"
+### 3.3 Why no re-delivery without "Delivered"
 
-O `CoreRunPeriodic01` (linha 295) só re-submete se:
+`CoreRunPeriodic01` (line 295) only re-submits if:
 ```cpp
 if ((GetTime() - PS->Timestamp) > TIMEOUT && PS->Status == "Waiting delivery")
 ```
 
-Com `Status == "Processing required"`, a condição **não** é satisfeita. O `CoreRunPeriodic01` nunca re-submete uma subscription que já está a ser processada. O "Delivered" é desnecessário para prevenir re-delivery.
+With `Status == "Processing required"`, the condition is **not** satisfied. `CoreRunPeriodic01` never re-submits a subscription already being processed. "Delivered" is unnecessary to prevent re-delivery.
 
-### 3.4 Ciclo completo
+### 3.4 Complete cycle
 
 ```
 Waiting delivery ──CoreInfoPayload01──→ Processing required ──CoreRunEvaluate01──→ Delete
-    ↑                    (condição fix)        │                                      │
-CoreDeliveryBind01                              │ (cria acceptance,                     │
-(arruma HasContent)                             │  publica resposta)                    │
+    ↑                    (condition fix)        │                                      │
+CoreDeliveryBind01                              │ (creates acceptance,                  │
+(arranges HasContent)                           │  publishes response)                 │
                                                 └── acceptance → Source ──→ contentpublish
+```
 
-## 4. Ficheiros Afectados
+## 4. Affected Files
 
-| Ficheiro | Código actual | Acção |
-|----------|--------------|-------|
-| `ContentApp/src/CoreInfoPayload01.cpp` | `if (PS->Status == "Waiting delivery")` ✅ | Fix já aplicado localmente |
+| File | Current code | Action |
+|------|--------------|--------|
+| `ContentApp/src/CoreInfoPayload01.cpp` | `if (PS->Status == "Waiting delivery")` ✅ | Fix already applied locally |
 
-## 5. Verificação
+## 5. Verification
 
-1. Compilar: `cd build && make -j$(nproc)`
-2. Deploy para repo61 e source36
-3. Iniciar NRNCS + PGCS + ContentApp em ambas as VMs
-4. Verificar log do Repo: **ZERO** ocorrências de `(The following message contains a subscription of delayed deliveries)`
-5. Verificar que cada subscription mostra `Status = Delivered` após a primeira entrega
-6. Testar com `--publish 0.1` — verificar 100/100 ficheiros sem re-delivery
+1. Compile: `cd build && make -j$(nproc)`
+2. Deploy to repo61 and source36
+3. Start NRNCS + PGCS + ContentApp on both VMs
+4. Check Repo log: **ZERO** occurrences of `(The following message contains a subscription of delayed deliveries)`
+5. Verify each subscription shows `Status = Delivered` after first delivery
+6. Test with `--publish 0.1` — verify 100/100 files without re-delivery
 
-## 6. Nota: PGCS
+## 6. Note: PGCS
 
-O `PGCS/src/CoreInfoPayload01.cpp` tem a condição `PS->Status == "Waiting delivery" && PS->HasContent == true` — diferente do bug do ContentApp. O PGCS **não** tem o re-delivery porque:
-- O `CoreRunPeriodic01` que re-submete subscrições é do ContentApp, não do PGCS
-- O PGCS é um relay; as subscriptions de conteúdo são geridas pelo ContentApp
+`PGCS/src/CoreInfoPayload01.cpp` has condition `PS->Status == "Waiting delivery" && PS->HasContent == true` — different from ContentApp bug. PGCS does **not** have re-delivery because:
+- The `CoreRunPeriodic01` that re-submits subscriptions is in ContentApp, not PGCS
+- PGCS is a relay; content subscriptions are managed by ContentApp
 
-Portanto, PGCS não precisa de correcção SPEC-020.
+Therefore, PGCS does not need SPEC-020 correction.
 
-## 7. Decisões
+## 7. Decisions
 
-| # | Decisão | Data | Razão |
-|---|---------|------|-------|
-| D1 | Remover `!PS->HasContent` em vez de reordenar CoreDeliveryBind01 | 2026-07-11 | `HasContent` é semanticamente correcto como sinal de "entrega anunciada"; a condição correcta é verificar só o Status |
-| D2 | Manter "Processing required" + "Delivered" (dupla atribuição) | 2026-07-11 | "Processing required" é usado por outro código que verifica o estado da subscription; "Delivered" é o estado terminal oficial |
+| # | Decision | Date | Reason |
+|---|----------|------|--------|
+| D1 | Remove `!PS->HasContent` instead of reordering CoreDeliveryBind01 | 2026-07-11 | `HasContent` is semantically correct as "delivery announced" signal; the correct condition is to check only Status |
+| D2 | Keep "Processing required" + "Delivered" (double assignment) | 2026-07-11 | "Processing required" used by other code checking subscription state; "Delivered" is official terminal state |

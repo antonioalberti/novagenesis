@@ -1,33 +1,23 @@
 # SPEC-008: Raw Socket Discovery — Inter-PGCS Exposition Failure
 
-**Autor:** Antonio Marcos Alberti
-**Data:** 25/06/2026
-**Revisão:** 26/06/2026 — diagnóstico original corrigido após análise estática completa
-**Estado:** Draft — **SPEC-008 Rev2 proposta em secção 11**
+**Author:** Antonio Marcos Alberti  
+**Date:** 25/06/2026  
+**Revision:** 26/06/2026 — original diagnosis corrected after complete static analysis  
+**Status:** Draft — Rev2 proposed in section 11  
+**Branch:** AIOPT3
 
 ---
 
-## 1. Problema
+## 1. Problem
 
-No cenário Docker 1core-1repo-1source e nas VMs Alpine 101/102, cada PGCS falha ao enviar mensagens de exposição inter-PGCS. O erro repetido nos logs é:
+In the Docker 1core-1repo-1source scenario and Alpine VMs 101/102, each PGCS fails to send inter-PGCS exposition messages. The repeated error in logs is:
 
 ```
 PGRunExposition01.cpp:420
 (ERROR: Unable to get peer PGCS::HT BID from local hash table)
 ```
 
-**Sintoma visível:** A exposição inter-PGCS (envio de bindings HTS, GIRS, PSS, NRNCS entre PGCS peers) nunca acontece. O ContentApp fica preso em "The domain NRNCS is still unknown" porque nunca recebe as bindings de serviços do PGCS peer via exposição.
-
-## 2. Diagnóstico original (INCORRECTO — 25/06/2026)
-
-A primeira análise propunha que Cat[2] Hash("HT") → HT_BID nunca era populado pela descoberta raw socket, e sugeria adicionar `StoreBinding(2, Hash("HT"), HT_BID)` em PGRunHello01.cpp após a linha 368.
-
-**Isto estava ERRADO.** A análise estática completa (26/06/2026) confirmou que `ScheduleStoreBindings()` em `PGHelloIHC01.cpp` (linhas 470-477) **já armazena** Cat[2] Hash("HT") → HT_BID via `NewStoreBindingCommandLineFromHashLNToSCN("0.1", 2, "HT", _ReceivedElements.at(5), ...)`.
-
-### 2.1 Lições da correção
-
-- Não assumir que uma binding está ausente baseado no nome de uma função — seguir o fluxo de dados desde a origem (`ReceivedElements` no PGHelloIHC01) até ao consumo (`DiscoverHomonymsBlocksBIDsFromPID` no PGRunExposition01)
-- O `ScheduleStoreBindings` popula TODAS as categorias relevantes (2, 3, 5, 6, 7, 8, 9, 15) a partir dos 9 elementos recebidos no `-hello --ihc`
+**Visible symptom:** Inter-PGCS exposition (sending HTS, GIRS, PSS, NRNCS bindings between PGCS peers) never happens. ContentApp gets stuck in "The domain NRNCS is still unknown" because it never receives service bindings from the peer PGCS via exposition.
 - Antes de propor uma correcção, verificar a cadeia completa: quem recebe a mensagem raw socket (PGHelloIHC01) → quem armazena bindings (ScheduleStoreBindings) → quem envia exposição (PGRunExposition01)
 
 ## 3. Análise estática completa (26/06/2026)
