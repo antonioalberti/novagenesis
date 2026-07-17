@@ -135,6 +135,9 @@ int HTGetBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messag
                       {
                         // Adding only the ng -info --payload 01 command line
                         PMB->NewInfoPayloadCommandLine("0.1", _Values, InlineResponseMessage, NewHTDeliveryBind01);
+
+                        PB->S << Offset << "(Served file: " << _Values->at(0)
+                              << " from cache at " << ThePath << ")" << endl;
                       }
                       else
                       {

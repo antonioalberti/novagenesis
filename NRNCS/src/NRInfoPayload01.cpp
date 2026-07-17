@@ -41,7 +41,7 @@
 #include "File.h"
 #endif
 
-// #define DEBUG
+#define DEBUG
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -129,6 +129,18 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                 _ReceivedMessage->SetPayloadFilePath(CachePath);
                 _ReceivedMessage->SetPayloadFileOption("BINARY");
                 _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
+
+                // SPEC-019: Log hash for traceability
+                {
+                  string PayloadHash;
+                  if (Payload != 0 && Size > 0)
+                  {
+                    PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(
+                        (const char*)Payload, Size);
+                  }
+                  PB->S << Offset << "(NRNCS cached payload: file=" << Values.at(0)
+                        << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
+                }
 
 #ifdef DEBUG
                 PB->S << Offset << "(Cached file: " << Values.at(0) << ", size=" << Size << " bytes, at " << CachePath << ")" << endl;
