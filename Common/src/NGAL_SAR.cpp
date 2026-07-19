@@ -434,10 +434,16 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     else
     {
 #ifdef DEBUG
-      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: INCOMPLETE MN=" << MN 
-           << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS 
-           << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize 
-           << " (waiting for more fragments)" << endl;
+      // Log progress at milestones to reduce noise: every 10 segments or 25%/50%/75%
+      unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
+      bool log_progress = (FB->SegmentsSoFar % 10 == 0) || 
+                          (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
+      if (log_progress || FB->SegmentsSoFar == FB->NoS)
+      {
+        cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN 
+             << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS 
+             << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
+      }
 #endif
       return 1; // ERROR — more fragments needed
     }

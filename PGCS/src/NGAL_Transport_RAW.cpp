@@ -310,14 +310,6 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
                                              CompletedBuffer, CompletedSize);
 
-#ifdef DEBUG
-        if (sar_status != 0 && CompletedSize == 0)
-        {
-          // SAR error already logged by NGAL_SAR, but log at transport level too
-          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: SAR returned error status=" << sar_status 
-               << " (see NGAL_SAR logs for details)" << endl;
-        }
-#endif
         if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
         {
           // Message reassembled — deliver raw char buffer to GW via NGAL_CS.
