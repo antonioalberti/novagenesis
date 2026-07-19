@@ -49,6 +49,8 @@
 #include <stdio.h>
 #endif
 
+#define DEBUG
+
 using namespace std;
 
 // ── Constructor / Destructor ──
@@ -182,6 +184,11 @@ int NGAL_SAR::SendSegmented(Message* M,
         // Generate a random MessageNumber for this message
         // Important: needs to be random to avoid conflict with messages numbered on other processes
         MessageNumber = static_cast<unsigned int>(rand() % 4294967289) + 1;
+#ifdef DEBUG
+        cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber 
+             << " NoS=" << NoS << " MessageSize=" << MessageSize 
+             << " BlockSize=" << BlockSize << endl;
+#endif
 
         for (unsigned int i = 0; i < NoS; i++)
         {
@@ -229,14 +236,24 @@ int NGAL_SAR::SendSegmented(Message* M,
           Status = 0; // OK so far
 
           SequenceNumber++;
+          #ifdef DEBUG
+          cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber 
+               << " SN=" << SequenceNumber - 1 << "/" << NoS - 1 
+               << " frag_size=" << EffectiveSize << endl;
+          #endif
 
           delete[] DataBlock;
-        }
+          }
 
         if (Status == 0) // OK
         {
-          MessageCounter++;
-          SequenceNumber = 0;
+            MessageCounter++;
+#ifdef DEBUG
+            cerr << "[DEBUG] NGAL_SAR::SendSegmented: COMPLETE MN=" << MessageNumber 
+                << " segments_sent=" << NoS << endl;
+            cerr << endl; // blank line to separate completed messages in log
+#endif
+            SequenceNumber = 0;
         }
 
         delete[] SDU;
@@ -269,6 +286,9 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
   if (MN == 0)
   {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_MN=0 (dropped) numbytes=" << numbytes << endl;
+#endif
     return 1; // ERROR — invalid message number
   }
 
@@ -291,6 +311,10 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   if (!found && SN > 0)
   {
     // Fragments received before the first one — drop
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_ORDER MN=" << MN 
+         << " SN=" << SN << " (no buffer yet, dropping)" << endl;
+#endif
     return 1;
   }
 
@@ -302,6 +326,10 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     if (MessageSize <= 0 || MessageSize >= 10 * 1024 * 1024) // sanity: 10MB max
     {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_SIZE MN=" << MN 
+           << " MessageSize=" << MessageSize << " (dropping)" << endl;
+#endif
       return 1; // Invalid message size
     }
 
@@ -329,6 +357,11 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     ReassemblyBuffers.push_back(FB);
     BufferIndex = static_cast<unsigned int>(ReassemblyBuffers.size() - 1);
+#ifdef DEBUG
+    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: NEW MN=" << MN 
+         << " NoS=" << FB->NoS << " MessageSize=" << FB->MessageSize 
+         << " BlockSize=" << BlockSize << endl;
+#endif
   }
   else if (found && SN > 0)
   {
@@ -337,6 +370,11 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     if (Pointer < 0 || Pointer >= FB->MessageSize)
     {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_BOUNDS MN=" << MN 
+           << " SN=" << SN << " Pointer=" << Pointer 
+           << " MessageSize=" << FB->MessageSize << " (dropping)" << endl;
+#endif
       return 1; // Out of bounds
     }
 
@@ -357,6 +395,11 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     FB->ReceivedSoFar += static_cast<long long>(h);
     FB->SegmentsSoFar++;
     FB->Timestamp = static_cast<double>(time(0));
+#ifdef DEBUG
+    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: MN=" << MN 
+         << " SN=" << SN << " seg_received=" << FB->SegmentsSoFar 
+         << "/" << FB->NoS << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
+#endif
   }
 
   // Check stop criteria
@@ -380,11 +423,22 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       FB->Buffer = 0; // prevent double-free in destructor
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + BufferIndex);
+      #ifdef DEBUG
+      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN 
+          << " segments=" << FB->SegmentsSoFar << " size=" << FB->MessageSize << endl;
+      cerr << endl; // blank line to separate completed messages in log
+      #endif
 
       return 0; // OK — completed message
     }
     else
     {
+#ifdef DEBUG
+      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: INCOMPLETE MN=" << MN 
+           << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS 
+           << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize 
+           << " (waiting for more fragments)" << endl;
+#endif
       return 1; // ERROR — more fragments needed
     }
   }
@@ -402,6 +456,10 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
     if (FB != 0 && !FB->ContinueReceiving)
     {
       // Already completed — should have been removed. Clean up.
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::CleanupTimedOut: STALE buffer MN=" << FB->MessageNumber 
+           << " (completed but not removed) - cleaning up" << endl;
+#endif
       delete[] FB->Buffer;
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + static_cast<long>(i));
@@ -409,6 +467,12 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
     else if (FB != 0 && FB->Timestamp > 0 && (timeout_threshold - FB->Timestamp) > 30.0)
     {
       // Timeout after 30 seconds
+#ifdef DEBUG
+      cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber 
+           << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS 
+           << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize 
+           << " age=" << (timeout_threshold - FB->Timestamp) << "s - discarding" << endl;
+#endif
       delete[] FB->Buffer;
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + static_cast<long>(i));

@@ -1,12 +1,12 @@
 /*
         NovaGenesis
 
-        Name:		NovaGenesis Adaptation Layer — Transport RAW
-        Object:		NGAL_Transport_RAW
-        File:		NGAL_Transport_RAW.cpp
-        Author:		Antonio Marcos Alberti
-        Date:		07/2026
-        Version:	0.1
+        Name:           NovaGenesis Adaptation Layer — Transport RAW
+        Object:         NGAL_Transport_RAW
+        File:           NGAL_Transport_RAW.cpp
+        Author:         Antonio Marcos Alberti
+        Date:           07/2026
+        Version:        0.1
 
         Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -89,7 +89,10 @@ int NGAL_Transport_RAW::CreateRawSocket(int& _SID)
   }
   else
   {
-    // Error handled by caller
+#ifdef DEBUG
+    cerr << "[ERROR] NGAL_Transport_RAW::CreateRawSocket: socket() failed: " 
+         << strerror(errno) << " (errno=" << errno << ")" << endl;
+#endif
     perror("socket:");
   }
 
@@ -144,6 +147,15 @@ int NGAL_Transport_RAW::SendFragment(int SSID, int ifindex,
     else
     {
       perror("sendto:");
+#ifdef DEBUG
+      if (Tentatives % 100 == 0 || Tentatives == 11999) // Log every 100 retries + first
+      {
+        cerr << "[WARN] NGAL_Transport_RAW::SendFragment: sendto() failed (attempt " 
+             << (12000 - Tentatives) << "/12000) SSID=" << SSID 
+             << " ifindex=" << ifindex << " errno=" << errno 
+             << " (" << strerror(errno) << ")" << endl;
+      }
+#endif
       Tentatives--;
       // Sleep 10ms between retries
       struct timespec ts = {0, 10 * 1000000};
@@ -151,6 +163,13 @@ int NGAL_Transport_RAW::SendFragment(int SSID, int ifindex,
     }
   }
 
+#ifdef DEBUG
+  if (Status != 0)
+  {
+    cerr << "[ERROR] NGAL_Transport_RAW::SendFragment: FAILED after 12000 retries SSID=" << SSID 
+         << " ifindex=" << ifindex << " frag_size=" << FragmentSize << endl;
+  }
+#endif
   return Status;
 }
 
@@ -199,6 +218,13 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
       if (poll_result < 0)
       {
         // Interrupted or error — retry
+#ifdef DEBUG
+        if (errno != EINTR)
+        {
+          cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: poll() error: " 
+               << strerror(errno) << " (errno=" << errno << ")" << endl;
+        }
+#endif
         continue;
       }
 
@@ -220,7 +246,20 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
                      (struct sockaddr*)&saddrll, &sll_len));
 
         if (receivedbytes <= 0)
+        {
+#ifdef DEBUG
+          if (receivedbytes == 0)
+          {
+            cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvfrom() returned 0 (EOF?) fd=" << fds[i].fd << endl;
+          }
+          else if (errno != EAGAIN && errno != EWOULDBLOCK)
+          {
+            cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvfrom() error fd=" << fds[i].fd 
+                   << " errno=" << errno << " (" << strerror(errno) << ")" << endl;
+          }
+#endif
           continue;
+        }
 
 #ifdef DEBUG
         cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: fd=" << fds[i].fd 
@@ -230,13 +269,26 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         // Only process NovaGenesis frames (ethertype 0x1234 → sll_protocol 13330)
         // Note (F6): 0x1234 on wire appears as 13330 (0x3412) in host byte order
         if (saddrll.sll_protocol != 13330)
+        {
+#ifdef DEBUG
+          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: NON_NG_FRAME fd=" << fds[i].fd 
+               << " proto=0x" << hex << saddrll.sll_protocol << dec 
+               << " bytes=" << receivedbytes << " (ignored)" << endl;
+#endif
           continue;
+        }
 
         // Strip Ethernet header (14 bytes)
         numbytes = receivedbytes - 14;
 
         if (numbytes < 8)
+        {
+#ifdef DEBUG
+          cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd 
+               << " payload_bytes=" << numbytes << " (min 8 for SegHeader, dropping)" << endl;
+#endif
           continue; // Too small — at least needs SegHeader
+        }
 
         unsigned char* TempBuffer = new unsigned char[numbytes];
 
@@ -256,11 +308,15 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         char* CompletedBuffer = 0;
         long long CompletedSize = 0;
         int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
-                                              CompletedBuffer, CompletedSize);
+                                             CompletedBuffer, CompletedSize);
 
 #ifdef DEBUG
-        cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: SAR status=" << sar_status 
-             << " completed_size=" << CompletedSize << endl;
+        if (sar_status != 0 && CompletedSize == 0)
+        {
+          // SAR error already logged by NGAL_SAR, but log at transport level too
+          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: SAR returned error status=" << sar_status 
+               << " (see NGAL_SAR logs for details)" << endl;
+        }
 #endif
         if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
         {
