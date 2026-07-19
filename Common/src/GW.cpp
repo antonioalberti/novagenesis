@@ -57,8 +57,11 @@
 
 #define LG(msg) S << endl \
                   << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl
+// #define DEBUG_NETWORK_QUEUE  // Uncomment to log NetworkReceiveQueue processing
+
+#define DEBUG_NETWORK_QUEUE
+
 // #define DEBUG1  // To follow shared memory access
-// #define DEBUG2  // More on shm access
 // #define DEBUG3 // Even more on shm access
 
 union semun
@@ -605,6 +608,10 @@ void GW::Gateway()
           Message* PM = NULL;
           if (PP->NewMessage(0, 0, false, PM) == OK)
           {
+          #ifdef DEBUG_NETWORK_QUEUE
+            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size 
+                 << " queue_remaining=" << NetworkReceiveQueue.size() << endl;
+          #endif
             PM->SetMessageFromCharArray(buffer, size);
             PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
             PushToInputQueue(PM);
