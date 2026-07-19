@@ -69,6 +69,8 @@
 #include <poll.h>
 #endif
 
+#define DEBUG
+
 using namespace std;
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -133,6 +135,11 @@ int NGAL_Transport_RAW::SendFragment(int SSID, int ifindex,
     {
       Tentatives = 0;
       Status = 0; // OK
+#ifdef DEBUG
+      cerr << "[DEBUG] NGAL_Transport_RAW::SendFragment: SSID=" << SSID 
+           << " ifindex=" << ifindex << " frag_size=" << FragmentSize 
+           << " bytes_sent=" << numbytes << endl;
+#endif
     }
     else
     {
@@ -215,6 +222,11 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         if (receivedbytes <= 0)
           continue;
 
+#ifdef DEBUG
+        cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: fd=" << fds[i].fd 
+             << " received_bytes=" << receivedbytes 
+             << " proto=0x" << hex << saddrll.sll_protocol << dec << endl;
+#endif
         // Only process NovaGenesis frames (ethertype 0x1234 → sll_protocol 13330)
         // Note (F6): 0x1234 on wire appears as 13330 (0x3412) in host byte order
         if (saddrll.sll_protocol != 13330)
@@ -246,6 +258,10 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
                                               CompletedBuffer, CompletedSize);
 
+#ifdef DEBUG
+        cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: SAR status=" << sar_status 
+             << " completed_size=" << CompletedSize << endl;
+#endif
         if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
         {
           // Message reassembled — deliver raw char buffer to GW via NGAL_CS.
@@ -253,6 +269,9 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
           // ConvertMessage (Finding F2 — no NewMessage in receiver thread).
           NGAL_CS::DeliverToGateway(PPG->PGW, CompletedBuffer, CompletedSize);
 
+#ifdef DEBUG
+          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: Delivered to GW size=" << CompletedSize << endl;
+#endif
           // The caller owns the completed buffer (returned by ReceiveFragment).
           // DeliverToGateway makes a copy for the queue, so we must delete
           // our copy now.
