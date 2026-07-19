@@ -1,12 +1,12 @@
 /*
         NovaGenesis
 
-        Name:		NovaGenesis Adaptation Layer — Segmentation & Reassembly
-        Object:		NGAL_SAR
-        File:		NGAL_SAR.cpp
-        Author:		Antonio Marcos Alberti
-        Date:		07/2026
-        Version:	0.1
+        Name:           NovaGenesis Adaptation Layer — Segmentation & Reassembly
+        Object:         NGAL_SAR
+        File:           NGAL_SAR.cpp
+        Author:         Antonio Marcos Alberti
+        Date:           07/2026
+        Version:        0.1
 
         Copyright (C) 2026  Antonio Marcos Alberti
 
@@ -49,6 +49,7 @@
 #include <stdio.h>
 #endif
 
+// #define DEBUG
 #define DEBUG
 
 using namespace std;
@@ -236,14 +237,14 @@ int NGAL_SAR::SendSegmented(Message* M,
           Status = 0; // OK so far
 
           SequenceNumber++;
-          #ifdef DEBUG
+#ifdef DEBUG
           cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber 
                << " SN=" << SequenceNumber - 1 << "/" << NoS - 1 
                << " frag_size=" << EffectiveSize << endl;
-          #endif
+#endif
 
           delete[] DataBlock;
-          }
+        }
 
         if (Status == 0) // OK
         {
@@ -263,6 +264,7 @@ int NGAL_SAR::SendSegmented(Message* M,
 
   return Status;
 }
+
 // ── Receive SAR ──
 // Process one frame from transport.
 // Manages reassembly buffer internally.
@@ -357,11 +359,6 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     ReassemblyBuffers.push_back(FB);
     BufferIndex = static_cast<unsigned int>(ReassemblyBuffers.size() - 1);
-#ifdef DEBUG
-    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: NEW MN=" << MN 
-         << " NoS=" << FB->NoS << " MessageSize=" << FB->MessageSize 
-         << " BlockSize=" << BlockSize << endl;
-#endif
   }
   else if (found && SN > 0)
   {
@@ -396,9 +393,16 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     FB->SegmentsSoFar++;
     FB->Timestamp = static_cast<double>(time(0));
 #ifdef DEBUG
-    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: MN=" << MN 
-         << " SN=" << SN << " seg_received=" << FB->SegmentsSoFar 
-         << "/" << FB->NoS << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
+    // Progress logging at milestones: every 10 segments + 25%/50%/75%
+    unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
+    bool log_progress = (FB->SegmentsSoFar % 10 == 0) || 
+                        (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
+    if (log_progress || FB->SegmentsSoFar == FB->NoS)
+    {
+      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN 
+           << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS 
+           << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
+    }
 #endif
   }
 
@@ -423,18 +427,19 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       FB->Buffer = 0; // prevent double-free in destructor
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + BufferIndex);
-      #ifdef DEBUG
+#ifdef DEBUG
       cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN 
           << " segments=" << FB->SegmentsSoFar << " size=" << FB->MessageSize << endl;
       cerr << endl; // blank line to separate completed messages in log
-      #endif
+#endif
 
       return 0; // OK — completed message
     }
     else
     {
+      FB->Timestamp = static_cast<double>(time(0));
 #ifdef DEBUG
-      // Log progress at milestones to reduce noise: every 10 segments or 25%/50%/75%
+      // Progress logging at milestones: every 10 segments + 25%/50%/75%
       unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
       bool log_progress = (FB->SegmentsSoFar % 10 == 0) || 
                           (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
