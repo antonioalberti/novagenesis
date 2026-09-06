@@ -36,7 +36,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#define DEBUG
+// #define DEBUG
 
 PGStresstestPing01::PGStresstestPing01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

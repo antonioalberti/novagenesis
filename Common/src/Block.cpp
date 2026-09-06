@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG // To follow message processing
+// #define DEBUG // To follow message processing
 // #define DEBUG1 // To follow inlineresponse message generation only
 // #define DEBUG2
 

@@ -43,7 +43,7 @@
 
 #include <iostream>
 
-#define DEBUG
+// #define DEBUG
 // #define DEBUG
 
 PGMsgCl01::PGMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)

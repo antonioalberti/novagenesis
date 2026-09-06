@@ -47,7 +47,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 // #define DEBUG
 
 PGRunPeriodic01::PGRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)

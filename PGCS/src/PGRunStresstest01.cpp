@@ -45,7 +45,7 @@
 #include "NameGenerator.h"
 #endif
 
-#define DEBUG
+// #define DEBUG
 // #define DEBUG
 
 PGRunStresstest01::PGRunStresstest01(string _LN, Block* _PB, MessageBuilder* _PMB)

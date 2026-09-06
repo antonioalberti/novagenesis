@@ -115,10 +115,10 @@
 #include <fstream>
 #endif
 
-#define DEBUG
-#define DEBUG2
+// #define DEBUG
+// #define DEBUG2
 // #define DEBUG1
-#define DEBUG3  // DEBUG6 or 3 are mutually exclusive
+// #define DEBUG3  // DEBUG6 or 3 are mutually exclusive
 // #define DEBUG5  // Details of each segment sent
 // #define DEBUG6  
 

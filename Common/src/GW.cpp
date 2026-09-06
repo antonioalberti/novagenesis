@@ -59,7 +59,7 @@
                   << "[" << fixed << setprecision(3) << GetTime() << "s]        " << msg << endl
 // #define DEBUG_NETWORK_QUEUE  // Uncomment to log NetworkReceiveQueue processing
 
-#define DEBUG_NETWORK_QUEUE
+// #define DEBUG_NETWORK_QUEUE
 
 // #define DEBUG1  // To follow shared memory access
 // #define DEBUG3 // Even more on shm access
