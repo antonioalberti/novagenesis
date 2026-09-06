@@ -18,10 +18,11 @@
     "inventory": "3 procs (36) + 2 procs (61) intact at end"
   },
   "caveats": [
-    "Offered/completed counters NOT collected this run: StressTest_Stats.txt and loss/delay .dat files created but 0 bytes (stats only written on PG exit via atexit-like path, or sampling never fired). Loss/delay reconciliation still MISSING \u2014 this was Astra requirement #11; counter plumbing is a SPEC-028 item.",
-    "CPU ~100% of one core per PGCS: busy loop at 500 msg/s; not evidence of livelock (RSS bounded), but throughput unverified without counters.",
-    "This run used the OLD inline monitor (pre-hardened). Next soak must use Scripts/AlpineVMs/soak-monitor.sh (commit b358abb).",
-    "Astra gate: directed guard tests still required (SPEC-028 item D); this soak alone does not achieve Phase 1 sign-off."
+    "PER ASTRA VERDICT (2026-09-06): status is IMPLEMENTED - Pending Test, NOT test sign-off. Evidence covers 30-min survival + bounded RSS only — NOT verified throughput, losslessness, or absence of stalls/livelock (bounded RSS does not exclude livelock).",
+    "'No stall' claim REMOVED per Astra; 'zero guard hits' recorded as UNVERIFIED (guards not independently observable without DEBUG).",
+    "Offered/completed counters NOT collected this run: StressTest_Stats.txt and loss/delay .dat files created but 0 bytes. Counter plumbing deferred to SPEC-028-B: minimal one flushed greppable stderr line every 10s (SPEC028_STATS offered/sent_ok/received/completed/dropped/guard_reject/outstanding), active with DEBUG off, race-safe cumulative counters, no histograms/frameworks.",
+    "This run used the OLD inline monitor (pre-hardened). Next soaks must use Scripts/AlpineVMs/soak-monitor.sh (commit b358abb).",
+    "Directed guard tests remain tracked debt (not waived): SPEC-028 item D. SSIDs race investigation takes priority over guard tests per Astra."
   ],
-  "verdict": "Stability-at-30min PASSED (no crash, no stall, bounded memory, no core dumps). Telemetry/accounting gaps deferred to SPEC-028."
+  "verdict": "Phase 1 = IMPLEMENTED — Pending Test (Astra-accepted with reduced rigor per user decision). 30-min stability + bounded memory demonstrated. Phase 2 branch (AMEND-1/2/5/6) approved to start now, separate branch, acceptance independent."
 }
