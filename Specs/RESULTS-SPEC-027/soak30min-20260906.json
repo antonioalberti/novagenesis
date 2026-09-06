@@ -1,0 +1,27 @@
+{
+  "test": "SPEC-027 Phase 1 \u2014 30-min soak at 500 msg/s (StressInterval=0.002, 2500 msgs/5s period, both PGCS)",
+  "date": "2026-09-06 18:52\u201319:22 UTC-ish (30 samples, 60s interval)",
+  "config": {
+    "vms": "101 repo61 + 102 source36, upsized to 4 cores / 4GB (pre-authorized)",
+    "build": "commit 8a9d2bf (AMEND-3 fixes 1396c62 + DEBUG off), built on both VMs via pull-and-build",
+    "debug": "OFF (all noisy macros disabled)",
+    "core_dumps": "enabled, /root/cores/ (persistent), verified pattern set"
+  },
+  "result": "SURVIVED \u2014 all processes UP for the full 30 min",
+  "metrics": {
+    "cpu_time_src": "0s -> 1871s over 30 min (steady ~60s/min, i.e. ~1 core busy)",
+    "cpu_time_repo": "0s -> 1866s (symmetric)",
+    "rss": "2436KB -> 2564-2692KB (bounded; +~120-260KB drift over 30 min, no runaway growth)",
+    "log_volume": "/tmp/pgcs.log static at ~3.8-4.8KB (buffered stdout; DEBUG off)",
+    "tmpfs": "1.9G total, <20KB used \u2014 no exhaustion",
+    "core_dumps": "0",
+    "inventory": "3 procs (36) + 2 procs (61) intact at end"
+  },
+  "caveats": [
+    "Offered/completed counters NOT collected this run: StressTest_Stats.txt and loss/delay .dat files created but 0 bytes (stats only written on PG exit via atexit-like path, or sampling never fired). Loss/delay reconciliation still MISSING \u2014 this was Astra requirement #11; counter plumbing is a SPEC-028 item.",
+    "CPU ~100% of one core per PGCS: busy loop at 500 msg/s; not evidence of livelock (RSS bounded), but throughput unverified without counters.",
+    "This run used the OLD inline monitor (pre-hardened). Next soak must use Scripts/AlpineVMs/soak-monitor.sh (commit b358abb).",
+    "Astra gate: directed guard tests still required (SPEC-028 item D); this soak alone does not achieve Phase 1 sign-off."
+  ],
+  "verdict": "Stability-at-30min PASSED (no crash, no stall, bounded memory, no core dumps). Telemetry/accounting gaps deferred to SPEC-028."
+}
