@@ -115,9 +115,15 @@ private:
     char* Buffer;                 // Reassembly buffer
     double Timestamp;             // For timeout cleanup
     bool ContinueReceiving;       // True = more segments needed
+    unsigned int BlockSize;       // BlockSize used when this buffer was created (AMEND-3)
+    std::vector<bool> ReceivedSN; // Per-SN received bitmap — count/copy each SN once (AMEND-3)
   };
 
   std::vector<FragmentBuffer*> ReassemblyBuffers;
+
+  // Maximum simultaneous reassembly buffers (AMEND-3: unbounded growth caused
+  // PGCS crashes under high load; MN collisions/timeouts leak buffers).
+  static const size_t MAX_REASSEMBLY_BUFFERS = 256;
 };
 
 #endif

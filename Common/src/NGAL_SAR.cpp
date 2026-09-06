@@ -294,6 +294,15 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     return 1; // ERROR — invalid message number
   }
 
+  // AMEND-3: minimum frame length guard — 8B SegHeader (+16B for SN=0 with SizeHeader)
+  if (numbytes < 8 || (SN == 0 && numbytes < 16))
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT numbytes=" << numbytes << " (dropped)" << endl;
+#endif
+    return 1;
+  }
+
   // Check if this MN already has a fragment buffer
   FragmentBuffer* FB = 0;
   unsigned int BufferIndex = 0;
@@ -329,24 +338,61 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     if (MessageSize <= 0 || MessageSize >= 10 * 1024 * 1024) // sanity: 10MB max
     {
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_SIZE MN=" << MN 
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_SIZE MN=" << MN
            << " MessageSize=" << MessageSize << " (dropping)" << endl;
 #endif
       return 1; // Invalid message size
     }
 
+    // AMEND-3: bound the number of simultaneous reassembly buffers.
+    // Unbounded growth was implicated in the 500 msg/s PGCS crashes.
+    if (ReassemblyBuffers.size() >= MAX_REASSEMBLY_BUFFERS)
+    {
+      // Drop the OLDEST buffer to make room (it is likely timed out or stalled)
+      FragmentBuffer* Oldest = ReassemblyBuffers.front();
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: BUFFER_LIMIT_REACHED (" << MAX_REASSEMBLY_BUFFERS
+           << ") dropping OLDEST MN=" << Oldest->MessageNumber
+           << " seg=" << Oldest->SegmentsSoFar << "/" << Oldest->NoS << endl;
+#endif
+      delete[] Oldest->Buffer;
+      delete Oldest;
+      ReassemblyBuffers.erase(ReassemblyBuffers.begin());
+    }
+
+    unsigned int LocalNoS = static_cast<unsigned int>(ceil(static_cast<double>(8 + MessageSize) / static_cast<double>(BlockSize)));
+
+    // AMEND-3: SN=0 is the first fragment; NoS must be at least 1 and the
+    // first-fragment payload must fit the freshly allocated buffer.
+    unsigned int payload_bytes = (numbytes > 16) ? (numbytes - 16) : 0;
+    if (LocalNoS == 0 || payload_bytes > static_cast<unsigned int>(MessageSize))
+    {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_FIRST_FRAGMENT MN=" << MN
+           << " NoS=" << LocalNoS << " payload=" << payload_bytes
+           << " MessageSize=" << MessageSize << " (dropping)" << endl;
+#endif
+      return 1;
+    }
+
     FB = new FragmentBuffer;
     FB->MessageNumber = MN;
-    FB->NoS = static_cast<unsigned int>(ceil(static_cast<double>(8 + MessageSize) / static_cast<double>(BlockSize)));
+    FB->NoS = LocalNoS;
     FB->MessageSize = MessageSize;
     FB->Buffer = new char[static_cast<size_t>(MessageSize)];
     FB->ReceivedSoFar = 0;
     FB->SegmentsSoFar = 0;
     FB->ContinueReceiving = true;
     FB->Timestamp = static_cast<double>(time(0));
+    FB->BlockSize = BlockSize; // AMEND-3: remember creation BlockSize
+    FB->ReceivedSN.assign(LocalNoS, false); // AMEND-3: per-SN bitmap
 
     // Copy payload from this segment (skip SegHeader(8) + SizeHeader(8) = 16 bytes)
-    unsigned int payload_bytes = (numbytes > 16) ? (numbytes - 16) : 0;
+    // AMEND-3: bound destination writes by MessageSize.
+    if (payload_bytes > static_cast<unsigned int>(MessageSize))
+    {
+      payload_bytes = static_cast<unsigned int>(MessageSize);
+    }
 
     for (unsigned int r = 0; r < payload_bytes; r++)
     {
@@ -355,6 +401,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
     FB->ReceivedSoFar = static_cast<long long>(payload_bytes);
     FB->SegmentsSoFar = 1;
+    FB->ReceivedSN[0] = true;
     FB->Timestamp = static_cast<double>(time(0));
 
     ReassemblyBuffers.push_back(FB);
@@ -362,45 +409,85 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   }
   else if (found && SN > 0)
   {
+    // AMEND-3: SN must be within the expected segment count for this buffer
+    if (SN >= FB->NoS)
+    {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: SN_OUT_OF_RANGE MN=" << MN
+           << " SN=" << SN << " NoS=" << FB->NoS << " (dropping)" << endl;
+#endif
+      return 1;
+    }
+
+    // AMEND-3: reject fragments carrying a different BlockSize than the one
+    // used to create the buffer (mixed-MTU / corrupted sender).
+    if (BlockSize != FB->BlockSize)
+    {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: BLOCKSIZE_MISMATCH MN=" << MN
+           << " got=" << BlockSize << " expected=" << FB->BlockSize << " (dropping)" << endl;
+#endif
+      return 1;
+    }
+
+    // AMEND-3: duplicate / already-received SN — ignore without copying twice
+    // and WITHOUT refreshing the timestamp (a retransmission storm must not
+    // keep a dead buffer alive forever).
+    if (SN < FB->ReceivedSN.size() && FB->ReceivedSN[SN])
+    {
+#ifdef DEBUG
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: DUPLICATE SN MN=" << MN
+           << " SN=" << SN << " (ignored, no timestamp refresh)" << endl;
+#endif
+      return 1;
+    }
+
     // Continuing fragment for an existing message
     long long Pointer = static_cast<long long>(SN) * static_cast<long long>(BlockSize) - 8;
 
     if (Pointer < 0 || Pointer >= FB->MessageSize)
     {
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_BOUNDS MN=" << MN 
-           << " SN=" << SN << " Pointer=" << Pointer 
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_BOUNDS MN=" << MN
+           << " SN=" << SN << " Pointer=" << Pointer
            << " MessageSize=" << FB->MessageSize << " (dropping)" << endl;
 #endif
       return 1; // Out of bounds
     }
 
+    // AMEND-3: bound the copy by BOTH the remaining message space AND the
+    // received frame payload. Previously only MessageSize gated the loop,
+    // and a long frame could write past the buffer end.
+    long long Remaining = FB->MessageSize - Pointer;
+
     unsigned int h = 0;
 
-    for (unsigned int q = 0; q < (numbytes - 8); q++)
+    unsigned int source_bytes = numbytes - 8; // skip SegHeader
+    if (source_bytes > static_cast<unsigned int>(Remaining))
+    {
+      source_bytes = static_cast<unsigned int>(Remaining);
+    }
+
+    for (unsigned int q = 0; q < source_bytes; q++)
     {
       FB->Buffer[Pointer + static_cast<long long>(q)] = static_cast<char>(TempBuffer[q + 8]);
 
       h++;
-
-      if ((FB->ReceivedSoFar + static_cast<long long>(h)) >= FB->MessageSize)
-      {
-        break;
-      }
     }
 
     FB->ReceivedSoFar += static_cast<long long>(h);
     FB->SegmentsSoFar++;
+    FB->ReceivedSN[SN] = true;
     FB->Timestamp = static_cast<double>(time(0));
 #ifdef DEBUG
     // Progress logging at milestones: every 10 segments + 25%/50%/75%
     unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
-    bool log_progress = (FB->SegmentsSoFar % 10 == 0) || 
+    bool log_progress = (FB->SegmentsSoFar % 10 == 0) ||
                         (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
     if (log_progress || FB->SegmentsSoFar == FB->NoS)
     {
-      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN 
-           << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS 
+      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN
+           << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS
            << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
     }
 #endif
@@ -419,6 +506,11 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       // The caller (NGAL_Transport_RAW::ReceiveDispatcher) will pass it
       // to NGAL_CS::DeliverToGateway, and the GW thread will do
       // NewMessage + SetMessageFromCharArray + ConvertMessage.
+
+      // AMEND-3 FIX (use-after-free): capture logging values BEFORE delete FB.
+      unsigned int DoneSegments = FB->SegmentsSoFar;
+      long long DoneSize = FB->MessageSize;
+
       CompletedBuffer = FB->Buffer;
       CompletedSize = FB->MessageSize;
 
@@ -428,8 +520,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       delete FB;
       ReassemblyBuffers.erase(ReassemblyBuffers.begin() + BufferIndex);
 #ifdef DEBUG
-      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN 
-          << " segments=" << FB->SegmentsSoFar << " size=" << FB->MessageSize << endl;
+      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN
+          << " segments=" << DoneSegments << " size=" << DoneSize << endl;
       cerr << endl; // blank line to separate completed messages in log
 #endif
 
