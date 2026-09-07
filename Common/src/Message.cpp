@@ -1846,7 +1846,9 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File* 
 
             //*_PF<<"Deleting the temporary array"<<endl;
 
-            delete Temp;
+            // M4 fix (SPEC-033): Temp was allocated with new[], so it must be
+            // released with delete[] (plain delete on new[] is UB).
+            delete[] Temp;
 
             //*_PF<<endl<<"Jumping to position = "<<u<<endl;
 

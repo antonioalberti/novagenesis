@@ -543,6 +543,9 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, Message*& M
 {
   int Status = ERROR;
 
+  // C2 fix (SPEC-033): always define the output, even when the container is full.
+  M = NULL;
+
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Controls[i] == FREE)
@@ -700,19 +703,33 @@ int Process::NewMessage(Message* _Original, Message*& M)
 // Get a Message
 int Process::GetMessage(unsigned int _Index, Message*& M)
 {
+  // C1 fix (SPEC-033): the old test (_Index < NoM) was wrong twice — NoM counts
+  // occupied slots, not the highest index, and M was left untouched (or stale)
+  // while OK was returned for out-of-range indices. Now the output is always
+  // defined and only occupied slots resolve.
+  M = NULL;
 
-  if (_Index < NoM)
+  if (_Index < MAX_MESSAGES_IN_MEMORY && Messages[_Index] != NULL && Controls[_Index] == BUSY)
   {
     M = Messages[_Index];
+
+    return OK;
   }
 
-  return OK;
+  return ERROR;
 }
 
 // Erase a Message from the container
 int Process::EraseMessage(Message* M)
 {
   int Status = OK;
+
+  // SPEC-033 (Astra finding 3): guard against a null pointer — previously a
+  // null M matched an empty slot and wrongly decremented NoM.
+  if (M == NULL)
+  {
+    return ERROR;
+  }
 
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
@@ -742,6 +759,15 @@ int Process::HasMessage(Message* M, bool& _Answer)
 {
   int Status = OK;
 
+  // SPEC-033 (Astra finding 1/2): initialize the answer; a miss must not
+  // preserve a stale true from the caller. A null pointer never matches.
+  _Answer = false;
+
+  if (M == NULL)
+  {
+    return Status;
+  }
+
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Messages[i] == M)
@@ -763,6 +789,13 @@ int Process::DeleteMessage(Message* M)
   bool Deleted = false;
 
   int Index = 0;
+
+  // SPEC-033 (Astra finding 4): a null M previously dereferenced inside the
+  // loop (M->GetDeleteFlag()) after matching an empty slot.
+  if (M == NULL)
+  {
+    return ERROR;
+  }
 
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {

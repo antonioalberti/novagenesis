@@ -380,13 +380,18 @@ int CommandLine::ConvertCommandLineFromCharArray(char* _CL, int _Size)
   int AlternativeMarkerPosition = 0;
   bool HasBeginArgumentMarker = false;
   bool HasEndArgumentMarker = false;
-  int WhiteSpacePositions[4096];    // There is a limit of 4096 white space per command line
+  // P3 fix (SPEC-033): dynamic white-space tracking. The previous fixed
+  // WhiteSpacePositions[4096] silently corrupted the stack when a command line
+  // contained more than 4096 white spaces. The hard cap now matches the
+  // maximum command line size accepted by the parser (64 KiB, see below).
+  const int MAX_WS_POSITIONS = 65536;
+  int* WhiteSpacePositions = new int[MAX_WS_POSITIONS];
   int WhiteSpaceCounter = 0;        // Number of white spaces detected
   int BeginVectorMarkerCounter = 0; // Zero means no marker
   int EndVectorMarkerCounter = 0;   // Zero means no marker
   int Status = ERROR;
 
-  for (int y = 0; y < 4096; y++)
+  for (int y = 0; y < MAX_WS_POSITIONS; y++)
   {
     WhiteSpacePositions[y] = 0;
   }
@@ -403,8 +408,19 @@ int CommandLine::ConvertCommandLineFromCharArray(char* _CL, int _Size)
       {
         if (_CL[i] == ' ')
         {
-          WhiteSpacePositions[WhiteSpaceCounter] = i;
-          WhiteSpaceCounter++;
+          // P3 fix (SPEC-033): bounds check before writing a white-space position.
+          if (WhiteSpaceCounter < MAX_WS_POSITIONS)
+          {
+            WhiteSpacePositions[WhiteSpaceCounter] = i;
+            WhiteSpaceCounter++;
+          }
+          else
+          {
+            // Too many white spaces: reject the command line instead of
+            // corrupting memory. The command line is oversized anyway.
+            delete[] WhiteSpacePositions;
+            return ERROR;
+          }
         }
 
         if (_CL[i] == '-' && _CL[i + 1] == '-')
@@ -514,12 +530,22 @@ int CommandLine::ConvertCommandLineFromCharArray(char* _CL, int _Size)
               }
             }
           }
+          else
+          {
+            // P2 fix (SPEC-033): a '<' near the end of the token stream left
+            // Words[l+1] out of bounds. Missing size means malformed input.
+            delete[] WhiteSpacePositions;
+            return ERROR;
+          }
         }
 
         delete[] Words;
       }
     }
   }
+
+  // P3 fix (SPEC-033): release the dynamically allocated tracking array.
+  delete[] WhiteSpacePositions;
 
   return Status;
 }
