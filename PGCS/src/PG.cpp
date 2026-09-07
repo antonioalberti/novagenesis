@@ -558,10 +558,10 @@ int PG::CreateRawSocket(int& _SID)
 // Write to other OS
 int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Size, Message* M)
 {
-  static double lastEntry = 0;
-  if (PB->GetTime() - lastEntry >= 10.0)
+  static time_t lastEntry = 0;
+  if (time(nullptr) - lastEntry >= 10)
   {
-    lastEntry = PB->GetTime();
+    lastEntry = time(nullptr);
     cerr << "[SPEC032DIAG] SendToARawSocket ENTER identifier=" << _Identifier << endl;
   }
   int Status = ERROR;
@@ -636,10 +636,10 @@ int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Si
     }
     else
     {
-      static double lastErr1 = 0;
-      if (PB->GetTime() - lastErr1 >= 10.0)
+      static time_t lastErr1 = 0;
+      if (time(nullptr) - lastErr1 >= 10)
       {
-        lastErr1 = PB->GetTime();
+        lastErr1 = time(nullptr);
         cerr << "[SPEC032DIAG] SendToARawSocket: MORE_THAN_ONE identifier=" << _Identifier << endl;
       }
       S << Offset << "(ERROR: more than one identifier to this address " << _Identifier << ")" << endl;
@@ -647,10 +647,10 @@ int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Si
   }
   else
   {
-    static double lastErr2 = 0;
-    if (PB->GetTime() - lastErr2 >= 10.0)
+    static time_t lastErr2 = 0;
+    if (time(nullptr) - lastErr2 >= 10)
     {
-      lastErr2 = PB->GetTime();
+      lastErr2 = time(nullptr);
       cerr << "[SPEC032DIAG] SendToARawSocket: NO_CLIENT_SID identifier=" << _Identifier
            << " (HT cat17 lookup failed)" << endl;
     }
