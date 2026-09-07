@@ -58,6 +58,8 @@ add_library(Common
         Common/src/CLISCNAck01.h
         Common/src/CommandLine.cpp
         Common/src/CommandLine.h
+        Common/src/CommandLineParser.cpp
+        Common/src/CommandLineParser.h
         Common/src/DataStore.h
         Common/src/fast_mutex.h
         Common/src/File.cpp

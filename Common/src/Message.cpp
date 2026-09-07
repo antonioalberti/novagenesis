@@ -1821,26 +1821,22 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File* 
         {
           if (Msg[u] == '\n')
           {
-            int CommandLineSize = (int)(u - t + 1);
+            // SPEC-033 Phase A: copied bytes are Msg[t..u-1] (u-t bytes, the
+            // last being '\n'). The old code passed u-t+1 as size, exposing
+            // one UNINITIALIZED byte to the parser. NUL-terminate and pass
+            // the exact length.
+            int CommandLineSize = (int)(u - t);
 
-            //*_PF<<"Command line size = "<<CommandLineSize<<endl;
-
-            Temp = new char[CommandLineSize];
-
-            //*_PF<<"Showing the discovered command line:"<<endl;
+            Temp = new char[CommandLineSize + 1];
 
             for (int v = 0; v < (u - t); v++)
             {
               Temp[v] = Msg[t + v];
-
-              //*_PF<<Temp[v];
             }
 
-            //*_PF<<endl<<"Creating the new command line object"<<endl;
+            Temp[u - t] = '\0';
 
             NewCommandLine(PCL);
-
-            //*_PF<<"Copying the temporary array content to command line object"<<endl;
 
             PCL->ConvertCommandLineFromCharArray(Temp, CommandLineSize);
 
@@ -1944,16 +1940,14 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
         {
           if (Msg[u] == '\n')
           {
-            int CommandLineSize = (int)(u - t + 1);
+            // SPEC-033 Phase A: same off-by-one fix as above — NUL-terminate
+            // and pass the exact length (u-t) instead of u-t+1.
+            int CommandLineSize = (int)(u - t);
+
+            Temp = new char[CommandLineSize + 1];
 
 #ifdef DEBUG
             cout << "Command line size = " << CommandLineSize << endl;
-#endif
-
-            Temp = new char[CommandLineSize];
-
-#ifdef DEBUG
-            cout << "Showing the discovered command line:" << endl;
 #endif
 
             for (int v = 0; v < (u - t); v++)
@@ -1963,6 +1957,8 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
               cout << Temp[v];
 #endif
             }
+
+            Temp[u - t] = '\0';
 
 #ifdef DEBUG
             cout << endl

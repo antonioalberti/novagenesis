@@ -29,6 +29,10 @@
 #include "CommandLine.h"
 #endif
 
+#ifndef _COMMANDLINEPARSER_H
+#include "CommandLineParser.h"
+#endif
+
 CommandLine::CommandLine()
 {
   Name = "";
@@ -80,6 +84,59 @@ CommandLine::CommandLine(const CommandLine& CL)
       Arguments[n][o] = CL.Arguments[n][o];
     }
   }
+}
+
+// SPEC-033 Phase A: deep copy assignment operator.
+CommandLine& CommandLine::operator=(const CommandLine& CL)
+{
+  if (this == &CL)
+  {
+    return *this;
+  }
+
+  // Release current resources first.
+  if (NoA > 0)
+  {
+    for (unsigned int i = 0; i < NoA; i++)
+    {
+      delete[] Arguments[i];
+    }
+
+    delete[] Arguments;
+
+    delete[] NoE;
+
+    Arguments = 0;
+
+    NoE = 0;
+  }
+
+  Name = CL.Name;
+  Alternative = CL.Alternative;
+  Version = CL.Version;
+
+  NoA = CL.NoA;
+
+  Arguments = new string*[NoA];
+
+  NoE = new unsigned int[NoA];
+
+  for (unsigned int m = 0; m < NoA; m++)
+  {
+    NoE[m] = CL.NoE[m];
+
+    Arguments[m] = new string[NoE[m]];
+  }
+
+  for (unsigned int n = 0; n < CL.NoA; n++)
+  {
+    for (unsigned int o = 0; o < CL.NoE[n]; o++)
+    {
+      Arguments[n][o] = CL.Arguments[n][o];
+    }
+  }
+
+  return *this;
 }
 
 CommandLine::~CommandLine()
@@ -286,268 +343,41 @@ ostream& operator<<(ostream& os, const CommandLine& CL)
   return os;
 }
 
+// SPEC-033 Phase A: this operator now delegates to the single parser.
+// Kept as an API adapter (Astra review: do not remove operator>> yet).
+// Parse failures set failbit on the stream.
 istringstream& operator>>(istringstream& iss, CommandLine& CL)
 {
-  string Temp;
-  int Size;
-  unsigned int Argument_Number = 0;
+  std::string Line((std::istreambuf_iterator<char>(iss)), std::istreambuf_iterator<char>());
 
-  iss >> Temp;
+  int ErrorCode = CLP_OK;
+  size_t ErrorOffset = 0;
 
-  if (Temp == "ng")
+  if (CommandLineParser::Parse(Line, CL, ErrorCode, ErrorOffset) != OK)
   {
-    iss >> CL.Name;
-    iss >> CL.Alternative;
-    iss >> CL.Version;
-    iss >> Temp; // Reads the [
-
-    if (Temp == "[" && CL.Name != "" && CL.Alternative != "" && CL.Version != "" && Temp != "[<")
-    {
-      while (!iss.eof())
-      {
-        iss >> Temp; // Reads the <
-
-        if (Temp == "<" && Temp != "<1" && Temp != "<2" && Temp != "<3" && Temp != "]")
-        {
-          iss >> Temp; // Reads the number
-
-          stringstream ssout(Temp.c_str());
-
-          ssout >> Size;
-
-          // cout << endl << "Size = "<<Size<<endl;
-
-          if (Size > 0)
-          {
-            // New argument
-            CL.NewArgument(Size);
-
-            iss >> Temp; // Reads the type
-
-            if ((Temp == "s" || Temp == "h" || Temp == "i") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
-            {
-              for (int i = 0; i < Size; i++)
-              {
-                iss >> Temp; // Reads the value
-
-                // cout << "Value = "<<Temp<<endl;
-
-                if (Temp != "" && Temp != ">" && Temp != "<" && Temp != "]" && Temp != " ")
-                {
-                  // New element
-
-                  CL.SetArgumentElement(Argument_Number, i, Temp);
-                }
-                else
-                {
-                  break;
-                }
-              }
-
-              iss >> Temp; // Reads the >
-            }
-            else
-            {
-              break;
-            }
-          }
-        }
-        else
-        {
-          break;
-        }
-
-        Argument_Number++;
-      }
-    }
+    iss.setstate(std::ios::failbit);
   }
-
-  iss >> Temp; // Reads the ]
-
-  // cout << "The command line is :" <<endl;
-
-  // cout << CL << endl;
 
   return iss;
 }
 
 // Example of command line
 // ng -p --notify _Version [ < 1 string _Category > < 1 string _Key > < _ValuesSize string S_1 ... S_ValuesSize > < _PubNotifySize string pub HID OSID PID BID > ... < _SubNotifySize string sub HID OSID PID BID > ]
+// SPEC-033 Phase A: this method now delegates to the single parser.
+// Kept for API compatibility (callers check the return value).
 int CommandLine::ConvertCommandLineFromCharArray(char* _CL, int _Size)
 {
-  bool HasNG = false;
-  bool HasCommandMarker = false;
-  int AlternativeMarkerPosition = 0;
-  bool HasBeginArgumentMarker = false;
-  bool HasEndArgumentMarker = false;
-  // P3 fix (SPEC-033): dynamic white-space tracking. The previous fixed
-  // WhiteSpacePositions[4096] silently corrupted the stack when a command line
-  // contained more than 4096 white spaces. The hard cap now matches the
-  // maximum command line size accepted by the parser (64 KiB, see below).
-  const int MAX_WS_POSITIONS = 65536;
-  int* WhiteSpacePositions = new int[MAX_WS_POSITIONS];
-  int WhiteSpaceCounter = 0;        // Number of white spaces detected
-  int BeginVectorMarkerCounter = 0; // Zero means no marker
-  int EndVectorMarkerCounter = 0;   // Zero means no marker
-  int Status = ERROR;
-
-  for (int y = 0; y < MAX_WS_POSITIONS; y++)
+  if (_CL == NULL || _Size <= 0)
   {
-    WhiteSpacePositions[y] = 0;
+    return ERROR;
   }
 
-  if (_Size > 9)
-  {
-    if (_CL[0] == 'n' && _CL[1] == 'g' && _CL[3] == '-')
-    {
-      HasNG = true;
-      HasCommandMarker = true;
+  std::string Input(_CL, _Size);
 
-      // Loop over all characters
-      for (int i = 0; i < (_Size - 1); i++)
-      {
-        if (_CL[i] == ' ')
-        {
-          // P3 fix (SPEC-033): bounds check before writing a white-space position.
-          if (WhiteSpaceCounter < MAX_WS_POSITIONS)
-          {
-            WhiteSpacePositions[WhiteSpaceCounter] = i;
-            WhiteSpaceCounter++;
-          }
-          else
-          {
-            // Too many white spaces: reject the command line instead of
-            // corrupting memory. The command line is oversized anyway.
-            delete[] WhiteSpacePositions;
-            return ERROR;
-          }
-        }
+  int ErrorCode = CLP_OK;
+  size_t ErrorOffset = 0;
 
-        if (_CL[i] == '-' && _CL[i + 1] == '-')
-        {
-          AlternativeMarkerPosition = i;
-        }
-
-        if (_CL[i] == '[')
-        {
-          HasBeginArgumentMarker = true;
-        }
-
-        if (_CL[i + 1] == ']')
-        {
-          HasEndArgumentMarker = true;
-        }
-
-        if (_CL[i] == '<')
-        {
-          BeginVectorMarkerCounter++;
-        }
-
-        if (_CL[i] == '>')
-        {
-          EndVectorMarkerCounter++;
-        }
-      }
-
-      if (HasNG == true &&
-          HasCommandMarker == true &&
-          HasBeginArgumentMarker == true &&
-          HasEndArgumentMarker == true &&
-          AlternativeMarkerPosition > 0 &&
-          WhiteSpaceCounter > 3)
-      {
-        string* Words = new string[WhiteSpaceCounter + 1];
-
-        // Loop over white space positions
-        for (int j = 0; j < (WhiteSpaceCounter - 1); j++)
-        {
-          // cout << "j = "<<j<<endl;
-          // cout <<"White space at = "<<WhiteSpacePositions[j]<<endl;
-
-          int Begin = WhiteSpacePositions[j];
-          int End = WhiteSpacePositions[j + 1];
-
-          if (End > Begin && Begin > 0)
-          {
-            for (int k = (Begin + 1); k < End; k++)
-            {
-              Words[j] = Words[j] + _CL[k];
-
-              // cout << "Temp["<<k<<"] = "<<_CL[k]<< endl;
-            }
-
-            // cout <<"I discovered the word = "<<Words[j]<<endl;
-          }
-        }
-
-        // cout<<endl<<endl;
-
-        for (int l = 0; l < WhiteSpaceCounter + 1; l++)
-        {
-          // cout <<Words[l]<<endl;
-
-          if (l == 0)
-            Name = Words[0];
-          if (l == 1)
-            Alternative = Words[1];
-          if (l == 2)
-            Version = Words[2];
-
-          Status = OK;
-
-          if (Words[l] == "<")
-          {
-            // cout <<endl<< "Vector Size = "<< Words[l+1]<<endl;
-            // cout << "Vector Type = "<< Words[l+2]<<endl;
-
-            stringstream ss(Words[l + 1]);
-
-            int VectorSize = 0;
-
-            ss >> VectorSize;
-
-            // cout << "Integer Size = "<<VectorSize<<endl;
-
-            if (VectorSize > 0 && VectorSize < 4096) // The maximum number of elements in a vector
-            {
-              // New argument
-              NewArgument(VectorSize);
-
-              for (int m = 0; m < VectorSize; m++)
-              {
-                int wi = l + 3 + m;
-
-                if (wi <= WhiteSpaceCounter)
-                {
-                  // cout << "Value = "<<Words[wi]<<endl;
-
-                  if (Words[wi] != "" && Words[wi] != ">" && Words[wi] != "<" && Words[wi] != "]" && Words[wi] != " ")
-                  {
-                    // New element
-                    SetArgumentElement((NoA - 1), m, Words[wi]);
-                  }
-                }
-              }
-            }
-          }
-          else
-          {
-            // P2 fix (SPEC-033): a '<' near the end of the token stream left
-            // Words[l+1] out of bounds. Missing size means malformed input.
-            delete[] WhiteSpacePositions;
-            return ERROR;
-          }
-        }
-
-        delete[] Words;
-      }
-    }
-  }
-
-  // P3 fix (SPEC-033): release the dynamically allocated tracking array.
-  delete[] WhiteSpacePositions;
-
-  return Status;
+  return CommandLineParser::Parse(Input, *this, ErrorCode, ErrorOffset) == OK ? OK : ERROR;
 }
 
 // Auxiliary functions
