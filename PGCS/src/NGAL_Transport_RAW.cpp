@@ -313,7 +313,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
           // MSG_TRUNC bit in msg_hdr.msg_flags set by the kernel when trimming.
           const int nrec = recvmmsg(fds[i].fd, pool->messages,
                                     RawReceivePool::BatchSize,
-                                    MSG_DONTWAIT, NULL);
+                                    MSG_DONTWAIT | MSG_TRUNC, NULL);
 
           if (nrec <= 0)
           {
