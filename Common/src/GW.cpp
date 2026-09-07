@@ -237,13 +237,9 @@ void GW::PushToInputQueue(Message* M)
         // Set the message tag
         M->SetTag(InputQueueTag);
 
-        // SPEC-032: assign tag + push + detect empty->nonempty under ONE lock;
-        // exactly one notify per transition, outside the lock.
-        bool wasEmpty = false;
+        // Lock for push + notify (thread-safe w.r.t. Gateway() pop)
         {
           std::lock_guard<std::mutex> lock(InputQueueMutex);
-
-          wasEmpty = InputQueue.empty();
 
           // Push the message to the queue
           InputQueue.push(M);
@@ -251,10 +247,8 @@ void GW::PushToInputQueue(Message* M)
           // Increases the tag counter
           InputQueueTag++;
         }
-        // Notify after unlock, only when the queue transitioned empty->nonempty;
-        // the wait predicate also rechecks on its bounded timeout (SPEC-032 §5).
-        if (wasEmpty)
-          InputQueueCV.notify_one();
+        // Notify after unlock to minimize time input thread is blocked
+        InputQueueCV.notify_one();
       }
       else
       {
@@ -270,8 +264,8 @@ void GW::PushToInputQueue(Message* M)
   }
   else
   {
-    // SPEC-032: null message has nothing to mark — do NOT dereference M.
     S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
+    M->MarkToDelete();
   }
 }
 
@@ -479,38 +473,30 @@ void GW::Gateway()
         break;
     }
 
-    // SPEC-032: lock once, pop up to InputBatchLimit due messages, unlock.
-    // Prioriity order preserved (top() order); execution stays sequential below.
-    Time = GetTime();
+    // Lock, pop all due messages, unlock — minimize critical section
+    PM1 = NULL;
     RunFlag = false;
-
-    static Message* batch[32];
-    unsigned int batchCount = 0;
+    Time = GetTime();
 
     {
       std::lock_guard<std::mutex> lock(InputQueueMutex);
-      while (batchCount < 32 && !InputQueue.empty())
+      if (!InputQueue.empty())
       {
-        Message* due = InputQueue.top();
-        if (due->GetTime() < Time)
+        PM1 = InputQueue.top();
+        ScheduledTime = PM1->GetTime();
+        if (ScheduledTime < Time)
         {
           InputQueue.pop();
-          batch[batchCount++] = due;
           RunFlag = true;
         }
         else
         {
-          break; // future message: leave queued (top is earliest)
+          PM1 = NULL; // not yet due, leave in queue
         }
       }
-      if (batchCount > 0)
-        ScheduledTime = batch[0]->GetTime();
     }
 
-    // Step 2 : Run procedure for each due message, in extraction (priority) order
-    for (unsigned int b = 0; b < batchCount && StopGateway == false; ++b)
-    {
-    PM1 = batch[b];
+    // Step 2 : Run procedure to interpret and run the received message
     if (PM1 != NULL && RunFlag == true)
     {
 
@@ -603,37 +589,19 @@ void GW::Gateway()
       PM1 = NULL;
       RunFlag = false;
     }
-    } // SPEC-032: end per-batch-message loop
 
     // Step 3 : NGAL: drain the NetworkReceiveQueue
     // The ReceiveDispatcher pushes raw char buffers here. The GW thread
     // does NewMessage + deserialisation + PushToInputQueue.
-    // SPEC-032: bounded drain — at most 32 raw entries per cycle; excess stays
-    // queued for the next outer-loop turn. Deserialization happens outside
-    // NetworkReceiveQueueMutex (released at block end).
     {
-      unsigned int drained = 0;
-      char* buffers[32];
-      long long sizes[32];
-      unsigned int count = 0;
-
+      std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
+      while (!NetworkReceiveQueue.empty())
       {
-        std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
-        while (!NetworkReceiveQueue.empty() && count < 32)
-        {
-          auto entry = NetworkReceiveQueue.front();
-          NetworkReceiveQueue.pop();
-          buffers[count] = entry.first;
-          sizes[count] = entry.second;
-          count++;
-        }
-      } // NetworkReceiveQueueMutex released — deserialization below is unlocked
+        auto entry = NetworkReceiveQueue.front();
+        NetworkReceiveQueue.pop();
 
-      for (unsigned int e = 0; e < count; ++e)
-      {
-        char* buffer = buffers[e];
-        long long size = sizes[e];
-        drained++;
+        char* buffer = entry.first;
+        long long size = entry.second;
 
         if (buffer != 0 && size > 0)
         {
@@ -641,7 +609,8 @@ void GW::Gateway()
           if (PP->NewMessage(0, 0, false, PM) == OK)
           {
           #ifdef DEBUG_NETWORK_QUEUE
-            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size << endl;
+            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size 
+                 << " queue_remaining=" << NetworkReceiveQueue.size() << endl;
           #endif
             PM->SetMessageFromCharArray(buffer, size);
             PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
@@ -651,7 +620,6 @@ void GW::Gateway()
 
         delete[] buffer;
       }
-      (void)drained;
     }
 
     // Step 4 : Read OS IPC — poll shared memory for messages from other processes
