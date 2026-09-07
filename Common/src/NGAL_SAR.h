@@ -54,7 +54,7 @@ public:
     Completed, FrameTooShort, InvalidMNOrBlockSize, SNOutOfRange,
     BlockSizeMismatch, DuplicateSN, InvalidPayload, BufferLimitReached,
     TimeoutAbandoned, ValidatedEvictions, OutOfOrder, InvalidSize,
-    SizeMismatch, AllocationFailed, MetricCount
+    SizeMismatch, AllocationFailed, RxTruncated, RxTooShort, MetricCount
   };
 
   struct Telemetry

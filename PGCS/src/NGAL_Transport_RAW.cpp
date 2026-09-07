@@ -25,6 +25,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #ifndef _NGAL_TRANSPORT_RAW_H
 #include "NGAL_Transport_RAW.h"
 #endif
@@ -69,7 +73,54 @@
 #include <poll.h>
 #endif
 
+#include <memory>
+#include <new>
+#include <cstdlib>
+#include <sys/uio.h>
+
 // #define DEBUG
+
+// ─────────────────────────────────────────────────────────────────────────
+// SPEC-031: batched receive pool (recvmmsg)
+// C = ETH_FRAME_LEN (1514). One pool per dispatcher, independent of SSID count.
+// ─────────────────────────────────────────────────────────────────────────
+namespace
+{
+struct RawReceivePool
+{
+  enum { BatchSize = 32, Capacity = ETH_FRAME_LEN };
+  unsigned char frames[BatchSize][Capacity];
+  struct iovec vectors[BatchSize];
+  struct mmsghdr messages[BatchSize];
+  struct sockaddr_ll addresses[BatchSize];
+
+  void Reset()
+  {
+    for (unsigned int slot = 0; slot < BatchSize; ++slot)
+    {
+      std::memset(&addresses[slot], 0, sizeof(addresses[slot]));
+      std::memset(&messages[slot], 0, sizeof(messages[slot]));
+      vectors[slot].iov_base = frames[slot];
+      vectors[slot].iov_len = Capacity;
+      messages[slot].msg_hdr.msg_name = &addresses[slot];
+      messages[slot].msg_hdr.msg_namelen = sizeof(addresses[slot]);
+      messages[slot].msg_hdr.msg_iov = &vectors[slot];
+      messages[slot].msg_hdr.msg_iovlen = 1;
+      messages[slot].msg_hdr.msg_control = NULL;
+      messages[slot].msg_hdr.msg_controllen = 0;
+      messages[slot].msg_hdr.msg_flags = 0;
+      messages[slot].msg_len = 0;
+    }
+  }
+};
+
+void RawReceiveFailure(const char* reason)
+{
+  std::cerr << "[FATAL] NGAL_Transport_RAW::ReceiveDispatcher: "
+            << reason << "; deployment failed, rollback required" << std::endl;
+  std::exit(EXIT_FAILURE);
+}
+}
 
 using namespace std;
 
@@ -189,11 +240,15 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
 
   string Offset = "                    ";
   NGAL_SAR SAR;                                // Reassembly state per dispatcher
-  char Frame[ETH_FRAME_LEN];                   // Frame buffer (Ethernet II)
-  struct sockaddr_ll saddrll;
-  socklen_t sll_len = (socklen_t)sizeof(saddrll);
-  unsigned int receivedbytes = 0;
   unsigned int numbytes = 0;
+
+  // SPEC-031: dispatcher-owned batch receive pool (RAII releases at scope exit;
+  // the polling loop has no stop flag).
+  std::unique_ptr<RawReceivePool> pool(new (std::nothrow) RawReceivePool);
+  if (!pool)
+    RawReceiveFailure("receive-pool allocation failed");
+
+  unsigned int nextStart = 0;
 
   while (1)
   {
@@ -235,98 +290,134 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         continue;
       }
 
-      // Process readable sockets
-      for (unsigned int i = 0; i < nfds; i++)
+      // Process readable sockets — SPEC-031: rotate the first socket each cycle,
+      // retaining each socket's original Sizes index for BlockSize lookup.
+      const unsigned int start = nextStart % nfds;
+      nextStart = (start + 1) % nfds;
+
+      for (unsigned int turn = 0; turn < nfds; ++turn)
       {
+        const unsigned int i = (start + turn) % nfds;
+
         if ((fds[i].revents & POLLIN) == 0)
           continue;
 
-        receivedbytes = static_cast<unsigned int>(
-            recvfrom(fds[i].fd, Frame, ETH_FRAME_LEN, MSG_DONTWAIT,
-                     (struct sockaddr*)&saddrll, &sll_len));
-
-        if (receivedbytes <= 0)
+        // SPEC-031 drain policy: up to two recvmmsg calls (64 frames) per ready
+        // socket per poll cycle; EAGAIN ends this socket's turn.
+        for (unsigned int attempt = 0; attempt < 2; ++attempt)
         {
+          pool->Reset();
+          const int nrec = recvmmsg(fds[i].fd, pool->messages,
+                                    RawReceivePool::BatchSize,
+                                    MSG_DONTWAIT | MSG_TRUNC, NULL);
+
+          if (nrec <= 0)
+          {
 #ifdef DEBUG
-          if (receivedbytes == 0)
-          {
-            cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvfrom() returned 0 (EOF?) fd=" << fds[i].fd << endl;
-          }
-          else if (errno != EAGAIN && errno != EWOULDBLOCK)
-          {
-            cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvfrom() error fd=" << fds[i].fd 
+            if (nrec < 0 && errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
+            {
+              cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvmmsg() error fd=" << fds[i].fd
                    << " errno=" << errno << " (" << strerror(errno) << ")" << endl;
+            }
+#endif
+            break; // EAGAIN/EWOULDBLOCK: drain complete; 0: nothing more this turn
           }
+
+          for (int slot = 0; slot < nrec; ++slot)
+          {
+            const unsigned int receivedbytes = static_cast<unsigned int>(pool->messages[slot].msg_len);
+            const struct sockaddr_ll* from = &pool->addresses[slot];
+
+            // SPEC-031: reject truncated frames (payload longer than pool capacity)
+            // and too-short frames — never parse partial data.
+            if ((pool->messages[slot].msg_hdr.msg_flags & MSG_TRUNC) != 0 ||
+                receivedbytes > RawReceivePool::Capacity)
+            {
+              NGAL_SAR::Stats().Count(NGAL_SAR::RxTruncated);
+#ifdef DEBUG
+              cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: RX_TRUNCATED fd=" << fds[i].fd
+                   << " bytes=" << receivedbytes << " (dropped)" << endl;
 #endif
-          continue;
-        }
+              continue;
+            }
+
+            if (receivedbytes < 14 + 8)
+            {
+              NGAL_SAR::Stats().Count(NGAL_SAR::RxTooShort);
+#ifdef DEBUG
+              cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd
+                   << " bytes=" << receivedbytes << " (dropped)" << endl;
+#endif
+              continue;
+            }
 
 #ifdef DEBUG
-        cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: fd=" << fds[i].fd 
-             << " received_bytes=" << receivedbytes 
-             << " proto=0x" << hex << saddrll.sll_protocol << dec << endl;
+            cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: fd=" << fds[i].fd
+                 << " received_bytes=" << receivedbytes
+                 << " proto=0x" << hex << from->sll_protocol << dec << endl;
 #endif
-        // Only process NovaGenesis frames (ethertype 0x1234 → sll_protocol 13330)
-        // Note (F6): 0x1234 on wire appears as 13330 (0x3412) in host byte order
-        if (saddrll.sll_protocol != 13330)
-        {
+            // Only process NovaGenesis frames (ethertype 0x1234 → sll_protocol 13330)
+            // Note (F6): 0x1234 on wire appears as 13330 (0x3412) in host byte order
+            if (from->sll_protocol != 13330)
+            {
 #ifdef DEBUG
-          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: NON_NG_FRAME fd=" << fds[i].fd 
-               << " proto=0x" << hex << saddrll.sll_protocol << dec 
-               << " bytes=" << receivedbytes << " (ignored)" << endl;
+              cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: NON_NG_FRAME fd=" << fds[i].fd
+                   << " proto=0x" << hex << from->sll_protocol << dec
+                   << " bytes=" << receivedbytes << " (ignored)" << endl;
 #endif
-          continue;
-        }
+              continue;
+            }
 
-        // Strip Ethernet header (14 bytes)
-        numbytes = receivedbytes - 14;
+            // Strip Ethernet header (14 bytes)
+            numbytes = receivedbytes - 14;
 
-        if (numbytes < 8)
-        {
+            if (numbytes < 8)
+            {
+              NGAL_SAR::Stats().Count(NGAL_SAR::RxTooShort);
 #ifdef DEBUG
-          cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd 
-               << " payload_bytes=" << numbytes << " (min 8 for SegHeader, dropping)" << endl;
+              cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd
+                   << " payload_bytes=" << numbytes << " (min 8 for SegHeader, dropping)" << endl;
 #endif
-          continue; // Too small — at least needs SegHeader
-        }
+              continue;
+            }
 
-        unsigned char* TempBuffer = new unsigned char[numbytes];
+            // Copy payload out of the pool slot — SAR and delivery must not retain
+            // pointers into receive buffers (SPEC-031 ownership rule).
+            unsigned char* TempBuffer = new unsigned char[numbytes];
+            memcpy(TempBuffer, pool->frames[slot] + 14, numbytes);
 
-        for (unsigned int v = 14; v < numbytes + 14; v++)
-        {
-          TempBuffer[v - 14] = static_cast<unsigned char>(Frame[v]);
-        }
+            // Get the BlockSize for this SSID
+            unsigned int BlockSize = 1400; // default
+            if (PPGCS->Sizes != 0 && i < PPGCS->Sizes->size())
+            {
+              BlockSize = PPGCS->Sizes->at(i);
+            }
 
-        // Get the BlockSize for this SSID
-        unsigned int BlockSize = 1400; // default
-        if (PPGCS->Sizes != 0 && i < PPGCS->Sizes->size())
-        {
-          BlockSize = PPGCS->Sizes->at(i);
-        }
+            // Feed to NGAL_SAR for reassembly
+            char* CompletedBuffer = 0;
+            long long CompletedSize = 0;
+            int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
+                                                 CompletedBuffer, CompletedSize);
 
-        // Feed to NGAL_SAR for reassembly
-        char* CompletedBuffer = 0;
-        long long CompletedSize = 0;
-        int sar_status = SAR.ReceiveFragment(TempBuffer, numbytes, BlockSize,
-                                             CompletedBuffer, CompletedSize);
-
-        if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
-        {
-          // Message reassembled — deliver raw char buffer to GW via NGAL_CS.
-          // The GW thread will do NewMessage + SetMessageFromCharArray +
-          // ConvertMessage (Finding F2 — no NewMessage in receiver thread).
-          NGAL_CS::DeliverToGateway(PPG->PGW, CompletedBuffer, CompletedSize);
+            if (sar_status == 0 && CompletedBuffer != 0 && CompletedSize > 0)
+            {
+              // Message reassembled — deliver raw char buffer to GW via NGAL_CS.
+              NGAL_CS::DeliverToGateway(PPG->PGW, CompletedBuffer, CompletedSize);
 
 #ifdef DEBUG
-          cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: Delivered to GW size=" << CompletedSize << endl;
+              cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: Delivered to GW size=" << CompletedSize << endl;
 #endif
-          // The caller owns the completed buffer (returned by ReceiveFragment).
-          // DeliverToGateway makes a copy for the queue, so we must delete
-          // our copy now.
-          delete[] CompletedBuffer;
-        }
+              // DeliverToGateway copies for the queue; delete our copy.
+              delete[] CompletedBuffer;
+            }
 
-        delete[] TempBuffer;
+            delete[] TempBuffer;
+          }
+
+          // A short batch means the socket is drained for now.
+          if (nrec < static_cast<int>(RawReceivePool::BatchSize))
+            break;
+        }
       }
     }
     else

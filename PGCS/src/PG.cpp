@@ -308,7 +308,7 @@ void PG::EmitHeartbeat(const char* prefix)
       "sn_out_of_range", "blocksize_mismatch", "duplicate_sn",
       "invalid_payload", "buffer_limit_reached", "timeout_abandoned",
       "validated_evictions", "out_of_order", "invalid_size",
-      "size_mismatch", "allocation_failed"};
+      "size_mismatch", "allocation_failed", "rx_truncated", "rx_too_short"};
   std::ostringstream line;
   line << prefix << " run=" << HeartbeatRun << " pid=" << getpid()
        << " elapsed_s=" << elapsed
