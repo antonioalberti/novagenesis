@@ -558,6 +558,12 @@ int PG::CreateRawSocket(int& _SID)
 // Write to other OS
 int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Size, Message* M)
 {
+  static double lastEntry = 0;
+  if (PB->GetTime() - lastEntry >= 10.0)
+  {
+    lastEntry = PB->GetTime();
+    cerr << "[SPEC032DIAG] SendToARawSocket ENTER identifier=" << _Identifier << endl;
+  }
   int Status = ERROR;
   string Offset = "                    ";
   vector<string>* SIDs = new vector<string>;
@@ -630,11 +636,24 @@ int PG::SendToARawSocket(string _Interface, string _Identifier, unsigned int _Si
     }
     else
     {
+      static double lastErr1 = 0;
+      if (PB->GetTime() - lastErr1 >= 10.0)
+      {
+        lastErr1 = PB->GetTime();
+        cerr << "[SPEC032DIAG] SendToARawSocket: MORE_THAN_ONE identifier=" << _Identifier << endl;
+      }
       S << Offset << "(ERROR: more than one identifier to this address " << _Identifier << ")" << endl;
     }
   }
   else
   {
+    static double lastErr2 = 0;
+    if (PB->GetTime() - lastErr2 >= 10.0)
+    {
+      lastErr2 = PB->GetTime();
+      cerr << "[SPEC032DIAG] SendToARawSocket: NO_CLIENT_SID identifier=" << _Identifier
+           << " (HT cat17 lookup failed)" << endl;
+    }
     S << Offset << "(ERROR: unable to recover the client socket ID from the PGCS::HT block)" << endl;
   }
 
