@@ -258,12 +258,24 @@ void GW::PushToInputQueue(Message* M)
       }
       else
       {
+        static time_t lastRej = 0;
+        if (time(nullptr) - lastRej >= 10)
+        {
+          lastRej = time(nullptr);
+          cerr << "[SPEC032DIAG] PushToInputQueue REJECTED (NoCL=" << NoCL << " <= 2)" << endl;
+        }
         // Mark to delete the message
         M->MarkToDelete();
       }
     }
     else
     {
+      static time_t lastRej2 = 0;
+      if (time(nullptr) - lastRej2 >= 10)
+      {
+        lastRej2 = time(nullptr);
+        cerr << "[SPEC032DIAG] PushToInputQueue REJECTED (GetNumberofCommandLines failed)" << endl;
+      }
       S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
       M->MarkToDelete();
     }
