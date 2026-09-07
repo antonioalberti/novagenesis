@@ -692,14 +692,18 @@ void GW::Gateway()
       {
         diagLastTime = now;
         unsigned long long queued = 0;
+        double topTime = -1;
         {
           std::lock_guard<std::mutex> lock(InputQueueMutex);
           queued = InputQueue.size();
+          if (!InputQueue.empty())
+            topTime = InputQueue.top()->GetTime();
         }
         cerr << "[SPEC032DIAG] t=" << now
              << " batch=" << diagBatchCount
              << " runCalls=" << diagRunCalls
              << " queued=" << queued
+             << " topTime=" << topTime
              << " duePopped=" << (diagBatchCount) << endl;
         diagRunCalls = 0;
       }
