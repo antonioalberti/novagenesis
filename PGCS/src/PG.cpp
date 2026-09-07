@@ -244,14 +244,6 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 
   // Mark to delete
   PIM->MarkToDelete();
-
-  // SPEC-028-B: Initialization has loaded StressEnabled; no heartbeat for normal runs.
-  if (StressEnabled)
-  {
-    HeartbeatRun = PP->GetSelfCertifyingName();
-    HeartbeatStart = std::chrono::steady_clock::now();
-    HeartbeatThread = std::thread(&PG::HeartbeatLoop, this);
-  }
 }
 
 bool PG::PushStressMessage(Message* M)

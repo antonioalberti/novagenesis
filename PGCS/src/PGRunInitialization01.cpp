@@ -207,6 +207,17 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   F3.CloseFile();
 
+  // SPEC-028-B: start the heartbeat here — AFTER PGCS.ini parsing loaded StressEnabled
+  // (the PG constructor runs before the ini file is read, so StressEnabled is still
+  // false there and the heartbeat would never start if launched from the constructor).
+  if (PPG->StressEnabled)
+  {
+    PPG->HeartbeatRun = PB->PP->GetSelfCertifyingName();
+    PPG->HeartbeatStart = std::chrono::steady_clock::now();
+    PPG->HeartbeatThread = std::thread(&PG::HeartbeatLoop, PPG);
+    LOG("(SPEC-028-B telemetry heartbeat started)");
+  }
+
   // Setting up the process SCN as the space limiter
   Limiters.push_back(PB->PP->Intra_Process);
 
