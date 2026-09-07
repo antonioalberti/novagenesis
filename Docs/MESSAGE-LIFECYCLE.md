@@ -87,17 +87,94 @@ Processo emissor → SHM → GW loop Step 4 → NewMessage + parse → igual A.
 - T5: nenhuma mensagem destruida enquanto queue/Run/Script a retém.
 - T6: shutdown zera vivos e retencoes.
 
-## 3. Auditoria C.2 — Script do ciclo de vida (PENDENTE DO USUARIO)
+## 3. Auditoria C.2 — RESPONDIDA (varredura Common/PGCS/NRNCS/ContentApp, 2026-09-07)
 
-Perguntas que bloqueiam Fase D (wire novo) e afetam Fase B:
+**Nota:** não existe uma classe "Script" isolada. O "Script do ciclo de vida"
+sao as classes Action/Run (CoreRunXxx01, NRRunXxx01, GWMsgCl01, etc.) que
+executam o ciclo das mensagens. As respostas abaixo valem para todo o
+conjunto, verificado por grep exaustivo nos 4 modulos.
 
-1. O Script usa as APIs de argumentos (GetCommandLineArgumentElement etc.) ou
-   interpreta o wire/texto diretamente?
-2. Usa a cardinalidade declarada para lookahead ou avanco?
-3. Retem Message* (ou payload/CommandLine*) alem do Run corrente?
-4. Associa estado ao Message::Type?
-5. Precisa de novos campos no wire (TTL, ordem)? (Astra: NAO adicionar nesta
-   SPEC; necessidade distribuida comprovada vira proposta semantica separada.)
+### P1 — APIs de argumentos ou parse direto do wire?
+
+**APIs.** Zero parse textual do wire fora de `CommandLineParser`:
+- `GetArgumentElement` usado 26x em ContentApp, 0x parse manual de
+  `<`/`[` em Actions (grep por `find("<"`, `strtok`, etc. so acha
+  `rfind('.')` para extensao de arquivo).
+- O unico consumidor de bytes crus e `NGAL_Transport_RAW` (framing de
+  rede, antes da Message existir) — nao ve o formato de CommandLine.
+- Consequencia: **Fase A e D nao quebram nenhum Action**.
+
+### P2 — Cardinalidade usada para lookahead?
+
+**Nao.** Nenhum Action le o numero declarado para avancar; todos usam
+`GetNumberofArgumentElements`/`GetArgumentElement` por indice. A
+cardinalidade no wire e usada apenas pelos parsers (alocacao + validacao).
+Fase D pode remover o `s` mantendo a contagem sem risco — ja decidido.
+
+### P3 — Retencao de Message*/Payload* alem do Run?
+
+**Uma retencao real encontrada: o mecanismo ScheduledMessages.**
+- `CoreMsgCl01.cpp:99` (e ContentApp/IoTTestApp/NBTestApp/GIRS) cria a
+  mensagem "Run" e faz `ScheduledMessages.push_back(Run)`.
+- O vetor e LOCAL de `Block::Run` (Block.cpp:230) e é passado por
+  referencia aos Actions seguintes da MESMA mensagem:
+  `Core::DiscoveryFirstStep/SecondStep` (Core.cpp:491,545) leem
+  `ScheduledMessages.at(0)`, adicionam CLs e ajustam `SetTime(futuro)`;
+  `CoreSCNSeq01.cpp:113` e `CoreSCNAck01.cpp:166` fazem o
+  `PushToInputQueue(Run)` que a agenda de verdade.
+- **Fecho do ciclo:** a retencao morre quando `Block::Run` retorna. A
+  mensagem fica no container do Process (dono) ate ser processada pelo GW
+  ou marcada/deletada. Nenhum ponteiro escapa do Run.
+- **Payload emprestado:** `CoreRunContentPublish01.cpp:590` faz
+  `GetPayloadFromCharArray(Payload)` mas o ponteiro e usado apenas dentro
+  do Run para calcular hash — nunca armazenado (o que persiste e o
+  `PayloadHash` string). NRNCS `NRInfoPayload01` persiste o payload em
+  DISCO (`ConvertPayloadFromCharArrayToFile`), nunca retem o ponteiro.
+- **Nenhuma classe (Block/Core/NR/HTS/PS) tem membro `Message*`.** Os
+  unicos retentores persistentes continuam sendo `Process::Messages[]`,
+  `GW::InputQueue`, `GW::OutputQueues`.
+- Consequencia: **Fase B (handles) e E (RAII) liberadas** — nao ha
+  retencao fora do fluxo dono; o padrão "empresta durante o Run" ja e
+  respeitado de facto.
+
+### P4 — Estado associado a Message::Type?
+
+**Sim, dois usos reais:**
+1. `CoreInfoPayload01.cpp:130`: `if (_ReceivedMessage->GetType() == 1)`
+   — estatisticas de tempo de processamento so para mensagens tipo 1
+   (mensagens de aplicacao; tipo 0 = internas do core).
+2. Escrito nos CLs de status/sequencia: `CoreRunPublish02/03`,
+   `CoreSCNSeq01` (`Run->GetType()`), `CoreDeliveryBind01`,
+   `CoreRunSubscribe01` — o valor do Type e ecoado num argumento
+   (`ng -message --type [ < 1 string N > ]`).
+3. Convencoes de criacao: 30x `NewMessage(..., 0, ...)` (internas) vs 35x
+   `NewMessage(..., 1, ...)` (aplicacao/payload).
+Consequencia: **Type e vivo e semantico (0=core, 1=app). NAO remover e
+documentar a convencao.** Um futuro `enum class` teria estes call sites.
+
+### P5 — Campos novos no wire (TTL, sequencia, prioridade)?
+
+**Nao fazem falta — ja existem por outros meios:**
+- Ordenacao/deferimento: `Message::Time` + `SetTime(futuro)` +
+  priority_queue do GW (DiscoveryFirstStep usa isso para atrasar a
+  discovery em `DelayBeforeDiscovery`).
+- Sequencia: comando proprio `ng -message --seq` com
+  `PCore->GetSequenceNumber()`.
+- Tipo: comando `ng -message --type`.
+- TTL/prioridade: nenhum uso identificado em nenhum modulo.
+Consequencia: **Fase D sai exatamente como esta na SPEC** (so remover o
+`s`), sem bump extra. Nenhuma segunda migracao sera necessaria.
+
+### Achado adicional (descoberta da varredura)
+
+O comentario SPEC-003 em Block.cpp:357-360 ("no action pushes to
+ScheduledMessages anymore. The vector is always empty") esta **ERRADO**:
+5 Actions ainda fazem `push_back` (CoreMsgCl01 x4 modulos, IRMsgCl02).
+O cleanup removido por SPEC-003 estava correto em nao deletar as
+mensagens agendadas (elas pertencem ao Process), mas o comentario que
+justificou a remocao e falso. Nao e bug hoje (o vetor local so some no
+fim do Run e as mensagens ficam com o dono), mas deve ser corrigido no
+comentario/documentacao para nao confundir auditorias futuras.
 
 ## 4. Plano imediato (pos-patches urgentes, commit 6c7c1e5)
 
