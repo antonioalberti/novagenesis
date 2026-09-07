@@ -680,8 +680,9 @@ int PGRunPeriodic01::StresstestScheduling()
       // Creating the ng -scn --s command line
       PMB->NewSCNCommandLine("0.1", SCN, RunStresstest, PCL);
 
-      // Push the message to the GW input queue
-      PPG->PGW->PushToInputQueue(RunStresstest);
+      // Push the message to the GW input queue (SPEC-028-B: validate + count offered)
+      if (PPG->PushStressMessage(RunStresstest))
+        PPG->StressOffered.fetch_add(1, std::memory_order_relaxed);
     }
   }
 

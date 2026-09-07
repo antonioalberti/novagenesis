@@ -28,6 +28,7 @@
 #ifndef _NGAL_SAR_H
 #define _NGAL_SAR_H
 
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
@@ -45,6 +46,31 @@ class NGAL_SAR
 public:
   NGAL_SAR();
   ~NGAL_SAR();
+
+  // Process-wide accounting across ALL SAR instances, not stress-only traffic.
+  // These counters do not replace the external reassembly mutex. (SPEC-028-B)
+  enum Metric
+  {
+    Completed, FrameTooShort, InvalidMNOrBlockSize, SNOutOfRange,
+    BlockSizeMismatch, DuplicateSN, InvalidPayload, BufferLimitReached,
+    TimeoutAbandoned, ValidatedEvictions, OutOfOrder, InvalidSize,
+    SizeMismatch, AllocationFailed, MetricCount
+  };
+
+  struct Telemetry
+  {
+    std::atomic<unsigned long long> Values[MetricCount];
+    Telemetry()
+    {
+      for (unsigned int i = 0; i < MetricCount; ++i)
+        Values[i].store(0, std::memory_order_relaxed);
+    }
+    void Count(Metric metric)
+    {
+      Values[metric].fetch_add(1, std::memory_order_relaxed);
+    }
+  };
+  static Telemetry& Stats();
 
   NGAL_SAR(const NGAL_SAR&) = delete;
   NGAL_SAR& operator=(const NGAL_SAR&) = delete;

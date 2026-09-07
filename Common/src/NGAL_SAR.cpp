@@ -43,6 +43,13 @@ using namespace std;
 const size_t NGAL_SAR::MAX_REASSEMBLY_BUFFERS;
 const size_t NGAL_SAR::MAX_REASSEMBLY_BYTES;
 
+NGAL_SAR::Telemetry& NGAL_SAR::Stats()
+{
+  // C++11 initialization is thread-safe; no PG-owned pointer escapes to SAR.
+  static Telemetry counters;
+  return counters;
+}
+
 NGAL_SAR::NGAL_SAR() : ReassemblyBytes(0)
 {
 }
@@ -241,6 +248,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   // No header access is permitted before this guard.
   if (numbytes < 8 || TempBuffer == 0)
   {
+    // One event contributes to both dropped and guard_reject.
+    Stats().Count(FrameTooShort);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT_OR_NULL numbytes="
          << numbytes << " (dropped)" << endl;
@@ -254,6 +263,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
   if (SN == 0 && numbytes < 16)
   {
+    Stats().Count(FrameTooShort);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT numbytes="
          << numbytes << " (dropped)" << endl;
@@ -263,6 +273,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   if (MN == 0 || BlockSize <= 8 ||
       BlockSize > std::numeric_limits<unsigned int>::max() - 8)
   {
+    Stats().Count(InvalidMNOrBlockSize);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_MN_OR_BLOCKSIZE MN="
          << MN << " BlockSize=" << BlockSize << " (dropped)" << endl;
@@ -284,6 +295,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
   if (!FB && SN != 0)
   {
+    Stats().Count(OutOfOrder);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_ORDER MN=" << MN
          << " SN=" << SN << " (no buffer yet, dropping)" << endl;
@@ -297,6 +309,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     const long long AdvertisedSize = OpenHeaderMessageSizeField(TempBuffer + 8);
     if (AdvertisedSize <= 0 || AdvertisedSize >= 10 * 1024 * 1024)
     {
+      Stats().Count(InvalidSize);
 #ifdef DEBUG
       cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_SIZE MN=" << MN
            << " MessageSize=" << AdvertisedSize << " (dropping)" << endl;
@@ -305,6 +318,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     }
     if (FB && AdvertisedSize != FB->MessageSize)
     {
+      Stats().Count(SizeMismatch);
 #ifdef DEBUG
       cerr << "[WARN] NGAL_SAR::ReceiveFragment: SIZE_MISMATCH MN=" << MN
            << " (existing buffer retained)" << endl;
@@ -316,6 +330,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
 
   if (FB && BlockSize != FB->BlockSize)
   {
+    Stats().Count(BlockSizeMismatch);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: BLOCKSIZE_MISMATCH MN=" << MN
          << " got=" << BlockSize << " expected=" << FB->BlockSize
@@ -333,6 +348,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       LocalNoS > std::numeric_limits<unsigned int>::max() ||
       SN >= LocalNoS)
   {
+    Stats().Count(SNOutOfRange);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: SN_OUT_OF_RANGE MN=" << MN
          << " SN=" << SN << " NoS=" << LocalNoS << " (dropping)" << endl;
@@ -345,7 +361,10 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       static_cast<unsigned long long>(SN) * BlockSize - 8;
   const unsigned long long Capacity = SN == 0 ? BlockSize - 8 : BlockSize;
   if (Offset >= static_cast<unsigned long long>(MessageSize))
+  {
+    Stats().Count(InvalidPayload);
     return 1;
+  }
 
   const unsigned long long Expected = std::min<unsigned long long>(
       Capacity, static_cast<unsigned long long>(MessageSize) - Offset);
@@ -357,6 +376,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   // This guard precedes all allocation, eviction, copying and bitmap changes.
   if (Expected == 0 || PayloadBytes < Expected)
   {
+    Stats().Count(InvalidPayload);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_PAYLOAD MN=" << MN
          << " SN=" << SN << " payload=" << PayloadBytes
@@ -368,6 +388,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   if (FB && FB->ReceivedSN[SN])
   {
     // Includes SN=0: retain the original buffer, do not copy or refresh time.
+    Stats().Count(DuplicateSN);
 #ifdef DEBUG
     cerr << "[WARN] NGAL_SAR::ReceiveFragment: DUPLICATE SN MN=" << MN
          << " SN=" << SN << " (ignored, no timestamp refresh)" << endl;
@@ -381,7 +402,10 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
                           static_cast<size_t>(LocalNoS) +
                           sizeof(FragmentBuffer) + 256;
     if (Charge > MAX_REASSEMBLY_BYTES)
+    {
+      Stats().Count(BufferLimitReached);
       return 1;
+    }
 
     // Vector order is creation order, preserving oldest-created eviction.
     // Invalid incoming geometry can never reach this loop.
@@ -389,6 +413,9 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
            (ReassemblyBuffers.size() >= MAX_REASSEMBLY_BUFFERS ||
             ReassemblyBytes > MAX_REASSEMBLY_BYTES - Charge))
     {
+      // Count each validated eviction, not each arriving fragment.
+      Stats().Count(BufferLimitReached);
+      Stats().Count(ValidatedEvictions);
 #ifdef DEBUG
       const FragmentBuffer* Oldest = ReassemblyBuffers.front();
       cerr << "[WARN] NGAL_SAR::ReceiveFragment: BUFFER_LIMIT_REACHED count="
@@ -419,6 +446,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     }
     catch (const std::bad_alloc&)
     {
+      Stats().Count(AllocationFailed);
 #ifdef DEBUG
       cerr << "[ERROR] NGAL_SAR::ReceiveFragment: ALLOCATION_FAILED MN="
            << MN << " (dropping)" << endl;
@@ -450,6 +478,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     CompletedSize = FB->MessageSize;
     FB->Buffer = 0; // Detach before the owning FragmentBuffer destructor runs.
     RemoveBuffer(BufferIndex);
+    Stats().Count(Completed); // Only the completed-buffer handoff counts.
 #ifdef DEBUG
     cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN
          << " segments=" << DoneSegments << " size=" << DoneSize << endl;
@@ -480,6 +509,8 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
     else if (FB->Timestamp > 0 &&
              (timeout_threshold - FB->Timestamp) > 30.0)
     {
+      if (FB->SegmentsSoFar < FB->NoS)
+        Stats().Count(TimeoutAbandoned);
 #ifdef DEBUG
       cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber
            << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS

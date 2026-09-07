@@ -131,6 +131,12 @@
 #ifndef _NGAL_SAR_H
 #include "NGAL_SAR.h"
 #endif
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <sstream>
+#include <thread>
 
 #ifndef _NGAL_CS_H
 #include "NGAL_CS.h"
@@ -238,13 +244,111 @@ PG::PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
 
   // Mark to delete
   PIM->MarkToDelete();
+
+  // SPEC-028-B: Initialization has loaded StressEnabled; no heartbeat for normal runs.
+  if (StressEnabled)
+  {
+    HeartbeatRun = PP->GetSelfCertifyingName();
+    HeartbeatStart = std::chrono::steady_clock::now();
+    HeartbeatThread = std::thread(&PG::HeartbeatLoop, this);
+  }
+}
+
+bool PG::PushStressMessage(Message* M)
+{
+  unsigned int NoCL = 0;
+  if (!M)
+    return false;
+  if (M->GetNumberofCommandLines(NoCL) != OK || NoCL <= 2)
+  {
+    M->MarkToDelete();
+    return false;
+  }
+  // Caller owns M until this call; do not inspect it after publication.
+  PGW->PushToInputQueue(M);
+  return true;
+}
+
+void PG::HeartbeatLoop()
+{
+  const auto interval = std::chrono::seconds(10);
+  auto next = HeartbeatStart + interval;
+  std::unique_lock<std::mutex> lock(HeartbeatMutex);
+  while (!HeartbeatStop)
+  {
+    if (HeartbeatCV.wait_until(lock, next, [this] { return HeartbeatStop; }))
+      break;
+    lock.unlock();
+    EmitHeartbeat("SPEC028_STATS");
+    lock.lock();
+    // Keep a steady-clock cadence; avoid catch-up bursts after blocked I/O.
+    do
+    {
+      next += interval;
+    } while (next <= std::chrono::steady_clock::now());
+  }
+}
+
+void PG::EmitHeartbeat(const char* prefix)
+{
+  unsigned long long outstanding;
+  {
+    // No heartbeat/SAR lock is held while taking the GW queue lock.
+    std::lock_guard<std::mutex> lock(PGW->InputQueueMutex);
+    outstanding = PGW->InputQueue.size();
+  }
+  unsigned long long sar[NGAL_SAR::MetricCount];
+  for (unsigned int i = 0; i < NGAL_SAR::MetricCount; ++i)
+    sar[i] = NGAL_SAR::Stats().Values[i].load(std::memory_order_relaxed);
+
+  const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+      std::chrono::steady_clock::now() - HeartbeatStart).count();
+  // Legacy dropped is mixed-unit: rejected input events plus abandoned buffers.
+  const auto dropped = sar[NGAL_SAR::FrameTooShort] +
+      sar[NGAL_SAR::InvalidMNOrBlockSize] + sar[NGAL_SAR::TimeoutAbandoned] +
+      sar[NGAL_SAR::ValidatedEvictions];
+  const auto guards = sar[NGAL_SAR::FrameTooShort] +
+      sar[NGAL_SAR::SNOutOfRange] + sar[NGAL_SAR::BlockSizeMismatch] +
+      sar[NGAL_SAR::DuplicateSN] + sar[NGAL_SAR::InvalidPayload] +
+      sar[NGAL_SAR::BufferLimitReached];
+  static const char* const names[NGAL_SAR::MetricCount] = {
+      "sar_completed_all", "frame_too_short", "invalid_mn_or_blocksize",
+      "sn_out_of_range", "blocksize_mismatch", "duplicate_sn",
+      "invalid_payload", "buffer_limit_reached", "timeout_abandoned",
+      "validated_evictions", "out_of_order", "invalid_size",
+      "size_mismatch", "allocation_failed"};
+  std::ostringstream line;
+  line << prefix << " run=" << HeartbeatRun << " pid=" << getpid()
+       << " elapsed_s=" << elapsed
+       << " offered=" << StressOffered.load(std::memory_order_relaxed)
+       << " sent_ok=" << StressSent.load(std::memory_order_relaxed)
+       << " received=" << StressReceived.load(std::memory_order_relaxed)
+       << " completed=" << sar[NGAL_SAR::Completed]
+       << " dropped=" << dropped
+       << " guard_reject=" << guards
+       << " outstanding=" << outstanding;
+  for (unsigned int i = 0; i < NGAL_SAR::MetricCount; ++i)
+    line << ' ' << names[i] << '=' << sar[i];
+  std::cerr << line.str() << '\n' << std::flush;
 }
 
 PG::~PG()
 {
+  const bool hadHeartbeat = HeartbeatThread.joinable();
+  {
+    std::lock_guard<std::mutex> lock(HeartbeatMutex);
+    HeartbeatStop = true;
+  }
+  HeartbeatCV.notify_one();
+  if (hadHeartbeat)
+    HeartbeatThread.join();
+
   cout << endl
-       << "[StressTest] Final: Sent=" << StressSent
-       << " Received=" << StressReceived << " Dropped=" << StressDropped << endl;
+       << "[StressTest] Final: Sent=" << StressSent.load(std::memory_order_relaxed)
+       << " Received=" << StressReceived.load(std::memory_order_relaxed)
+       << " Dropped=" << StressDropped.load(std::memory_order_relaxed) << endl;
+  if (hadHeartbeat)
+    EmitHeartbeat("SPEC028_FINAL");
 
   delete DelayStats;
   delete Loss;

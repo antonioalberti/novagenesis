@@ -28,6 +28,12 @@
 #ifndef _PG_H
 #define _PG_H
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
 #ifndef _BLOCK_H
 #include "Block.h"
 #endif
@@ -277,13 +283,29 @@ public:
 
   bool StressEnabled;
   double StressInterval;
-  unsigned long long StressSent;
-  unsigned long long StressReceived;
-  unsigned long long StressDropped;
+  std::atomic<unsigned long long> StressOffered{0};
+  std::atomic<unsigned long long> StressSent{0};
+  std::atomic<unsigned long long> StressReceived{0};
+  std::atomic<unsigned long long> StressDropped{0};
   int StressDelayCount;
   File StressStats;
   OutputVariable* DelayStats;
   OutputVariable* Loss;
+
+  // Validate the same admission predicate as GW before calling its void API. (SPEC-028-B)
+  bool PushStressMessage(Message* M);
+
+private:
+  std::thread HeartbeatThread;
+  std::mutex HeartbeatMutex;
+  std::condition_variable HeartbeatCV;
+  bool HeartbeatStop = false; // Protected by HeartbeatMutex.
+  std::chrono::steady_clock::time_point HeartbeatStart;
+  std::string HeartbeatRun;
+  void HeartbeatLoop();
+  void EmitHeartbeat(const char* prefix);
+
+public:
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes

@@ -65,7 +65,8 @@ int PGStresstestPing01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
   if (!PPG->StressEnabled)
     return OK;
 
-  PPG->StressReceived++;
+  const unsigned long long received =
+      PPG->StressReceived.fetch_add(1, std::memory_order_relaxed) + 1;
 
   // Calculate one-way delay from payload timestamp
   double Delay = 0;
@@ -93,7 +94,7 @@ int PGStresstestPing01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
     }
   }
 
-  if (PPG->StressReceived % 100 == 0)
+  if (received % 100 == 0)
   {
     double LossRate = 100.0;
     unsigned long long Expected = 0;
@@ -107,7 +108,7 @@ int PGStresstestPing01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
     }
 
     if (Expected > 0)
-      LossRate = 100.0 * (1.0 - (double)PPG->StressReceived / (double)Expected);
+      LossRate = 100.0 * (1.0 - (double)received / (double)Expected);
 
     // Sample loss rate to OutputVariable (exported to .dat)
     PPG->Loss->Sample(LossRate);
@@ -120,8 +121,8 @@ int PGStresstestPing01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
     // Summary line to StressStats
     PPG->StressStats << PPG->GetTime()
                      << " NPeers=" << NPeers
-                     << " Sent=" << PPG->StressSent
-                     << " Recv=" << PPG->StressReceived
+                     << " Sent=" << PPG->StressSent.load(std::memory_order_relaxed)
+                     << " Recv=" << received
                      << " Expected=" << Expected
                      << " Loss=" << LossRate << "%"
                      << " DelayAvg=" << PPG->DelayStats->GetMean()

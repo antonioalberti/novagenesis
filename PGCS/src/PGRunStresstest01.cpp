@@ -138,7 +138,8 @@ int PGRunStresstest01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
 
     // Add counter as argument (for testing serialization)
     PCL->NewArgument(1);
-    PCL->SetArgumentElement(0, 0, PB->IntToString((int)PPG->StressSent));
+    PCL->SetArgumentElement(0, 0, PB->IntToString(
+        (int)PPG->StressSent.load(std::memory_order_relaxed)));
 
     // Embed send timestamp in payload for delay measurement
     char TimeStr[64];
@@ -156,11 +157,12 @@ int PGRunStresstest01::Run(Message* _ReceivedMessage, CommandLine* _PCL,
 #endif
 
     // Push to GW InputQueue — GW routes to PG, PG sends via raw socket
-    PPG->PGW->PushToInputQueue(StressPing);
-    PPG->StressSent++;
+    if (PPG->PushStressMessage(StressPing))
+      PPG->StressSent.fetch_add(1, std::memory_order_relaxed);
 
 #ifdef DEBUG
-    PB->S << Offset << "(Pushed OK. Total Sent=" << PPG->StressSent << ")" << endl;
+    PB->S << Offset << "(Pushed OK. Total Sent="
+          << PPG->StressSent.load(std::memory_order_relaxed) << ")" << endl;
 #endif
   }
 

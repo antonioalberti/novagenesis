@@ -291,6 +291,7 @@ public:
   friend class GWRunHelloIPC02;
   friend class GWExposition02;
   friend class Message;
+  friend class PG; // SPEC-028-B: heartbeat reads InputQueue depth under InputQueueMutex.
 };
 
 #endif
