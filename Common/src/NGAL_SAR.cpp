@@ -8,7 +8,7 @@
         Date:           07/2026
         Version:        0.1
 
-        Copyright (C) 2026  Antonio Marcos Alberti
+        Copyright (C) 2026 Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -18,259 +18,217 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _NGAL_SAR_H
 #include "NGAL_SAR.h"
-#endif
-
-#ifndef _MESSAGE_H
 #include "Message.h"
-#endif
-
-#ifndef _PROCESS_H
 #include "Process.h"
-#endif
 
-#ifndef _GLIBCXX_CMATH
-#include <cmath>
-#endif
-
-#ifndef _CTIME_H
+#include <algorithm>
+#include <cstring>
 #include <ctime>
-#endif
+#include <limits>
+#include <memory>
+#include <new>
 
-#ifndef _STDIO_H
-#include <stdio.h>
-#endif
-
-// #define DEBUG
 // #define DEBUG
 
 using namespace std;
 
-// ── Constructor / Destructor ──
+const size_t NGAL_SAR::MAX_REASSEMBLY_BUFFERS;
+const size_t NGAL_SAR::MAX_REASSEMBLY_BYTES;
 
-NGAL_SAR::NGAL_SAR()
+NGAL_SAR::NGAL_SAR() : ReassemblyBytes(0)
 {
 }
 
 NGAL_SAR::~NGAL_SAR()
 {
-  for (size_t i = 0; i < ReassemblyBuffers.size(); i++)
-  {
-    if (ReassemblyBuffers[i] != 0)
-    {
-      if (ReassemblyBuffers[i]->Buffer != 0)
-      {
-        delete[] ReassemblyBuffers[i]->Buffer;
-      }
-      delete ReassemblyBuffers[i];
-    }
-  }
-  ReassemblyBuffers.clear();
+  for (size_t i = 0; i < ReassemblyBuffers.size(); ++i)
+    delete ReassemblyBuffers[i];
 }
 
-// ── Static Header Helpers ──
+void NGAL_SAR::RemoveBuffer(size_t index)
+{
+  FragmentBuffer* FB = ReassemblyBuffers[index];
+  ReassemblyBytes -= FB->ChargedBytes;
+  delete FB;
+  ReassemblyBuffers.erase(ReassemblyBuffers.begin() + index);
+}
 
 long long NGAL_SAR::OpenHeaderMessageSizeField(unsigned char* _Buffer)
 {
-  // _Buffer should point to the SizeHeader field (at offset 8 in the PDU)
-  // SizeHeader is 8 bytes, big-endian
-  long long Size = 0;
+  unsigned long long Size = 0;
+  for (unsigned int i = 0; i < 8; ++i)
+    Size = (Size << 8) | static_cast<unsigned long long>(_Buffer[i]);
 
-  Size = (static_cast<long long>(_Buffer[0]) << (8 * 7)) |
-         (static_cast<long long>(_Buffer[1]) << (8 * 6)) |
-         (static_cast<long long>(_Buffer[2]) << (8 * 5)) |
-         (static_cast<long long>(_Buffer[3]) << (8 * 4)) |
-         (static_cast<long long>(_Buffer[4]) << (8 * 3)) |
-         (static_cast<long long>(_Buffer[5]) << (8 * 2)) |
-         (static_cast<long long>(_Buffer[6]) << (8 * 1)) |
-         (static_cast<long long>(_Buffer[7]) << (8 * 0));
-
-  return Size;
+  // Avoid signed-shift overflow and implementation-defined unsigned conversion.
+  if (Size > static_cast<unsigned long long>(
+                 std::numeric_limits<long long>::max()))
+    return -1;
+  return static_cast<long long>(Size);
 }
 
 void NGAL_SAR::OpenHeaderSegmentationField(unsigned char* _Buffer,
-                                           unsigned int& _MessageNumber,
-                                           unsigned int& _SequenceNumber)
+                                          unsigned int& _MessageNumber,
+                                          unsigned int& _SequenceNumber)
 {
-  // SegHeader is 8 bytes: MN (4B big-endian) + SN (4B big-endian)
-  _MessageNumber = (static_cast<unsigned int>(_Buffer[0]) << (8 * 3)) |
-                   (static_cast<unsigned int>(_Buffer[1]) << (8 * 2)) |
-                   (static_cast<unsigned int>(_Buffer[2]) << (8 * 1)) |
-                   (static_cast<unsigned int>(_Buffer[3]) << (8 * 0));
-
-  _SequenceNumber = (static_cast<unsigned int>(_Buffer[4]) << (8 * 3)) |
-                    (static_cast<unsigned int>(_Buffer[5]) << (8 * 2)) |
-                    (static_cast<unsigned int>(_Buffer[6]) << (8 * 1)) |
-                    (static_cast<unsigned int>(_Buffer[7]) << (8 * 0));
+  _MessageNumber = 0;
+  _SequenceNumber = 0;
+  for (unsigned int i = 0; i < 4; ++i)
+  {
+    _MessageNumber = (_MessageNumber << 8) |
+                     static_cast<unsigned int>(_Buffer[i]);
+    _SequenceNumber = (_SequenceNumber << 8) |
+                      static_cast<unsigned int>(_Buffer[i + 4]);
+  }
 }
 
 void NGAL_SAR::BuildHeaderSizeField(unsigned char* Header, long long TotalSize)
 {
-  Header[0] = static_cast<unsigned char>((TotalSize >> (8 * 7)) & 0xff);
-  Header[1] = static_cast<unsigned char>((TotalSize >> (8 * 6)) & 0xff);
-  Header[2] = static_cast<unsigned char>((TotalSize >> (8 * 5)) & 0xff);
-  Header[3] = static_cast<unsigned char>((TotalSize >> (8 * 4)) & 0xff);
-  Header[4] = static_cast<unsigned char>((TotalSize >> (8 * 3)) & 0xff);
-  Header[5] = static_cast<unsigned char>((TotalSize >> (8 * 2)) & 0xff);
-  Header[6] = static_cast<unsigned char>((TotalSize >> (8 * 1)) & 0xff);
-  Header[7] = static_cast<unsigned char>((TotalSize >> (8 * 0)) & 0xff);
+  unsigned long long Size = static_cast<unsigned long long>(TotalSize);
+  for (unsigned int i = 0; i < 8; ++i)
+    Header[i] = static_cast<unsigned char>((Size >> (8 * (7 - i))) & 0xff);
 }
 
 void NGAL_SAR::BuildHeaderSegmentationField(unsigned char* Header,
-                                            unsigned int MessageNumber,
-                                            unsigned int SequenceNumber)
+                                           unsigned int MessageNumber,
+                                           unsigned int SequenceNumber)
 {
-  Header[0] = static_cast<unsigned char>((MessageNumber >> (8 * 3)) & 0xff);
-  Header[1] = static_cast<unsigned char>((MessageNumber >> (8 * 2)) & 0xff);
-  Header[2] = static_cast<unsigned char>((MessageNumber >> (8 * 1)) & 0xff);
-  Header[3] = static_cast<unsigned char>((MessageNumber >> (8 * 0)) & 0xff);
-  Header[4] = static_cast<unsigned char>((SequenceNumber >> (8 * 3)) & 0xff);
-  Header[5] = static_cast<unsigned char>((SequenceNumber >> (8 * 2)) & 0xff);
-  Header[6] = static_cast<unsigned char>((SequenceNumber >> (8 * 1)) & 0xff);
-  Header[7] = static_cast<unsigned char>((SequenceNumber >> (8 * 0)) & 0xff);
+  for (unsigned int i = 0; i < 4; ++i)
+  {
+    Header[i] = static_cast<unsigned char>(
+        (MessageNumber >> (8 * (3 - i))) & 0xff);
+    Header[i + 4] = static_cast<unsigned char>(
+        (SequenceNumber >> (8 * (3 - i))) & 0xff);
+  }
 }
 
-// ── Send SAR ──
-// Serialise Message → NGAL-PDU fragments.
-// Calls transport_callback(data, size, index) for each fragment.
-int NGAL_SAR::SendSegmented(Message* M,
-                            unsigned int BlockSize,
-                            unsigned int& MessageNumber,
-                            unsigned int& SequenceNumber,
-                            unsigned int& MessageCounter,
-                            std::function<int(char*, unsigned int, unsigned int)> transport_callback)
+int NGAL_SAR::SendSegmented(
+    Message* M,
+    unsigned int BlockSize,
+    unsigned int& MessageNumber,
+    unsigned int& SequenceNumber,
+    unsigned int& MessageCounter,
+    std::function<int(char*, unsigned int, unsigned int)> transport_callback)
 {
-  int Status = 1; // ERROR
+  int Status = 1;
   long long MessageSize = 0;
   unsigned int NoCL = 0;
-  unsigned int EffectiveSize = 0;
 
-  // Serialise the message to its char array representation
+  // SN=0 must accommodate the size header and a nonempty message payload.
+  // Also ensure that fragment size (BlockSize + SegHeader) fits unsigned int.
+  if (!M || !transport_callback || BlockSize <= 8 ||
+      BlockSize > std::numeric_limits<unsigned int>::max() - 8)
+    return 1;
+
   M->ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray();
+  if (M->GetMessageSize(MessageSize) != 0 || MessageSize <= 0)
+    return 1;
 
-  if (M->GetMessageSize(MessageSize) == 0) // 0 = OK
+  M->GetNumberofCommandLines(NoCL);
+  if (NoCL <= 2)
+    return 1;
+
+  const unsigned long long TotalSize =
+      static_cast<unsigned long long>(MessageSize) + 8;
+  if (TotalSize > std::numeric_limits<size_t>::max())
+    return 1;
+
+  const unsigned long long SegmentCount =
+      TotalSize / BlockSize + (TotalSize % BlockSize != 0);
+  if (SegmentCount == 0 ||
+      SegmentCount > std::numeric_limits<unsigned int>::max())
+    return 1;
+  const unsigned int NoS = static_cast<unsigned int>(SegmentCount);
+
+  char* Payload = 0;
+  M->GetMessageFromCharArray(Payload);
+  if (!Payload)
+    return 1;
+
+  std::unique_ptr<unsigned char[]> SDU(
+      new unsigned char[static_cast<size_t>(TotalSize)]);
+  BuildHeaderSizeField(SDU.get(), MessageSize);
+  std::memcpy(SDU.get() + 8, Payload, static_cast<size_t>(MessageSize));
+
+  // Preserve the existing MN generation and caller-owned SN/counter semantics.
+  MessageNumber = static_cast<unsigned int>(rand() % 4294967289) + 1;
+#ifdef DEBUG
+  cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber
+       << " NoS=" << NoS << " MessageSize=" << MessageSize
+       << " BlockSize=" << BlockSize << endl;
+#endif
+
+  for (unsigned int i = 0; i < NoS; ++i)
   {
-    if (MessageSize > 0)
+    const unsigned long long Offset =
+        static_cast<unsigned long long>(i) * BlockSize;
+    const unsigned int SegmentPayloadSize = static_cast<unsigned int>(
+        std::min<unsigned long long>(BlockSize, TotalSize - Offset));
+    const unsigned int EffectiveSize = SegmentPayloadSize + 8;
+    std::unique_ptr<unsigned char[]> DataBlock(
+        new unsigned char[EffectiveSize]);
+
+    BuildHeaderSegmentationField(DataBlock.get(), MessageNumber, SequenceNumber);
+    std::memcpy(DataBlock.get() + 8,
+                SDU.get() + static_cast<size_t>(Offset), SegmentPayloadSize);
+
+    int send_status = transport_callback(
+        reinterpret_cast<char*>(DataBlock.get()), EffectiveSize, i);
+    if (send_status != 0)
     {
-      M->GetNumberofCommandLines(NoCL);
-
-      if (NoCL > 2)
-      {
-        // Build SDU = SizeHeader(8B) + Payload(MessageSize bytes)
-        unsigned char* SDU = new unsigned char[8 + static_cast<size_t>(MessageSize)];
-        char* Payload = 0;
-
-        M->GetMessageFromCharArray(Payload);
-
-        // Write the Size Header (MessageSize only, not MessageSize+8)
-        // Note (F5): The code writes MessageSize into the Size Header.
-        // The receiver reads this value and allocates MessageSize+8 for the full SDU.
-        BuildHeaderSizeField(SDU, MessageSize);
-
-        for (int j = 8; j < (8 + static_cast<int>(MessageSize)); j++)
-        {
-          SDU[j] = static_cast<unsigned char>(Payload[j - 8]);
-        }
-
-        unsigned int NoS = static_cast<unsigned int>(ceil(static_cast<double>(8 + MessageSize) / static_cast<double>(BlockSize)));
-
-        // Generate a random MessageNumber for this message
-        // Important: needs to be random to avoid conflict with messages numbered on other processes
-        MessageNumber = static_cast<unsigned int>(rand() % 4294967289) + 1;
-#ifdef DEBUG
-        cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber 
-             << " NoS=" << NoS << " MessageSize=" << MessageSize 
-             << " BlockSize=" << BlockSize << endl;
-#endif
-
-        for (unsigned int i = 0; i < NoS; i++)
-        {
-          unsigned char* DataBlock;
-          unsigned int SegmentPayloadSize;
-
-          if (i < (NoS - 1))
-          {
-            SegmentPayloadSize = BlockSize;
-            DataBlock = new unsigned char[SegmentPayloadSize + 8];
-          }
-          else
-          {
-            unsigned int Remaining = static_cast<unsigned int>((8 + MessageSize) - (NoS - 1) * BlockSize);
-            SegmentPayloadSize = Remaining;
-            DataBlock = new unsigned char[SegmentPayloadSize + 8];
-          }
-
-          // Build Segmentation Header (8 bytes): MN + SN
-          unsigned char HeaderSegmentationField[8];
-          BuildHeaderSegmentationField(HeaderSegmentationField, MessageNumber, SequenceNumber);
-
-          for (unsigned int j = 0; j < 8; j++)
-          {
-            DataBlock[j] = HeaderSegmentationField[j];
-          }
-
-          for (unsigned int k = 8; k < SegmentPayloadSize + 8; k++)
-          {
-            DataBlock[k] = SDU[i * BlockSize + k - 8];
-          }
-
-          EffectiveSize = SegmentPayloadSize + 8;
-
-          // Call the transport callback to send this fragment
-          int send_status = transport_callback(reinterpret_cast<char*>(DataBlock), EffectiveSize, i);
-
-          if (send_status != 0) // 0 = OK
-          {
-            Status = 1; // ERROR
-            delete[] DataBlock;
-            break;
-          }
-
-          Status = 0; // OK so far
-
-          SequenceNumber++;
-#ifdef DEBUG
-          cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber 
-               << " SN=" << SequenceNumber - 1 << "/" << NoS - 1 
-               << " frag_size=" << EffectiveSize << endl;
-#endif
-
-          delete[] DataBlock;
-        }
-
-        if (Status == 0) // OK
-        {
-            MessageCounter++;
-#ifdef DEBUG
-            cerr << "[DEBUG] NGAL_SAR::SendSegmented: COMPLETE MN=" << MessageNumber 
-                << " segments_sent=" << NoS << endl;
-            cerr << endl; // blank line to separate completed messages in log
-#endif
-            SequenceNumber = 0;
-        }
-
-        delete[] SDU;
-      }
+      Status = 1;
+      break;
     }
+
+    Status = 0;
+    ++SequenceNumber;
+#ifdef DEBUG
+    cerr << "[DEBUG] NGAL_SAR::SendSegmented: MN=" << MessageNumber
+         << " SN=" << SequenceNumber - 1 << "/" << NoS - 1
+         << " frag_size=" << EffectiveSize << endl;
+#endif
   }
 
+  if (Status == 0)
+  {
+    ++MessageCounter;
+#ifdef DEBUG
+    cerr << "[DEBUG] NGAL_SAR::SendSegmented: COMPLETE MN=" << MessageNumber
+         << " segments_sent=" << NoS << endl;
+    cerr << endl;
+#endif
+    SequenceNumber = 0;
+  }
   return Status;
 }
 
-// ── Receive SAR ──
-// Process one frame from transport.
-// Manages reassembly buffer internally.
-// Returns 0 (OK) when a message is completed, 1 (ERROR) otherwise.
-// On completion, CompletedBuffer/CompletedSize are set — CALLER must delete[] CompletedBuffer.
-// Does NOT call NewMessage/ConvertMessage — that is the GW's job (Finding F2).
+void NGAL_SAR::LogProgress(const FragmentBuffer* FB)
+{
+#ifdef DEBUG
+  unsigned int progress_pct =
+      (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
+  bool log_progress = (FB->SegmentsSoFar % 10 == 0) ||
+                      (progress_pct == 25) || (progress_pct == 50) ||
+                      (progress_pct == 75);
+  if (log_progress || FB->SegmentsSoFar == FB->NoS)
+  {
+    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << FB->MessageNumber
+         << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS
+         << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar
+         << "/" << FB->MessageSize << endl;
+  }
+#else
+  (void)FB;
+#endif
+}
+
 int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
                               unsigned int numbytes,
                               unsigned int BlockSize,
@@ -280,309 +238,260 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   CompletedBuffer = 0;
   CompletedSize = 0;
 
-  unsigned int MN = 0;
-  unsigned int SN = 0;
-
-  // Parse the Segmentation Header (first 8 bytes)
-  OpenHeaderSegmentationField(TempBuffer, MN, SN);
-
-  if (MN == 0)
+  // No header access is permitted before this guard.
+  if (numbytes < 8 || TempBuffer == 0)
   {
 #ifdef DEBUG
-    cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_MN=0 (dropped) numbytes=" << numbytes << endl;
-#endif
-    return 1; // ERROR — invalid message number
-  }
-
-  // AMEND-3: minimum frame length guard — 8B SegHeader (+16B for SN=0 with SizeHeader)
-  if (numbytes < 8 || (SN == 0 && numbytes < 16))
-  {
-#ifdef DEBUG
-    cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT numbytes=" << numbytes << " (dropped)" << endl;
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT_OR_NULL numbytes="
+         << numbytes << " (dropped)" << endl;
 #endif
     return 1;
   }
 
-  // Check if this MN already has a fragment buffer
-  FragmentBuffer* FB = 0;
-  unsigned int BufferIndex = 0;
-  bool found = false;
+  unsigned int MN = 0;
+  unsigned int SN = 0;
+  OpenHeaderSegmentationField(TempBuffer, MN, SN);
 
-  for (unsigned int c = 0; c < ReassemblyBuffers.size(); c++)
+  if (SN == 0 && numbytes < 16)
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: FRAME_TOO_SHORT numbytes="
+         << numbytes << " (dropped)" << endl;
+#endif
+    return 1;
+  }
+  if (MN == 0 || BlockSize <= 8 ||
+      BlockSize > std::numeric_limits<unsigned int>::max() - 8)
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_MN_OR_BLOCKSIZE MN="
+         << MN << " BlockSize=" << BlockSize << " (dropped)" << endl;
+#endif
+    return 1;
+  }
+
+  FragmentBuffer* FB = 0;
+  size_t BufferIndex = 0;
+  for (size_t c = 0; c < ReassemblyBuffers.size(); ++c)
   {
     if (ReassemblyBuffers[c]->MessageNumber == MN)
     {
-      found = true;
       FB = ReassemblyBuffers[c];
       BufferIndex = c;
       break;
     }
   }
 
-  if (!found && SN > 0)
+  if (!FB && SN != 0)
   {
-    // Fragments received before the first one — drop
 #ifdef DEBUG
-    cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_ORDER MN=" << MN 
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_ORDER MN=" << MN
          << " SN=" << SN << " (no buffer yet, dropping)" << endl;
 #endif
     return 1;
   }
 
-  if (!found && SN == 0)
+  long long MessageSize = FB ? FB->MessageSize : 0;
+  if (SN == 0)
   {
-    // First fragment of a new message
-    // Read the Size Header (bytes 8..15 of the PDU)
-    long long MessageSize = OpenHeaderMessageSizeField(TempBuffer + 8);
-
-    if (MessageSize <= 0 || MessageSize >= 10 * 1024 * 1024) // sanity: 10MB max
+    const long long AdvertisedSize = OpenHeaderMessageSizeField(TempBuffer + 8);
+    if (AdvertisedSize <= 0 || AdvertisedSize >= 10 * 1024 * 1024)
     {
 #ifdef DEBUG
       cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_SIZE MN=" << MN
-           << " MessageSize=" << MessageSize << " (dropping)" << endl;
+           << " MessageSize=" << AdvertisedSize << " (dropping)" << endl;
 #endif
-      return 1; // Invalid message size
+      return 1;
     }
-
-    // AMEND-3: bound the number of simultaneous reassembly buffers.
-    // Unbounded growth was implicated in the 500 msg/s PGCS crashes.
-    if (ReassemblyBuffers.size() >= MAX_REASSEMBLY_BUFFERS)
+    if (FB && AdvertisedSize != FB->MessageSize)
     {
-      // Drop the OLDEST buffer to make room (it is likely timed out or stalled)
-      FragmentBuffer* Oldest = ReassemblyBuffers.front();
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: BUFFER_LIMIT_REACHED (" << MAX_REASSEMBLY_BUFFERS
-           << ") dropping OLDEST MN=" << Oldest->MessageNumber
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: SIZE_MISMATCH MN=" << MN
+           << " (existing buffer retained)" << endl;
+#endif
+      return 1;
+    }
+    MessageSize = AdvertisedSize;
+  }
+
+  if (FB && BlockSize != FB->BlockSize)
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: BLOCKSIZE_MISMATCH MN=" << MN
+         << " got=" << BlockSize << " expected=" << FB->BlockSize
+         << " (dropping)" << endl;
+#endif
+    return 1;
+  }
+
+  // All inputs to this integer ceiling division are now validated.
+  const unsigned long long TotalSize =
+      static_cast<unsigned long long>(MessageSize) + 8;
+  const unsigned long long LocalNoS =
+      TotalSize / BlockSize + (TotalSize % BlockSize != 0);
+  if (LocalNoS == 0 ||
+      LocalNoS > std::numeric_limits<unsigned int>::max() ||
+      SN >= LocalNoS)
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: SN_OUT_OF_RANGE MN=" << MN
+         << " SN=" << SN << " NoS=" << LocalNoS << " (dropping)" << endl;
+#endif
+    return 1;
+  }
+
+  // Unsigned wide multiplication avoids overflow even for hostile wire SNs.
+  const unsigned long long Offset = SN == 0 ? 0 :
+      static_cast<unsigned long long>(SN) * BlockSize - 8;
+  const unsigned long long Capacity = SN == 0 ? BlockSize - 8 : BlockSize;
+  if (Offset >= static_cast<unsigned long long>(MessageSize))
+    return 1;
+
+  const unsigned long long Expected = std::min<unsigned long long>(
+      Capacity, static_cast<unsigned long long>(MessageSize) - Offset);
+  const unsigned int HeaderBytes = SN == 0 ? 16 : 8;
+  const unsigned int PayloadBytes = numbytes - HeaderBytes;
+
+  // Ignore trailing bytes (e.g. Ethernet padding); reject short fragments.
+  // Copy and account for only the geometry-derived Expected bytes.
+  // This guard precedes all allocation, eviction, copying and bitmap changes.
+  if (Expected == 0 || PayloadBytes < Expected)
+  {
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_PAYLOAD MN=" << MN
+         << " SN=" << SN << " payload=" << PayloadBytes
+         << " expected=" << Expected << " (dropping)" << endl;
+#endif
+    return 1;
+  }
+
+  if (FB && FB->ReceivedSN[SN])
+  {
+    // Includes SN=0: retain the original buffer, do not copy or refresh time.
+#ifdef DEBUG
+    cerr << "[WARN] NGAL_SAR::ReceiveFragment: DUPLICATE SN MN=" << MN
+         << " SN=" << SN << " (ignored, no timestamp refresh)" << endl;
+#endif
+    return 1;
+  }
+
+  if (!FB)
+  {
+    const size_t Charge = static_cast<size_t>(MessageSize) +
+                          static_cast<size_t>(LocalNoS) +
+                          sizeof(FragmentBuffer) + 256;
+    if (Charge > MAX_REASSEMBLY_BYTES)
+      return 1;
+
+    // Vector order is creation order, preserving oldest-created eviction.
+    // Invalid incoming geometry can never reach this loop.
+    while (!ReassemblyBuffers.empty() &&
+           (ReassemblyBuffers.size() >= MAX_REASSEMBLY_BUFFERS ||
+            ReassemblyBytes > MAX_REASSEMBLY_BYTES - Charge))
+    {
+#ifdef DEBUG
+      const FragmentBuffer* Oldest = ReassemblyBuffers.front();
+      cerr << "[WARN] NGAL_SAR::ReceiveFragment: BUFFER_LIMIT_REACHED count="
+           << ReassemblyBuffers.size() << " bytes=" << ReassemblyBytes
+           << " dropping OLDEST MN=" << Oldest->MessageNumber
            << " seg=" << Oldest->SegmentsSoFar << "/" << Oldest->NoS << endl;
 #endif
-      delete[] Oldest->Buffer;
-      delete Oldest;
-      ReassemblyBuffers.erase(ReassemblyBuffers.begin());
+      RemoveBuffer(0);
     }
 
-    unsigned int LocalNoS = static_cast<unsigned int>(ceil(static_cast<double>(8 + MessageSize) / static_cast<double>(BlockSize)));
+    // Allocate only after making room, avoiding a transient cap overrun.
+    // RAII owns all partially constructed state until insertion succeeds.
+    try
+    {
+      std::unique_ptr<FragmentBuffer> NewBuffer(new FragmentBuffer);
+      NewBuffer->MessageNumber = MN;
+      NewBuffer->NoS = static_cast<unsigned int>(LocalNoS);
+      NewBuffer->MessageSize = MessageSize;
+      NewBuffer->BlockSize = BlockSize;
+      NewBuffer->ChargedBytes = Charge;
+      NewBuffer->ReceivedSN.assign(static_cast<size_t>(LocalNoS), false);
+      NewBuffer->Buffer = new char[static_cast<size_t>(MessageSize)];
 
-    // AMEND-3: SN=0 is the first fragment; NoS must be at least 1 and the
-    // first-fragment payload must fit the freshly allocated buffer.
-    unsigned int payload_bytes = (numbytes > 16) ? (numbytes - 16) : 0;
-    if (LocalNoS == 0 || payload_bytes > static_cast<unsigned int>(MessageSize))
+      ReassemblyBuffers.push_back(NewBuffer.get());
+      FB = NewBuffer.release();
+      ReassemblyBytes += Charge;
+      BufferIndex = ReassemblyBuffers.size() - 1;
+    }
+    catch (const std::bad_alloc&)
     {
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: INVALID_FIRST_FRAGMENT MN=" << MN
-           << " NoS=" << LocalNoS << " payload=" << payload_bytes
-           << " MessageSize=" << MessageSize << " (dropping)" << endl;
+      cerr << "[ERROR] NGAL_SAR::ReceiveFragment: ALLOCATION_FAILED MN="
+           << MN << " (dropping)" << endl;
 #endif
       return 1;
     }
-
-    FB = new FragmentBuffer;
-    FB->MessageNumber = MN;
-    FB->NoS = LocalNoS;
-    FB->MessageSize = MessageSize;
-    FB->Buffer = new char[static_cast<size_t>(MessageSize)];
-    FB->ReceivedSoFar = 0;
-    FB->SegmentsSoFar = 0;
-    FB->ContinueReceiving = true;
-    FB->Timestamp = static_cast<double>(time(0));
-    FB->BlockSize = BlockSize; // AMEND-3: remember creation BlockSize
-    FB->ReceivedSN.assign(LocalNoS, false); // AMEND-3: per-SN bitmap
-
-    // Copy payload from this segment (skip SegHeader(8) + SizeHeader(8) = 16 bytes)
-    // AMEND-3: bound destination writes by MessageSize.
-    if (payload_bytes > static_cast<unsigned int>(MessageSize))
-    {
-      payload_bytes = static_cast<unsigned int>(MessageSize);
-    }
-
-    for (unsigned int r = 0; r < payload_bytes; r++)
-    {
-      FB->Buffer[r] = static_cast<char>(TempBuffer[r + 16]);
-    }
-
-    FB->ReceivedSoFar = static_cast<long long>(payload_bytes);
-    FB->SegmentsSoFar = 1;
-    FB->ReceivedSN[0] = true;
-    FB->Timestamp = static_cast<double>(time(0));
-
-    ReassemblyBuffers.push_back(FB);
-    BufferIndex = static_cast<unsigned int>(ReassemblyBuffers.size() - 1);
   }
-  else if (found && SN > 0)
+
+  std::memcpy(FB->Buffer + static_cast<size_t>(Offset),
+              TempBuffer + HeaderBytes, static_cast<size_t>(Expected));
+  FB->ReceivedSoFar += Expected;
+  ++FB->SegmentsSoFar;
+  FB->ReceivedSN[SN] = true;
+  FB->Timestamp = static_cast<double>(time(0));
+
+  // Preserve continuing-fragment and incomplete-message progress logging.
+  if (SN > 0)
+    LogProgress(FB);
+
+  if (FB->ReceivedSoFar >= FB->MessageSize &&
+      FB->SegmentsSoFar >= FB->NoS)
   {
-    // AMEND-3: SN must be within the expected segment count for this buffer
-    if (SN >= FB->NoS)
-    {
+    FB->ContinueReceiving = false;
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: SN_OUT_OF_RANGE MN=" << MN
-           << " SN=" << SN << " NoS=" << FB->NoS << " (dropping)" << endl;
+    const unsigned int DoneSegments = FB->SegmentsSoFar;
+    const long long DoneSize = FB->MessageSize;
 #endif
-      return 1;
-    }
-
-    // AMEND-3: reject fragments carrying a different BlockSize than the one
-    // used to create the buffer (mixed-MTU / corrupted sender).
-    if (BlockSize != FB->BlockSize)
-    {
+    CompletedBuffer = FB->Buffer;
+    CompletedSize = FB->MessageSize;
+    FB->Buffer = 0; // Detach before the owning FragmentBuffer destructor runs.
+    RemoveBuffer(BufferIndex);
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: BLOCKSIZE_MISMATCH MN=" << MN
-           << " got=" << BlockSize << " expected=" << FB->BlockSize << " (dropping)" << endl;
+    cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN
+         << " segments=" << DoneSegments << " size=" << DoneSize << endl;
+    cerr << endl;
 #endif
-      return 1;
-    }
-
-    // AMEND-3: duplicate / already-received SN — ignore without copying twice
-    // and WITHOUT refreshing the timestamp (a retransmission storm must not
-    // keep a dead buffer alive forever).
-    if (SN < FB->ReceivedSN.size() && FB->ReceivedSN[SN])
-    {
-#ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: DUPLICATE SN MN=" << MN
-           << " SN=" << SN << " (ignored, no timestamp refresh)" << endl;
-#endif
-      return 1;
-    }
-
-    // Continuing fragment for an existing message
-    long long Pointer = static_cast<long long>(SN) * static_cast<long long>(BlockSize) - 8;
-
-    if (Pointer < 0 || Pointer >= FB->MessageSize)
-    {
-#ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::ReceiveFragment: OUT_OF_BOUNDS MN=" << MN
-           << " SN=" << SN << " Pointer=" << Pointer
-           << " MessageSize=" << FB->MessageSize << " (dropping)" << endl;
-#endif
-      return 1; // Out of bounds
-    }
-
-    // AMEND-3: bound the copy by BOTH the remaining message space AND the
-    // received frame payload. Previously only MessageSize gated the loop,
-    // and a long frame could write past the buffer end.
-    long long Remaining = FB->MessageSize - Pointer;
-
-    unsigned int h = 0;
-
-    unsigned int source_bytes = numbytes - 8; // skip SegHeader
-    if (source_bytes > static_cast<unsigned int>(Remaining))
-    {
-      source_bytes = static_cast<unsigned int>(Remaining);
-    }
-
-    for (unsigned int q = 0; q < source_bytes; q++)
-    {
-      FB->Buffer[Pointer + static_cast<long long>(q)] = static_cast<char>(TempBuffer[q + 8]);
-
-      h++;
-    }
-
-    FB->ReceivedSoFar += static_cast<long long>(h);
-    FB->SegmentsSoFar++;
-    FB->ReceivedSN[SN] = true;
-    FB->Timestamp = static_cast<double>(time(0));
-#ifdef DEBUG
-    // Progress logging at milestones: every 10 segments + 25%/50%/75%
-    unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
-    bool log_progress = (FB->SegmentsSoFar % 10 == 0) ||
-                        (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
-    if (log_progress || FB->SegmentsSoFar == FB->NoS)
-    {
-      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN
-           << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS
-           << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
-    }
-#endif
+    return 0;
   }
 
-  // Check stop criteria
-  if (found || !found) // check the buffer we just created or updated
-  {
-    FB = ReassemblyBuffers[BufferIndex];
-
-    if (FB->ReceivedSoFar >= FB->MessageSize && FB->SegmentsSoFar >= FB->NoS)
-    {
-      FB->ContinueReceiving = false;
-
-      // Transfer ownership of the reassembly buffer to the caller.
-      // The caller (NGAL_Transport_RAW::ReceiveDispatcher) will pass it
-      // to NGAL_CS::DeliverToGateway, and the GW thread will do
-      // NewMessage + SetMessageFromCharArray + ConvertMessage.
-
-      // AMEND-3 FIX (use-after-free): capture logging values BEFORE delete FB.
-      unsigned int DoneSegments = FB->SegmentsSoFar;
-      long long DoneSize = FB->MessageSize;
-
-      CompletedBuffer = FB->Buffer;
-      CompletedSize = FB->MessageSize;
-
-      // Don't delete FB->Buffer — it's now owned by the caller.
-      // Only delete the FragmentBuffer struct itself.
-      FB->Buffer = 0; // prevent double-free in destructor
-      delete FB;
-      ReassemblyBuffers.erase(ReassemblyBuffers.begin() + BufferIndex);
-#ifdef DEBUG
-      cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN
-          << " segments=" << DoneSegments << " size=" << DoneSize << endl;
-      cerr << endl; // blank line to separate completed messages in log
-#endif
-
-      return 0; // OK — completed message
-    }
-    else
-    {
-      FB->Timestamp = static_cast<double>(time(0));
-#ifdef DEBUG
-      // Progress logging at milestones: every 10 segments + 25%/50%/75%
-      unsigned int progress_pct = (FB->NoS > 0) ? (FB->SegmentsSoFar * 100 / FB->NoS) : 0;
-      bool log_progress = (FB->SegmentsSoFar % 10 == 0) || 
-                          (progress_pct == 25) || (progress_pct == 50) || (progress_pct == 75);
-      if (log_progress || FB->SegmentsSoFar == FB->NoS)
-      {
-        cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: PROGRESS MN=" << MN 
-             << " seg=" << FB->SegmentsSoFar << "/" << FB->NoS 
-             << " (" << progress_pct << "%) bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize << endl;
-      }
-#endif
-      return 1; // ERROR — more fragments needed
-    }
-  }
-
-  return 1; // ERROR
+  if (SN == 0)
+    LogProgress(FB);
+  return 1;
 }
 
-// ── Timeout Cleanup ──
 void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
 {
   for (size_t i = 0; i < ReassemblyBuffers.size();)
   {
     FragmentBuffer* FB = ReassemblyBuffers[i];
-
-    if (FB != 0 && !FB->ContinueReceiving)
+    if (!FB->ContinueReceiving)
     {
-      // Already completed — should have been removed. Clean up.
 #ifdef DEBUG
-      cerr << "[WARN] NGAL_SAR::CleanupTimedOut: STALE buffer MN=" << FB->MessageNumber 
+      cerr << "[WARN] NGAL_SAR::CleanupTimedOut: STALE buffer MN="
+           << FB->MessageNumber
            << " (completed but not removed) - cleaning up" << endl;
 #endif
-      delete[] FB->Buffer;
-      delete FB;
-      ReassemblyBuffers.erase(ReassemblyBuffers.begin() + static_cast<long>(i));
+      RemoveBuffer(i);
     }
-    else if (FB != 0 && FB->Timestamp > 0 && (timeout_threshold - FB->Timestamp) > 30.0)
+    else if (FB->Timestamp > 0 &&
+             (timeout_threshold - FB->Timestamp) > 30.0)
     {
-      // Timeout after 30 seconds
 #ifdef DEBUG
-      cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber 
-           << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS 
-           << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize 
-           << " age=" << (timeout_threshold - FB->Timestamp) << "s - discarding" << endl;
+      cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber
+           << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS
+           << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize
+           << " age=" << (timeout_threshold - FB->Timestamp)
+           << "s - discarding" << endl;
 #endif
-      delete[] FB->Buffer;
-      delete FB;
-      ReassemblyBuffers.erase(ReassemblyBuffers.begin() + static_cast<long>(i));
+      RemoveBuffer(i);
     }
     else
     {
-      i++;
+      ++i;
     }
   }
 }
