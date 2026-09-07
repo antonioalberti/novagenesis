@@ -336,6 +336,33 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
         LOG("MyMACAddress = " << MAC);
         LOG("Interface = " << _Interface);
 
+        // SPEC-029: fail-fast validation — the -p identifier is the REMOTE peer MAC.
+        // If it equals the local MAC, category 17 would get two bindings (MAC->CSID and
+        // MAC->SSID) and every SendToARawSocket would fail with
+        // "more than one identifier to this address". Abort with an actionable message.
+        {
+          string ConfiguredMAC = PPGCS->Identifiers->at(i);
+          string LocalLower = MAC;
+          string ConfiguredLower = ConfiguredMAC;
+          for (unsigned int c = 0; c < LocalLower.size(); c++)
+          {
+            LocalLower[c] = static_cast<char>(tolower(static_cast<unsigned char>(LocalLower[c])));
+            ConfiguredLower[c] = static_cast<char>(tolower(static_cast<unsigned char>(ConfiguredLower[c])));
+          }
+
+          if (ConfiguredLower != "ff:ff:ff:ff:ff:ff" && ConfiguredLower == LocalLower)
+          {
+            PB->S << Offset << "(ERROR: Ethernet/Wi-Fi peer MAC equals the local interface MAC.)" << endl;
+            PB->S << Offset << "(ERROR: The -p identifier must be the REMOTE peer MAC, not this "
+                  << "host's own address " << ConfiguredMAC << ".)" << endl;
+            PB->S << Offset << "(ERROR: Configure the peer's MAC and restart. Aborting initialization.)" << endl;
+
+            Status = ERROR;
+
+            return Status;
+          }
+        }
+
         // Create a socket to send frames to a peer PGCS
         if (PPG->CreateRawSocket(CSID) == OK)
         {
