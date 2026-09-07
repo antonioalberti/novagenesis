@@ -1,0 +1,13 @@
+{
+ "benchmark": "SPEC-031 BEFORE baseline @500 msg/s bidirectional (current build 75caf4c)",
+ "date": "2026-09-07T11:39:38Z",
+ "convention": "per-direction offered rates recorded from SPEC028_STATS (offered field)",
+ "duration_s": 300,
+ "warmup_s": 60,
+ "reps": 1,
+ "baseline_last_stats": {
+  "source36": "SPEC028_STATS run=00B50E23 pid=12374 elapsed_s=1220 offered=602500 sent_ok=602500 received=601334 completed=601867 dropped=0 guard_reject=0 outstanding=414 sar_completed_all=601867 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0",
+  "repo61": "SPEC028_STATS run=00B50E23 pid=9949 elapsed_s=1220 offered=605000 sent_ok=605000 received=600908 completed=601030 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=601030 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0"
+ },
+ "note": "Full 3-rep protocol deferred: capture first rep now; subsequent reps on demand"
+}
