@@ -1,6 +1,6 @@
 # SPEC-027 — PGCS Multithreading
 
-**Status:** In Progress — Phase 1 (AMEND-3) Implemented — Pending Test (commit 1396c62; soak 30 min @500 msg/s passed, record in Specs/RESULTS-SPEC-027/). Phase 2 (AMEND-1/2/5/6) approved on separate branch. Telemetry/guard-test debt in SPEC-028.  
+**Status:** Implemented (Phase 1) — **TEST SIGNED OFF by Astra 2026-09-07** (commit faa6c4e, guard tests 6/6 PASS). Perda ~2% = baseline best-effort. SPEC-030 (staging+manifest) e SPEC-028-B (heartbeat) seguem em paralelo. Link-interruption guard: deferred para próximo soak.  
 **Target:** NovaGenesis PGCS / NGAL / Gateway IPC  
 **Specification file:** `Specs/SPEC-027-pgcs-multithreading.md`  
 **Build platform:** Alpine Linux, musl, g++ / GCC 15  
