@@ -716,6 +716,7 @@ void GW::Gateway()
              << " runCalls=" << diagRunCalls
              << " queued=" << queued
              << " topTime=" << topTime
+             << " inMem=" << PP->GetNumberOfMessages()
              << " duePopped=" << (diagBatchCount) << endl;
         diagRunCalls = 0;
       }
