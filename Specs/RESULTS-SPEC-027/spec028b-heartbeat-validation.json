@@ -1,0 +1,26 @@
+{
+ "test": "SPEC-028-B validation \u2014 heartbeat telemetry at 500 msg/s bidirectional",
+ "date": "2026-09-07T11:33:25Z",
+ "build": "37fa0a7 + musl fix 0627aa7",
+ "result": "HEARTBEAT WORKING \u2014 20+ lines over ~13 min, all counters plausible and monotonic",
+ "key_findings": [
+  "ZERO loss measured correctly: offered==sent_ok, received matches peer sent within in-flight (outstanding=2)",
+  "dropped=0, guard_reject=0, all 14 SAR metrics = 0 \u2014 no corruption, no guard hits at 500 msg/s",
+  "The earlier '~2% loss' was sub-counting of offered (StressOffered now counted at admission)",
+  "LOSSLESS within measured window at 500 msg/s bidirectional"
+ ],
+ "final": {
+  "source36": {
+   "stats": "SPEC028_STATS run=00B50E23 pid=12374 elapsed_s=850 offered=417500 sent_ok=417500 received=418525 completed=418609 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=418609 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0",
+   "alive": "1",
+   "rss": "2820",
+   "cores": "0"
+  },
+  "repo61": {
+   "stats": "SPEC028_STATS run=00B50E23 pid=9949 elapsed_s=850 offered=420000 sent_ok=420000 received=418628 completed=418713 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=418713 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0",
+   "alive": "1",
+   "rss": "2796",
+   "cores": "0"
+  }
+ }
+}
