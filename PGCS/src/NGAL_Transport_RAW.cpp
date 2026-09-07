@@ -307,19 +307,29 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         for (unsigned int attempt = 0; attempt < 2; ++attempt)
         {
           pool->Reset();
+          // NOTE: MSG_TRUNC must NOT be passed as an input flag on AF_PACKET raw
+          // sockets (it is an output-only flag there; as input it causes EINVAL).
+          // Oversize detection instead relies on msg_len > Capacity and the
+          // MSG_TRUNC bit in msg_hdr.msg_flags set by the kernel when trimming.
           const int nrec = recvmmsg(fds[i].fd, pool->messages,
                                     RawReceivePool::BatchSize,
-                                    MSG_DONTWAIT | MSG_TRUNC, NULL);
+                                    MSG_DONTWAIT, NULL);
 
           if (nrec <= 0)
           {
-#ifdef DEBUG
             if (nrec < 0 && errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
             {
-              cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: recvmmsg() error fd=" << fds[i].fd
-                   << " errno=" << errno << " (" << strerror(errno) << ")" << endl;
+              // SPEC-031: visible without DEBUG — a persistent non-EAGAIN error
+              // starves the receive path (once per 5s, throttled by static var).
+              static double lastErrLog = 0;
+              double now = PPGCS->GetTime();
+              if (now - lastErrLog >= 5.0)
+              {
+                lastErrLog = now;
+                cerr << "[ERROR] NGAL_Transport_RAW::ReceiveDispatcher: recvmmsg() failed fd=" << fds[i].fd
+                     << " errno=" << errno << " (" << strerror(errno) << ")" << endl;
+              }
             }
-#endif
             break; // EAGAIN/EWOULDBLOCK: drain complete; 0: nothing more this turn
           }
 
