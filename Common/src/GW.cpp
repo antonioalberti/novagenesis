@@ -237,6 +237,29 @@ void GW::PushToInputQueue(Message* M)
         // Set the message tag
         M->SetTag(InputQueueTag);
 
+        // SPEC-033 Phase B (B-3): queue residence = one retention. Acquire
+        // it via FindHandle + TryRetain BEFORE taking the queue lock. If it
+        // fails the message is NOT queueable — mark it and let the regular
+        // reclamation path handle it.
+        MsgHandle QH;
+
+        if (PP->FindHandle(M, QH) != OK || PP->TryRetain(QH) == NULL)
+        {
+          cerr << "[SPEC033B3] PushToInputQueue REJECTED (retention failed — message not resident)" << endl;
+
+          M->MarkToDelete();
+
+          return;
+        }
+
+        // Copy the scheduling keys at enqueue time (snapshot semantics: the
+        // entry's keys decide scheduling; later message mutation does not
+        // reschedule this entry).
+        QEntry QE;
+        QE.Time = M->GetTime();
+        QE.Tag = InputQueueTag;
+        QE.H = QH;
+
         // SPEC-032: assign tag + push + detect empty->nonempty under ONE lock;
         // exactly one notify per transition, outside the lock.
         bool wasEmpty = false;
@@ -245,8 +268,8 @@ void GW::PushToInputQueue(Message* M)
 
           wasEmpty = InputQueue.empty();
 
-          // Push the message to the queue
-          InputQueue.push(M);
+          // Push the entry to the queue
+          InputQueue.push(QE);
 
           // Increases the tag counter
           InputQueueTag++;
@@ -316,10 +339,27 @@ void GW::PushToOutputQueue(std::string OQS, Message* M)
             M->UnmarkToDelete();
             M->SetTag(OutputQueueTag);
 
+            // SPEC-033 Phase B (B-3): output queue residence = one retention.
+            MsgHandle QH;
+
+            if (PP->FindHandle(M, QH) != OK || PP->TryRetain(QH) == NULL)
+            {
+              S << Offset << "(ERROR: SPEC-033 output queue retention failed — message not queueable)" << endl;
+
+              M->MarkToDelete();
+
+              return;
+            }
+
+            QEntry QE;
+            QE.Time = M->GetTime();
+            QE.Tag = OutputQueueTag;
+            QE.H = QH;
+
             // Lock for push + notify (thread-safe w.r.t. ReadFromOutputQueue)
             {
               std::lock_guard<std::mutex> lock(OutputQueueMutex);
-              OutputQueues[OQS].push(M);
+              OutputQueues[OQS].push(QE);
               OutputQueueTag++;
               NewOutputMessage = true;
             }
@@ -379,7 +419,7 @@ void GW::ReadFromOutputQueue()
     }
 
     // Phase 1: Pop at most one message per queue (under lock — microseconds)
-    std::vector<std::pair<std::string, Message*>> batch;
+    std::vector<std::pair<std::string, QEntry>> batch;
     {
       std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
@@ -387,9 +427,9 @@ void GW::ReadFromOutputQueue()
       {
         if (!it->second.empty())
         {
-          PM1 = it->second.top();
+          QEntry QE = it->second.top();
           it->second.pop();
-          batch.emplace_back(it->first, PM1);
+          batch.emplace_back(it->first, QE); // queue retention transfers to the batch
         }
       }
     } // Lock released
@@ -402,13 +442,35 @@ void GW::ReadFromOutputQueue()
 
     for (auto& kv : batch)
     {
-      if (WriteToSharedMemory3(kv.first, kv.second) == OK)
+      // SPEC-033 Phase B (B-3): identity from the entry's handle. The batch
+      // owns the queue's retention for the duration of the SHM write.
+      Message* PM = PP->ResolveMessage(kv.second.H);
+
+      if (PM == NULL)
       {
-        kv.second->MarkToDelete();
+        // Stale while retained = invariant violation (should be impossible).
+        // Defensive containment: discard the entry, touch no message.
+        cerr << "[SPEC033B3] INVIOLANT: stale output entry (slot " << kv.second.H.Slot
+             << ", gen " << kv.second.H.Generation << ") — discarding without dereference" << endl;
+
+        continue;
+      }
+
+      if (WriteToSharedMemory3(kv.first, PM) == OK)
+      {
+        // Delivered: release the queue's retention and request deletion.
+        PM->MarkToDelete();
+
+        if (PP->Release(kv.second.H) != OK)
+        {
+          cerr << "[SPEC033B3] output release failed post-delivery (slot " << kv.second.H.Slot << ")" << endl;
+        }
       }
       else
       {
-        // SHM busy — re-push under lock for retry on next cycle
+        // SHM busy — re-push under lock for retry on next cycle. Per Astra B-3
+        // rule (c): TRANSFER the retention back to the queue (no release +
+        // re-acquire).
         {
           std::lock_guard<std::mutex> qlock(OutputQueueMutex);
           OutputQueues[kv.first].push(kv.second);
@@ -471,7 +533,7 @@ void GW::Gateway()
       std::lock_guard<std::mutex> lock(InputQueueMutex);
       if (!InputQueue.empty())
       {
-        double nextTime = InputQueue.top()->GetTime();
+        double nextTime = InputQueue.top().Time;
         double now = GetTime();
         secondsUntilNext = nextTime - now;
         if (secondsUntilNext < 0)
@@ -500,18 +562,18 @@ void GW::Gateway()
     Time = GetTime();
     RunFlag = false;
 
-    static Message* batch[32];
+    static QEntry batch[32];
     unsigned int batchCount = 0;
 
     {
       std::lock_guard<std::mutex> lock(InputQueueMutex);
       while (batchCount < 32 && !InputQueue.empty())
       {
-        Message* due = InputQueue.top();
-        if (due->GetTime() < Time)
+        QEntry due = InputQueue.top();
+        if (due.Time < Time)
         {
           InputQueue.pop();
-          batch[batchCount++] = due;
+          batch[batchCount++] = due; // queue retention transfers to the batch
           RunFlag = true;
         }
         else
@@ -520,14 +582,18 @@ void GW::Gateway()
         }
       }
       if (batchCount > 0)
-        ScheduledTime = batch[0]->GetTime();
+        ScheduledTime = batch[0].Time;
       diagBatchCount = batchCount;
     }
 
     // Step 2 : Run procedure for each due message, in extraction (priority) order
     for (unsigned int b = 0; b < batchCount && StopGateway == false; ++b)
     {
-    PM1 = batch[b];
+    // SPEC-033 Phase B (B-3): resolve from the ENTRY's handle (identity from
+    // the handle chain, not a raw pointer). The batch holds the queue's
+    // retention; Run(msg, irm, handle) ADOPTS it — no second count, no gap.
+    PM1 = PP->ResolveMessage(batch[b].H);
+
     if (PM1 != NULL && RunFlag == true)
     {
 
@@ -615,12 +681,25 @@ void GW::Gateway()
 
       diagRunCalls++;
 
-      Run(PM1, PM2);
+      // SPEC-033 Phase B (B-3): adopt path — Run takes over the batch's
+      // queue retention (count unchanged) and releases it at its single
+      // exit. Identity guaranteed by the handle chain.
+      Run(PM1, PM2, batch[b].H);
 
       PP->DeleteMarkedMessages();
 
       PM1 = NULL;
       RunFlag = false;
+    }
+    else if (RunFlag == true)
+    {
+      // Stale entry while the batch still holds the queue retention: this
+      // should be impossible (a retained message cannot be reclaimed).
+      // Defensive containment per Astra B-3 rules: discard WITHOUT touching
+      // any message the slot may hold now, release nothing (the count died
+      // with the message), and log loudly.
+      cerr << "[SPEC033B3] INVIOLANT: stale queued entry at pop (slot " << batch[b].H.Slot
+           << ", gen " << batch[b].H.Generation << ") — discarding without dereference" << endl;
     }
     } // SPEC-032: end per-batch-message loop
 
@@ -684,7 +763,7 @@ void GW::Gateway()
         std::lock_guard<std::mutex> lock(InputQueueMutex);
         if (!InputQueue.empty())
         {
-          double nextTime = InputQueue.top()->GetTime();
+          double nextTime = InputQueue.top().Time;
           double currentTime = GetTime();
           if (nextTime <= currentTime)
             hasDueMessage = true;
@@ -709,7 +788,7 @@ void GW::Gateway()
           std::lock_guard<std::mutex> lock(InputQueueMutex);
           queued = InputQueue.size();
           if (!InputQueue.empty())
-            topTime = InputQueue.top()->GetTime();
+            topTime = InputQueue.top().Time;
         }
         cerr << "[SPEC032DIAG] t=" << now
              << " batch=" << diagBatchCount

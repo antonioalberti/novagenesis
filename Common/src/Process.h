@@ -184,12 +184,12 @@ private:
   // LifecycleMutex. Returns OK or ERROR (deferred reclamation).
   int FreeSlot(unsigned int _Index);
 
-  // ── SPEC-033 Phase B (Astra review D3): lifecycle mutex + retention ──────
-  // Guards slot bookkeeping, generation validation, retention acquire/release
-  // and the reclamation decision. NOT held across Run or queue operations —
-  // only around the short critical sections inside Process.
-  std::mutex LifecycleMutex;
+  // SPEC-033 Phase B (D3): lifecycle mutex + retention. Retention control is
+  // PUBLIC — GW queues (Block subclasses via PP) must acquire/release queue
+  // residence retentions. The mutex itself stays private; all mutation goes
+  // through these two functions.
 
+public:
   // TryRetain: atomically (w.r.t. erase/delete) validates the handle and
   // increments the message's retention count. On success the caller holds a
   // retention and may use the resolved pointer until Release(H). Returns the
@@ -199,6 +199,15 @@ private:
 
   // Release: decrements the retention count. Never resurrects a freed slot.
   int Release(const MsgHandle& _H);
+
+private:
+
+  // SPEC-033 Phase B (D3): guards slot bookkeeping, generation validation,
+  // retention acquire/release and the reclamation decision. NOT held across
+  // Run or queue operations.
+  std::mutex LifecycleMutex;
+
+public:
 
   // Counter on the number of message stored in memory
   unsigned int NoM;
