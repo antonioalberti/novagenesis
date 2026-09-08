@@ -240,9 +240,11 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
       {
         PB->S << Offset << "(ERROR: Unable to get the forwarding binding from destination block)" << endl;
 
-        // SPEC033B3DIAG (temporary, Astra): binding-failure trace (unthrottled)
+        // SPEC033B3DIAG (temporary, Astra): binding-failure trace (unthrottled) with lookup identity
         std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=FAIL binding-lookup-failed destCount="
-                  << ReceivedMessageDestinations.size() << std::endl;
+                  << ReceivedMessageDestinations.size()
+                  << " cat=" << Category << " key=" << Key
+                  << " isfinite-key=" << (Key.empty() ? "EMPTY" : "OK") << std::endl;
       }
     }
     else
