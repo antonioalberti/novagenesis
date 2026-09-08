@@ -375,9 +375,34 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
         }
 
         // SPEC-003: Removed ScheduledMessages cleanup loop.
-        // With the GWStatusS01Msg dead code eliminated from GWMsgCl01,
-        // no action pushes to ScheduledMessages anymore. The vector is
-        // always empty, making the cleanup loop unnecessary.
+        // CORRECTED (SPEC-033 Phase B, D4 — the original justification below
+        // was factually wrong): 5 Actions still push to ScheduledMessages
+        // (CoreMsgCl01 in PGCS/ContentApp/IoTTestApp/NBTestApp, IRMsgCl02 in
+        // GIRS). The vector is NOT always empty. The cleanup loop stays
+        // removed for a different reason: pushed messages belong to the
+        // Process container (sole owner), so deleting them here would be a
+        // double-ownership bug. Their disposition happens when a later Action
+        // (e.g. CoreSCNSeq01/CoreSCNAck01) PushToInputQueue's them — that
+        // transfer, not deletion, is what retires the vector's content.
+        //
+        // DEBUG invariant (SPEC-033 D4): every scheduled message must be
+        // either still pending (a later CL of THIS Run will consume it) or
+        // already dispositioned. We check the cheap necessary condition here:
+        // each scheduled message is a live Process-owned slot. Full
+        // disposition tracking (push succeeded + retention transferred) is
+        // the B-3 queue-migration step, where PushToInputQueue returns a
+        // verifiable outcome.
+#ifndef NDEBUG
+        for (Message* SM : ScheduledMessages)
+        {
+          bool Ans = false;
+
+          if (PP->HasMessage(SM, Ans) == OK && Ans == false)
+          {
+            cerr << "(WARNING: SPEC-033 D4 scheduled message no longer in the Process container — disposition outside the contract)" << endl;
+          }
+        }
+#endif
 
 #ifdef DEBUG1
 
