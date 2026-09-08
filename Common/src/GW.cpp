@@ -597,6 +597,19 @@ void GW::Gateway()
           lastPoppedHandle = due.H;
           lastPoppedEntryTime = due.Time;
           lastPoppedNow = Time;
+          {
+            unsigned int _dbgNoCL = 0;
+            unsigned int _dbgInst = 0;
+            Message* _dbgM = PP->ResolveMessage(due.H);
+            if (_dbgM != NULL)
+            {
+              _dbgInst = _dbgM->InstantiationNumber;
+              _dbgM->GetNumberofCommandLines(_dbgNoCL);
+            }
+            std::cerr << "[SPEC033B3DIAG] POP inst=" << _dbgInst << " NoCL=" << _dbgNoCL
+                      << " entryTime=" << due.Time << " now=" << Time
+                      << " h=" << due.H.Slot << ":" << due.H.Generation << std::endl;
+          }
         }
         else
         {
