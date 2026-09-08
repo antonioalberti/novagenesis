@@ -344,11 +344,16 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
 #endif
 
                     // SPEC033B3DIAG (temporary): log every executed action LN
-                    static time_t lastActDiag = 0;
-                    if (time(nullptr) - lastActDiag >= 5)
+                    // (Astra: rate-limiter shared across CLs can hide the payload CL —
+                    // use an unconditional counter instead, print per-LN counts at exit)
+                    static std::map<string, unsigned long long> ActCounts;
+                    ActCounts[LN1]++;
+                    if (LN1.find("--periodic") != string::npos ||
+                        LN1.find("--hello") != string::npos)
                     {
-                      lastActDiag = time(nullptr);
-                      std::cerr << "[SPEC033B3DIAG] Action executing: " << LN1 << std::endl;
+                      // UNTHROTTLED: bootstrap-critical actions must never be hidden
+                      std::cerr << "[SPEC033B3DIAG] Bootstrap-critical action executing: "
+                                << LN1 << " (total=" << ActCounts[LN1] << ")" << std::endl;
                     }
 
                     // Call the action

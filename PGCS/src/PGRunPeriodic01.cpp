@@ -75,6 +75,11 @@ int PGRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   vector<string> Sources;
   vector<string> Destinations;
 
+  // SPEC033B3DIAG (temporary, Astra): UNCONDITIONAL entry counter — proves/disproves execution
+  static unsigned long long PeriodicRunCount = 0;
+  PeriodicRunCount++;
+  std::cerr << "[SPEC033B3DIAG] PGRunPeriodic01::Run ENTERED count=" << PeriodicRunCount << std::endl;
+
   PPG = (PG*)PB;
 
 #ifdef DEBUG

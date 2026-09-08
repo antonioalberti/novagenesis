@@ -239,6 +239,10 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
       else
       {
         PB->S << Offset << "(ERROR: Unable to get the forwarding binding from destination block)" << endl;
+
+        // SPEC033B3DIAG (temporary, Astra): binding-failure trace (unthrottled)
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=FAIL binding-lookup-failed destCount="
+                  << ReceivedMessageDestinations.size() << std::endl;
       }
     }
     else
@@ -298,6 +302,10 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 #ifdef DEBUG
         PB->S << Offset << "(Forwarding: The destination is a block inside this process)" << endl;
 #endif
+        // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=LOCAL dest[last-2]="
+                  << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
+                  << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
         Status = ForwardMessageInsideProcess(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
 
@@ -315,6 +323,11 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 #ifdef DEBUG
         PB->S << Offset << "(Forwarding: The destination is a block outside this process)" << endl;
 #endif
+
+        // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=REMOTE dest[last-2]="
+                  << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
+                  << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
         // Stop processing the other command lines of the message. The destination is another block outside this process
         PB->StopProcessingMessage = true;
