@@ -178,6 +178,20 @@ private:
   // free (erase or delete). Handles capture it at issue time.
   unsigned int SlotsGeneration[MAX_MESSAGES_IN_MEMORY];
 
+  // ── SPEC-033 Phase B (Astra review, finding 1): SHARED slot bookkeeping ──
+  // Both the legacy pointer API and the handle API delegate here, so there is
+  // exactly ONE allocator/reclaimer. No path may touch Messages[]/Controls[]/
+  // FreeList[]/NoM directly outside these two functions and the constructor.
+  // AllocSlot: pops the free-list (O(1)), installs PM, bumps NoM. Returns the
+  // slot index (>= 0), or -1 on exhaustion (leaves the free-list unchanged).
+  // NOTE: -1, NOT ERROR (=1): 1 is a valid slot index.
+  int AllocSlot(Message* _PM);
+
+  // FreeSlot: bumps the slot generation (stale handles die here), returns the
+  // slot to the free-list (O(1)), decrements NoM. O(index) precondition: the
+  // slot is BUSY and _PM is its message.
+  void FreeSlot(unsigned int _Index);
+
   // Counter on the number of message stored in memory
   unsigned int NoM;
 

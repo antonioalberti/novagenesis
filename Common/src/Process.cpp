@@ -240,6 +240,52 @@ Process::Process(string _LN, key_t _Key, string _Path)
   // NewBlock("CLI",PB1);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SPEC-033 Phase B (Astra review, finding 1): shared slot bookkeeping.
+// The single allocator/reclaimer behind BOTH the legacy pointer API and the
+// handle API. Every successful destruction bumps the generation, updates NoM
+// and returns the slot exactly once, regardless of which API initiated it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Pop the free-list (O(1)), install PM, bump NoM. Returns -1 on exhaustion.
+int Process::AllocSlot(Message* _PM)
+{
+  if (NoFreeSlots == 0)
+  {
+    return -1;
+  }
+
+  unsigned int i = FreeList[--NoFreeSlots];
+
+  Messages[i] = _PM;
+
+  Controls[i] = BUSY;
+
+  NoM++;
+
+  return (int)i;
+}
+
+// Bump the slot generation (stale handles die here), return the slot to the
+// free-list (O(1)), decrement NoM.
+void Process::FreeSlot(unsigned int _Index)
+{
+  if (_Index >= MAX_MESSAGES_IN_MEMORY)
+  {
+    return;
+  }
+
+  Messages[_Index] = NULL;
+
+  Controls[_Index] = FREE;
+
+  SlotsGeneration[_Index]++;
+
+  FreeList[NoFreeSlots++] = _Index;
+
+  NoM--;
+}
+
 Process::~Process()
 {
   cout << "Deleting " << LN << endl;
@@ -555,34 +601,30 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, Message*& M
   // C2 fix (SPEC-033): always define the output, even when the container is full.
   M = NULL;
 
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
+  Message* PM = new Message(_Time, _Type, _HasPayload);
+
+  int Slot = AllocSlot(PM);
+
+  if (Slot >= 0)
   {
-    if (Controls[i] == FREE)
-    {
-      Message* PM = new Message(_Time, _Type, _HasPayload);
+    PM->InstantiationNumber = MessageCounter;
 
-      M = PM;
+    MessageCounter++;
 
-      PM->InstantiationNumber = MessageCounter;
+    M = PM;
 
-      MessageCounter++;
-
-      NoM++;
-
-      Messages[i] = PM;
-
-      Controls[i] = BUSY;
-
-      Status = OK;
+    Status = OK;
 
 #ifdef DEBUG
-      cout << "          (Creating a message at " << GetLegibleName() << " with instantiation number " << PM->InstantiationNumber << ". Number of messages is " << NoM << ")" << endl;
+    cout << "          (Creating a message at " << GetLegibleName() << " with instantiation number " << PM->InstantiationNumber << ". Number of messages is " << NoM << ")" << endl;
 
-      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
+    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
 #endif
-
-      break;
-    }
+  }
+  else
+  {
+    delete PM; // exhausted: do not leak
   }
 
   return Status;
@@ -595,34 +637,28 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, string _Hea
 
   M = NULL;
 
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
+  Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _Path);
+
+  int Slot = AllocSlot(PM);
+
+  if (Slot >= 0)
   {
-    if (Controls[i] == FREE)
-    {
-      Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _Path);
+    PM->InstantiationNumber = MessageCounter;
 
-      M = PM;
+    MessageCounter++;
 
-      PM->InstantiationNumber = MessageCounter;
+    M = PM;
 
-      MessageCounter++;
-
-      NoM++;
-
-      Messages[i] = PM;
-
-      Controls[i] = BUSY;
+    Status = OK;
 
 #ifdef DEBUG
-
-      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
-
+    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
 #endif
-
-      Status = OK;
-
-      break;
-    }
+  }
+  else
+  {
+    delete PM; // exhausted: do not leak
   }
 
   return Status;
@@ -635,34 +671,28 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, string _Hea
 
   M = NULL;
 
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
+  Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _PayloadFileName, _MessageFileName, _Path);
+
+  int Slot = AllocSlot(PM);
+
+  if (Slot >= 0)
   {
-    if (Controls[i] == FREE)
-    {
-      Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _PayloadFileName, _MessageFileName, _Path);
+    PM->InstantiationNumber = MessageCounter;
 
-      M = PM;
+    MessageCounter++;
 
-      PM->InstantiationNumber = MessageCounter;
+    M = PM;
 
-      MessageCounter++;
-
-      NoM++;
-
-      Messages[i] = PM;
-
-      Controls[i] = BUSY;
+    Status = OK;
 
 #ifdef DEBUG
-
-      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
-
+    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
 #endif
-
-      Status = OK;
-
-      break;
-    }
+  }
+  else
+  {
+    delete PM; // exhausted: do not leak
   }
 
   return Status;
@@ -674,37 +704,29 @@ int Process::NewMessage(Message* _Original, Message*& M)
 
   M = NULL;
 
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
+  Message* PM = new Message(*_Original);
+
+  int Slot = AllocSlot(PM);
+
+  if (Slot >= 0)
   {
-    if (Controls[i] == FREE)
-    {
-      Message* PM = new Message(*_Original);
+    PM->InstantiationNumber = MessageCounter;
 
-      M = PM;
+    MessageCounter++;
 
-      PM->InstantiationNumber = MessageCounter;
+    M = PM;
 
-      MessageCounter++;
-
-      NoM++;
-
-      Messages[i] = PM;
-
-      Controls[i] = BUSY;
+    Status = OK;
 
 #ifdef DEBUG
-
-      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
-
+    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
 #endif
-
-      Status = OK;
-
-      break;
-    }
   }
-
-  // S <<"          (Creating a message at block "<<GetLegibleName()<<" with instantiation number " <<PM->InstantiationNumber<< ". Number of messages is "<<NoM<<")" << endl;
+  else
+  {
+    delete PM; // exhausted: do not leak
+  }
 
   return Status;
 }
@@ -733,6 +755,8 @@ int Process::EraseMessage(Message* M)
 {
   int Status = OK;
 
+  bool Found = false;
+
   // SPEC-033 (Astra finding 3): guard against a null pointer — previously a
   // null M matched an empty slot and wrongly decremented NoM.
   if (M == NULL)
@@ -744,11 +768,10 @@ int Process::EraseMessage(Message* M)
   {
     if (Messages[i] == M)
     {
-      Messages[i] = NULL;
+      // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+      FreeSlot(i);
 
-      Controls[i] = FREE;
-
-      NoM--;
+      Found = true;
 
 #ifdef DEBUG
 
@@ -760,7 +783,7 @@ int Process::EraseMessage(Message* M)
     }
   }
 
-  return Status;
+  return Found == true ? OK : ERROR;
 }
 
 // Tests if a message is ok
@@ -814,11 +837,8 @@ int Process::DeleteMessage(Message* M)
       {
         delete M;
 
-        Messages[i] = NULL;
-
-        Controls[i] = FREE;
-
-        NoM--;
+        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+        FreeSlot(i);
 
         Deleted = true;
 
@@ -899,29 +919,26 @@ int Process::NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHa
   // Always define the output, even on exhaustion.
   _H = MsgHandle();
 
-  if (NoFreeSlots == 0)
-  {
-    return Status;
-  }
-
-  unsigned int i = FreeList[--NoFreeSlots];
-
+  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
   Message* PM = new Message(_Time, _Type, _HasPayload);
 
-  PM->InstantiationNumber = MessageCounter;
+  int Slot = AllocSlot(PM);
 
-  MessageCounter++;
+  if (Slot >= 0)
+  {
+    PM->InstantiationNumber = MessageCounter;
 
-  NoM++;
+    MessageCounter++;
 
-  Messages[i] = PM;
+    _H.Slot = (unsigned int)Slot;
+    _H.Generation = SlotsGeneration[Slot];
 
-  Controls[i] = BUSY;
-
-  _H.Slot = i;
-  _H.Generation = SlotsGeneration[i];
-
-  Status = OK;
+    Status = OK;
+  }
+  else
+  {
+    delete PM; // exhausted: do not leak
+  }
 
   return Status;
 }
@@ -934,17 +951,8 @@ int Process::EraseMessageHandle(const MsgHandle& _H)
     return ERROR;
   }
 
-  unsigned int i = _H.Slot;
-
-  Messages[i] = NULL;
-
-  Controls[i] = FREE;
-
-  SlotsGeneration[i]++;
-
-  FreeList[NoFreeSlots++] = i;
-
-  NoM--;
+  // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+  FreeSlot(_H.Slot);
 
   return OK;
 }
@@ -1002,11 +1010,8 @@ void Process::DeleteMessages()
 
         delete Temp;
 
-        Messages[i] = NULL;
-
-        Controls[i] = FREE;
-
-        NoM--;
+        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+        FreeSlot(i);
       }
     }
   }
@@ -1040,11 +1045,8 @@ void Process::DeleteMarkedMessages()
 
         delete Temp;
 
-        Messages[i] = NULL;
-
-        Controls[i] = FREE; // Frees the position
-
-        NoM--;
+        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+        FreeSlot(i);
       }
 #ifdef DEBUG
       else
