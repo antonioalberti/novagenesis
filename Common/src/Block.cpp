@@ -295,6 +295,13 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
 
         CLStatus.resize(NCL, ERROR);
 
+        // SPEC033B3DIAG (temporary, Astra): pre-loop state (unthrottled)
+        std::cerr << "[SPEC033B3DIAG] PRELOOP blk=" << GetLegibleName()
+                  << " inst=" << _ReceivedMessage->InstantiationNumber
+                  << " NCL=" << NCL << " stop=" << StopProcessingMessage
+                  << " adopted=" << _AdoptOwned << std::endl;
+
+
         // Vector of indexes to the block Messages container
         vector<Message*> ScheduledMessages;
 
