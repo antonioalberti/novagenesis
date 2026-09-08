@@ -90,6 +90,12 @@ NR::NR(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string
   DelayBeforeRunExposition = 2;
   DelayBeforeSendingToGIRS = 0.001;
   DelayBeforeSendingANotification = 0.03;
+  // SPEC-033 B-3 FIX: DelayBeforeRunPeriodic was never initialized here — with
+  // no NRNCS.ini (wiped during cache cleanup) it stayed uninitialized, and
+  // NRRunPeriodic01 rescheduled at +garbage (immediate), flooding the GW queue
+  // with 180k+ messages and starving the whole VM102 process. Default 5s,
+  // matching the PGCS default; NRNCS.ini can override.
+  DelayBeforeRunPeriodic = 5;
 
   MarkForDeletion = false;
 

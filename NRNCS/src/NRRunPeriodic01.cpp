@@ -107,6 +107,16 @@ int NRRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   // Setting up the block SCN as the destination SCN
   Destinations.push_back(PB->GetSelfCertifyingName());
 
+  // SPEC-033 B-3 fail-fast: a non-positive delay means an uninitialized
+  // parameter (see NR.cpp constructor fix) — clamp to 5s instead of flooding
+  // the GW queue with immediate self-rescheduling messages.
+  if (PNR->DelayBeforeRunPeriodic <= 0)
+  {
+    std::cerr << "[SPEC033B3DIAG] WARNING: NRNCS DelayBeforeRunPeriodic <= 0 ("
+              << PNR->DelayBeforeRunPeriodic << ") — clamping to 5s" << std::endl;
+    PNR->DelayBeforeRunPeriodic = 5;
+  }
+
   // Creating a new message
   PB->PP->NewMessage(GetTime() + PNR->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
 
