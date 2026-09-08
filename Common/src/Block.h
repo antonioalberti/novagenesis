@@ -48,6 +48,10 @@
 #include "Message.h"
 #endif
 
+#ifndef _MSGHANDLE_H
+#include "MsgHandle.h"
+#endif
+
 #ifndef _PROMPT_IOSTREAM_H
 #include "Prompt_iostream.h"
 #endif
@@ -130,6 +134,24 @@ public:
 
   // Run the actions behind a received message
   virtual int Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage);
+
+  // SPEC-033 Phase B gate 2 (Astra): entry with an ALREADY-OWNED retention.
+  // The caller (GW pop path, B-3) holds a retention acquired from the queue
+  // entry's original handle — identity guaranteed without pointer lookup.
+  // This overload adopts that retention (does NOT add a second count) and
+  // releases it at the single exit point. _RunHandle must be the handle the
+  // retention was taken on; _ReceivedMessage must equal ResolveMessage
+  // (_RunHandle).
+  virtual int Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle);
+
+private:
+  // SPEC-033 Phase B gate 2: shared core behind both Run overloads.
+  // _AdoptOwned == true -> adopt the caller's existing retention (queued
+  // path, identity from the handle); false -> acquire via FindHandle +
+  // TryRetain (legacy pointer path).
+  int Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle, bool _AdoptOwned);
+
+public:
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Basic functions

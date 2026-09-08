@@ -268,11 +268,24 @@ int Process::AllocSlot(Message* _PM)
 
 // Bump the slot generation (stale handles die here), return the slot to the
 // free-list (O(1)), decrement NoM.
-void Process::FreeSlot(unsigned int _Index)
+// Bump the slot generation, return the slot to the free-list, decrement NoM.
+// SPEC-033 Phase B gate 1 (Astra): the COMMON reclaim boundary. Refuses with
+// ERROR while the message is retained — callers (all deletion/erase paths)
+// treat this as "deferred", not "failed fatally". Callers must already hold
+// LifecycleMutex (DeleteMessage/DeleteMarkedMessages do; the destructor path
+// via DeleteMessages is single-threaded at shutdown).
+int Process::FreeSlot(unsigned int _Index)
 {
   if (_Index >= MAX_MESSAGES_IN_MEMORY)
   {
-    return;
+    return ERROR;
+  }
+
+  // Gate 1: universal retention-aware reclamation. No destruction path may
+  // free a slot while any retention is active.
+  if (Messages[_Index] != NULL && Messages[_Index]->Retentions > 0)
+  {
+    return ERROR; // deferred: reclaimed on a later pass after Release
   }
 
   Messages[_Index] = NULL;
@@ -284,6 +297,8 @@ void Process::FreeSlot(unsigned int _Index)
   FreeList[NoFreeSlots++] = _Index;
 
   NoM--;
+
+  return OK;
 }
 
 Process::~Process()
@@ -768,8 +783,11 @@ int Process::EraseMessage(Message* M)
   {
     if (Messages[i] == M)
     {
-      // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-      FreeSlot(i);
+      // SPEC-033 Phase B gate 1: the common reclaim boundary refuses while
+      // retained; surface that as ERROR (deferred), not silent success.
+      std::lock_guard<std::mutex> Lock(LifecycleMutex);
+
+      Status = FreeSlot(i);
 
       Found = true;
 
@@ -1075,34 +1093,42 @@ void Process::DeleteMessages()
        << "(------------------------- Deleting messages in memory -------------------------)" << endl;
 #endif
 
+  // SPEC-033 Phase B: destructor path = post-quiesce shutdown (Astra gate:
+  // retention may be overridden ONLY here). Clear all retentions first, then
+  // reclaim everything regardless of delete flags.
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  {
+    if (Controls[i] == BUSY && Messages[i] != NULL)
+    {
+      Messages[i]->Retentions = 0;
+    }
+  }
+
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Controls[i] == BUSY) // Only the occupied positions
     {
       Message* Temp = Messages[i];
 
-      // SPEC-033 Phase B (D3): retained messages survive this pass.
+      // SPEC-033 Phase B (D3): retained messages survive this pass — but the
+      // pre-pass above zeroed retentions for this shutdown path.
       if (Temp->Retentions > 0)
       {
         continue;
       }
 
-      if (Temp->GetDeleteFlag() == true)
-      {
-
 #ifdef DEBUG
-        cout << "(The following message with index " << i << " will be deleted.)" << endl;
+      cout << "(The following message with index " << i << " will be deleted.)" << endl;
 
-        cout << "(" << endl
-             << *Messages[i] << ")" << endl
-             << endl;
+      cout << "(" << endl
+           << *Messages[i] << ")" << endl
+           << endl;
 #endif
 
-        delete Temp;
+      delete Temp;
 
-        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-        FreeSlot(i);
-      }
+      // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
+      FreeSlot(i);
     }
   }
 }

@@ -138,8 +138,31 @@ unsigned int Block::GetIndex()
   return Index;
 }
 
-// Run the actions behind a received message, generating a resulting message
+// Run the actions behind a received message
 int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
+{
+  // SPEC-033 Phase B gate 2 (Astra): legacy pointer entry. The caller must
+  // provide the lifetime guarantee itself (OkToRun historically covered this
+  // only for pointers still resident in the container). Retention is acquired
+  // here via FindHandle — acceptable for non-queued entry paths (CLI, IPC
+  // inline, HT list-bindings) where the caller just created the message.
+  MsgHandle EntryHandle;
+
+  return Run(_ReceivedMessage, _InlineResponseMessage, EntryHandle, false);
+}
+
+// Entry with an ALREADY-OWNED retention (queued path, B-3): adopt the
+// caller's count instead of adding a second one.
+int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle)
+{
+  return Run(_ReceivedMessage, _InlineResponseMessage, _RunHandle, true);
+}
+
+// Shared core. _AdoptOwned == true: _RunHandle already carries a retention
+// taken on the ORIGINAL queued handle (identity guaranteed by the queue's
+// own retention, not by pointer lookup). _AdoptOwned == false: acquire the
+// retention here via FindHandle + TryRetain.
+int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle, bool _AdoptOwned)
 {
   int Status = ERROR;           // Overall execution status
   vector<int> CLStatus;         // Status of every command line action
@@ -153,7 +176,7 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
 
   // SPEC-033 Phase B (D3): Run retention. Declared at function scope so the
   // single release point at the end can see it from every nested path.
-  Process::MsgHandle RunHandle;
+  MsgHandle RunHandle;
 
   bool RunRetained = false;
 
@@ -181,21 +204,48 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
   // Call the corresponding actions to perform the processing
   // ***********************************************************************
 
-  if (PP->OkToRun(_ReceivedMessage) == true)
+  // SPEC-033 Phase B gate 2 (Astra): identity comes from the HANDLE, not the
+  // pointer. Adopt path: validate the handle FIRST (under the lifecycle
+  // mutex, via TryRetain-less resolve) — OkToRun dereferences, so it runs
+  // only after the message is confirmed and retained.
+  if (_AdoptOwned == true)
   {
-    // SPEC-033 Phase B (D3): acquire the Run retention atomically with the
-    // handle validation. From here to Release(), no reclamation pass can
-    // destroy the message, even if an Action marks it to delete.
-    if (PP->FindHandle(_ReceivedMessage, RunHandle) != OK || PP->TryRetain(RunHandle) == NULL)
+    RunHandle = _RunHandle;
+
+    // Adopt: the caller's retention IS ours now (count unchanged). Verify
+    // the handle still resolves — if not, the caller handed us a stale
+    // retention, which is a contract violation on their side (they should
+    // never have gotten here with a dead handle while holding a count).
+    if (PP->ResolveMessage(RunHandle) == NULL)
     {
-      // The message vanished between the OkToRun scan and the retention —
-      // do not touch it (T2 semantics).
-      S << "(ERROR: Unable to retain the received message for Run)" << endl;
+      S << "(ERROR: Adopted Run handle does not resolve — caller-side retention contract violated)" << endl;
 
       return ERROR;
     }
 
+    // OkToRun is now safe: the message is alive and the caller's count
+    // protects it for the duration of this Run.
     RunRetained = true;
+  }
+
+  if (PP->OkToRun(_ReceivedMessage) == true)
+  {
+    if (_AdoptOwned == false)
+    {
+      // SPEC-033 Phase B (D3): acquire the Run retention atomically with the
+      // handle validation. From here to Release(), no reclamation pass can
+      // destroy the message, even if an Action marks it to delete.
+      if (PP->FindHandle(_ReceivedMessage, RunHandle) != OK || PP->TryRetain(RunHandle) == NULL)
+      {
+        // The message vanished between the OkToRun scan and the retention —
+        // do not touch it (T2 semantics).
+        S << "(ERROR: Unable to retain the received message for Run)" << endl;
+
+        return ERROR;
+      }
+
+      RunRetained = true;
+    }
     // SPEC-003: Moved DEBUGX and message dump AFTER OkToRun check.
     // Previously, these accessed _ReceivedMessage before verifying it
     // is still in Process::Messages[], causing use-after-free SIGSEGV

@@ -32,6 +32,10 @@
 #include <iostream>
 #endif
 
+#ifndef _MSGHANDLE_H
+#include "MsgHandle.h"
+#endif
+
 #ifndef _VECTOR_H
 #include <vector>
 #endif
@@ -151,24 +155,7 @@ private:
   // slot. A handle {Slot, Generation} resolves ONLY while the slot still
   // holds the message the caller saw (generation match) — stale handles
   // resolve to NULL instead of a recycled-slot message (ABA prevention).
-  struct MsgHandle
-  {
-    unsigned int Slot;
-    unsigned int Generation;
-
-    MsgHandle() : Slot(0xFFFFFFFFu), Generation(0) {}
-    bool Valid() const { return Slot != 0xFFFFFFFFu; }
-  };
-
-  // Queue entry carrying COPIED sort keys: the GW priority queues sort by
-  // (Time, Tag) from the entry — the comparator never dereferences the
-  // Message (the UAF class that SPEC-032 exposed).
-  struct QEntry
-  {
-    double Time;
-    unsigned int Tag;
-    MsgHandle H;
-  };
+  // MsgHandle/QEntry structs live in MsgHandle.h (shared with Block/GW).
 
   // Free-list of slot indices. Capacity == MAX_MESSAGES_IN_MEMORY, so it
   // never grows. LIFO pop hands out the lowest free index first (same
@@ -191,10 +178,11 @@ private:
   // NOTE: -1, NOT ERROR (=1): 1 is a valid slot index.
   int AllocSlot(Message* _PM);
 
-  // FreeSlot: bumps the slot generation (stale handles die here), returns the
-  // slot to the free-list (O(1)), decrements NoM. O(index) precondition: the
-  // slot is BUSY and _PM is its message.
-  void FreeSlot(unsigned int _Index);
+  // FreeSlot: the COMMON reclaim boundary — refuses (ERROR) while the slot's
+  // message is retained (Retentions > 0), else bumps the generation, returns
+  // the slot to the free-list (O(1)), decrements NoM. Caller holds
+  // LifecycleMutex. Returns OK or ERROR (deferred reclamation).
+  int FreeSlot(unsigned int _Index);
 
   // ── SPEC-033 Phase B (Astra review D3): lifecycle mutex + retention ──────
   // Guards slot bookkeeping, generation validation, retention acquire/release
