@@ -116,7 +116,8 @@ int HTStoreBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
                   // post-store verification (does the entry actually exist now?)
                   std::vector<string>* _dbgVerify = new std::vector<string>();
                   int _dbgGet = PB->PP->GetHTBindingValues(Category, Key, _dbgVerify);
-                  std::cerr << "[SPEC033B3DIAG] HT STORE cat=" << Category << " key=" << Key
+                  std::cerr << "[SPEC033B3DIAG] HT STORE blk=" << PB->GetLegibleName()
+                            << " cat=" << Category << " key=" << Key
                             << " values=" << PArguments.size()
                             << " store-status=" << Status
                             << " post-verify=" << (_dbgGet == OK ? "FOUND" : "ABSENT")

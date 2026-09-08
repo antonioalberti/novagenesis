@@ -241,7 +241,7 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
         PB->S << Offset << "(ERROR: Unable to get the forwarding binding from destination block)" << endl;
 
         // SPEC033B3DIAG (temporary, Astra): binding-failure trace (unthrottled) with lookup identity
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=FAIL binding-lookup-failed destCount="
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=FAIL binding-lookup-failed destCount="
                   << ReceivedMessageDestinations.size()
                   << " cat=" << Category << " key=" << Key
                   << " isfinite-key=" << (Key.empty() ? "EMPTY" : "OK") << std::endl;
@@ -305,7 +305,7 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
         PB->S << Offset << "(Forwarding: The destination is a block inside this process)" << endl;
 #endif
         // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=LOCAL dest[last-2]="
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=LOCAL dest[last-2]="
                   << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
                   << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
@@ -327,7 +327,7 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 #endif
 
         // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 route=REMOTE dest[last-2]="
+        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=REMOTE dest[last-2]="
                   << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
                   << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
