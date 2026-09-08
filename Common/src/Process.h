@@ -142,6 +142,42 @@ private:
   // Auxiliary container to control access to Messages container
   bool Controls[MAX_MESSAGES_IN_MEMORY];
 
+  // ── SPEC-033 Phase B: slot container + generational handles ──────────────
+  // Slots parallel the Messages array: same index space, one generation per
+  // slot. A handle {Slot, Generation} resolves ONLY while the slot still
+  // holds the message the caller saw (generation match) — stale handles
+  // resolve to NULL instead of a recycled-slot message (ABA prevention).
+  struct MsgHandle
+  {
+    unsigned int Slot;
+    unsigned int Generation;
+
+    MsgHandle() : Slot(0xFFFFFFFFu), Generation(0) {}
+    bool Valid() const { return Slot != 0xFFFFFFFFu; }
+  };
+
+  // Queue entry carrying COPIED sort keys: the GW priority queues sort by
+  // (Time, Tag) from the entry — the comparator never dereferences the
+  // Message (the UAF class that SPEC-032 exposed).
+  struct QEntry
+  {
+    double Time;
+    unsigned int Tag;
+    MsgHandle H;
+  };
+
+  // Free-list of slot indices. Capacity == MAX_MESSAGES_IN_MEMORY, so it
+  // never grows. LIFO pop hands out the lowest free index first (same
+  // allocation order the old linear scan produced).
+  unsigned int FreeList[MAX_MESSAGES_IN_MEMORY];
+
+  // Number of free slots on the free-list.
+  unsigned int NoFreeSlots;
+
+  // Per-slot generation counter, bumped every time the slot transitions to
+  // free (erase or delete). Handles capture it at issue time.
+  unsigned int SlotsGeneration[MAX_MESSAGES_IN_MEMORY];
+
   // Counter on the number of message stored in memory
   unsigned int NoM;
 
@@ -287,6 +323,17 @@ public:
 
   // Get a Message
   int GetMessage(unsigned int _Index, Message*& M);
+
+  // ── SPEC-033 Phase B: handle-based API ────────────────────────────────────
+  // Allocate + insert; returns a generational handle. O(1).
+  int NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHandle& _H);
+
+  // Resolve a handle to the live message, or NULL. O(1). Never returns a
+  // recycled-slot message: stale generation -> NULL.
+  Message* ResolveMessage(const MsgHandle& _H);
+
+  // Erase (container-side, no destruction) by handle. O(1).
+  int EraseMessageHandle(const MsgHandle& _H);
 
   // Delete a Message
   int HasMessage(Message* M, bool& _Answer);

@@ -79,6 +79,15 @@ Process::Process(string _LN, key_t _Key, string _Path)
 
   NoM = 0;
 
+  // SPEC-033 Phase B: initialise the free-list (descending fill so a LIFO
+  // pop hands out index 0 first, matching the old linear-scan order).
+  NoFreeSlots = MAX_MESSAGES_IN_MEMORY;
+
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  {
+    FreeList[i] = MAX_MESSAGES_IN_MEMORY - 1 - i;
+  }
+
   InstantiationTime = GetTime();
 
   PMB = new MessageBuilder(this);
@@ -849,6 +858,95 @@ Message* Process::GetMessage(unsigned int _Index)
   }
 
   return Temp;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SPEC-033 Phase B: handle-based message container API
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Resolve a handle to its message, or NULL if the slot was freed/reused.
+Message* Process::ResolveMessage(const MsgHandle& _H)
+{
+  if (_H.Valid() == false || _H.Slot >= MAX_MESSAGES_IN_MEMORY)
+  {
+    return NULL;
+  }
+
+  const unsigned int Index = _H.Slot;
+
+  if (Messages[Index] == NULL || Controls[Index] != BUSY)
+  {
+    return NULL;
+  }
+
+  // Generational check: the slot's generation must match the one captured
+  // when the handle was issued. A mismatch means the slot was freed and
+  // reused after this handle was taken — returning the current message
+  // would be the ABA bug this mechanism exists to prevent.
+  if (_H.Generation != SlotsGeneration[Index])
+  {
+    return NULL;
+  }
+
+  return Messages[Index];
+}
+
+// Allocate + insert, O(1) via free-list. Returns a generational handle.
+int Process::NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHandle& _H)
+{
+  int Status = ERROR;
+
+  // Always define the output, even on exhaustion.
+  _H = MsgHandle();
+
+  if (NoFreeSlots == 0)
+  {
+    return Status;
+  }
+
+  unsigned int i = FreeList[--NoFreeSlots];
+
+  Message* PM = new Message(_Time, _Type, _HasPayload);
+
+  PM->InstantiationNumber = MessageCounter;
+
+  MessageCounter++;
+
+  NoM++;
+
+  Messages[i] = PM;
+
+  Controls[i] = BUSY;
+
+  _H.Slot = i;
+  _H.Generation = SlotsGeneration[i];
+
+  Status = OK;
+
+  return Status;
+}
+
+// Erase (container-side, no destruction) by handle. O(1). Bumps generation.
+int Process::EraseMessageHandle(const MsgHandle& _H)
+{
+  if (ResolveMessage(_H) == NULL)
+  {
+    return ERROR;
+  }
+
+  unsigned int i = _H.Slot;
+
+  Messages[i] = NULL;
+
+  Controls[i] = FREE;
+
+  SlotsGeneration[i]++;
+
+  FreeList[NoFreeSlots++] = i;
+
+  NoM--;
+
+  return OK;
 }
 
 void Process::ShowMessages()
