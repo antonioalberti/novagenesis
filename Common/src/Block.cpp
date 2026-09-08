@@ -300,6 +300,20 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
 
         while (i < NCL && StopProcessingMessage == false)
         {
+          // SPEC033B3DIAG (temporary, Astra): trace every CL iteration (unthrottled, first 10 per message)
+          if (i < 10)
+          {
+            CommandLine* _dbgPCL = 0;
+            string _dbgName = "?", _dbgAlt = "?";
+            if (_ReceivedMessage->GetCommandLine(i, _dbgPCL) == OK && _dbgPCL != 0)
+            {
+              _dbgName = _dbgPCL->Name;
+              _dbgAlt = _dbgPCL->Alternative;
+            }
+            std::cerr << "[SPEC033B3DIAG] CL[" << i << "/" << NCL << "] name=" << _dbgName
+                      << " alt=" << _dbgAlt << " stop=" << StopProcessingMessage << std::endl;
+          }
+
           if (_ReceivedMessage->GetCommandLine(i, PCL) == OK)
           {
             if (PCL != 0)
