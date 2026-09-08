@@ -752,6 +752,14 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
   // Load the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
   {
+    // SPEC033B3DIAG (temporary, Astra): entry trace with limiter identity (unthrottled)
+    {
+      vector<string> _dbgLim;
+      _PCL->GetArgument(0, _dbgLim);
+      std::cerr << "[SPEC033B3DIAG] GWMsgCl01 ENTRY blk=" << PB->GetLegibleName()
+                << " limiter=" << (_dbgLim.empty() ? "NONE" : _dbgLim.at(0)) << std::endl;
+    }
+
     // Check the number of argument
     if (NA == 3)
     {
