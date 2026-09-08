@@ -310,7 +310,7 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
               _dbgName = _dbgPCL->Name;
               _dbgAlt = _dbgPCL->Alternative;
             }
-            std::cerr << "[SPEC033B3DIAG] CL[" << i << "/" << NCL << "] name=" << _dbgName
+            std::cerr << "[SPEC033B3DIAG] blk=" << GetLegibleName() << " CL[" << i << "/" << NCL << "] name=" << _dbgName
                       << " alt=" << _dbgAlt << " stop=" << StopProcessingMessage << std::endl;
           }
 
