@@ -35,6 +35,12 @@
 
 #ifndef _GWMSGCL01_H
 #include "GWMsgCl01.h"
+
+// SPEC033B3DIAG (temporary, Astra review): cumulative queue mutation accounting (file-scope:
+// PushToInputQueue and Gateway are different member functions sharing one InputQueue)
+static unsigned long long pushTotal = 0, popTotal = 0, popDueTotal = 0, resolveFailTotal = 0;
+static MsgHandle lastPoppedHandle;
+static double lastPoppedEntryTime = 0.0, lastPoppedNow = 0.0;
 #endif
 
 #ifndef _GWRUNINITIALIZATION01_H
@@ -259,6 +265,14 @@ void GW::PushToInputQueue(Message* M)
         QE.Time = M->GetTime();
         QE.Tag = InputQueueTag;
         QE.H = QH;
+
+        // SPEC033B3DIAG: cumulative accounting at push (Astra: instrument every insertion)
+        pushTotal++;
+        if (!std::isfinite(QE.Time))
+        {
+          std::cerr << "[SPEC033B3DIAG] NON-FINITE Time at enqueue: " << QE.Time
+                    << " slot=" << QE.H.Slot << " gen=" << QE.H.Generation << std::endl;
+        }
 
         // SPEC-032: assign tag + push + detect empty->nonempty under ONE lock;
         // exactly one notify per transition, outside the lock.
@@ -575,6 +589,12 @@ void GW::Gateway()
           InputQueue.pop();
           batch[batchCount++] = due; // queue retention transfers to the batch
           RunFlag = true;
+          // SPEC033B3DIAG: cumulative accounting at every actual removal
+          popTotal++;
+          popDueTotal++;
+          lastPoppedHandle = due.H;
+          lastPoppedEntryTime = due.Time;
+          lastPoppedNow = Time;
         }
         else
         {
@@ -796,7 +816,14 @@ void GW::Gateway()
              << " queued=" << queued
              << " topTime=" << topTime
              << " inMem=" << PP->GetNumberOfMessages()
-             << " duePopped=" << (diagBatchCount) << endl;
+             << " duePopped=" << (diagBatchCount)
+             << " | pushTot=" << pushTotal
+             << " popTot=" << popTotal
+             << " popDue=" << popDueTotal
+             << " rslvFail=" << resolveFailTotal
+             << " lastPop=" << lastPoppedEntryTime << "@" << lastPoppedNow
+             << " h=" << lastPoppedHandle.Slot << ":" << lastPoppedHandle.Generation
+             << endl;
         diagRunCalls = 0;
       }
     }
