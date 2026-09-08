@@ -724,7 +724,13 @@ void GW::Gateway()
       PP->DeleteMarkedMessages();
 
       PM1 = NULL;
-      RunFlag = false;
+      // SPEC-033 B-3 FIX: RunFlag is the BATCH flag ("the batch popped at least
+      // one due message"), set once before this loop. Resetting it here — the
+      // pre-B-3 code did — silently skipped every batch element after the
+      // first: the second bootstrap StoringInitialBinds never ran, the PG
+      // block binding was never stored, and the whole periodic/hello/discovery
+      // chain died at startup. Batch elements must not gate on a flag that a
+      // sibling element just cleared.
     }
     else if (RunFlag == true)
     {
