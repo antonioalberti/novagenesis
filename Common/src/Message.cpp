@@ -65,6 +65,8 @@ Message::Message(double _Time, short _Type, bool _HasPayload)
 
   InstantiationNumber = 0;
 
+  Retentions = 0;
+
   NoCL = 0;
   CommandLines = NULL;
 }
@@ -102,6 +104,8 @@ Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFile
   ApplicationDeleted = DELETED_BY_CORE;
 
   InstantiationNumber = 0;
+
+  Retentions = 0;
 
   NoCL = 0;
   CommandLines = NULL;
@@ -146,6 +150,8 @@ Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFile
   ApplicationDeleted = DELETED_BY_CORE;
 
   InstantiationNumber = 0;
+
+  Retentions = 0;
 
   NoCL = 0;
   CommandLines = NULL;
@@ -234,6 +240,8 @@ Message::Message(const Message& M)
   DeletePayloadArray = M.DeletePayloadArray;
 
   InstantiationNumber = 0;
+
+  Retentions = 0;
 }
 
 Message::~Message()

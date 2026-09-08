@@ -36,6 +36,10 @@
 #include <vector>
 #endif
 
+#ifndef _MUTEX_HH
+#include <mutex>
+#endif
+
 #ifndef _QUEUE_H
 #include <queue>
 #endif
@@ -192,6 +196,22 @@ private:
   // slot is BUSY and _PM is its message.
   void FreeSlot(unsigned int _Index);
 
+  // ── SPEC-033 Phase B (Astra review D3): lifecycle mutex + retention ──────
+  // Guards slot bookkeeping, generation validation, retention acquire/release
+  // and the reclamation decision. NOT held across Run or queue operations —
+  // only around the short critical sections inside Process.
+  std::mutex LifecycleMutex;
+
+  // TryRetain: atomically (w.r.t. erase/delete) validates the handle and
+  // increments the message's retention count. On success the caller holds a
+  // retention and may use the resolved pointer until Release(H). Returns the
+  // message, or NULL if the handle is stale/invalid (then NO retention was
+  // taken — the caller must not touch anything).
+  Message* TryRetain(const MsgHandle& _H);
+
+  // Release: decrements the retention count. Never resurrects a freed slot.
+  int Release(const MsgHandle& _H);
+
   // Counter on the number of message stored in memory
   unsigned int NoM;
 
@@ -341,6 +361,11 @@ public:
   // ── SPEC-033 Phase B: handle-based API ────────────────────────────────────
   // Allocate + insert; returns a generational handle. O(1).
   int NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHandle& _H);
+
+  // Find the handle of a live message by pointer. O(n) — used only where the
+  // caller holds a Message* (e.g. Block::Run acquiring its retention) and
+  // never in per-message hot paths. ERROR if the pointer is not a live slot.
+  int FindHandle(Message* _M, MsgHandle& _H);
 
   // Resolve a handle to the live message, or NULL. O(1). Never returns a
   // recycled-slot message: stale generation -> NULL.

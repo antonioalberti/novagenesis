@@ -833,8 +833,17 @@ int Process::DeleteMessage(Message* M)
   {
     if (Messages[i] == M)
     {
+      // SPEC-033 Phase B (D3): respect active retentions — refuse here; the
+      // caller re-runs on a later pass once retention is released.
+      if (M->Retentions > 0)
+      {
+        return ERROR;
+      }
+
       if (M->GetDeleteFlag() == true)
       {
+        std::lock_guard<std::mutex> Lock(LifecycleMutex);
+
         delete M;
 
         // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
@@ -861,6 +870,57 @@ int Process::DeleteMessage(Message* M)
   return Status;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SPEC-033 Phase B (Astra review D3): retention acquire/release.
+// TryRetain validates the handle and increments Retentions as ONE critical
+// section, closing the Resolve→use window against concurrent reclamation.
+// ─────────────────────────────────────────────────────────────────────────────
+
+Message* Process::TryRetain(const MsgHandle& _H)
+{
+  std::lock_guard<std::mutex> Lock(LifecycleMutex);
+
+  Message* M = ResolveMessage(_H); // handles bounds, occupancy and generation
+
+  if (M == NULL)
+  {
+    return NULL; // no retention taken
+  }
+
+  M->Retentions++;
+
+  return M;
+}
+
+int Process::Release(const MsgHandle& _H)
+{
+  std::lock_guard<std::mutex> Lock(LifecycleMutex);
+
+  if (_H.Valid() == false || _H.Slot >= MAX_MESSAGES_IN_MEMORY)
+  {
+    return ERROR;
+  }
+
+  const unsigned int Index = _H.Slot;
+
+  if (Messages[Index] == NULL || Controls[Index] != BUSY)
+  {
+    return ERROR; // already reclaimed; retention died with it
+  }
+
+  if (Messages[Index]->Retentions == 0)
+  {
+    // Underflow guard: release without a matching TryRetain. Log and refuse.
+    cerr << "(WARNING: SPEC-033 Release with Retentions == 0 at slot " << Index << ")" << endl;
+
+    return ERROR;
+  }
+
+  Messages[Index]->Retentions--;
+
+  return OK;
+}
+
 // Get number of Message object on Messages container
 unsigned int Process::GetNumberOfMessages()
 {
@@ -884,7 +944,31 @@ Message* Process::GetMessage(unsigned int _Index)
 // SPEC-033 Phase B: handle-based message container API
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Resolve a handle to its message, or NULL if the slot was freed/reused.
+// Find the handle of a live message by pointer. O(n). ERROR if not found.
+int Process::FindHandle(Message* _M, MsgHandle& _H)
+{
+  _H = MsgHandle();
+
+  if (_M == NULL)
+  {
+    return ERROR;
+  }
+
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
+  {
+    if (Messages[i] == _M && Controls[i] == BUSY)
+    {
+      _H.Slot = i;
+      _H.Generation = SlotsGeneration[i];
+
+      return OK;
+    }
+  }
+
+  return ERROR;
+}
+
+// Resolve a handle to the live message, or NULL if the slot was freed/reused.
 Message* Process::ResolveMessage(const MsgHandle& _H)
 {
   if (_H.Valid() == false || _H.Slot >= MAX_MESSAGES_IN_MEMORY)
@@ -997,6 +1081,12 @@ void Process::DeleteMessages()
     {
       Message* Temp = Messages[i];
 
+      // SPEC-033 Phase B (D3): retained messages survive this pass.
+      if (Temp->Retentions > 0)
+      {
+        continue;
+      }
+
       if (Temp->GetDeleteFlag() == true)
       {
 
@@ -1030,6 +1120,13 @@ void Process::DeleteMarkedMessages()
     if (Controls[i] == BUSY)
     {
       Message* Temp = Messages[i];
+
+      // SPEC-033 Phase B (D3): retained messages survive this pass and are
+      // reclaimed on a later pass, after the holder releases.
+      if (Temp->Retentions > 0)
+      {
+        continue;
+      }
 
       if (Temp->GetDeleteFlag() == true)
       {

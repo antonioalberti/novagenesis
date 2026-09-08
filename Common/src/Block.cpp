@@ -151,6 +151,12 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
   unsigned int i = 0;           // Command lines counter
   string Offset = "          "; // Auxiliary variable for logging
 
+  // SPEC-033 Phase B (D3): Run retention. Declared at function scope so the
+  // single release point at the end can see it from every nested path.
+  Process::MsgHandle RunHandle;
+
+  bool RunRetained = false;
+
   if (LN != "GW")
   {
     Offset = "                    ";
@@ -177,6 +183,19 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
 
   if (PP->OkToRun(_ReceivedMessage) == true)
   {
+    // SPEC-033 Phase B (D3): acquire the Run retention atomically with the
+    // handle validation. From here to Release(), no reclamation pass can
+    // destroy the message, even if an Action marks it to delete.
+    if (PP->FindHandle(_ReceivedMessage, RunHandle) != OK || PP->TryRetain(RunHandle) == NULL)
+    {
+      // The message vanished between the OkToRun scan and the retention —
+      // do not touch it (T2 semantics).
+      S << "(ERROR: Unable to retain the received message for Run)" << endl;
+
+      return ERROR;
+    }
+
+    RunRetained = true;
     // SPEC-003: Moved DEBUGX and message dump AFTER OkToRun check.
     // Previously, these accessed _ReceivedMessage before verifying it
     // is still in Process::Messages[], causing use-after-free SIGSEGV
@@ -398,6 +417,14 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
   else
   {
     S << "(ERROR: Unable to run a message that is not at the Messages container)" << endl;
+  }
+
+  // SPEC-033 Phase B (D3): single release point. Every path that entered the
+  // retained region falls through here; paths that never retained (OkToRun
+  // false or retention failure) return earlier or skip via the flag.
+  if (RunRetained == true)
+  {
+    PP->Release(RunHandle);
   }
 
   return Status;
