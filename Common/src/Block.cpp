@@ -343,6 +343,14 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
                     S << Offset << "(Action is " << PA1->GetLegibleName() << ")" << endl;
 #endif
 
+                    // SPEC033B3DIAG (temporary): log every executed action LN
+                    static time_t lastActDiag = 0;
+                    if (time(nullptr) - lastActDiag >= 5)
+                    {
+                      lastActDiag = time(nullptr);
+                      std::cerr << "[SPEC033B3DIAG] Action executing: " << LN1 << std::endl;
+                    }
+
                     // Call the action
                     CLStatus[i] = PA1->Run(_ReceivedMessage, PCL, ScheduledMessages, _InlineResponseMessage);
 
