@@ -268,6 +268,8 @@ void GW::PushToInputQueue(Message* M)
 
         // SPEC033B3DIAG: cumulative accounting at push (Astra: instrument every insertion)
         pushTotal++;
+        std::cerr << "[SPEC033B3DIAG] PUSH inst=" << M->InstantiationNumber
+                  << " NoCL=" << NoCL << " slot=" << QH.Slot << ":" << QH.Generation << std::endl;
         if (!std::isfinite(QE.Time))
         {
           std::cerr << "[SPEC033B3DIAG] NON-FINITE Time at enqueue: " << QE.Time
