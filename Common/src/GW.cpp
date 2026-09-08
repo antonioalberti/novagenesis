@@ -276,13 +276,14 @@ void GW::PushToInputQueue(Message* M)
                     << " slot=" << QE.H.Slot << " gen=" << QE.H.Generation << std::endl;
         }
 
-        // SPEC-032: assign tag + push + detect empty->nonempty under ONE lock;
-        // exactly one notify per transition, outside the lock.
-        bool wasEmpty = false;
+        // SPEC-032: assign tag + push + detect whether this entry changes the
+        // runnable head under ONE lock. Notify after unlock so a waiting GW
+        // recomputes the predicate immediately for an earlier insertion.
+        bool notifyInput = false;
         {
           std::lock_guard<std::mutex> lock(InputQueueMutex);
 
-          wasEmpty = InputQueue.empty();
+          notifyInput = InputQueue.empty() || QE.Time < InputQueue.top().Time;
 
           // Push the entry to the queue
           InputQueue.push(QE);
@@ -290,9 +291,9 @@ void GW::PushToInputQueue(Message* M)
           // Increases the tag counter
           InputQueueTag++;
         }
-        // Notify after unlock, only when the queue transitioned empty->nonempty;
-        // the wait predicate also rechecks on its bounded timeout (SPEC-032 §5).
-        if (wasEmpty)
+        // The bounded timeout remains the fallback for non-head insertions
+        // and spurious wake-ups.
+        if (notifyInput)
           InputQueueCV.notify_one();
       }
       else
@@ -531,11 +532,9 @@ void GW::Gateway()
   double ScheduledTime = 0;
   double Time = 0;
   long long int MessageSize = 0;
-  std::chrono::milliseconds waitTimeout;
   constexpr long long SHM_POLL_INTERVAL_MS = 1; // SHM poll every 1ms (SPEC-007a)
-  double secondsUntilNext = 1.0;                // default 1s when queue empty
   // SPEC-032 debug diagnostics (throttled to one line per 2s)
-  unsigned int diagBatchCount = 0, diagBatchExecuted = 0;
+  unsigned int diagBatchCount = 0;
   double diagLastTime = 0;
   unsigned long long diagRunCalls = 0;
 
@@ -544,31 +543,18 @@ void GW::Gateway()
 
   while (StopGateway == false)
   {
-    // Calculate how long to wait: time until next scheduled message
-    {
-      std::lock_guard<std::mutex> lock(InputQueueMutex);
-      if (!InputQueue.empty())
-      {
-        double nextTime = InputQueue.top().Time;
-        double now = GetTime();
-        secondsUntilNext = nextTime - now;
-        if (secondsUntilNext < 0)
-          secondsUntilNext = 0;
-      }
-      else
-      {
-        secondsUntilNext = 1.0; // no messages, check SHM every 1s max
-      }
-    }
-
-    // Wait for input queue or stop flag (timer-aware blocking wait)
+    // Future queue entries are not runnable. Keep a positive bounded wait
+    // so network/SHM service continues without sub-millisecond truncation.
     {
       std::unique_lock<std::mutex> lock(InputQueueMutex);
-      waitTimeout = std::chrono::milliseconds(
-          std::min((long long)(secondsUntilNext * 1000), SHM_POLL_INTERVAL_MS));
-      InputQueueCV.wait_for(lock, waitTimeout,
+      InputQueueCV.wait_for(lock,
+                            std::chrono::milliseconds(SHM_POLL_INTERVAL_MS),
                             [this]()
-                            { return !InputQueue.empty() || StopGateway; });
+                            {
+                              return StopGateway ||
+                                     (!InputQueue.empty() &&
+                                      InputQueue.top().Time < GetTime());
+                            });
       if (StopGateway)
         break;
     }
@@ -580,6 +566,7 @@ void GW::Gateway()
 
     static QEntry batch[32];
     unsigned int batchCount = 0;
+    unsigned int batchExecuted = 0;
 
     {
       std::lock_guard<std::mutex> lock(InputQueueMutex);
@@ -742,7 +729,27 @@ void GW::Gateway()
       cerr << "[SPEC033B3] INVIOLANT: stale queued entry at pop (slot " << batch[b].H.Slot
            << ", gen " << batch[b].H.Generation << ") — discarding without dereference" << endl;
     }
+    ++batchExecuted;
     } // SPEC-032: end per-batch-message loop
+
+    // If shutdown interrupts the batch, release every entry that was popped
+    // but not adopted by Run(). Otherwise its queue retention would survive
+    // the Gateway thread and prevent reclamation.
+    for (unsigned int b = 0; b < batchCount; ++b)
+    {
+      // Entries already adopted by Run() have released their batch retention;
+      // only the suffix after a stop needs cleanup. The loop below is entered
+      // only when StopGateway became true during execution.
+      if (StopGateway && b >= batchExecuted)
+      {
+        Message* pending = PP->ResolveMessage(batch[b].H);
+        if (pending != NULL)
+          pending->MarkToDelete();
+        if (PP->Release(batch[b].H) != OK)
+          cerr << "[SPEC033B3] batch shutdown release failed (slot "
+               << batch[b].H.Slot << ")" << endl;
+      }
+    }
 
     // Step 3 : NGAL: drain the NetworkReceiveQueue
     // The ReceiveDispatcher pushes raw char buffers here. The GW thread
@@ -793,8 +800,8 @@ void GW::Gateway()
       (void)drained;
     }
 
-    // Step 4 : Read OS IPC — poll shared memory for messages from other processes
-    // Phase 2: rate limit to 100ms when no due messages to process (idle or waiting for future messages)
+    // Step 4: poll shared memory at the configured bounded interval when
+    // there is no strictly due input message.
     {
       static auto lastSHMPoll = std::chrono::steady_clock::now();
       auto now = std::chrono::steady_clock::now();
@@ -806,7 +813,7 @@ void GW::Gateway()
         {
           double nextTime = InputQueue.top().Time;
           double currentTime = GetTime();
-          if (nextTime <= currentTime)
+          if (nextTime < currentTime)
             hasDueMessage = true;
         }
       }
@@ -1526,8 +1533,15 @@ int GW::ReturnIPCSHMID(key_t _Key, int& _shmid)
 // Auxiliary functions
 void GW::SetStopGatewayFlag(bool _F)
 {
-  StopGateway = _F;
-  // Wake up both threads blocked on wait()
+  {
+    // Publish stop under both wait mutexes; atomicity alone does not
+    // prevent a notification being lost between predicate check and wait.
+    std::unique_lock<std::mutex> inputLock(InputQueueMutex, std::defer_lock);
+    std::unique_lock<std::mutex> outputLock(OutputQueueMutex, std::defer_lock);
+    std::lock(inputLock, outputLock);
+    StopGateway = _F;
+  }
+  // Notify after releasing both wait mutexes.
   InputQueueCV.notify_all();
   OutputQueueCV.notify_all();
 }

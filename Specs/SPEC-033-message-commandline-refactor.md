@@ -237,7 +237,49 @@ depois de C.3; nesta fase apenas documentar quem lê/escreve.
 | Container no hot path regredir com map/hash | Benchmark A/B no gate B (2000 msg/s) |
 | Rejeitar mensagens legadas toleradas pelo parser velho | Fase A mantém comportamento: mesmos inputs válidos passam; só adiciona erros para os que já corrompiam |
 
-## 7. Perguntas para o Astra
+## 7. Adenda — Runtime scheduler wait e aceitação da Fase B
+
+### Estado actualizado
+
+| Campo | Estado |
+|---|---|
+| Estado documental | Em revisão — adenda de aceitação runtime |
+| Implementação da Fase B | Parcialmente implementada |
+| Harnesses | 14/14 reportados; reexecutar após a correcção |
+| Runtime cross-VM | Bloqueado por busy-loop com fila futura |
+| Gate 1000 fotos | Não concluído |
+| Aceitação da Fase B | Não concedida |
+| Referência | `AIOPT3@05ffc35` |
+
+### Requisitos normativos
+
+- A mera existência de uma entrada na `InputQueue` não pode tornar o gateway imediatamente executável quando o deadline ainda é futuro.
+- A espera deve distinguir fila não vazia de trabalho devido, usando a mesma comparação temporal estrita (`deadline < agora`) da extracção actual, e reavaliar o estado após timeout, notificação ou wake-up espúrio.
+- O cálculo da espera e a observação da fila devem ocorrer sob `InputQueueMutex`.
+- Quando não houver stop nem cabeça dispatchable, o timeout solicitado deve ser positivo e não superior a 1 ms; este é o limite da espera solicitada, não uma garantia de latência end-to-end.
+- A correcção não pode truncar uma duração positiva para timeout zero.
+- A espera deve preservar o polling SHM configurado e não introduzir um ciclo de reespera que adie esse serviço.
+- Inserções que alterem o próximo trabalho relevante devem permitir recalcular a espera.
+- O pedido de shutdown deve sincronizar-se com os waiters de input e output e notificá-los sem depender da expiração do polling.
+- Devem ser preservados o ordering da fila, o limite de batch 32, a transferência de retenção e a arquitectura SHM.
+
+### Critérios de aceitação
+
+1. Um reproducer com uma mensagem válida a pelo menos 5 segundos no futuro deve falhar em `05ffc35` e passar após a correcção: durante 2 segundos, zero pop/Run, entrada preservada e CPU inferior a 10% de um core no harness controlado.
+2. O deadline deve ser respeitado sem execução antecipada e com exactamente uma execução.
+3. Devem ser testados deadline vencido, igualdade, intervalo sub-ms, inserção de entrada anterior, wake-up espúrio e shutdown com fila vazia/futura.
+4. A recepção SHM deve continuar funcional durante uma espera por mensagem futura.
+5. Os harnesses 14/14 devem ser reexecutados após a alteração.
+6. Deve passar um smoke test cross-VM antes do gate de 1000 fotos.
+7. O gate 1000/1000 permanece bloqueado até todos os critérios acima e os gates originais da SPEC estarem comprovados.
+
+### Implementação e próximos passos
+
+A correcção inicial fica limitada ao scheduler de `GW.cpp`: espera com deadline bounded e sincronização de shutdown. A optimização/substituição do polling SHM e qualquer refactor arquitectural do scheduler ficam fora desta adenda e exigem SPEC separada.
+
+Ordem obrigatória: aplicar patch → reproducer pre/post → testes temporais/shutdown/SHM → harnesses 14/14 → rebuild limpo nas VMs → smoke test cross-VM → gate 1000 fotos → revisão de aceitação da Fase B.
+
+## 8. Perguntas para o Astra
 
 1. Discriminador de codificação: sufixo na Version (`0.1+enc2`), marker novo
    (`n2`), ou campo no envelope? (ele pediu "fora do corpo"; falta escolher.)
