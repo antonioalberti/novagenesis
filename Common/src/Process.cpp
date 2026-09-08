@@ -266,26 +266,19 @@ int Process::AllocSlot(Message* _PM)
   return (int)i;
 }
 
-// Bump the slot generation (stale handles die here), return the slot to the
-// free-list (O(1)), decrement NoM.
 // Bump the slot generation, return the slot to the free-list, decrement NoM.
-// SPEC-033 Phase B gate 1 (Astra): the COMMON reclaim boundary. Refuses with
-// ERROR while the message is retained — callers (all deletion/erase paths)
-// treat this as "deferred", not "failed fatally". Callers must already hold
-// LifecycleMutex (DeleteMessage/DeleteMarkedMessages do; the destructor path
-// via DeleteMessages is single-threaded at shutdown).
+// SPEC-033 Phase B gate 1 (Astra): the COMMON reclaim boundary.
+// IMPORTANT: this function must NOT dereference Messages[_Index] — deletion
+// callers delete the message BEFORE calling FreeSlot, so the slot may point
+// to freed memory here (use-after-free if dereferenced — found by the VM101
+// bootstrap segfault, gdb-confirmed). The retention check happens in the
+// CALLERS, before the delete; by the time FreeSlot runs the caller has
+// already decided reclamation is safe. Callers must hold LifecycleMutex.
 int Process::FreeSlot(unsigned int _Index)
 {
   if (_Index >= MAX_MESSAGES_IN_MEMORY)
   {
     return ERROR;
-  }
-
-  // Gate 1: universal retention-aware reclamation. No destruction path may
-  // free a slot while any retention is active.
-  if (Messages[_Index] != NULL && Messages[_Index]->Retentions > 0)
-  {
-    return ERROR; // deferred: reclaimed on a later pass after Release
   }
 
   Messages[_Index] = NULL;
