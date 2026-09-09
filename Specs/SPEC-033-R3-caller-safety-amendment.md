@@ -1,6 +1,6 @@
 # SPEC-033-R3: Caller-safe allocation failure handling
 
-**Status:** Draft split amendment — planning/test-only; production not approved
+**Status:** A e B0 implementados e aceites pelo Astra nos commits `8b4aeaf` e `1f89c31`; B1/B2/B3 e C continuam bloqueados por gates próprios.
 **Branch:** AIOPT3
 **Related:** SPEC-033 Restart 1, SPEC-033-R2, `Docs/DECISIONS/SPEC033-R2-CALLER-MATRIX.md`
 
