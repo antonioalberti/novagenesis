@@ -110,16 +110,21 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
   NewAction("-run --exposition 0.2", PA); // GWExposition02 - periodic trigger
 
   // Creating a -run --initialization message
-  PP->NewMessage(GetTime(), 0, false, PIM);
+  int PIMStatus = PP->NewMessage(GetTime(), 0, false, PIM);
 
-  // Adding only the run initialization command line
-  PIM->NewCommandLine("-run", "--initialization", "0.1", PCL);
+  // Adding only the run initialization command line and executing it when the
+  // message allocation succeeded. On allocation failure, leave the gateway
+  // constructible without inspecting or marking an unowned output.
+  if (PIMStatus == OK && PIM != 0)
+  {
+    PIM->NewCommandLine("-run", "--initialization", "0.1", PCL);
 
-  // Run
-  Run(PIM, InlineResponseMessage);
+    // Run
+    Run(PIM, InlineResponseMessage);
 
-  // Mark to delete
-  PIM->MarkToDelete();
+    // Mark to delete
+    PIM->MarkToDelete();
+  }
 }
 
 GW::~GW()
