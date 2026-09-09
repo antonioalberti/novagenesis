@@ -1205,21 +1205,23 @@ int MessageBuilder::NewConnectionLessStoreBindingMessage(string _Version, vector
 {
   int Status = ERROR;
   string _SCN = "empty";
-
+  Message* Working = NULL;
   CommandLine* PConnectionLessCL = 0;
   CommandLine* PSCNCL = 0;
   CommandLine* PStoreCL = 0;
 
-  PP->NewMessage(GetTime(), 0, false, _M);
-
-  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, _M, PConnectionLessCL) == OK)
+  _M = NULL;
+  if (PP->NewMessage(GetTime(), 0, false, Working) != OK || Working == NULL)
   {
-    if (NewCommonCommandLine("-sr", "--b", _Version, _Category, _Key, _Values, _M, PStoreCL) == OK)
-    {
-      // Generate a SCN for the message
-          _SCN = NameGenerator::GetInstance().GenerateFromMessage(_M);
+    return ERROR;
+  }
 
-      if (NewSCNCommandLine(_Version, _SCN, _M, PSCNCL) == OK)
+  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, Working, PConnectionLessCL) == OK)
+  {
+    if (NewCommonCommandLine("-sr", "--b", _Version, _Category, _Key, _Values, Working, PStoreCL) == OK)
+    {
+      _SCN = NameGenerator::GetInstance().GenerateFromMessage(Working);
+      if (NewSCNCommandLine(_Version, _SCN, Working, PSCNCL) == OK)
       {
         Status = OK;
       }
@@ -1228,10 +1230,12 @@ int MessageBuilder::NewConnectionLessStoreBindingMessage(string _Version, vector
 
   if (Status == ERROR)
   {
-    _M->MarkToDelete();
+    Working->MarkToDelete();
+    return ERROR;
   }
 
-  return Status;
+  _M = Working;
+  return OK;
 }
 
 // Creates a get binding message
@@ -1240,21 +1244,23 @@ int MessageBuilder::NewConnectionLessGetBindingMessage(string _Version, vector<s
 {
   int Status = ERROR;
   string _SCN = "empty";
-
+  Message* Working = NULL;
   CommandLine* PConnectionLessCL = 0;
   CommandLine* PSCNCL = 0;
   CommandLine* PGetCL = 0;
 
-  PP->NewMessage(GetTime(), 0, false, _M);
-
-  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, _M, PConnectionLessCL) == OK)
+  _M = NULL;
+  if (PP->NewMessage(GetTime(), 0, false, Working) != OK || Working == NULL)
   {
-    if (PConnectionLessCL != 0 && NewGetCommandLine(_Version, _Category, _Key, _M, PGetCL) == OK && PGetCL != 0)
-    {
-      // Generate a SCN for the message
-          _SCN = NameGenerator::GetInstance().GenerateFromMessage(_M);
+    return ERROR;
+  }
 
-      if (NewSCNCommandLine(_Version, _SCN, _M, PSCNCL) == OK)
+  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, Working, PConnectionLessCL) == OK)
+  {
+    if (PConnectionLessCL != 0 && NewGetCommandLine(_Version, _Category, _Key, Working, PGetCL) == OK && PGetCL != 0)
+    {
+      _SCN = NameGenerator::GetInstance().GenerateFromMessage(Working);
+      if (NewSCNCommandLine(_Version, _SCN, Working, PSCNCL) == OK)
       {
         Status = OK;
       }
@@ -1263,10 +1269,12 @@ int MessageBuilder::NewConnectionLessGetBindingMessage(string _Version, vector<s
 
   if (Status == ERROR)
   {
-    _M->MarkToDelete();
+    Working->MarkToDelete();
+    return ERROR;
   }
 
-  return Status;
+  _M = Working;
+  return OK;
 }
 
 // Creates a delivery binding message
@@ -1275,21 +1283,23 @@ int MessageBuilder::NewConnectionLessDeliveryBindingMessage(string _Version, vec
 {
   int Status = ERROR;
   string _SCN = "empty";
-
+  Message* Working = NULL;
   CommandLine* PConnectionLessCL = 0;
   CommandLine* PSCNCL = 0;
   CommandLine* PDeliveryCL = 0;
 
-  PP->NewMessage(GetTime(), 0, false, _M);
-
-  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, _M, PConnectionLessCL) == OK)
+  _M = NULL;
+  if (PP->NewMessage(GetTime(), 0, false, Working) != OK || Working == NULL)
   {
-    if (NewCommonCommandLine("-d", "--b", _Version, _Category, _Key, _Values, _M, PDeliveryCL) == OK)
-    {
-      // Generate a SCN for the message
-          _SCN = NameGenerator::GetInstance().GenerateFromMessage(_M);
+    return ERROR;
+  }
 
-      if (NewSCNCommandLine(_Version, _SCN, _M, PSCNCL) == OK)
+  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, Working, PConnectionLessCL) == OK)
+  {
+    if (NewCommonCommandLine("-d", "--b", _Version, _Category, _Key, _Values, Working, PDeliveryCL) == OK)
+    {
+      _SCN = NameGenerator::GetInstance().GenerateFromMessage(Working);
+      if (NewSCNCommandLine(_Version, _SCN, Working, PSCNCL) == OK)
       {
         Status = OK;
       }
@@ -1298,10 +1308,12 @@ int MessageBuilder::NewConnectionLessDeliveryBindingMessage(string _Version, vec
 
   if (Status == ERROR)
   {
-    _M->MarkToDelete();
+    Working->MarkToDelete();
+    return ERROR;
   }
 
-  return Status;
+  _M = Working;
+  return OK;
 }
 
 // Creates a status message
@@ -1310,21 +1322,23 @@ int MessageBuilder::NewConnectionLessStatusMessage(string _Version, vector<strin
 {
   int Status = ERROR;
   string _SCN = "empty";
-
+  Message* Working = NULL;
   CommandLine* PConnectionLessCL = 0;
   CommandLine* PSCNCL = 0;
   CommandLine* PStatusCL = 0;
 
-  PP->NewMessage(GetTime(), 0, false, _M);
-
-  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, _M, PConnectionLessCL) == OK)
+  _M = NULL;
+  if (PP->NewMessage(GetTime(), 0, false, Working) != OK || Working == NULL)
   {
-    if (NewStatusCommandLine(_AckCommandName, _AckCommandAlt, _Version, _StatusCode, _M, PStatusCL) == OK)
-    {
-      // Generate a SCN for the message
-          _SCN = NameGenerator::GetInstance().GenerateFromMessage(_M);
+    return ERROR;
+  }
 
-      if (NewSCNCommandLine(_Version, _SCN, _M, PSCNCL) == OK)
+  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, Working, PConnectionLessCL) == OK)
+  {
+    if (NewStatusCommandLine(_AckCommandName, _AckCommandAlt, _Version, _StatusCode, Working, PStatusCL) == OK)
+    {
+      _SCN = NameGenerator::GetInstance().GenerateFromMessage(Working);
+      if (NewSCNCommandLine(_Version, _SCN, Working, PSCNCL) == OK)
       {
         Status = OK;
       }
@@ -1333,10 +1347,12 @@ int MessageBuilder::NewConnectionLessStatusMessage(string _Version, vector<strin
 
   if (Status == ERROR)
   {
-    _M->MarkToDelete();
+    Working->MarkToDelete();
+    return ERROR;
   }
 
-  return Status;
+  _M = Working;
+  return OK;
 }
 
 // Creates a run procedure message
@@ -1345,21 +1361,22 @@ int MessageBuilder::NewConnectionLessRunMessage(string _Version, vector<string>*
 {
   int Status = ERROR;
   string _SCN = "empty";
-
+  Message* Working = NULL;
   CommandLine* PConnectionLessCL = 0;
   CommandLine* PSCNCL = 0;
   CommandLine* PRunCL = 0;
 
-  PP->NewMessage(GetTime(), 0, false, _M);
-
-  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, _M, PConnectionLessCL) == OK)
+  if (PP->NewMessage(GetTime(), 0, false, Working) != OK || Working == NULL)
   {
-    if (NewRunProcedureCommandLine(_Version, _Procedure, _M, PRunCL) == OK)
-    {
-      // Generate a SCN for the message
-          _SCN = NameGenerator::GetInstance().GenerateFromMessage(_M);
+    return ERROR;
+  }
 
-      if (NewSCNCommandLine(_Version, _SCN, _M, PSCNCL) == OK)
+  if (NewConnectionLessCommandLine(_Version, _Limiters, _Sources, _Destinations, Working, PConnectionLessCL) == OK)
+  {
+    if (NewRunProcedureCommandLine(_Version, _Procedure, Working, PRunCL) == OK)
+    {
+      _SCN = NameGenerator::GetInstance().GenerateFromMessage(Working);
+      if (NewSCNCommandLine(_Version, _SCN, Working, PSCNCL) == OK)
       {
         Status = OK;
       }
@@ -1368,10 +1385,12 @@ int MessageBuilder::NewConnectionLessRunMessage(string _Version, vector<string>*
 
   if (Status == ERROR)
   {
-    _M->MarkToDelete();
+    Working->MarkToDelete();
+    return ERROR;
   }
 
-  return Status;
+  _M = Working;
+  return OK;
 }
 
 // Auxiliary functions
