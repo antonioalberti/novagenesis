@@ -75,11 +75,6 @@ int PGRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
   vector<string> Sources;
   vector<string> Destinations;
 
-  // SPEC033B3DIAG (temporary, Astra): UNCONDITIONAL entry counter — proves/disproves execution
-  static unsigned long long PeriodicRunCount = 0;
-  PeriodicRunCount++;
-  std::cerr << "[SPEC033B3DIAG] PGRunPeriodic01::Run ENTERED count=" << PeriodicRunCount << std::endl;
-
   PPG = (PG*)PB;
 
 #ifdef DEBUG
@@ -321,19 +316,6 @@ int PGRunPeriodic01::HelloScheduling()
   PPG = (PG*)PB;
   PPGCS = (PGCS*)PB->PP;
   callCount++;
-
-  // SPEC033B3DIAG (temporary): trace hello scheduling decisions
-  static time_t lastDiag = 0;
-  if (time(nullptr) - lastDiag >= 10)
-  {
-    lastDiag = time(nullptr);
-    std::cerr << "[SPEC033B3DIAG] HelloScheduling call=" << callCount
-              << " HelloCounter=" << HelloCounter
-              << " HasCore=" << PPGCS->HasCore
-              << " Stacks=" << (PPGCS->Stacks ? PPGCS->Stacks->size() : 0)
-              << " PSTuples=" << PPG->PSTuples.size()
-              << " Delay01=" << PPG->DelayBetweenHellos01 << std::endl;
-  }
 
   // TODO: Added in Feb. 2022 to deal with the frequency of hellos
 

@@ -79,15 +79,6 @@ Process::Process(string _LN, key_t _Key, string _Path)
 
   NoM = 0;
 
-  // SPEC-033 Phase B: initialise the free-list (descending fill so a LIFO
-  // pop hands out index 0 first, matching the old linear-scan order).
-  NoFreeSlots = MAX_MESSAGES_IN_MEMORY;
-
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
-  {
-    FreeList[i] = MAX_MESSAGES_IN_MEMORY - 1 - i;
-  }
-
   InstantiationTime = GetTime();
 
   PMB = new MessageBuilder(this);
@@ -238,60 +229,6 @@ Process::Process(string _LN, key_t _Key, string _Path)
   NewBlock("HT", PB3);
   NewBlock("GW", PB2);
   // NewBlock("CLI",PB1);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SPEC-033 Phase B (Astra review, finding 1): shared slot bookkeeping.
-// The single allocator/reclaimer behind BOTH the legacy pointer API and the
-// handle API. Every successful destruction bumps the generation, updates NoM
-// and returns the slot exactly once, regardless of which API initiated it.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Pop the free-list (O(1)), install PM, bump NoM. Returns -1 on exhaustion.
-int Process::AllocSlot(Message* _PM)
-{
-  if (NoFreeSlots == 0)
-  {
-    return -1;
-  }
-
-  unsigned int i = FreeList[--NoFreeSlots];
-
-  Messages[i] = _PM;
-
-  Controls[i] = BUSY;
-
-  NoM++;
-
-  return (int)i;
-}
-
-// Bump the slot generation, return the slot to the free-list, decrement NoM.
-// SPEC-033 Phase B gate 1 (Astra): the COMMON reclaim boundary.
-// IMPORTANT: this function must NOT dereference Messages[_Index] — deletion
-// callers delete the message BEFORE calling FreeSlot, so the slot may point
-// to freed memory here (use-after-free if dereferenced — found by the VM101
-// bootstrap segfault, gdb-confirmed). The retention check happens in the
-// CALLERS, before the delete; by the time FreeSlot runs the caller has
-// already decided reclamation is safe. Callers must hold LifecycleMutex.
-int Process::FreeSlot(unsigned int _Index)
-{
-  if (_Index >= MAX_MESSAGES_IN_MEMORY)
-  {
-    return ERROR;
-  }
-
-  Messages[_Index] = NULL;
-
-  Controls[_Index] = FREE;
-
-  SlotsGeneration[_Index]++;
-
-  FreeList[NoFreeSlots++] = _Index;
-
-  NoM--;
-
-  return OK;
 }
 
 Process::~Process()
@@ -606,33 +543,34 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, Message*& M
 {
   int Status = ERROR;
 
-  // C2 fix (SPEC-033): always define the output, even when the container is full.
-  M = NULL;
-
-  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
-  Message* PM = new Message(_Time, _Type, _HasPayload);
-
-  int Slot = AllocSlot(PM);
-
-  if (Slot >= 0)
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
-    PM->InstantiationNumber = MessageCounter;
+    if (Controls[i] == FREE)
+    {
+      Message* PM = new Message(_Time, _Type, _HasPayload);
 
-    MessageCounter++;
+      M = PM;
 
-    M = PM;
+      PM->InstantiationNumber = MessageCounter;
 
-    Status = OK;
+      MessageCounter++;
+
+      NoM++;
+
+      Messages[i] = PM;
+
+      Controls[i] = BUSY;
+
+      Status = OK;
 
 #ifdef DEBUG
-    cout << "          (Creating a message at " << GetLegibleName() << " with instantiation number " << PM->InstantiationNumber << ". Number of messages is " << NoM << ")" << endl;
+      cout << "          (Creating a message at " << GetLegibleName() << " with instantiation number " << PM->InstantiationNumber << ". Number of messages is " << NoM << ")" << endl;
 
-    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
+      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
 #endif
-  }
-  else
-  {
-    delete PM; // exhausted: do not leak
+
+      break;
+    }
   }
 
   return Status;
@@ -645,28 +583,34 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, string _Hea
 
   M = NULL;
 
-  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
-  Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _Path);
-
-  int Slot = AllocSlot(PM);
-
-  if (Slot >= 0)
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
-    PM->InstantiationNumber = MessageCounter;
+    if (Controls[i] == FREE)
+    {
+      Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _Path);
 
-    MessageCounter++;
+      M = PM;
 
-    M = PM;
+      PM->InstantiationNumber = MessageCounter;
 
-    Status = OK;
+      MessageCounter++;
+
+      NoM++;
+
+      Messages[i] = PM;
+
+      Controls[i] = BUSY;
 
 #ifdef DEBUG
-    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
+
+      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
+
 #endif
-  }
-  else
-  {
-    delete PM; // exhausted: do not leak
+
+      Status = OK;
+
+      break;
+    }
   }
 
   return Status;
@@ -679,28 +623,34 @@ int Process::NewMessage(double _Time, short _Type, bool _HasPayload, string _Hea
 
   M = NULL;
 
-  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
-  Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _PayloadFileName, _MessageFileName, _Path);
-
-  int Slot = AllocSlot(PM);
-
-  if (Slot >= 0)
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
-    PM->InstantiationNumber = MessageCounter;
+    if (Controls[i] == FREE)
+    {
+      Message* PM = new Message(_Time, _Type, _HasPayload, _HeaderFileName, _PayloadFileName, _MessageFileName, _Path);
 
-    MessageCounter++;
+      M = PM;
 
-    M = PM;
+      PM->InstantiationNumber = MessageCounter;
 
-    Status = OK;
+      MessageCounter++;
+
+      NoM++;
+
+      Messages[i] = PM;
+
+      Controls[i] = BUSY;
 
 #ifdef DEBUG
-    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
+
+      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
+
 #endif
-  }
-  else
-  {
-    delete PM; // exhausted: do not leak
+
+      Status = OK;
+
+      break;
+    }
   }
 
   return Status;
@@ -712,29 +662,37 @@ int Process::NewMessage(Message* _Original, Message*& M)
 
   M = NULL;
 
-  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
-  Message* PM = new Message(*_Original);
-
-  int Slot = AllocSlot(PM);
-
-  if (Slot >= 0)
+  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
-    PM->InstantiationNumber = MessageCounter;
+    if (Controls[i] == FREE)
+    {
+      Message* PM = new Message(*_Original);
 
-    MessageCounter++;
+      M = PM;
 
-    M = PM;
+      PM->InstantiationNumber = MessageCounter;
 
-    Status = OK;
+      MessageCounter++;
+
+      NoM++;
+
+      Messages[i] = PM;
+
+      Controls[i] = BUSY;
 
 #ifdef DEBUG
-    cout << "(Allocated the message with index = " << Slot << ". Number of messages is " << NoM << ".)" << endl;
+
+      cout << "(Allocated the message with index = " << i << ". Number of messages is " << NoM << ".)" << endl;
+
 #endif
+
+      Status = OK;
+
+      break;
+    }
   }
-  else
-  {
-    delete PM; // exhausted: do not leak
-  }
+
+  // S <<"          (Creating a message at block "<<GetLegibleName()<<" with instantiation number " <<PM->InstantiationNumber<< ". Number of messages is "<<NoM<<")" << endl;
 
   return Status;
 }
@@ -742,20 +700,13 @@ int Process::NewMessage(Message* _Original, Message*& M)
 // Get a Message
 int Process::GetMessage(unsigned int _Index, Message*& M)
 {
-  // C1 fix (SPEC-033): the old test (_Index < NoM) was wrong twice — NoM counts
-  // occupied slots, not the highest index, and M was left untouched (or stale)
-  // while OK was returned for out-of-range indices. Now the output is always
-  // defined and only occupied slots resolve.
-  M = NULL;
 
-  if (_Index < MAX_MESSAGES_IN_MEMORY && Messages[_Index] != NULL && Controls[_Index] == BUSY)
+  if (_Index < NoM)
   {
     M = Messages[_Index];
-
-    return OK;
   }
 
-  return ERROR;
+  return OK;
 }
 
 // Erase a Message from the container
@@ -763,26 +714,15 @@ int Process::EraseMessage(Message* M)
 {
   int Status = OK;
 
-  bool Found = false;
-
-  // SPEC-033 (Astra finding 3): guard against a null pointer — previously a
-  // null M matched an empty slot and wrongly decremented NoM.
-  if (M == NULL)
-  {
-    return ERROR;
-  }
-
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Messages[i] == M)
     {
-      // SPEC-033 Phase B gate 1: the common reclaim boundary refuses while
-      // retained; surface that as ERROR (deferred), not silent success.
-      std::lock_guard<std::mutex> Lock(LifecycleMutex);
+      Messages[i] = NULL;
 
-      Status = FreeSlot(i);
+      Controls[i] = FREE;
 
-      Found = true;
+      NoM--;
 
 #ifdef DEBUG
 
@@ -794,22 +734,13 @@ int Process::EraseMessage(Message* M)
     }
   }
 
-  return Found == true ? OK : ERROR;
+  return Status;
 }
 
 // Tests if a message is ok
 int Process::HasMessage(Message* M, bool& _Answer)
 {
   int Status = OK;
-
-  // SPEC-033 (Astra finding 1/2): initialize the answer; a miss must not
-  // preserve a stale true from the caller. A null pointer never matches.
-  _Answer = false;
-
-  if (M == NULL)
-  {
-    return Status;
-  }
 
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
@@ -833,32 +764,19 @@ int Process::DeleteMessage(Message* M)
 
   int Index = 0;
 
-  // SPEC-033 (Astra finding 4): a null M previously dereferenced inside the
-  // loop (M->GetDeleteFlag()) after matching an empty slot.
-  if (M == NULL)
-  {
-    return ERROR;
-  }
-
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Messages[i] == M)
     {
-      // SPEC-033 Phase B (D3): respect active retentions — refuse here; the
-      // caller re-runs on a later pass once retention is released.
-      if (M->Retentions > 0)
-      {
-        return ERROR;
-      }
-
       if (M->GetDeleteFlag() == true)
       {
-        std::lock_guard<std::mutex> Lock(LifecycleMutex);
-
         delete M;
 
-        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-        FreeSlot(i);
+        Messages[i] = NULL;
+
+        Controls[i] = FREE;
+
+        NoM--;
 
         Deleted = true;
 
@@ -881,57 +799,6 @@ int Process::DeleteMessage(Message* M)
   return Status;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SPEC-033 Phase B (Astra review D3): retention acquire/release.
-// TryRetain validates the handle and increments Retentions as ONE critical
-// section, closing the Resolve→use window against concurrent reclamation.
-// ─────────────────────────────────────────────────────────────────────────────
-
-Message* Process::TryRetain(const MsgHandle& _H)
-{
-  std::lock_guard<std::mutex> Lock(LifecycleMutex);
-
-  Message* M = ResolveMessage(_H); // handles bounds, occupancy and generation
-
-  if (M == NULL)
-  {
-    return NULL; // no retention taken
-  }
-
-  M->Retentions++;
-
-  return M;
-}
-
-int Process::Release(const MsgHandle& _H)
-{
-  std::lock_guard<std::mutex> Lock(LifecycleMutex);
-
-  if (_H.Valid() == false || _H.Slot >= MAX_MESSAGES_IN_MEMORY)
-  {
-    return ERROR;
-  }
-
-  const unsigned int Index = _H.Slot;
-
-  if (Messages[Index] == NULL || Controls[Index] != BUSY)
-  {
-    return ERROR; // already reclaimed; retention died with it
-  }
-
-  if (Messages[Index]->Retentions == 0)
-  {
-    // Underflow guard: release without a matching TryRetain. Log and refuse.
-    cerr << "(WARNING: SPEC-033 Release with Retentions == 0 at slot " << Index << ")" << endl;
-
-    return ERROR;
-  }
-
-  Messages[Index]->Retentions--;
-
-  return OK;
-}
-
 // Get number of Message object on Messages container
 unsigned int Process::GetNumberOfMessages()
 {
@@ -949,107 +816,6 @@ Message* Process::GetMessage(unsigned int _Index)
   }
 
   return Temp;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SPEC-033 Phase B: handle-based message container API
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Find the handle of a live message by pointer. O(n). ERROR if not found.
-int Process::FindHandle(Message* _M, MsgHandle& _H)
-{
-  _H = MsgHandle();
-
-  if (_M == NULL)
-  {
-    return ERROR;
-  }
-
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
-  {
-    if (Messages[i] == _M && Controls[i] == BUSY)
-    {
-      _H.Slot = i;
-      _H.Generation = SlotsGeneration[i];
-
-      return OK;
-    }
-  }
-
-  return ERROR;
-}
-
-// Resolve a handle to the live message, or NULL if the slot was freed/reused.
-Message* Process::ResolveMessage(const MsgHandle& _H)
-{
-  if (_H.Valid() == false || _H.Slot >= MAX_MESSAGES_IN_MEMORY)
-  {
-    return NULL;
-  }
-
-  const unsigned int Index = _H.Slot;
-
-  if (Messages[Index] == NULL || Controls[Index] != BUSY)
-  {
-    return NULL;
-  }
-
-  // Generational check: the slot's generation must match the one captured
-  // when the handle was issued. A mismatch means the slot was freed and
-  // reused after this handle was taken — returning the current message
-  // would be the ABA bug this mechanism exists to prevent.
-  if (_H.Generation != SlotsGeneration[Index])
-  {
-    return NULL;
-  }
-
-  return Messages[Index];
-}
-
-// Allocate + insert, O(1) via free-list. Returns a generational handle.
-int Process::NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHandle& _H)
-{
-  int Status = ERROR;
-
-  // Always define the output, even on exhaustion.
-  _H = MsgHandle();
-
-  // SPEC-033 Phase B: single shared allocator (legacy + handle APIs).
-  Message* PM = new Message(_Time, _Type, _HasPayload);
-
-  int Slot = AllocSlot(PM);
-
-  if (Slot >= 0)
-  {
-    PM->InstantiationNumber = MessageCounter;
-
-    MessageCounter++;
-
-    _H.Slot = (unsigned int)Slot;
-    _H.Generation = SlotsGeneration[Slot];
-
-    Status = OK;
-  }
-  else
-  {
-    delete PM; // exhausted: do not leak
-  }
-
-  return Status;
-}
-
-// Erase (container-side, no destruction) by handle. O(1). Bumps generation.
-int Process::EraseMessageHandle(const MsgHandle& _H)
-{
-  if (ResolveMessage(_H) == NULL)
-  {
-    return ERROR;
-  }
-
-  // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-  FreeSlot(_H.Slot);
-
-  return OK;
 }
 
 void Process::ShowMessages()
@@ -1086,42 +852,31 @@ void Process::DeleteMessages()
        << "(------------------------- Deleting messages in memory -------------------------)" << endl;
 #endif
 
-  // SPEC-033 Phase B: destructor path = post-quiesce shutdown (Astra gate:
-  // retention may be overridden ONLY here). Clear all retentions first, then
-  // reclaim everything regardless of delete flags.
-  for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
-  {
-    if (Controls[i] == BUSY && Messages[i] != NULL)
-    {
-      Messages[i]->Retentions = 0;
-    }
-  }
-
   for (unsigned int i = 0; i < MAX_MESSAGES_IN_MEMORY; i++)
   {
     if (Controls[i] == BUSY) // Only the occupied positions
     {
       Message* Temp = Messages[i];
 
-      // SPEC-033 Phase B (D3): retained messages survive this pass — but the
-      // pre-pass above zeroed retentions for this shutdown path.
-      if (Temp->Retentions > 0)
+      if (Temp->GetDeleteFlag() == true)
       {
-        continue;
-      }
 
 #ifdef DEBUG
-      cout << "(The following message with index " << i << " will be deleted.)" << endl;
+        cout << "(The following message with index " << i << " will be deleted.)" << endl;
 
-      cout << "(" << endl
-           << *Messages[i] << ")" << endl
-           << endl;
+        cout << "(" << endl
+             << *Messages[i] << ")" << endl
+             << endl;
 #endif
 
-      delete Temp;
+        delete Temp;
 
-      // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-      FreeSlot(i);
+        Messages[i] = NULL;
+
+        Controls[i] = FREE;
+
+        NoM--;
+      }
     }
   }
 }
@@ -1140,13 +895,6 @@ void Process::DeleteMarkedMessages()
     {
       Message* Temp = Messages[i];
 
-      // SPEC-033 Phase B (D3): retained messages survive this pass and are
-      // reclaimed on a later pass, after the holder releases.
-      if (Temp->Retentions > 0)
-      {
-        continue;
-      }
-
       if (Temp->GetDeleteFlag() == true)
       {
 
@@ -1161,8 +909,11 @@ void Process::DeleteMarkedMessages()
 
         delete Temp;
 
-        // SPEC-033 Phase B: single shared reclaimer (legacy + handle APIs).
-        FreeSlot(i);
+        Messages[i] = NULL;
+
+        Controls[i] = FREE; // Frees the position
+
+        NoM--;
       }
 #ifdef DEBUG
       else

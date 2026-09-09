@@ -134,22 +134,17 @@
 using namespace std;
 using namespace tthread;
 
-// SPEC-033 Phase B (B-3): queue comparator on COPIED keys — never
-// dereferences the Message (removes the cross-thread sort UAF class from
-// SPEC-032). Direction preserved from DereferenceCompareNode: earliest due
-// time first, tie -> lowest tag first (priority_queue "largest" on top, so
-// greater-than on the inverted field).
-struct QEntryCompare : public binary_function<const QEntry, const QEntry, bool>
+struct DereferenceCompareNode : public binary_function<const Message*, const Message*, bool>
 {
-  bool operator()(const QEntry& E1, const QEntry& E2) const
+  bool operator()(const Message* M1, const Message* M2) const
   {
-    if (E1.Time != E2.Time)
+    if (M1->GetTime() != M2->GetTime())
     {
-      return E1.Time > E2.Time;
+      return M1->GetTime() > M2->GetTime();
     }
     else
     {
-      return E1.Tag > E2.Tag;
+      return M1->GetTag() > M2->GetTag();
     }
   }
 };
@@ -160,17 +155,14 @@ class GW : public Block
 {
 private:
   // ------------------------------------------------------------------------------------------------------------------------------
-  // Priority queues — SPEC-033 Phase B (B-3): entries carry a generational
-  // handle + copied sort keys. Queue residence IS a retention: PushToInput/
-  // OutputQueue TryRetain's the entry; pop transfers that retention to the
-  // consumer (worker / Run adopt path) with no release-acquire gap.
+  // Priority queues
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Input message queue
-  priority_queue<QEntry, vector<QEntry>, QEntryCompare> InputQueue;
+  priority_queue<Message*, vector<Message*>, DereferenceCompareNode> InputQueue;
 
   // Per key output message queue
-  map<std::string, priority_queue<QEntry, vector<QEntry>, QEntryCompare>> OutputQueues;
+  map<std::string, priority_queue<Message*, vector<Message*>, DereferenceCompareNode>> OutputQueues;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary variables

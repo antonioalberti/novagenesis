@@ -85,11 +85,6 @@ public:
   // Copy constructor
   CommandLine(const CommandLine& CL);
 
-  // SPEC-033 Phase A: deep copy assignment. The implicit operator= would
-  // shallow-copy the Arguments/NoE raw pointers, causing double-free when
-  // both objects are destroyed (found by the parser commit path).
-  CommandLine& operator=(const CommandLine& CL);
-
   // Destructor
   ~CommandLine();
 

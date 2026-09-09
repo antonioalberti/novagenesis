@@ -41,42 +41,7 @@
 #include "File.h"
 #endif
 
-#include <cerrno>
-#include <cctype>
-#include <sys/stat.h>
-
 #define DEBUG
-
-static string BoundedCacheLogField(const string& Value)
-{
-  const size_t BodyLimit = 93; // leave room for the truncation marker
-  const char Hex[] = "0123456789ABCDEF";
-  string Result;
-  Result.reserve(96);
-  size_t i = 0;
-  for (; i < Value.size() && Result.size() < BodyLimit; ++i)
-  {
-    unsigned char c = (unsigned char)Value[i];
-    string Token;
-    if (c >= 0x20 && c <= 0x7E && c != '\\')
-      Token.assign(1, (char)c);
-    else if (c == '\\')
-      Token = "\\\\\\\\";
-    else
-    {
-      Token = "\\\\x";
-      Token += Hex[c >> 4];
-      Token += Hex[c & 0x0F];
-    }
-
-    if (Result.size() + Token.size() > BodyLimit)
-      break;
-    Result += Token;
-  }
-  if (i < Value.size())
-    Result += "...";
-  return Result;
-}
 
 NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)
@@ -163,38 +128,17 @@ int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Me
                 _ReceivedMessage->SetPayloadFileName(Values.at(0));
                 _ReceivedMessage->SetPayloadFilePath(CachePath);
                 _ReceivedMessage->SetPayloadFileOption("BINARY");
-                int CacheWriteStatus = _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
+                _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
 
-                // Bounded, behavior-neutral postcondition trace. The payload
-                // hash is the NG content identity; the probe observes the
-                // exact path used by File::OpenOutputFile (Path + Name).
-                string PayloadHash;
-                if (Payload != 0 && Size > 0)
+                // SPEC-019: Log hash for traceability
                 {
-                  PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(
-                      (const char*)Payload, Size);
-                }
-                string CachedFilePath = CachePath + Values.at(0);
-                struct stat CachedStat;
-                int CacheProbeStatus = stat(CachedFilePath.c_str(), &CachedStat);
-                long long CachedSize = CacheProbeStatus == 0
-                                           ? (long long)CachedStat.st_size
-                                           : -1;
-                int CacheProbeError = CacheProbeStatus == 0 ? 0 : errno;
-                PB->S << Offset << "[SPEC033CACHE] key=" << BoundedCacheLogField(PayloadHash)
-                      << " file=" << BoundedCacheLogField(Values.at(0))
-                      << " payload_size=" << Size
-                      << " cache_path=" << BoundedCacheLogField(CachedFilePath)
-                      << " write_status=" << CacheWriteStatus
-                      << " probe_status=" << CacheProbeStatus
-                      << " probe_errno=" << CacheProbeError
-                      << " cached_size=" << CachedSize << endl;
-
-                // SPEC-019: Log hash for traceability. Reuse the hash computed
-                // above so instrumentation adds no second payload traversal.
-                {
-                  PB->S << Offset << "(NRNCS cached payload: file="
-                        << BoundedCacheLogField(Values.at(0))
+                  string PayloadHash;
+                  if (Payload != 0 && Size > 0)
+                  {
+                    PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(
+                        (const char*)Payload, Size);
+                  }
+                  PB->S << Offset << "(NRNCS cached payload: file=" << Values.at(0)
                         << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
                 }
 

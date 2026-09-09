@@ -112,18 +112,6 @@ int HTStoreBind01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Mess
                   // Store the binding on the hash_multimap container
                   PHT->StoreBinding(Category, Key, &PArguments);
 
-                  // SPEC033B3DIAG (temporary, Astra): store-completion trace with
-                  // post-store verification (does the entry actually exist now?)
-                  std::vector<string>* _dbgVerify = new std::vector<string>();
-                  int _dbgGet = PB->PP->GetHTBindingValues(Category, Key, _dbgVerify);
-                  std::cerr << "[SPEC033B3DIAG] HT STORE blk=" << PB->GetLegibleName()
-                            << " cat=" << Category << " key=" << Key
-                            << " values=" << PArguments.size()
-                            << " store-status=" << Status
-                            << " post-verify=" << (_dbgGet == OK ? "FOUND" : "ABSENT")
-                            << " (" << _dbgVerify->size() << " vals)" << std::endl;
-                  delete _dbgVerify;
-
                   // Changed to insert just one status command line in the message (6th Nov. 2017).
                   if (PHT->HaveOneStatusCL == false)
                   {

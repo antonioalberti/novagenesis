@@ -157,14 +157,6 @@ public:
   // Instantiation number to check for double deletion
   unsigned int InstantiationNumber;
 
-  // SPEC-033 Phase B (Astra review D3): active retention count. Incremented
-  // by Process::TryRetain (under the lifecycle mutex, together with the
-  // handle/generation validation) and decremented by Release(H). Destruction
-  // in DeleteMessage/DeleteMarkedMessages/DeleteMessages is refused while
-  // Retentions > 0 — the message is reclaimed on a later pass. Guarded by
-  // Process::LifecycleMutex, not by its own lock (see SPEC-033 doc §2).
-  unsigned int Retentions;
-
   // An application avoid deletion of message by turning this flag true. False means that the core will delete the message automatically
   bool ApplicationDeleted;
 

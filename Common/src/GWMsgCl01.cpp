@@ -239,12 +239,6 @@ int GWMsgCl01::ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLin
       else
       {
         PB->S << Offset << "(ERROR: Unable to get the forwarding binding from destination block)" << endl;
-
-        // SPEC033B3DIAG (temporary, Astra): binding-failure trace (unthrottled) with lookup identity
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=FAIL binding-lookup-failed destCount="
-                  << ReceivedMessageDestinations.size()
-                  << " cat=" << Category << " key=" << Key
-                  << " isfinite-key=" << (Key.empty() ? "EMPTY" : "OK") << std::endl;
       }
     }
     else
@@ -304,10 +298,6 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 #ifdef DEBUG
         PB->S << Offset << "(Forwarding: The destination is a block inside this process)" << endl;
 #endif
-        // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=LOCAL dest[last-2]="
-                  << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
-                  << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
         Status = ForwardMessageInsideProcess(_ReceivedMessage, _PCL, ScheduledMessages, InlineResponseMessage);
 
@@ -325,11 +315,6 @@ int GWMsgCl01::ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _P
 #ifdef DEBUG
         PB->S << Offset << "(Forwarding: The destination is a block outside this process)" << endl;
 #endif
-
-        // SPEC033B3DIAG (temporary, Astra): route decision trace (unthrottled)
-        std::cerr << "[SPEC033B3DIAG] GWMsgCl01 blk=" << PB->GetLegibleName() << " route=REMOTE dest[last-2]="
-                  << ReceivedMessageDestinations.at(ReceivedMessageDestinations.size() - 2)
-                  << " destCount=" << ReceivedMessageDestinations.size() << std::endl;
 
         // Stop processing the other command lines of the message. The destination is another block outside this process
         PB->StopProcessingMessage = true;
@@ -752,14 +737,6 @@ int GWMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*
   // Load the number of arguments
   if (_PCL->GetNumberofArguments(NA) == OK)
   {
-    // SPEC033B3DIAG (temporary, Astra): entry trace with limiter identity (unthrottled)
-    {
-      vector<string> _dbgLim;
-      _PCL->GetArgument(0, _dbgLim);
-      std::cerr << "[SPEC033B3DIAG] GWMsgCl01 ENTRY blk=" << PB->GetLegibleName()
-                << " limiter=" << (_dbgLim.empty() ? "NONE" : _dbgLim.at(0)) << std::endl;
-    }
-
     // Check the number of argument
     if (NA == 3)
     {

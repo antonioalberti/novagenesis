@@ -35,12 +35,6 @@
 
 #ifndef _GWMSGCL01_H
 #include "GWMsgCl01.h"
-
-// SPEC033B3DIAG (temporary, Astra review): cumulative queue mutation accounting (file-scope:
-// PushToInputQueue and Gateway are different member functions sharing one InputQueue)
-static unsigned long long pushTotal = 0, popTotal = 0, popDueTotal = 0, resolveFailTotal = 0;
-static MsgHandle lastPoppedHandle;
-static double lastPoppedEntryTime = 0.0, lastPoppedNow = 0.0;
 #endif
 
 #ifndef _GWRUNINITIALIZATION01_H
@@ -243,87 +237,35 @@ void GW::PushToInputQueue(Message* M)
         // Set the message tag
         M->SetTag(InputQueueTag);
 
-        // SPEC-033 Phase B (B-3): queue residence = one retention. Acquire
-        // it via FindHandle + TryRetain BEFORE taking the queue lock. If it
-        // fails the message is NOT queueable — mark it and let the regular
-        // reclamation path handle it.
-        MsgHandle QH;
-
-        if (PP->FindHandle(M, QH) != OK || PP->TryRetain(QH) == NULL)
-        {
-          cerr << "[SPEC033B3] PushToInputQueue REJECTED (retention failed — message not resident)" << endl;
-
-          M->MarkToDelete();
-
-          return;
-        }
-
-        // Copy the scheduling keys at enqueue time (snapshot semantics: the
-        // entry's keys decide scheduling; later message mutation does not
-        // reschedule this entry).
-        QEntry QE;
-        QE.Time = M->GetTime();
-        QE.Tag = InputQueueTag;
-        QE.H = QH;
-
-        // SPEC033B3DIAG: cumulative accounting at push (Astra: instrument every insertion)
-        pushTotal++;
-        std::cerr << "[SPEC033B3DIAG] PUSH inst=" << M->InstantiationNumber
-                  << " NoCL=" << NoCL << " slot=" << QH.Slot << ":" << QH.Generation << std::endl;
-        if (!std::isfinite(QE.Time))
-        {
-          std::cerr << "[SPEC033B3DIAG] NON-FINITE Time at enqueue: " << QE.Time
-                    << " slot=" << QE.H.Slot << " gen=" << QE.H.Generation << std::endl;
-        }
-
-        // SPEC-032: assign tag + push + detect whether this entry changes the
-        // runnable head under ONE lock. Notify after unlock so a waiting GW
-        // recomputes the predicate immediately for an earlier insertion.
-        bool notifyInput = false;
+        // Lock for push + notify (thread-safe w.r.t. Gateway() pop)
         {
           std::lock_guard<std::mutex> lock(InputQueueMutex);
 
-          notifyInput = InputQueue.empty() || QE.Time < InputQueue.top().Time;
-
-          // Push the entry to the queue
-          InputQueue.push(QE);
+          // Push the message to the queue
+          InputQueue.push(M);
 
           // Increases the tag counter
           InputQueueTag++;
         }
-        // The bounded timeout remains the fallback for non-head insertions
-        // and spurious wake-ups.
-        if (notifyInput)
-          InputQueueCV.notify_one();
+        // Notify after unlock to minimize time input thread is blocked
+        InputQueueCV.notify_one();
       }
       else
       {
-        static time_t lastRej = 0;
-        if (time(nullptr) - lastRej >= 10)
-        {
-          lastRej = time(nullptr);
-          cerr << "[SPEC032DIAG] PushToInputQueue REJECTED (NoCL=" << NoCL << " <= 2)" << endl;
-        }
         // Mark to delete the message
         M->MarkToDelete();
       }
     }
     else
     {
-      static time_t lastRej2 = 0;
-      if (time(nullptr) - lastRej2 >= 10)
-      {
-        lastRej2 = time(nullptr);
-        cerr << "[SPEC032DIAG] PushToInputQueue REJECTED (GetNumberofCommandLines failed)" << endl;
-      }
       S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
       M->MarkToDelete();
     }
   }
   else
   {
-    // SPEC-032: null message has nothing to mark — do NOT dereference M.
     S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
+    M->MarkToDelete();
   }
 }
 
@@ -356,27 +298,10 @@ void GW::PushToOutputQueue(std::string OQS, Message* M)
             M->UnmarkToDelete();
             M->SetTag(OutputQueueTag);
 
-            // SPEC-033 Phase B (B-3): output queue residence = one retention.
-            MsgHandle QH;
-
-            if (PP->FindHandle(M, QH) != OK || PP->TryRetain(QH) == NULL)
-            {
-              S << Offset << "(ERROR: SPEC-033 output queue retention failed — message not queueable)" << endl;
-
-              M->MarkToDelete();
-
-              return;
-            }
-
-            QEntry QE;
-            QE.Time = M->GetTime();
-            QE.Tag = OutputQueueTag;
-            QE.H = QH;
-
             // Lock for push + notify (thread-safe w.r.t. ReadFromOutputQueue)
             {
               std::lock_guard<std::mutex> lock(OutputQueueMutex);
-              OutputQueues[OQS].push(QE);
+              OutputQueues[OQS].push(M);
               OutputQueueTag++;
               NewOutputMessage = true;
             }
@@ -436,7 +361,7 @@ void GW::ReadFromOutputQueue()
     }
 
     // Phase 1: Pop at most one message per queue (under lock — microseconds)
-    std::vector<std::pair<std::string, QEntry>> batch;
+    std::vector<std::pair<std::string, Message*>> batch;
     {
       std::lock_guard<std::mutex> qlock(OutputQueueMutex);
 
@@ -444,9 +369,9 @@ void GW::ReadFromOutputQueue()
       {
         if (!it->second.empty())
         {
-          QEntry QE = it->second.top();
+          PM1 = it->second.top();
           it->second.pop();
-          batch.emplace_back(it->first, QE); // queue retention transfers to the batch
+          batch.emplace_back(it->first, PM1);
         }
       }
     } // Lock released
@@ -459,35 +384,13 @@ void GW::ReadFromOutputQueue()
 
     for (auto& kv : batch)
     {
-      // SPEC-033 Phase B (B-3): identity from the entry's handle. The batch
-      // owns the queue's retention for the duration of the SHM write.
-      Message* PM = PP->ResolveMessage(kv.second.H);
-
-      if (PM == NULL)
+      if (WriteToSharedMemory3(kv.first, kv.second) == OK)
       {
-        // Stale while retained = invariant violation (should be impossible).
-        // Defensive containment: discard the entry, touch no message.
-        cerr << "[SPEC033B3] INVIOLANT: stale output entry (slot " << kv.second.H.Slot
-             << ", gen " << kv.second.H.Generation << ") — discarding without dereference" << endl;
-
-        continue;
-      }
-
-      if (WriteToSharedMemory3(kv.first, PM) == OK)
-      {
-        // Delivered: release the queue's retention and request deletion.
-        PM->MarkToDelete();
-
-        if (PP->Release(kv.second.H) != OK)
-        {
-          cerr << "[SPEC033B3] output release failed post-delivery (slot " << kv.second.H.Slot << ")" << endl;
-        }
+        kv.second->MarkToDelete();
       }
       else
       {
-        // SHM busy — re-push under lock for retry on next cycle. Per Astra B-3
-        // rule (c): TRANSFER the retention back to the queue (no release +
-        // re-acquire).
+        // SHM busy — re-push under lock for retry on next cycle
         {
           std::lock_guard<std::mutex> qlock(OutputQueueMutex);
           OutputQueues[kv.first].push(kv.second);
@@ -532,90 +435,68 @@ void GW::Gateway()
   double ScheduledTime = 0;
   double Time = 0;
   long long int MessageSize = 0;
+  std::chrono::milliseconds waitTimeout;
   constexpr long long SHM_POLL_INTERVAL_MS = 1; // SHM poll every 1ms (SPEC-007a)
-  // SPEC-032 debug diagnostics (throttled to one line per 2s)
-  unsigned int diagBatchCount = 0;
-  double diagLastTime = 0;
-  unsigned long long diagRunCalls = 0;
+  double secondsUntilNext = 1.0;                // default 1s when queue empty
 
   // Start output queue thread
   tthread::thread* T = new tthread::thread(&GW::ReadFromOutputQueueThreadWrapper, this);
 
   while (StopGateway == false)
   {
-    // Future queue entries are not runnable. Keep a positive bounded wait
-    // so network/SHM service continues without sub-millisecond truncation.
+    // Calculate how long to wait: time until next scheduled message
+    {
+      std::lock_guard<std::mutex> lock(InputQueueMutex);
+      if (!InputQueue.empty())
+      {
+        double nextTime = InputQueue.top()->GetTime();
+        double now = GetTime();
+        secondsUntilNext = nextTime - now;
+        if (secondsUntilNext < 0)
+          secondsUntilNext = 0;
+      }
+      else
+      {
+        secondsUntilNext = 1.0; // no messages, check SHM every 1s max
+      }
+    }
+
+    // Wait for input queue or stop flag (timer-aware blocking wait)
     {
       std::unique_lock<std::mutex> lock(InputQueueMutex);
-      InputQueueCV.wait_for(lock,
-                            std::chrono::milliseconds(SHM_POLL_INTERVAL_MS),
+      waitTimeout = std::chrono::milliseconds(
+          std::min((long long)(secondsUntilNext * 1000), SHM_POLL_INTERVAL_MS));
+      InputQueueCV.wait_for(lock, waitTimeout,
                             [this]()
-                            {
-                              return StopGateway ||
-                                     (!InputQueue.empty() &&
-                                      InputQueue.top().Time < GetTime());
-                            });
+                            { return !InputQueue.empty() || StopGateway; });
       if (StopGateway)
         break;
     }
 
-    // SPEC-032: lock once, pop up to InputBatchLimit due messages, unlock.
-    // Prioriity order preserved (top() order); execution stays sequential below.
-    Time = GetTime();
+    // Lock, pop all due messages, unlock — minimize critical section
+    PM1 = NULL;
     RunFlag = false;
-
-    static QEntry batch[32];
-    unsigned int batchCount = 0;
-    unsigned int batchExecuted = 0;
+    Time = GetTime();
 
     {
       std::lock_guard<std::mutex> lock(InputQueueMutex);
-      while (batchCount < 32 && !InputQueue.empty())
+      if (!InputQueue.empty())
       {
-        QEntry due = InputQueue.top();
-        if (due.Time < Time)
+        PM1 = InputQueue.top();
+        ScheduledTime = PM1->GetTime();
+        if (ScheduledTime < Time)
         {
           InputQueue.pop();
-          batch[batchCount++] = due; // queue retention transfers to the batch
           RunFlag = true;
-          // SPEC033B3DIAG: cumulative accounting at every actual removal
-          popTotal++;
-          popDueTotal++;
-          lastPoppedHandle = due.H;
-          lastPoppedEntryTime = due.Time;
-          lastPoppedNow = Time;
-          {
-            unsigned int _dbgNoCL = 0;
-            unsigned int _dbgInst = 0;
-            Message* _dbgM = PP->ResolveMessage(due.H);
-            if (_dbgM != NULL)
-            {
-              _dbgInst = _dbgM->InstantiationNumber;
-              _dbgM->GetNumberofCommandLines(_dbgNoCL);
-            }
-            std::cerr << "[SPEC033B3DIAG] POP inst=" << _dbgInst << " NoCL=" << _dbgNoCL
-                      << " entryTime=" << due.Time << " now=" << Time
-                      << " h=" << due.H.Slot << ":" << due.H.Generation << std::endl;
-          }
         }
         else
         {
-          break; // future message: leave queued (top is earliest)
+          PM1 = NULL; // not yet due, leave in queue
         }
       }
-      if (batchCount > 0)
-        ScheduledTime = batch[0].Time;
-      diagBatchCount = batchCount;
     }
 
-    // Step 2 : Run procedure for each due message, in extraction (priority) order
-    for (unsigned int b = 0; b < batchCount && StopGateway == false; ++b)
-    {
-    // SPEC-033 Phase B (B-3): resolve from the ENTRY's handle (identity from
-    // the handle chain, not a raw pointer). The batch holds the queue's
-    // retention; Run(msg, irm, handle) ADOPTS it — no second count, no gap.
-    PM1 = PP->ResolveMessage(batch[b].H);
-
+    // Step 2 : Run procedure to interpret and run the received message
     if (PM1 != NULL && RunFlag == true)
     {
 
@@ -701,85 +582,26 @@ void GW::Gateway()
 
 #endif
 
-      diagRunCalls++;
-
-      // SPEC-033 Phase B (B-3): adopt path — Run takes over the batch's
-      // queue retention (count unchanged) and releases it at its single
-      // exit. Identity guaranteed by the handle chain.
-      Run(PM1, PM2, batch[b].H);
+      Run(PM1, PM2);
 
       PP->DeleteMarkedMessages();
 
       PM1 = NULL;
-      // SPEC-033 B-3 FIX: RunFlag is the BATCH flag ("the batch popped at least
-      // one due message"), set once before this loop. Resetting it here — the
-      // pre-B-3 code did — silently skipped every batch element after the
-      // first: the second bootstrap StoringInitialBinds never ran, the PG
-      // block binding was never stored, and the whole periodic/hello/discovery
-      // chain died at startup. Batch elements must not gate on a flag that a
-      // sibling element just cleared.
-    }
-    else if (RunFlag == true)
-    {
-      // Stale entry while the batch still holds the queue retention: this
-      // should be impossible (a retained message cannot be reclaimed).
-      // Defensive containment per Astra B-3 rules: discard WITHOUT touching
-      // any message the slot may hold now, release nothing (the count died
-      // with the message), and log loudly.
-      cerr << "[SPEC033B3] INVIOLANT: stale queued entry at pop (slot " << batch[b].H.Slot
-           << ", gen " << batch[b].H.Generation << ") — discarding without dereference" << endl;
-    }
-    ++batchExecuted;
-    } // SPEC-032: end per-batch-message loop
-
-    // If shutdown interrupts the batch, release every entry that was popped
-    // but not adopted by Run(). Otherwise its queue retention would survive
-    // the Gateway thread and prevent reclamation.
-    for (unsigned int b = 0; b < batchCount; ++b)
-    {
-      // Entries already adopted by Run() have released their batch retention;
-      // only the suffix after a stop needs cleanup. The loop below is entered
-      // only when StopGateway became true during execution.
-      if (StopGateway && b >= batchExecuted)
-      {
-        Message* pending = PP->ResolveMessage(batch[b].H);
-        if (pending != NULL)
-          pending->MarkToDelete();
-        if (PP->Release(batch[b].H) != OK)
-          cerr << "[SPEC033B3] batch shutdown release failed (slot "
-               << batch[b].H.Slot << ")" << endl;
-      }
+      RunFlag = false;
     }
 
     // Step 3 : NGAL: drain the NetworkReceiveQueue
     // The ReceiveDispatcher pushes raw char buffers here. The GW thread
     // does NewMessage + deserialisation + PushToInputQueue.
-    // SPEC-032: bounded drain — at most 32 raw entries per cycle; excess stays
-    // queued for the next outer-loop turn. Deserialization happens outside
-    // NetworkReceiveQueueMutex (released at block end).
     {
-      unsigned int drained = 0;
-      char* buffers[32];
-      long long sizes[32];
-      unsigned int count = 0;
-
+      std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
+      while (!NetworkReceiveQueue.empty())
       {
-        std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
-        while (!NetworkReceiveQueue.empty() && count < 32)
-        {
-          auto entry = NetworkReceiveQueue.front();
-          NetworkReceiveQueue.pop();
-          buffers[count] = entry.first;
-          sizes[count] = entry.second;
-          count++;
-        }
-      } // NetworkReceiveQueueMutex released — deserialization below is unlocked
+        auto entry = NetworkReceiveQueue.front();
+        NetworkReceiveQueue.pop();
 
-      for (unsigned int e = 0; e < count; ++e)
-      {
-        char* buffer = buffers[e];
-        long long size = sizes[e];
-        drained++;
+        char* buffer = entry.first;
+        long long size = entry.second;
 
         if (buffer != 0 && size > 0)
         {
@@ -787,7 +609,8 @@ void GW::Gateway()
           if (PP->NewMessage(0, 0, false, PM) == OK)
           {
           #ifdef DEBUG_NETWORK_QUEUE
-            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size << endl;
+            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size 
+                 << " queue_remaining=" << NetworkReceiveQueue.size() << endl;
           #endif
             PM->SetMessageFromCharArray(buffer, size);
             PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
@@ -797,11 +620,10 @@ void GW::Gateway()
 
         delete[] buffer;
       }
-      (void)drained;
     }
 
-    // Step 4: poll shared memory at the configured bounded interval when
-    // there is no strictly due input message.
+    // Step 4 : Read OS IPC — poll shared memory for messages from other processes
+    // Phase 2: rate limit to 100ms when no due messages to process (idle or waiting for future messages)
     {
       static auto lastSHMPoll = std::chrono::steady_clock::now();
       auto now = std::chrono::steady_clock::now();
@@ -811,9 +633,9 @@ void GW::Gateway()
         std::lock_guard<std::mutex> lock(InputQueueMutex);
         if (!InputQueue.empty())
         {
-          double nextTime = InputQueue.top().Time;
+          double nextTime = InputQueue.top()->GetTime();
           double currentTime = GetTime();
-          if (nextTime < currentTime)
+          if (nextTime <= currentTime)
             hasDueMessage = true;
         }
       }
@@ -821,38 +643,6 @@ void GW::Gateway()
       {
         ReadFromSharedMemory3();
         lastSHMPoll = std::chrono::steady_clock::now();
-      }
-    }
-
-    // SPEC-032 diagnostics (throttled)
-    {
-      double now = GetTime();
-      if (now - diagLastTime >= 2.0)
-      {
-        diagLastTime = now;
-        unsigned long long queued = 0;
-        double topTime = -1;
-        {
-          std::lock_guard<std::mutex> lock(InputQueueMutex);
-          queued = InputQueue.size();
-          if (!InputQueue.empty())
-            topTime = InputQueue.top().Time;
-        }
-        cerr << "[SPEC032DIAG] t=" << now
-             << " batch=" << diagBatchCount
-             << " runCalls=" << diagRunCalls
-             << " queued=" << queued
-             << " topTime=" << topTime
-             << " inMem=" << PP->GetNumberOfMessages()
-             << " duePopped=" << (diagBatchCount)
-             << " | pushTot=" << pushTotal
-             << " popTot=" << popTotal
-             << " popDue=" << popDueTotal
-             << " rslvFail=" << resolveFailTotal
-             << " lastPop=" << lastPoppedEntryTime << "@" << lastPoppedNow
-             << " h=" << lastPoppedHandle.Slot << ":" << lastPoppedHandle.Generation
-             << endl;
-        diagRunCalls = 0;
       }
     }
 
@@ -1533,15 +1323,8 @@ int GW::ReturnIPCSHMID(key_t _Key, int& _shmid)
 // Auxiliary functions
 void GW::SetStopGatewayFlag(bool _F)
 {
-  {
-    // Publish stop under both wait mutexes; atomicity alone does not
-    // prevent a notification being lost between predicate check and wait.
-    std::unique_lock<std::mutex> inputLock(InputQueueMutex, std::defer_lock);
-    std::unique_lock<std::mutex> outputLock(OutputQueueMutex, std::defer_lock);
-    std::lock(inputLock, outputLock);
-    StopGateway = _F;
-  }
-  // Notify after releasing both wait mutexes.
+  StopGateway = _F;
+  // Wake up both threads blocked on wait()
   InputQueueCV.notify_all();
   OutputQueueCV.notify_all();
 }

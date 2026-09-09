@@ -82,15 +82,6 @@ int PGRunHello01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 
   if (PB->StopProcessingMessage == false)
   {
-    // SPEC033B3DIAG (temporary): confirm the hello action runs and reaches the send branch
-    static time_t lastRunDiag = 0;
-    if (time(nullptr) - lastRunDiag >= 10)
-    {
-      lastRunDiag = time(nullptr);
-      std::cerr << "[SPEC033B3DIAG] PGRunHello01::Run entered, Stacks="
-                << (PPGCS->Stacks ? PPGCS->Stacks->size() : 0)
-                << " PSTuples=" << PPG->PSTuples.size() << std::endl;
-    }
     // **************************************************************
     // Sending a Hello message to the PGCS::PG at another hosts
     // **************************************************************

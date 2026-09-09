@@ -65,8 +65,6 @@ Message::Message(double _Time, short _Type, bool _HasPayload)
 
   InstantiationNumber = 0;
 
-  Retentions = 0;
-
   NoCL = 0;
   CommandLines = NULL;
 }
@@ -104,8 +102,6 @@ Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFile
   ApplicationDeleted = DELETED_BY_CORE;
 
   InstantiationNumber = 0;
-
-  Retentions = 0;
 
   NoCL = 0;
   CommandLines = NULL;
@@ -150,8 +146,6 @@ Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFile
   ApplicationDeleted = DELETED_BY_CORE;
 
   InstantiationNumber = 0;
-
-  Retentions = 0;
 
   NoCL = 0;
   CommandLines = NULL;
@@ -240,8 +234,6 @@ Message::Message(const Message& M)
   DeletePayloadArray = M.DeletePayloadArray;
 
   InstantiationNumber = 0;
-
-  Retentions = 0;
 }
 
 Message::~Message()
@@ -1829,30 +1821,32 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File* 
         {
           if (Msg[u] == '\n')
           {
-            // SPEC-033 Phase A: copied bytes are Msg[t..u-1] (u-t bytes, the
-            // last being '\n'). The old code passed u-t+1 as size, exposing
-            // one UNINITIALIZED byte to the parser. NUL-terminate and pass
-            // the exact length.
-            int CommandLineSize = (int)(u - t);
+            int CommandLineSize = (int)(u - t + 1);
 
-            Temp = new char[CommandLineSize + 1];
+            //*_PF<<"Command line size = "<<CommandLineSize<<endl;
+
+            Temp = new char[CommandLineSize];
+
+            //*_PF<<"Showing the discovered command line:"<<endl;
 
             for (int v = 0; v < (u - t); v++)
             {
               Temp[v] = Msg[t + v];
+
+              //*_PF<<Temp[v];
             }
 
-            Temp[u - t] = '\0';
+            //*_PF<<endl<<"Creating the new command line object"<<endl;
 
             NewCommandLine(PCL);
+
+            //*_PF<<"Copying the temporary array content to command line object"<<endl;
 
             PCL->ConvertCommandLineFromCharArray(Temp, CommandLineSize);
 
             //*_PF<<"Deleting the temporary array"<<endl;
 
-            // M4 fix (SPEC-033): Temp was allocated with new[], so it must be
-            // released with delete[] (plain delete on new[] is UB).
-            delete[] Temp;
+            delete Temp;
 
             //*_PF<<endl<<"Jumping to position = "<<u<<endl;
 
@@ -1948,14 +1942,16 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
         {
           if (Msg[u] == '\n')
           {
-            // SPEC-033 Phase A: same off-by-one fix as above — NUL-terminate
-            // and pass the exact length (u-t) instead of u-t+1.
-            int CommandLineSize = (int)(u - t);
-
-            Temp = new char[CommandLineSize + 1];
+            int CommandLineSize = (int)(u - t + 1);
 
 #ifdef DEBUG
             cout << "Command line size = " << CommandLineSize << endl;
+#endif
+
+            Temp = new char[CommandLineSize];
+
+#ifdef DEBUG
+            cout << "Showing the discovered command line:" << endl;
 #endif
 
             for (int v = 0; v < (u - t); v++)
@@ -1965,8 +1961,6 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
               cout << Temp[v];
 #endif
             }
-
-            Temp[u - t] = '\0';
 
 #ifdef DEBUG
             cout << endl

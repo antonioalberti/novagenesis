@@ -23,8 +23,3 @@ Thumbs.db
 *.jpg
 *.dat
 build/
-Common/tests/t_asan
-Common/tests/test_slot_container
-Common/tests/t_mixed_asan
-Common/tests/test_mixed_api
-Common/tests/test_slot_container

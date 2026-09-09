@@ -32,16 +32,8 @@
 #include <iostream>
 #endif
 
-#ifndef _MSGHANDLE_H
-#include "MsgHandle.h"
-#endif
-
 #ifndef _VECTOR_H
 #include <vector>
-#endif
-
-#ifndef _MUTEX_HH
-#include <mutex>
 #endif
 
 #ifndef _QUEUE_H
@@ -149,65 +141,6 @@ private:
 
   // Auxiliary container to control access to Messages container
   bool Controls[MAX_MESSAGES_IN_MEMORY];
-
-  // ── SPEC-033 Phase B: slot container + generational handles ──────────────
-  // Slots parallel the Messages array: same index space, one generation per
-  // slot. A handle {Slot, Generation} resolves ONLY while the slot still
-  // holds the message the caller saw (generation match) — stale handles
-  // resolve to NULL instead of a recycled-slot message (ABA prevention).
-  // MsgHandle/QEntry structs live in MsgHandle.h (shared with Block/GW).
-
-  // Free-list of slot indices. Capacity == MAX_MESSAGES_IN_MEMORY, so it
-  // never grows. LIFO pop hands out the lowest free index first (same
-  // allocation order the old linear scan produced).
-  unsigned int FreeList[MAX_MESSAGES_IN_MEMORY];
-
-  // Number of free slots on the free-list.
-  unsigned int NoFreeSlots;
-
-  // Per-slot generation counter, bumped every time the slot transitions to
-  // free (erase or delete). Handles capture it at issue time.
-  unsigned int SlotsGeneration[MAX_MESSAGES_IN_MEMORY];
-
-  // ── SPEC-033 Phase B (Astra review, finding 1): SHARED slot bookkeeping ──
-  // Both the legacy pointer API and the handle API delegate here, so there is
-  // exactly ONE allocator/reclaimer. No path may touch Messages[]/Controls[]/
-  // FreeList[]/NoM directly outside these two functions and the constructor.
-  // AllocSlot: pops the free-list (O(1)), installs PM, bumps NoM. Returns the
-  // slot index (>= 0), or -1 on exhaustion (leaves the free-list unchanged).
-  // NOTE: -1, NOT ERROR (=1): 1 is a valid slot index.
-  int AllocSlot(Message* _PM);
-
-  // FreeSlot: the COMMON reclaim boundary — refuses (ERROR) while the slot's
-  // message is retained (Retentions > 0), else bumps the generation, returns
-  // the slot to the free-list (O(1)), decrements NoM. Caller holds
-  // LifecycleMutex. Returns OK or ERROR (deferred reclamation).
-  int FreeSlot(unsigned int _Index);
-
-  // SPEC-033 Phase B (D3): lifecycle mutex + retention. Retention control is
-  // PUBLIC — GW queues (Block subclasses via PP) must acquire/release queue
-  // residence retentions. The mutex itself stays private; all mutation goes
-  // through these two functions.
-
-public:
-  // TryRetain: atomically (w.r.t. erase/delete) validates the handle and
-  // increments the message's retention count. On success the caller holds a
-  // retention and may use the resolved pointer until Release(H). Returns the
-  // message, or NULL if the handle is stale/invalid (then NO retention was
-  // taken — the caller must not touch anything).
-  Message* TryRetain(const MsgHandle& _H);
-
-  // Release: decrements the retention count. Never resurrects a freed slot.
-  int Release(const MsgHandle& _H);
-
-private:
-
-  // SPEC-033 Phase B (D3): guards slot bookkeeping, generation validation,
-  // retention acquire/release and the reclamation decision. NOT held across
-  // Run or queue operations.
-  std::mutex LifecycleMutex;
-
-public:
 
   // Counter on the number of message stored in memory
   unsigned int NoM;
@@ -354,22 +287,6 @@ public:
 
   // Get a Message
   int GetMessage(unsigned int _Index, Message*& M);
-
-  // ── SPEC-033 Phase B: handle-based API ────────────────────────────────────
-  // Allocate + insert; returns a generational handle. O(1).
-  int NewMessageHandle(double _Time, short _Type, bool _HasPayload, MsgHandle& _H);
-
-  // Find the handle of a live message by pointer. O(n) — used only where the
-  // caller holds a Message* (e.g. Block::Run acquiring its retention) and
-  // never in per-message hot paths. ERROR if the pointer is not a live slot.
-  int FindHandle(Message* _M, MsgHandle& _H);
-
-  // Resolve a handle to the live message, or NULL. O(1). Never returns a
-  // recycled-slot message: stale generation -> NULL.
-  Message* ResolveMessage(const MsgHandle& _H);
-
-  // Erase (container-side, no destruction) by handle. O(1).
-  int EraseMessageHandle(const MsgHandle& _H);
 
   // Delete a Message
   int HasMessage(Message* M, bool& _Answer);

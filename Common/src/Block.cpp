@@ -138,31 +138,8 @@ unsigned int Block::GetIndex()
   return Index;
 }
 
-// Run the actions behind a received message
+// Run the actions behind a received message, generating a resulting message
 int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage)
-{
-  // SPEC-033 Phase B gate 2 (Astra): legacy pointer entry. The caller must
-  // provide the lifetime guarantee itself (OkToRun historically covered this
-  // only for pointers still resident in the container). Retention is acquired
-  // here via FindHandle — acceptable for non-queued entry paths (CLI, IPC
-  // inline, HT list-bindings) where the caller just created the message.
-  MsgHandle EntryHandle;
-
-  return Run(_ReceivedMessage, _InlineResponseMessage, EntryHandle, false);
-}
-
-// Entry with an ALREADY-OWNED retention (queued path, B-3): adopt the
-// caller's count instead of adding a second one.
-int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle)
-{
-  return Run(_ReceivedMessage, _InlineResponseMessage, _RunHandle, true);
-}
-
-// Shared core. _AdoptOwned == true: _RunHandle already carries a retention
-// taken on the ORIGINAL queued handle (identity guaranteed by the queue's
-// own retention, not by pointer lookup). _AdoptOwned == false: acquire the
-// retention here via FindHandle + TryRetain.
-int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, const MsgHandle& _RunHandle, bool _AdoptOwned)
 {
   int Status = ERROR;           // Overall execution status
   vector<int> CLStatus;         // Status of every command line action
@@ -173,12 +150,6 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
   ActionsIterator it;           // Iterator to find out a value
   unsigned int i = 0;           // Command lines counter
   string Offset = "          "; // Auxiliary variable for logging
-
-  // SPEC-033 Phase B (D3): Run retention. Declared at function scope so the
-  // single release point at the end can see it from every nested path.
-  MsgHandle RunHandle;
-
-  bool RunRetained = false;
 
   if (LN != "GW")
   {
@@ -204,48 +175,8 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
   // Call the corresponding actions to perform the processing
   // ***********************************************************************
 
-  // SPEC-033 Phase B gate 2 (Astra): identity comes from the HANDLE, not the
-  // pointer. Adopt path: validate the handle FIRST (under the lifecycle
-  // mutex, via TryRetain-less resolve) — OkToRun dereferences, so it runs
-  // only after the message is confirmed and retained.
-  if (_AdoptOwned == true)
-  {
-    RunHandle = _RunHandle;
-
-    // Adopt: the caller's retention IS ours now (count unchanged). Verify
-    // the handle still resolves — if not, the caller handed us a stale
-    // retention, which is a contract violation on their side (they should
-    // never have gotten here with a dead handle while holding a count).
-    if (PP->ResolveMessage(RunHandle) == NULL)
-    {
-      S << "(ERROR: Adopted Run handle does not resolve — caller-side retention contract violated)" << endl;
-
-      return ERROR;
-    }
-
-    // OkToRun is now safe: the message is alive and the caller's count
-    // protects it for the duration of this Run.
-    RunRetained = true;
-  }
-
   if (PP->OkToRun(_ReceivedMessage) == true)
   {
-    if (_AdoptOwned == false)
-    {
-      // SPEC-033 Phase B (D3): acquire the Run retention atomically with the
-      // handle validation. From here to Release(), no reclamation pass can
-      // destroy the message, even if an Action marks it to delete.
-      if (PP->FindHandle(_ReceivedMessage, RunHandle) != OK || PP->TryRetain(RunHandle) == NULL)
-      {
-        // The message vanished between the OkToRun scan and the retention —
-        // do not touch it (T2 semantics).
-        S << "(ERROR: Unable to retain the received message for Run)" << endl;
-
-        return ERROR;
-      }
-
-      RunRetained = true;
-    }
     // SPEC-003: Moved DEBUGX and message dump AFTER OkToRun check.
     // Previously, these accessed _ReceivedMessage before verifying it
     // is still in Process::Messages[], causing use-after-free SIGSEGV
@@ -295,32 +226,11 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
 
         CLStatus.resize(NCL, ERROR);
 
-        // SPEC033B3DIAG (temporary, Astra): pre-loop state (unthrottled)
-        std::cerr << "[SPEC033B3DIAG] PRELOOP blk=" << GetLegibleName()
-                  << " inst=" << _ReceivedMessage->InstantiationNumber
-                  << " NCL=" << NCL << " stop=" << StopProcessingMessage
-                  << " adopted=" << _AdoptOwned << std::endl;
-
-
         // Vector of indexes to the block Messages container
         vector<Message*> ScheduledMessages;
 
         while (i < NCL && StopProcessingMessage == false)
         {
-          // SPEC033B3DIAG (temporary, Astra): trace every CL iteration (unthrottled, first 10 per message)
-          if (i < 10)
-          {
-            CommandLine* _dbgPCL = 0;
-            string _dbgName = "?", _dbgAlt = "?";
-            if (_ReceivedMessage->GetCommandLine(i, _dbgPCL) == OK && _dbgPCL != 0)
-            {
-              _dbgName = _dbgPCL->Name;
-              _dbgAlt = _dbgPCL->Alternative;
-            }
-            std::cerr << "[SPEC033B3DIAG] blk=" << GetLegibleName() << " CL[" << i << "/" << NCL << "] name=" << _dbgName
-                      << " alt=" << _dbgAlt << " stop=" << StopProcessingMessage << std::endl;
-          }
-
           if (_ReceivedMessage->GetCommandLine(i, PCL) == OK)
           {
             if (PCL != 0)
@@ -363,19 +273,6 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
 #ifdef DEBUG
                     S << Offset << "(Action is " << PA1->GetLegibleName() << ")" << endl;
 #endif
-
-                    // SPEC033B3DIAG (temporary): log every executed action LN
-                    // (Astra: rate-limiter shared across CLs can hide the payload CL —
-                    // use an unconditional counter instead, print per-LN counts at exit)
-                    static std::map<string, unsigned long long> ActCounts;
-                    ActCounts[LN1]++;
-                    if (LN1.find("--periodic") != string::npos ||
-                        LN1.find("--hello") != string::npos)
-                    {
-                      // UNTHROTTLED: bootstrap-critical actions must never be hidden
-                      std::cerr << "[SPEC033B3DIAG] Bootstrap-critical action executing: "
-                                << LN1 << " (total=" << ActCounts[LN1] << ")" << std::endl;
-                    }
 
                     // Call the action
                     CLStatus[i] = PA1->Run(_ReceivedMessage, PCL, ScheduledMessages, _InlineResponseMessage);
@@ -459,34 +356,9 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
         }
 
         // SPEC-003: Removed ScheduledMessages cleanup loop.
-        // CORRECTED (SPEC-033 Phase B, D4 — the original justification below
-        // was factually wrong): 5 Actions still push to ScheduledMessages
-        // (CoreMsgCl01 in PGCS/ContentApp/IoTTestApp/NBTestApp, IRMsgCl02 in
-        // GIRS). The vector is NOT always empty. The cleanup loop stays
-        // removed for a different reason: pushed messages belong to the
-        // Process container (sole owner), so deleting them here would be a
-        // double-ownership bug. Their disposition happens when a later Action
-        // (e.g. CoreSCNSeq01/CoreSCNAck01) PushToInputQueue's them — that
-        // transfer, not deletion, is what retires the vector's content.
-        //
-        // DEBUG invariant (SPEC-033 D4): every scheduled message must be
-        // either still pending (a later CL of THIS Run will consume it) or
-        // already dispositioned. We check the cheap necessary condition here:
-        // each scheduled message is a live Process-owned slot. Full
-        // disposition tracking (push succeeded + retention transferred) is
-        // the B-3 queue-migration step, where PushToInputQueue returns a
-        // verifiable outcome.
-#ifndef NDEBUG
-        for (Message* SM : ScheduledMessages)
-        {
-          bool Ans = false;
-
-          if (PP->HasMessage(SM, Ans) == OK && Ans == false)
-          {
-            cerr << "(WARNING: SPEC-033 D4 scheduled message no longer in the Process container — disposition outside the contract)" << endl;
-          }
-        }
-#endif
+        // With the GWStatusS01Msg dead code eliminated from GWMsgCl01,
+        // no action pushes to ScheduledMessages anymore. The vector is
+        // always empty, making the cleanup loop unnecessary.
 
 #ifdef DEBUG1
 
@@ -526,14 +398,6 @@ int Block::Run(Message* _ReceivedMessage, Message*& _InlineResponseMessage, cons
   else
   {
     S << "(ERROR: Unable to run a message that is not at the Messages container)" << endl;
-  }
-
-  // SPEC-033 Phase B (D3): single release point. Every path that entered the
-  // retained region falls through here; paths that never retained (OkToRun
-  // false or retention failure) return earlier or skip via the flag.
-  if (RunRetained == true)
-  {
-    PP->Release(RunHandle);
   }
 
   return Status;
