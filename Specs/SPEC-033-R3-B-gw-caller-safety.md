@@ -51,7 +51,73 @@ whether to authorize a narrowly scoped test seam, a friend declaration, or an
 integration fixture that drives the public `Gateway()` path. No seam is proposed
 as production code in this draft.
 
-## B0 result and Astra acceptance
+## B1 characterization result
+
+A public-lifecycle fixture was added at
+`/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp`.
+It constructs `Process` and `GW` normally, fills the Process after GW startup,
+creates a valid shared-memory segment, injects a bounded message, and drives the
+public `Gateway()` with normal stop/teardown.
+
+The first public-lifecycle fixture compiled successfully and reached the receive
+path, but its baseline crash was initially misattributed because pending startup
+work could fail first. An ASAN run after adding a normal-capacity warmup produced
+an exact stack attribution to `Message::SetMessageFromCharArray()` at
+`Message.cpp:865`, called from `GW::ReadFromSharedMemory3()` at `GW.cpp:857`,
+with a null `PM` after allocation failure. This confirms the B1 dereference.
+
+The subsequent synchronized fixture revision did not complete: the warmup/public
+Gateway cycle remained blocked for 420 seconds and was terminated. Its run is not
+acceptance evidence. The fixture therefore remains test-only and must be redesigned
+with a bounded, independently observable warmup/termination condition before any
+B1 production authorization. No B1 production code has been changed.
+
+### B1 fixture redesign (test-only)
+
+The replacement fixture removes the temporal warmup as a readiness criterion. The
+`GW` constructor completes synchronously, and the test then prepares one valid SHM
+message before starting the public `Gateway()` cycle. Readiness and completion are
+observable only through the SHM state transition `w -> f`; the worker has a hard
+bounded deadline and is stopped through the public `SetStopGatewayFlag()` path on
+both success and timeout. The fixture records whether the transition occurred,
+the final Process count/marking state, and the cleanup result. A timeout is an
+inconclusive fixture failure, never acceptance evidence.
+
+The fixture continues to use the normal public lifecycle and does not add a private
+access seam, friend declaration, production callback, or API change. The valid
+payload is deliberately minimal and independent of the Process capacity fill. The
+acceptance assertion remains narrow: when the real `NewMessage()` allocation fails,
+`ReadFromSharedMemory3()` must not dereference or enqueue `PM`, must complete the
+existing SHM cleanup/free-state path, and must preserve Process occupancy and
+marking counters.
+
+### B1 redesign characterization result
+
+The rewritten fixture was compiled against the restored baseline and executed in
+three isolated trials with a unique SysV IPC key per process and a 5-second public
+Gateway completion deadline. All trials reached `PHASE shm-prepared` and then
+terminated with exit code 139 (`SIGSEGV`) in the known baseline B1 path; none hung
+in the former unbounded warmup. The fixture cleanup wrapper removed all IPC
+segments in its reserved key range after each trial. These runs are RED
+characterization evidence only, not acceptance evidence and not authorization for
+production changes.
+
+The warmup-observable version then completed the public warmup at `count=3` in
+all three normal trials, filled the Process to 30,000, reached `PHASE shm-prepared`,
+and terminated with exit code 139. An ASAN build independently attributed the
+first failure to the intended B1 path:
+
+```text
+Message::SetMessageFromCharArray(Message.cpp:865)
+GW::ReadFromSharedMemory3(GW.cpp:857)
+GW::Gateway(GW.cpp:649)
+```
+
+This closes the previous startup-attribution gap, but the process still crashes on
+the unchanged baseline by design. The external runner remains responsible for
+watchdog enforcement and orphan-IPC cleanup on crash/timeout until the fixture's
+post-patch cleanup assertions are exercised.
+
 
 A RED fixture was added at
 `/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b0_constructor.cpp`.
