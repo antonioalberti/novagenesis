@@ -144,3 +144,28 @@ lifecycle and can prevent reaching shared-memory receive?
 runtime API or ownership semantics?
 4. Should B2 remain separate from B0/B1?
 5. Authorize only one next production group and list exact files/lines.
+
+## B1 test-only controls — 2026-09-10
+
+The fixture was extended with three explicit modes without changing production
+source: `valid`, `malformed-zero` and `exhaustion`.
+
+- Valid serialized-message control: 3/3 PASS, `rc=0`, `consumed=1`,
+  `before=3`, `after=4`, `marked_before=0`, `marked_after=1`, cleanup OK.
+- Malformed-size control (`total_size=0`): 3/3 PASS, `rc=0`, `consumed=1`,
+  `before=3`, `after=3`, `marked_before=0`, `marked_after=0`, SHM returned to
+  `f`, cleanup OK.
+- Allocation-exhaustion control: 3/3 baseline RED, reached `PHASE
+  shm-prepared`, then exited 139 in the known B1 path.
+
+The complete machine-readable record is
+`Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`. These results
+close the two missing test-only controls and prepare a fresh Astra review. They
+do not authorize production changes; the unchanged baseline RED is retained.
+
+A current-source ASAN run of `exhaustion` reproduced the failure with exit 134
+(ASAN abort) and the exact stack `Message.cpp:865` → `GW.cpp:857` →
+`GW.cpp:649`. Direct valid and malformed-zero controls each passed 3/3. The
+external runner reported an inconsistent rc=139 for malformed-zero despite the
+fixture log's `stable=1` and `cleanup_ok=1`; this discrepancy is recorded and
+must be resolved before the runner can serve as an acceptance gate.

@@ -1,0 +1,43 @@
+{
+  "test": "SPEC-033 R3 B1 test-only controls",
+  "date": "2026-09-10",
+  "branch": "AIOPT3",
+  "production_source_changed": false,
+  "fixture": "/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp",
+  "fixture_modes": ["valid", "malformed-zero", "exhaustion"],
+  "build": {
+    "command": "g++ -std=c++20 -O0 -g -Wno-deprecated -pthread gw_b1_shm_exhaustion.cpp Common/src/*.cpp -I Common/src -lrt",
+    "result": "PASS",
+    "binary": "/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_controls"
+  },
+  "controls": {
+    "valid_serialized_message": {
+      "trials": 3,
+      "result": "PASS",
+      "observed": "rc=0, warmup_done=1, shm_prepared=1, consumed=1, before=3, after=4, marked_before=0, marked_after=1, stable=1"
+    },
+    "malformed_size_zero": {
+      "trials": 3,
+      "result": "PASS",
+      "observed": "rc=0, warmup_done=1, shm_prepared=1, consumed=1, before=3, after=3, marked_before=0, marked_after=0, shm_byte=f, stable=1"
+    },
+    "allocation_exhaustion": {
+      "trials": 3,
+      "result": "BASELINE RED CONFIRMED",
+      "observed": "rc=139, PHASE shm-prepared reached in 3/3; SIGSEGV is expected on unchanged baseline B1 path",
+      "meaning": "characterization only; not production acceptance"
+    }
+  },
+  "cleanup": {
+    "valid_and_malformed_direct_runs": "fixture cleanup_ok=1 in 3/3 trials per mode",
+    "exhaustion": "external watchdog/cleanup path removed fixture IPC after each trial"
+  },
+  "current_source_asan": {
+    "mode": "exhaustion",
+    "exit": 134,
+    "result": "ASAN abort",
+    "stack": "Message.cpp:865 -> GW.cpp:857 -> GW.cpp:649",
+    "log": "/home/gandalf/workspace/ng-spec033-characterization-20260909/exhaustion-current-asan.log"
+  },
+  "runner_note": "The original pipe-capture runner reported rc=139 for malformed-zero although direct and ASAN runs returned rc=0. A file-backed runner was tested and the discrepancy persisted. Treat the runner as unreliable until separately diagnosed.",
+  "conclusion": "Direct valid and malformed-zero controls pass 3/3; current-source ASAN confirms the exhaustion crash. Fresh Astra review allows submission for scope review only; production implementation remains blocked."}
