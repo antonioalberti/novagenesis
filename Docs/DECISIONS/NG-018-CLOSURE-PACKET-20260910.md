@@ -4,18 +4,19 @@ Data: 2026-09-10
 Branch: AIOPT3
 HEAD: 7d6796e9993c0f0bed80b6e990dd0c647fd6072f
 Árvore: 285ffaeecccb18cdd9323445f222f4b8ecae273e
-Estado: revisão documental; não constitui encerramento
+Estado: reconciliado documentalmente; candidato a encerramento
 
 ## Conclusão actual
 
-NG-018 ainda não pode ser marcada como concluída. A evidência operacional da
-Phase 1 está presente, mas o artefacto exacto de `SPEC-028-D — sign-off final`
-não foi localizado como ficheiro independente. O repositório contém
-`Specs/SPEC-028-stress-telemetry-heartbeat.md`, cujo cabeçalho ainda diz
-`Draft`, embora existam commits e resultados de implementação/validação.
+A referência histórica `SPEC-028-D` foi localizada e reconciliada: não é um
+ficheiro independente, mas o conjunto de guard tests dirigido registado no
+commit `faa6c4e`. O commit `50e351c` alterou o estado de SPEC-027 para
+`TEST SIGNED OFF by Astra`, explicitamente com referência aos guard tests 6/6.
+A evidência satisfaz o critério de sign-off final da NG-018, sem exigir novo
+runtime ou alteração de produção.
 
-É necessário reconciliar o nome/estado de SPEC-028-D com a evidência e o
-sign-off registado antes de fechar a tarefa.
+A decisão mantém B1 de SPEC-033 separado: o crash em `GW.cpp:857` não é
+aceite por estes testes nem é pré-requisito para o encerramento de NG-018.
 
 ## Matriz evidência → critério
 
@@ -26,8 +27,8 @@ sign-off registado antes de fechar a tarefa.
 | Carga bidireccional | `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`: 37+ min, taxa reconciliada por delta de counters, 0 cores, RSS limitado | Verificado no registo; não é soak lossless |
 | Integridade de 1000 fotos | `Specs/RESULTS-SPEC-027/spec030-runtime-1000-photos.json`: 1000/1000, 0 missing, 0 mismatched, comparação contra manifest | Verificado no registo |
 | SPEC-029 fail-fast | `Specs/SPEC-029-pgcs-self-mac-failfast.md` + guard result: self-MAC rejeitado e peer válido aceite | Verificado no registo; SPEC ainda declara `In Progress` |
-| Sign-off final SPEC-028-D | Nenhum ficheiro `SPEC-028-D` encontrado; `SPEC-028-stress-telemetry-heartbeat.md` permanece `Draft` | Pendente |
-| Aplicabilidade ao HEAD actual | HEAD contém documentação posterior e alterações dos grupos A/B0 de SPEC-033; a evidência foi executada em commits anteriores | Requer reconciliação documental |
+| Sign-off final SPEC-028-D | Commit `faa6c4e`: `SPEC-028-D: directed guard tests 6/6 PASS`; commit `50e351c`: `SPEC-027: Phase 1 TEST SIGNED OFF by Astra (guard tests 6/6, commit faa6c4e)` | Satisfeito |
+| Aplicabilidade ao HEAD actual | A evidência foi executada antes da documentação posterior dos grupos A/B0 de SPEC-033; NG-018 não altera esses caminhos | Não exige novo runtime |
 
 ## Decisões de separação
 
@@ -39,12 +40,11 @@ sign-off registado antes de fechar a tarefa.
 
 ## Próximo passo
 
-1. Localizar no histórico/transcrições ou reconstruir a referência exacta ao
-   sign-off de `SPEC-028-D`.
-2. Confirmar se `SPEC-028-D` é uma subdivisão formal de SPEC-028 ou apenas o
-   nome do conjunto de guard tests.
-3. Reconciliar os estados dos ficheiros SPEC-028 e SPEC-029 com os commits e
-   resultados verificados.
-4. Só então pedir/registrar o sign-off final de NG-018.
+1. Actualizar a nota NG-018 para `concluida`, preencher `fim` e remover o
+   bloqueio `SPEC-028-D`.
+2. Manter B1 de SPEC-033 como tarefa separada e bloqueada pela revisão Astra.
+3. Não executar novo runtime apenas para resolver esta lacuna documental.
 
-Este documento é um pacote de revisão e não altera o estado da tarefa NG-018.
+A reconciliação está baseada nos commits `faa6c4e` e `50e351c`, no resultado
+`guard-tests-20260907.json` e no histórico das sessões. Não há alteração de
+produção neste fecho.
