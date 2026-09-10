@@ -1,6 +1,6 @@
 # SPEC-033-R3: Caller-safe allocation failure handling
 
-**Status:** A e B0 implementados e aceites pelo Astra nos commits `8b4aeaf` e `1f89c31`; B1/B2/B3 e C continuam bloqueados por gates próprios.
+**Status:** Grupo A, B0, B1 e B2 implementados e aceites nos respectivos escopos; B3 auditada sem defeito demonstrado; C continua bloqueada por gate próprio.
 **Branch:** AIOPT3
 **Related:** SPEC-033 Restart 1, SPEC-033-R2, `Docs/DECISIONS/SPEC033-R2-CALLER-MATRIX.md`
 

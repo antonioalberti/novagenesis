@@ -1,6 +1,6 @@
 # SPEC-033-R3-B: GW caller-safety amendments
 
-Status: Implemented — B1 accepted by Astra 2026-09-10; matched Alpine runtime PASS at e086868
+Status: Implemented — B1 and B2 accepted by Astra in their independent scopes; B3 audited with no defect demonstrated; C remains blocked.
 Branch: AIOPT3
 Parent: SPEC-033-R3-caller-safety-amendment.md
 
