@@ -1,6 +1,6 @@
 # SPEC-033-R3-B: GW caller-safety amendments
 
-Status: In Progress — B1 implemented locally; formal Astra acceptance and matched runtime validation pending
+Status: Implemented — B1 accepted by Astra 2026-09-10; matched Alpine runtime PASS at e086868
 Branch: AIOPT3
 Parent: SPEC-033-R3-caller-safety-amendment.md
 
@@ -175,6 +175,13 @@ serialized exhaustion remains RED 3/3 with current ASAN attribution.
 A fresh Astra review still returns NO-GO for production implementation until the
 complete cleanup/control-flow evidence and production-cleanup proof are supplied.
 
+## Final acceptance — 2026-09-10
+
+B1 was implemented in commit `e086868` within `GW.cpp:852-914`. Full CMake,
+normal runner, ASAN and matched Alpine runtime validation passed. The final
+runtime delivered 100/100 manifest-matched JPEGs with zero missing or
+mismatched files. Astra verdict: **PASS — B1 accepted independently**.
+B2/B3/C remain outside this acceptance.
 Direct valid and two boundary malformed-size controls each pass 3/3 through
 the corrected file-backed runner. The current-source ASAN exhaustion run
 reproduces the intended RED at `Message.cpp:865` via `GW.cpp:857`. The earlier

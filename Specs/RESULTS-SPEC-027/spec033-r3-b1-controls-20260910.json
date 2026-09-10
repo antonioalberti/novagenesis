@@ -53,7 +53,7 @@
   "post_change": {
     "production_source_changed": true,
     "production_scope": "Common/src/GW.cpp::ReadFromSharedMemory3(), original lines 852-914",
-    "production_commit": "pending commit",
+    "production_commit": "e086868",
     "build": "full CMake build PASS; fixture normal and ASAN builds PASS",
     "normal_runner": {
       "valid": "3/3 PASS, rc=0",
@@ -62,6 +62,17 @@
       "exhaustion-fixed": "3/3 PASS, rc=0, stable=1, retained_ok=1, slots_accessible=1"
     },
     "asan": "valid, malformed-zero, malformed-max and exhaustion all exit 0 with no sanitizer report",
-    "result": "Post-change local RED->GREEN achieved; formal Astra acceptance review pending"
+    "matched_alpine_runtime": {
+      "revision": "e086868",
+      "build_hosts": ["repo61 (192.168.0.61)", "source36 (192.168.0.36)"],
+      "build": "both guests built e086868 successfully; PGCS/NRNCS/ContentApp static-pie",
+      "workflow": "fresh VM stop/start; PGCS -> NRNCS -> Repository -> Source",
+      "source_manifest": "100 files",
+      "repository_files": "100 JPEGs",
+      "sha256": "100/100 matched; missing=0; mismatched=0",
+      "logs": "captured for Source and Repository",
+      "final_vm_state": "VM101 stopped; VM102 stopped"
+    },
+    "result": "B1 accepted: local RED->GREEN and matched Alpine 100-photo runtime passed; Astra final acceptance PASS"
   },
-  "conclusion": "B1 production change passes the local post-change RED->GREEN controls and ASAN runs. Formal Astra acceptance review and matched runtime validation remain pending."}
+  "conclusion": "B1 accepted: scoped production change e086868 passes local RED->GREEN controls, ASAN and matched Alpine 100-photo runtime (100/100 SHA-256 matched, missing=0, mismatched=0). B2/B3/C remain separate and blocked; this is not broader merge/release approval."}

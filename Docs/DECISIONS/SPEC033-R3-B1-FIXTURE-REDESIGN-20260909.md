@@ -155,3 +155,19 @@ Verification:
 
 Formal Astra post-change acceptance and matched Alpine runtime validation remain
 pending. Do not merge/release based only on these local controls.
+
+## Final Astra acceptance — 2026-09-10
+
+Astra reviewed the exact committed change `e086868` and the post-change
+results. Verdict: **PASS — B1 accepted independently**.
+
+- Local fixture: PASS, including normal, ASAN and runner-negative tests.
+- Matched Alpine runtime: PASS on repo61/source36 after fresh VM restart;
+  100/100 JPEGs matched the publish-time manifest, with zero missing or
+  mismatched files.
+- Scope: only `Common/src/GW.cpp::ReadFromSharedMemory3()`, original lines
+  852–914.
+- B2/B3/C remain blocked and are not accepted by this verdict.
+- This does not constitute broader merge/release approval.
+
+Durable evidence: `/home/gandalf/workspace/novagenesis/IO/NG-018-B1-runtime-20260910/sha256-verification.json`.
