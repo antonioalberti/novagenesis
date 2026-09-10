@@ -161,7 +161,19 @@ source: `valid`, `malformed-zero` and `exhaustion`.
 The complete machine-readable record is
 `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`. These results
 close the two missing test-only controls and prepare a fresh Astra review. They
-do not authorize production changes; the unchanged baseline RED is retained.
+do not authorize production changes; the baseline RED is retained.
+
+## Test-only remediation update — 2026-09-10
+
+The fixture now uses generated serialized NG bytes in both the valid and
+exhaustion modes. The valid control asserts a command-bearing received message,
+retained identity/flags, SHM state and slot/semaphore accessibility. The runner
+uses mode-specific expectations and treats missing IPC identity or cleanup
+errors as failures. Valid, malformed-zero and malformed-max controls pass 3/3;
+serialized exhaustion remains RED 3/3 with current ASAN attribution.
+
+A fresh Astra review still returns NO-GO for production implementation until the
+complete cleanup/control-flow evidence and production-cleanup proof are supplied.
 
 Direct valid and two boundary malformed-size controls each pass 3/3 through
 the corrected file-backed runner. The current-source ASAN exhaustion run

@@ -117,12 +117,18 @@ expanded results returned **NO-GO for B1 production implementation**. It allows
 continued test-only remediation.
 
 - the valid control now constructs a Message through the production `Message`
-  API, serializes `-run --initialization 0.1`, and passes the serialized bytes;
+  API, serializes `-run --initialization 0.1`, injects those bytes, and asserts
+  `serialized_roundtrip_ok=1` plus a parsed command in the received message;
+- the exhaustion control prepares the same serialized bytes before filling
+  Process capacity, so RED exercises valid data plus allocation failure;
 - two boundary malformed-size controls pass 3/3 through the corrected runner;
-- exhaustion remains RED and current-source ASAN attribution is preserved;
-- complete `ReadFromSharedMemory3()` cleanup/control-flow context and
-  identity-level preservation assertions remain required;
-- production cleanup must be demonstrated separately from runner cleanup.
+- retained message flags, command-bearing messages, primary SHM free state and
+  all four slot/semaphore accessibility are asserted before external cleanup;
+- runner mode expectations are now explicit: baseline crash is accepted only in
+  `exhaustion` mode, while unexpected normal-mode crashes and cleanup failures
+  fail the run;
+- complete `ReadFromSharedMemory3()` cleanup/control-flow context and stronger
+  production-cleanup proof remain required.
 
 The existing controls remain characterization evidence, but they do not
 authorize production edits.
