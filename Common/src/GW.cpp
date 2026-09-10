@@ -220,6 +220,12 @@ void GW::PushToInputQueue(Message* M)
 {
   unsigned int NoCL = 0;
 
+  if (M == 0)
+  {
+    S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
+    return;
+  }
+
 #ifdef DEBUG
 
   S << "[1]       (Pushing the following message to InputQueue. Size = " << InputQueue.size()
@@ -266,11 +272,6 @@ void GW::PushToInputQueue(Message* M)
       S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
       M->MarkToDelete();
     }
-  }
-  else
-  {
-    S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
-    M->MarkToDelete();
   }
 }
 
