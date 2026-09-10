@@ -163,9 +163,8 @@ The complete machine-readable record is
 close the two missing test-only controls and prepare a fresh Astra review. They
 do not authorize production changes; the unchanged baseline RED is retained.
 
-A current-source ASAN run of `exhaustion` reproduced the failure with exit 134
-(ASAN abort) and the exact stack `Message.cpp:865` → `GW.cpp:857` →
-`GW.cpp:649`. Direct valid and malformed-zero controls each passed 3/3. The
-external runner reported an inconsistent rc=139 for malformed-zero despite the
-fixture log's `stable=1` and `cleanup_ok=1`; this discrepancy is recorded and
-must be resolved before the runner can serve as an acceptance gate.
+Direct valid and two boundary malformed-size controls each pass 3/3 through
+the corrected file-backed runner. The current-source ASAN exhaustion run
+reproduces the intended RED at `Message.cpp:865` via `GW.cpp:857`. The earlier
+runner discrepancy is resolved. These results prepare a fresh Astra scope
+review but do not authorize production changes; the baseline RED is retained.

@@ -85,27 +85,47 @@ implementation was authorized.
 
 Astra confirmed:
 
-- valid control: 3/3 direct PASS, with expected message/marking changes;
-- malformed-zero control: 3/3 direct PASS and one clean ASAN run;
-- exhaustion: repeatable RED, now freshly attributed on the current source by
-  ASAN to `Message.cpp:865` via `GW.cpp:857`;
-- the external runner discrepancy for malformed-zero must be resolved before
-  treating the runner as a reliable acceptance gate or making a favorable
-  production-scope decision;
-- broader malformed-size coverage, complete fixture/source bundle and explicit
-  cleanup assertions remain required for production acceptance.
+- valid control: 3/3 through the corrected file-backed runner, with expected
+  message/marking changes;
+- malformed-zero control: 3/3 through the corrected runner, with unchanged
+  counters, free SHM state and cleanup;
+- malformed-max control: 3/3 through the corrected runner, with unchanged
+  counters, free SHM state and cleanup;
+- exhaustion: repeatable RED, freshly attributed on the current source by ASAN
+  to `Message.cpp:865` via `GW.cpp:857`;
+- the earlier runner discrepancy was resolved by changing capture from a pipe to
+  a file-backed child log; all nine normal control trials now return `rc=0`;
+- production acceptance still requires the post-change RED→GREEN assertions.
 
 The current-source ASAN report is preserved at
 `/home/gandalf/workspace/ng-spec033-characterization-20260909/exhaustion-current-asan.log`.
 
 ## Remaining gates
 
-1. Resolve the malformed-zero external-runner discrepancy and add any required
-   malformed-size cases.
-2. Send the complete B1 source, runner, logs, current ASAN evidence and exact
+1. Send the complete B1 source, runner, logs, current ASAN evidence and exact
    production boundary for formal scope review.
-3. Obtain an explicit conditional GO for the B1 production change.
-4. Obtain user approval for the exact production file/line scope.
-5. Implement, rebuild and run RED→GREEN plus matched runtime validation.
+2. Obtain an explicit conditional GO for the B1 production change.
+3. Obtain user approval for the exact production file/line scope.
+4. Implement, rebuild and run RED→GREEN plus matched runtime validation.
 
 No production implementation is authorized at this stage.
+
+## Subsequent Astra scope review — 2026-09-10
+
+A later review with the complete fixture, corrected runner, current ASAN log and
+expanded results returned **NO-GO for B1 production implementation**. It allows
+continued test-only remediation.
+
+Required corrections before another production-scope review:
+
+- replace the literal valid payload with a demonstrably serialized NG message
+  and assert intended parsing/handling, not only SHM consumption and counts;
+- provide the complete `ReadFromSharedMemory3()` cleanup/control-flow context;
+- make runner exit status and cleanup failures fatal and keep mode-specific
+  expectations;
+- add identity-level preservation assertions for unrelated messages and
+  explicitly distinguish runner cleanup from production cleanup;
+- preserve the current-source ASAN attribution and exact production allowlist.
+
+The existing direct controls and malformed-size controls remain useful
+characterization evidence, but they do not authorize production edits.
