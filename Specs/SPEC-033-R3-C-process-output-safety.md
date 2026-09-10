@@ -71,11 +71,11 @@ The first three focused classifications are:
 - `Common/src/GW.cpp:615`: invariant-protected at the shown queue boundary; `PM` starts null, status is checked and assignment precedes `OK`.
 - `PGCS/src/PG.cpp:234`: unresolved upstream caller; the separately analysed `PushStressMessage()` helper at line 260 does not protect this earlier path.
 
-GPT-6 Astra's current verdict is `NO-GO` for C production. The current provisional triage of the 76-row inventory reports 4 callers as `SAFE`, 8 as `UPSTREAM-DEFECT-OUTSIDE-C` and 64 as `UNRESOLVED`; no pointer-preservation compatibility risk was demonstrated, but compatibility is not thereby proven. Subsequent batch review found that some supplied blocks were nested excerpts rather than complete functions, so these counts are not semantic closure. The consolidated audit is:
+GPT-6 Astra's current verdict is `NO-GO` for C production. The exact-overload inventory has 76 rows. A reconciled three-batch ledger classifies 8 callers as `SAFE`, 38 as `UPSTREAM-DEFECT-OUTSIDE-C`, 3 as `POINTER-PRESERVATION-COMPATIBILITY-RISK` and 27 as `UNRESOLVED`; conflicts and one omitted batch row were conservatively classified as unresolved. Semantic compatibility is not closed. The ledger is:
 
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/SPEC-033-R3-C-semantic-caller-audit-final.md`
+`/home/gandalf/workspace/ng-spec033-characterization-20260909/SPEC-033-R3-C-reconciled-matrix.md`
 
-The 64 unresolved rows require a revision-stamped evidence supplement with complete declarations, loops, aliases, cleanup, exception handlers and transitive helper contracts. The eight upstream defects cannot be repaired by this first-overload-only amendment. No separate test seam is currently necessary.
+The unresolved rows require a revision-stamped evidence supplement with complete declarations, loops, aliases, cleanup, exception handlers and transitive helper contracts. The upstream defects cannot be repaired by this first-overload-only amendment. No separate test seam is currently necessary.
 
 ## 7. Required gates
 
