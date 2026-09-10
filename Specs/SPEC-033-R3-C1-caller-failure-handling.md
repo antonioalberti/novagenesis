@@ -46,13 +46,13 @@ Astra classified all three as concrete compatibility risks, while not claiming a
 
 For each of the three loops, a failed first-overload allocation must bypass every message-dependent operation for that iteration, including builders, name generation, serialization, sending, queue submission and message marking.
 
-The proposal must choose and document one control-flow behavior per function:
+GPT-6 Astra selected the conservative policy for all three functions: **return `ERROR` immediately after allocation failure**. This avoids reporting success after incomplete work, preserves earlier successful effects without rollback, and prevents subsequent operations from consuming a null or stale output. No failed output may be deleted, marked, unmarked or resubmitted.
 
-- skip the current iteration and continue with the next peer/tuple; or
-- terminate the current action with `ERROR`.
+The detailed test-only manifest is:
 
-The choice must preserve existing successful behavior and must not silently delete or mark a previous message. It must also define cleanup for messages already allocated earlier in the same invocation.
+`Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
 
+The policy and exact allowlist remain proposals until the test-only evidence is produced and reviewed.
 ## 5. Required evidence before implementation
 
 - Full current functions and relevant helper contracts for all three paths.
