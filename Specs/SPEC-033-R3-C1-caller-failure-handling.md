@@ -2,7 +2,7 @@
 
 **Author:** Antonio Alberti / Hermes Agent  
 **Date:** 2026-09-10  
-**Status:** Proposal — review only; no production authorization  
+**Status:** Deferred — test-only observability unavailable within current authorized scope  
 **Branch:** AIOPT3  
 **Implementation commit:** —  
 **Parent:** `SPEC-033-R3-C-process-output-safety.md`  
@@ -71,4 +71,6 @@ C1 does not authorize the producer change. Conversely, C1 does not authorize unr
 
 ## 7. Current disposition
 
-`NO-GO` for production. This document records the smallest caller group identified as incompatible with an unqualified producer-only output-clearing change. B1 and B2 remain accepted independently; B3 remains closed as no defect demonstrated.
+`DEFERRED` — test-only observability is unavailable within the current authorized scope. GPT-6 Astra recommends deferring C1 without a seam. No production change, caller change or seam work is authorized.
+
+The producer-only C proposal remains `NO-GO`. B1 and B2 remain accepted independently; B3 remains closed as no defect demonstrated.
