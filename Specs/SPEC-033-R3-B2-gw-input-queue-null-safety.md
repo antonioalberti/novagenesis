@@ -4,7 +4,7 @@
 **Date:** 2026-09-10  
 **Status:** Implemented — B2 local boundary accepted by Astra; broader caller/allocator safety remains outside scope.  
 **Branch:** AIOPT3
-**Implementation commit:** `b3912e4`
+**Implementation commit:** `53f06ff`
 **Related:** `SPEC-033-R3-caller-safety-amendment.md`, `SPEC-033-R3-B-gw-caller-safety.md`, `SPEC-033-R3-B1` (accepted independently)
 
 ## 1. Context and decision boundary
