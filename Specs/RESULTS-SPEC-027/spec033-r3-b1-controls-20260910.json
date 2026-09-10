@@ -15,7 +15,7 @@
     "valid_serialized_message": {
       "trials": 3,
       "result": "PASS",
-      "observed": "runner rc=0 in 3/3; warmup_done=1; shm_prepared=1; consumed=1; before=3; after=4; marked_before=0; marked_after=1; stable=1"
+      "observed": "runner rc=0 in 3/3; source Message built through Process::NewMessage + NewCommandLine(-run,--initialization,0.1) + ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray; serialized size=29 bytes; shm total_size=37; consumed=1; before=3; after=5; marked_before=0; marked_after=1; stable=1"
     },
     "malformed_size_zero": {
       "trials": 3,
@@ -44,5 +44,5 @@
     "valid_and_malformed_runner_trials": "all 9 normal trials completed rc=0; fixture cleanup_ok=1",
     "exhaustion": "external runner cleanup removed fixture IPC after each trial"
   },
-  "conclusion": "Direct valid and two boundary malformed-size controls pass 3/3 through the corrected file-backed runner. Current-source ASAN confirms the exhaustion crash. Fresh scope review returned NO-GO for production implementation: the valid payload is not proven to be a serialized NG message, the full cleanup/control-flow scope is incomplete, and runner/ownership assertions require strengthening. Continued test-only remediation is authorized; production remains blocked."
+  "conclusion": "A demonstrably serialized NG message and two boundary malformed-size controls pass 3/3 through the corrected file-backed runner. Current-source ASAN confirms the exhaustion crash. Fresh scope review still returns NO-GO for production implementation because complete ReadFromSharedMemory3 cleanup/control-flow context, identity-level preservation assertions and production-cleanup proof remain to be supplied. Continued test-only remediation is authorized; production remains blocked."
 }

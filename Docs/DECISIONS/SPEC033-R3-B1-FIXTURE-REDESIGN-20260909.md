@@ -116,16 +116,13 @@ A later review with the complete fixture, corrected runner, current ASAN log and
 expanded results returned **NO-GO for B1 production implementation**. It allows
 continued test-only remediation.
 
-Required corrections before another production-scope review:
+- the valid control now constructs a Message through the production `Message`
+  API, serializes `-run --initialization 0.1`, and passes the serialized bytes;
+- two boundary malformed-size controls pass 3/3 through the corrected runner;
+- exhaustion remains RED and current-source ASAN attribution is preserved;
+- complete `ReadFromSharedMemory3()` cleanup/control-flow context and
+  identity-level preservation assertions remain required;
+- production cleanup must be demonstrated separately from runner cleanup.
 
-- replace the literal valid payload with a demonstrably serialized NG message
-  and assert intended parsing/handling, not only SHM consumption and counts;
-- provide the complete `ReadFromSharedMemory3()` cleanup/control-flow context;
-- make runner exit status and cleanup failures fatal and keep mode-specific
-  expectations;
-- add identity-level preservation assertions for unrelated messages and
-  explicitly distinguish runner cleanup from production cleanup;
-- preserve the current-source ASAN attribution and exact production allowlist.
-
-The existing direct controls and malformed-size controls remain useful
-characterization evidence, but they do not authorize production edits.
+The existing controls remain characterization evidence, but they do not
+authorize production edits.
