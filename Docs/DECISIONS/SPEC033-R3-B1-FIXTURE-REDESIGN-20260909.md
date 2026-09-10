@@ -135,3 +135,23 @@ The existing controls remain characterization evidence. Astra's latest review
 provided a **conditional GO for implementing only B1**, limited to
 `Common/src/GW.cpp::ReadFromSharedMemory3()`, original lines 852–914. This is
 not a merge or release acceptance; the exact post-change gates remain mandatory.
+
+## B1 implementation and local validation — 2026-09-10
+
+After explicit user approval, the production change was limited to
+`Common/src/GW.cpp::ReadFromSharedMemory3()`, original lines 852–914. The
+allocation status and pointer are now checked before PM use; failure skips
+conversion/debug/enqueue and preserves the existing cleanup route. The
+unconditional allocation-path `Status = OK` was removed while scan-level status
+aggregation remains cumulative.
+
+Verification:
+
+- Full CMake build: PASS.
+- Valid, malformed-zero, malformed-max and exhaustion-fixed runner modes: 3/3
+  PASS each, normal exit 0.
+- Rebuilt ASAN versions of all four modes: exit 0, no sanitizer report.
+- Production diff: `Common/src/GW.cpp` only.
+
+Formal Astra post-change acceptance and matched Alpine runtime validation remain
+pending. Do not merge/release based only on these local controls.

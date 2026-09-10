@@ -2,7 +2,7 @@
   "test": "SPEC-033 R3 B1 test-only controls",
   "date": "2026-09-10",
   "branch": "AIOPT3",
-  "production_source_changed": false,
+  "baseline_production_source_changed": false,
   "fixture": "/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp",
   "runner": "/home/gandalf/workspace/ng-spec033-characterization-20260909/run-gw-b1-fixture.py",
   "fixture_modes": ["valid", "malformed-zero", "malformed-max", "exhaustion"],
@@ -50,5 +50,18 @@
       "cleanup_failure": "PASS: fake ipcs failure -> runner exit 1; ipcs-error is fatal"
     }
   },
-  "conclusion": "A demonstrably serialized NG message and two boundary malformed-size controls pass 3/3 through the corrected file-backed runner. Current-source ASAN confirms the exhaustion crash. Fresh scope review still returns NO-GO for production implementation because complete ReadFromSharedMemory3 cleanup/control-flow context, identity-level preservation assertions and production-cleanup proof remain to be supplied. Continued test-only remediation is authorized; production remains blocked."
-}
+  "post_change": {
+    "production_source_changed": true,
+    "production_scope": "Common/src/GW.cpp::ReadFromSharedMemory3(), original lines 852-914",
+    "production_commit": "pending commit",
+    "build": "full CMake build PASS; fixture normal and ASAN builds PASS",
+    "normal_runner": {
+      "valid": "3/3 PASS, rc=0",
+      "malformed-zero": "3/3 PASS, rc=0",
+      "malformed-max": "3/3 PASS, rc=0",
+      "exhaustion-fixed": "3/3 PASS, rc=0, stable=1, retained_ok=1, slots_accessible=1"
+    },
+    "asan": "valid, malformed-zero, malformed-max and exhaustion all exit 0 with no sanitizer report",
+    "result": "Post-change local RED->GREEN achieved; formal Astra acceptance review pending"
+  },
+  "conclusion": "B1 production change passes the local post-change RED->GREEN controls and ASAN runs. Formal Astra acceptance review and matched runtime validation remain pending."}

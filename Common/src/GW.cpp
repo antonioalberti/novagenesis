@@ -852,49 +852,52 @@ int GW::ReadFromSharedMemory3()
                   // Allocate a new Message object
                   Message* PM = 0;
 
-                  PP->NewMessage(GetTime(), 0, false, PM);
+                  const int PMStatus = PP->NewMessage(GetTime(), 0, false, PM);
+                  if (PMStatus == OK && PM != 0)
+                  {
+                    PM->SetMessageFromCharArray(Payload, (TotalSize - 8));
 
-                  PM->SetMessageFromCharArray(Payload, (TotalSize - 8));
-
-                  PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+                    PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
 
 #ifdef DEBUG1
-                  long long SS;
-                  long long SP;
-                  PM->GetMessageSize(SS);
-                  PM->GetPayloadSize(SP);
+                    long long SS;
+                    long long SP;
+                    PM->GetMessageSize(SS);
+                    PM->GetPayloadSize(SP);
 
-                  S << Offset << "(The total size of the message is = " << TotalSize - 8 << ")" << endl;
-                  S << Offset << "(The total size of the message is = " << SS << ")" << endl;
-                  S << Offset << "(The total size of the payload content in message is = " << SP << ")" << endl;
+                    S << Offset << "(The total size of the message is = " << TotalSize - 8 << ")" << endl;
+                    S << Offset << "(The total size of the message is = " << SS << ")" << endl;
+                    S << Offset << "(The total size of the payload content in message is = " << SP << ")" << endl;
 
-                  if (TotalSize < 3000 && SP > 1)
-                  {
-                    S << Offset << "(Showing what is on the payload array. Limited to messages smaller than 3000 bytes)" << endl;
-
-                    for (unsigned int l = 0; l < (TotalSize - 8); l++)
+                    if (TotalSize < 3000 && SP > 1)
                     {
-                      printf("%i %d %c \n", l, Payload[l], Payload[l]);
-                    }
+                      S << Offset << "(Showing what is on the payload array. Limited to messages smaller than 3000 bytes)" << endl;
 
-                    S << Offset << "(Shown)" << endl;
-                  }
+                      for (unsigned int l = 0; l < (TotalSize - 8); l++)
+                      {
+                        printf("%i %d %c \n", l, Payload[l], Payload[l]);
+                      }
+
+                      S << Offset << "(Shown)" << endl;
+                    }
 #endif
 
 #ifdef DEBUG2
-                  S << Offset << "(MessageSize = " << (TotalSize - 8) << ")" << endl;
+                    S << Offset << "(MessageSize = " << (TotalSize - 8) << ")" << endl;
 
-                  S << Offset
-                    << "(The following message was received from another process in the same OS)"
-                    << endl;
+                    S << Offset
+                      << "(The following message was received from another process in the same OS)"
+                      << endl;
 
-                  S << "(" << endl
-                    << *PM << endl
-                    << ")" << endl;
+                    S << "(" << endl
+                      << *PM << endl
+                      << ")" << endl;
 #endif
 
-                  // Pushing message to the queue
-                  PushToInputQueue(PM);
+                    // Pushing message to the queue
+                    PushToInputQueue(PM);
+                    Status = OK;
+                  }
 
                   delete[] HeaderTimeStampField;
 
@@ -910,8 +913,6 @@ int GW::ReadFromSharedMemory3()
                   // S << Offset << "(Finished reading)"<< endl;
 
                   // S << Offset << "(Time = "<<GetTime()<<")"<<endl;
-
-                  Status = OK;
 
                 } // (TotalSize < 0 && TotalSize > 1073741816) means that the message is with error or misconfigured
                 else

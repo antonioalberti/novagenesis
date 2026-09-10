@@ -1,6 +1,6 @@
 # SPEC-033-R3-B: GW caller-safety amendments
 
-Status: Draft for Astra review — no production changes
+Status: In Progress — B1 implemented locally; formal Astra acceptance and matched runtime validation pending
 Branch: AIOPT3
 Parent: SPEC-033-R3-caller-safety-amendment.md
 
