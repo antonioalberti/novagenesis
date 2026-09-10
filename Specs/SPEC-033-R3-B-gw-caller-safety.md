@@ -21,7 +21,7 @@ the null branch and is a separate B2 queue-hardening issue.
 ## Proposed split
 
 B0 — constructor/startup allocation failure (`GW.cpp:113-122`)
-B1 — shared-memory receive allocation failure (`GW.cpp:847-904`)
+B1 — shared-memory receive allocation failure (`GW.cpp:852-914`; complete control-flow boundary)
 B2 — null input-queue rejection (`GW.cpp:214-270`)
 B3 — network receive already-checked path (`GW.cpp:603-622`), only if cleanup
 or capacity-drop behavior is shown unsafe.
