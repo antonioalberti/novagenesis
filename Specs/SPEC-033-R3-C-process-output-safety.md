@@ -71,7 +71,7 @@ The first three focused classifications are:
 - `Common/src/GW.cpp:615`: invariant-protected at the shown queue boundary; `PM` starts null, status is checked and assignment precedes `OK`.
 - `PGCS/src/PG.cpp:234`: unresolved upstream caller; the separately analysed `PushStressMessage()` helper at line 260 does not protect this earlier path.
 
-GPT-6 Astra's current verdict is `NO-GO` for C production. The consolidated 76-row matrix classifies 4 callers as `SAFE`, 8 as `UPSTREAM-DEFECT-OUTSIDE-C` and 64 as `UNRESOLVED`; no pointer-preservation compatibility risk was demonstrated, but compatibility is not thereby proven. The complete consolidated audit is:
+GPT-6 Astra's current verdict is `NO-GO` for C production. The current provisional triage of the 76-row inventory reports 4 callers as `SAFE`, 8 as `UPSTREAM-DEFECT-OUTSIDE-C` and 64 as `UNRESOLVED`; no pointer-preservation compatibility risk was demonstrated, but compatibility is not thereby proven. Subsequent batch review found that some supplied blocks were nested excerpts rather than complete functions, so these counts are not semantic closure. The consolidated audit is:
 
 `/home/gandalf/workspace/ng-spec033-characterization-20260909/SPEC-033-R3-C-semantic-caller-audit-final.md`
 

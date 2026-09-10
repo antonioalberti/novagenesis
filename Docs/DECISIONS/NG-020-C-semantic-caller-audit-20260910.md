@@ -6,9 +6,7 @@
 
 ## Verdict
 
-The exact-overload inventory was reconciled to 76 actual four-argument call sites. The previous 77-row inventory contained the target function definition at `Common/src/Process.cpp:542` and was corrected.
-
-Astra classification counts:
+A classificação abaixo é a consolidação provisória dos relatórios Astra. Os lotes posteriores confirmaram que os blocos enviados não constituem, em todos os casos, funções envolventes completas; por isso, as classificações `SAFE`, `UPSTREAM-DEFECT-OUTSIDE-C` e `UNRESOLVED` devem ser tratadas como evidência de triagem, não como encerramento semântico definitivo. C permanece `NO-GO`.
 
 | Classification | Count |
 |---|---:|
