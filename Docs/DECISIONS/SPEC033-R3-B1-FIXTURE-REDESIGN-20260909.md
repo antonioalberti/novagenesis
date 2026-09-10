@@ -127,8 +127,11 @@ continued test-only remediation.
 - runner mode expectations are now explicit: baseline crash is accepted only in
   `exhaustion` mode, while unexpected normal-mode crashes and cleanup failures
   fail the run;
-- complete `ReadFromSharedMemory3()` cleanup/control-flow context and stronger
-  production-cleanup proof remain required.
-
-The existing controls remain characterization evidence, but they do not
-authorize production edits.
+- complete `ReadFromSharedMemory3()` cleanup/control-flow context was supplied to
+  Astra; production-cleanup proof remains a post-change acceptance gate;
+- marker-based received-message identity, attachment count (`shm_nattch=0`) and
+  exclusive fixture ownership are now asserted;
+The existing controls remain characterization evidence. Astra's latest review
+provided a **conditional GO for implementing only B1**, limited to
+`Common/src/GW.cpp::ReadFromSharedMemory3()`, original lines 852–914. This is
+not a merge or release acceptance; the exact post-change gates remain mandatory.

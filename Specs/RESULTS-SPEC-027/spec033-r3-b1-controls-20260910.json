@@ -15,17 +15,17 @@
     "valid_serialized_message": {
       "trials": 3,
       "result": "PASS",
-      "observed": "runner rc=0 in 3/3; serialized message captured from a production Message before warmup/capacity fill, size=29 bytes, injected; consumed=1; before=3; after=4; marked_before=0; marked_after=1; retained_ok=1; marked_with_commands=1 asserted; serialized_roundtrip_ok=1; slots_accessible=1; stable=1"
+      "observed": "runner rc=0 in 3/3; serialized Message captured before warmup/capacity fill and injected; marker_received=1; marked_with_commands=1 asserted; retained_ok=1; slots_accessible=1 with shm_nattch=0; consumed=1; before=3; after=4; marked_before=0; marked_after=1; stable=1"
     },
     "malformed_size_zero": {
       "trials": 3,
       "result": "PASS",
-      "observed": "runner rc=0 in 3/3; warmup_done=1; shm_prepared=1; consumed=1; before=3; after=3; marked_before=0; marked_after=0; shm_byte=f; stable=1"
+      "observed": "runner rc=0 in 3/3; unchanged count/marking; retained_ok=1; primary SHM free; all slots/semaphores accessible; shm_nattch=0; exclusive fixture lock held; stable=1"
     },
     "malformed_size_max": {
       "trials": 3,
       "result": "PASS",
-      "observed": "runner rc=0 in 3/3; warmup_done=1; shm_prepared=1; consumed=1; before=3; after=3; marked_before=0; marked_after=0; shm_byte=f; stable=1"
+      "observed": "runner rc=0 in 3/3; unchanged count/marking; retained_ok=1; primary SHM free; all slots/semaphores accessible; shm_nattch=0; exclusive fixture lock held; stable=1"
     },
     "allocation_exhaustion": {
       "trials": 3,
@@ -46,7 +46,8 @@
     "negative_runner_tests": {
       "unexpected_crash_normal_mode": "PASS: fake rc=139 -> runner exit 1, status unexpected-crash",
       "missing_ipc_identity": "PASS: fake no-key -> runner exit 1",
-      "watchdog_timeout": "PASS: fake timeout -> runner exit 1"
+      "watchdog_timeout": "PASS: fake timeout -> runner exit 1",
+      "cleanup_failure": "PASS: fake ipcs failure -> runner exit 1; ipcs-error is fatal"
     }
   },
   "conclusion": "A demonstrably serialized NG message and two boundary malformed-size controls pass 3/3 through the corrected file-backed runner. Current-source ASAN confirms the exhaustion crash. Fresh scope review still returns NO-GO for production implementation because complete ReadFromSharedMemory3 cleanup/control-flow context, identity-level preservation assertions and production-cleanup proof remain to be supplied. Continued test-only remediation is authorized; production remains blocked."
