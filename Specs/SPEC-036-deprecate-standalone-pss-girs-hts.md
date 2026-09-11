@@ -1,6 +1,6 @@
 # SPEC-036: Staged deprecation of standalone PSS, GIRS and HTS
 
-**Version:** v1.0
+**Version:** v1.1
 **Date:** 2026-09-11
 **Author:** Antonio Alberti, with GPT-6 Astra review
 **Status:** In Progress
