@@ -19,9 +19,6 @@ COPY /Common /home/ng/workspace/novagenesis/Common
 COPY /PGCS /home/ng/workspace/novagenesis/PGCS
 COPY /ContentApp /home/ng/workspace/novagenesis/ContentApp
 COPY /NRNCS /home/ng/workspace/novagenesis/NRNCS
-COPY /PSS /home/ng/workspace/novagenesis/PSS
-COPY /GIRS /home/ng/workspace/novagenesis/GIRS
-COPY /HTS /home/ng/workspace/novagenesis/HTS
 COPY /IoTTestApp /home/ng/workspace/novagenesis/IoTTestApp
 COPY /NBTestApp /home/ng/workspace/novagenesis/NBTestApp
 COPY /IO /home/ng/workspace/novagenesis/IO

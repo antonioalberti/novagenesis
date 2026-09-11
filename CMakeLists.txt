@@ -3,17 +3,23 @@ project(novagenesis)
 
 set(CMAKE_CXX_STANDARD 20)
 
+option(NG_ENABLE_LEGACY_STANDALONE
+       "Build deprecated standalone PSS, GIRS and HTS services"
+       OFF)
+
+if(NG_ENABLE_LEGACY_STANDALONE)
+    message(WARNING
+            "NG_ENABLE_LEGACY_STANDALONE=ON: PSS, GIRS and HTS are deprecated; use NRNCS")
+endif()
+
 include_directories(ContentApp/src)
 include_directories(Common/src)
 include_directories(Common/src/rapidjson)
 include_directories(Common/src/rapidjson/error)
 include_directories(Common/src/rapidjson/internal)
-include_directories(GIRS/src)
-include_directories(HTS/src)
 include_directories(IoTTestApp/src)
 include_directories(NBTestApp/src)
 include_directories(PGCS/src)
-include_directories(PSS/src)
 include_directories(NRNCS/src)
 
 add_library(Common
@@ -183,6 +189,7 @@ add_executable(ContentApp
 
 target_link_libraries(ContentApp LINK_PRIVATE Common)
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(GIRS
         GIRS/src/execGIRS.cpp
         GIRS/src/GIRS.cpp
@@ -224,8 +231,11 @@ add_executable(GIRS
         GIRS/src/IRStoreBind02.cpp
         GIRS/src/IRStoreBind02.h)
 
+target_include_directories(GIRS PRIVATE GIRS/src)
 target_link_libraries(GIRS LINK_PRIVATE Common)
+endif()
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(HTS
         HTS/src/DHT.cpp
         HTS/src/DHT.h
@@ -241,7 +251,9 @@ add_executable(HTS
         HTS/src/HTS.cpp
         HTS/src/HTS.h)
 
+target_include_directories(HTS PRIVATE HTS/src)
 target_link_libraries(HTS LINK_PRIVATE Common)
+endif()
 
 add_executable(IoTTestApp
         IoTTestApp/src/Core.cpp
@@ -388,6 +400,7 @@ add_executable(PGCS
 
 target_link_libraries(PGCS LINK_PRIVATE Common)
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(PSS
         PSS/src/execPSS.cpp
         PSS/src/PS.cpp
@@ -421,7 +434,9 @@ add_executable(PSS
         PSS/src/PSSubBind01.cpp
         PSS/src/PSSubBind01.h)
 
+target_include_directories(PSS PRIVATE PSS/src)
 target_link_libraries(PSS LINK_PRIVATE Common)
+endif()
 
 add_executable(NRNCS
         NRNCS/src/execNRNCS.cpp
