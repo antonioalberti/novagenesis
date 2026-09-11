@@ -21,7 +21,7 @@ Observed in `/home/gandalf/workspace/novagenesis` on 2026-09-11:
 | Item | Current state |
 |---|---|
 | Active integration branch | `AIOPT3` |
-| `AIOPT3` / `origin/AIOPT3` | `74eae2e` — `SPEC-036: sync task version and canonical filename` |
+| `AIOPT3` / `origin/AIOPT3` | `b69a9ae` — `SPEC-037: define AIOPT3 default branch promotion` |
 | `master` / `origin/master` | `e305782` — `Fix: add return 0; to GenerateSCNFromCharArrayBinaryPatterns functions to prevent SIGILL` |
 | Remote HEAD | `origin/HEAD -> origin/master` |
 | Divergence | `master...AIOPT3`: `0 261` — AIOPT3 is 261 commits ahead and has no commits absent from master according to the local graph |
