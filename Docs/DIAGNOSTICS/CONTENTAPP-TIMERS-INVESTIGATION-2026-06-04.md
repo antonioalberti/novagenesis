@@ -2,6 +2,7 @@
 
 **Sessão:** 2026-06-04 (sessão tarde, após NG-042-03)
 **Status:** Investigação (sem código alterado ainda)
+**Applicability:** As referências a PSS/GIRS/HTS neste diagnóstico descrevem a topologia legacy. O caminho normal actual usa NRNCS; reproduções da topologia antiga exigem `NG_RUNTIME_PROFILE=legacy`.
 **Pedido do usuário:**
 - Simplificar a fase de descoberta (INTERNO, sem remover etapas)
 - Usar o que temos para avançar até Service Offer e Acceptance

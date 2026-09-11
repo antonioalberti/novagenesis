@@ -8,6 +8,8 @@
 
 ---
 
+> **SPEC-036 applicability:** This SPEC's references to standalone HTS, GIRS or PSS describe the legacy distributed profile. Normal operation uses NRNCS; `NG_RUNTIME_PROFILE=legacy` is required when reproducing that topology. The shared PGCS `HT` destination and NRNCS exposition path remain in scope where stated.
+
 ## 1. Problem
 
 In the Docker 1core-1repo-1source scenario and Alpine VMs 101/102, each PGCS fails to send inter-PGCS exposition messages. The repeated error in logs is:
