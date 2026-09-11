@@ -23,7 +23,7 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 
 ### High privacy/reproducibility concern
 
-- Active scripts and SPEC-009 contain deployment-specific IPs, MACs, hostnames, Proxmox references, VM numbers, `/root` paths and `/home` paths.
+- Initial audit found private deployment identities, local filesystem references and generated runtime material in active scripts and historical records.
 - These values describe one laboratory deployment and cannot be assumed by another user.
 - Active operational scripts should use required environment variables or a local ignored configuration file. Historical records may retain exact values only when clearly labelled as historical and intentionally excluded from active instructions.
 
