@@ -2,7 +2,7 @@ Thank you for your interest in NovaGenesis.
 
 # 1. What is NovaGenesis (NG)?
 
-NG is a convergent information processing, storage and exchanging architecture developed at INATEL - Instituto Nacional de Telecomunicações, Santa Rita do Sapucaí, MG, Brazil. Nowadays, NovaGenesis is kept by Information and Communications Technologies (ICT) Lab.
+NG is a convergent information processing, storage and exchanging architecture developed at INATEL - Instituto Nacional de Telecomunicações, Santa Rita do Sapucaí, MG, Brazil. Nowadays, NovaGenesis is kept by Information and Communications Technologies (ICT) Lab. The project currently continues at the University of Leeds under the leadership of Prof. Antônio Marcos Alberti.
 
 Its design started in 2008, when Prof. Antônio Marcos Alberti selected project requirements, design principles, guidelines and main foundations. Alberti also did its first specification in 2011 and coded this prototype in C/C++ in 2012-2013. The key idea of NovaGenesis can be summarized in the following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is no guarantee of any kind. NG is a registered software.
 
@@ -244,3 +244,67 @@ Now, run the NG services locally:
 In this case, results will be placed locally in the /IO/NBTestApp folder.
 
 When the test finishes, the NBTestApp stops runnig by itself.
+
+
+# 5. Alpine VM cross-process test scenarios
+
+NovaGenesis can also be tested as separate processes across two Alpine Linux VMs. The normal profile uses NRNCS as the domain service; standalone PSS, GIRS and HTS are deprecated and are not started by the normal scenario. The legacy profile is opt-in and is intended for compatibility testing only.
+
+## 5.1 VM roles and network identities
+
+| VM | Hostname | Address | Role | Ethernet MAC |
+|---|---|---|---|---|
+| 101 | repo61 | `192.168.0.61` | PGCS + ContentApp Repository | `08:00:27:65:00:08` |
+| 102 | source36 | `192.168.0.36` | PGCS + NRNCS + ContentApp Source | `08:00:27:79:bb:15` |
+
+The peer MAC values above must be copied literally, including lowercase hexadecimal letters. In particular, the Repo PGCS must target `08:00:27:79:bb:15`; changing `bb` to `BB` can produce an incorrect Ethernet destination in the current command path and cause one-way discovery.
+
+## 5.2 Normal cross-process content-distribution scenario
+
+The test uses independent PGCS, NRNCS and ContentApp processes communicating through shared memory and NovaGenesis raw Ethernet frames (`ethertype 0x1234`). No HTTP, TCP or UDP transport is used for the NG data path.
+
+Before every run:
+
+1. Stop both VMs and start them cleanly.
+2. Verify the expected `AIOPT3` commit on both guests.
+3. Run `Scripts/Simple/clean.sh` on both VMs and preserve any external evidence directories.
+4. Build the normal profile in a fresh build directory; verify executable identity and the NRNCS cache marker.
+5. Start exactly one PGCS per VM, using the peer MAC values in Section 5.1.
+6. Wait for bidirectional PGCS peer registration before starting NRNCS or ContentApp.
+7. Start NRNCS on VM 102 and wait for its operational/shared-memory discovery markers.
+8. Start the Repository ContentApp on VM 101.
+9. Generate a fresh, unique photo set and start the Source ContentApp on VM 102.
+
+The normal launch order is therefore:
+
+```text
+PGCS Source (VM 102)
+    + PGCS Repository (VM 101)
+        + NRNCS (VM 102)
+            + ContentApp Repository (VM 101)
+                + ContentApp Source (VM 102)
+```
+
+## 5.3 Acceptance evidence
+
+A photo-transfer run is accepted only when:
+
+- Source, NRNCS and Repository contain the expected number of fresh JPEGs;
+- filenames match at all three locations;
+- programmatic SHA-256 maps satisfy `Source == NRNCS == Repository`;
+- there are no missing or extra files;
+- logs contain no unexplained `ERROR`, `ALARM` or `FATAL` entries;
+- the tested commit and configuration are recorded;
+- logs, manifests and hash comparisons are preserved in an external evidence directory.
+
+For a 100-photo gate, exactly 100 fresh JPEGs must be present and byte-exact at Source, NRNCS and Repository. File counts or textual delivery messages alone are not sufficient evidence.
+
+For asymmetric discovery, inspect the actual frames on the Proxmox bridge before changing NovaGenesis code:
+
+```bash
+tcpdump -eni vmbr0 ether proto 0x1234
+```
+
+The first diagnostic question is whether the transmitted Ethernet destination matches the peer VM MAC. A wrong destination is a test/deployment configuration error, not evidence of a NovaGenesis runtime defect.
+
+After evidence collection, stop all NG processes and leave VMs 101 and 102 stopped unless another test is actively running.
