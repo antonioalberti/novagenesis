@@ -135,7 +135,7 @@ The implementation inventory must use tracked-file searches and classify every r
 
 7. All three relevant applications are covered by the normal/legacy discovery tests.
 8. NRNCS publication, resolution and ContentApp delivery remain functional with byte-exact manifests and hashes.
-9. The revised IoT/LoRa/EPGS scenario is validated, or the missing prerequisite is recorded as a blocking gap rather than a pass.
+9. LoRa/EPGS validation is explicitly out of scope for this repository task and remains a dependency/reference to the separate repository where that scenario is being handled.
 10. Active documentation contains no unqualified recommendation or requirement for standalone deployment.
 11. Historical evidence and excluded untracked IO evidence are unchanged.
 12. Build, runtime and documentation changes are independently revertible.
@@ -173,7 +173,7 @@ These criteria are proposed gates; no implementation or test result is claimed b
 
 ### Implementation gate review — 2026-09-11
 
-GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. Remaining acceptance gates are the cross-process normal/legacy discovery matrix, normal-mode NRNCS byte-exact ContentApp delivery, clean Docker builds, VM 101/102 validation, and the LoRa/EPGS runtime. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
+GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. Remaining acceptance gates are the cross-process normal/legacy discovery matrix, normal-mode NRNCS byte-exact ContentApp delivery, and clean Docker/VM validation. LoRa/EPGS is explicitly out of scope and is being handled in a separate repository. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
 
 ## 9. Pitfalls
 
