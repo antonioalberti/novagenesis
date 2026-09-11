@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Compile script for NovaGenesis
-# Run from: /home/gandalf/workspace/novagenesis/Make/
+# Run from: <workspace-root>/novagenesis/Make/
 # Usage: bash compile.sh [service1] [service2] ...
 #   If no arguments: compiles all services
 #   With arguments: compiles only specified services

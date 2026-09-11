@@ -127,7 +127,7 @@ CoreDeliveryBind01                              │ (creates acceptance,        
 ## 5. Verification
 
 1. Compile: `cd build && make -j$(nproc)`
-2. Deploy to repo61 and source36
+2. Deploy to repository guest and source guest
 3. Start NRNCS + PGCS + ContentApp on both VMs
 4. Check Repo log: **ZERO** occurrences of `(The following message contains a subscription of delayed deliveries)`
 5. Verify each subscription shows `Status = Delivered` after first delivery

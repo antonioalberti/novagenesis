@@ -119,7 +119,7 @@ A intersecção faz `BottomUpBIDs[i] == TopDownBIDs[j]` (string equality). Cat[5
 
 ### 5.1 Pré-requisitos
 
-- Acesso SSH às VMs 101/102 (deploy da nova chave `id_ed25519_hermes`)
+- Acesso SSH às VMs 101/102 (deploy da nova chave `<operator-ssh-key>`)
 - Ou: compilar e testar localmente no host 100
 
 ### 5.2 Etapas

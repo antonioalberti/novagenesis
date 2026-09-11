@@ -29,10 +29,10 @@ All trials returned exit code `10`, the expected RED for the proposed output con
 
 Evidence files:
 
-- `/home/gandalf/workspace/ng-spec033-characterization-20260909/process_exhaustion.cpp`
-- `/home/gandalf/workspace/ng-spec033-characterization-20260909/process-c-current-1.log`
-- `/home/gandalf/workspace/ng-spec033-characterization-20260909/process-c-current-2.log`
-- `/home/gandalf/workspace/ng-spec033-characterization-20260909/process-c-current-3.log`
+- `<workspace-root>/ng-spec033-characterization-20260909/process_exhaustion.cpp`
+- `<workspace-root>/ng-spec033-characterization-20260909/process-c-current-1.log`
+- `<workspace-root>/ng-spec033-characterization-20260909/process-c-current-2.log`
+- `<workspace-root>/ng-spec033-characterization-20260909/process-c-current-3.log`
 
 ## 3. Proposed contract
 
@@ -63,7 +63,7 @@ The corrected mechanical filter excludes comments, overload definitions and non-
 
 The complete evidence-only workset is:
 
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/SPEC-033-R3-C-exact-overload-callers.md`
+`<workspace-root>/ng-spec033-characterization-20260909/SPEC-033-R3-C-exact-overload-callers.md`
 
 The first three focused classifications are:
 
@@ -73,7 +73,7 @@ The first three focused classifications are:
 
 GPT-6 Astra's current verdict is `NO-GO` for C production. The exact-overload inventory has 76 rows. A reconciled three-batch ledger classifies 8 callers as `SAFE`, 38 as `UPSTREAM-DEFECT-OUTSIDE-C`, 3 as `POINTER-PRESERVATION-COMPATIBILITY-RISK` and 27 as `UNRESOLVED`; conflicts and one omitted batch row were conservatively classified as unresolved. Semantic compatibility is not closed. The ledger is:
 
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/SPEC-033-R3-C-reconciled-matrix.md`
+`<workspace-root>/ng-spec033-characterization-20260909/SPEC-033-R3-C-reconciled-matrix.md`
 
 The unresolved rows require a revision-stamped evidence supplement with complete declarations, loops, aliases, cleanup, exception handlers and transitive helper contracts. The upstream defects cannot be repaired by this first-overload-only amendment. No separate test seam is currently necessary.
 

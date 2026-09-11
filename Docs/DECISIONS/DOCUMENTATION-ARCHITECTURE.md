@@ -2,14 +2,14 @@
 
 **Version:** 1.0  
 **Date:** 2026-07-16  
-**Scope:** Repository-wide documentation organization for `/home/gandalf/workspace/novagenesis`
+**Scope:** Repository-wide documentation organization for `<local-repository-path>`
 
 ---
 
 ## 1. Top-Level Structure
 
 ```
-/home/gandalf/workspace/novagenesis/
+<local-repository-path>/
 ├── Specs/              # Specifications (SPECs) — design, implementation, fixes
 ├── Docs/               # Reference documentation — architecture, diagnostics, decisions
 ├── Issues/             # Issue tracking — open/closed issues with evidence

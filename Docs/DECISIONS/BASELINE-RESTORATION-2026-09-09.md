@@ -13,7 +13,7 @@ Date: 2026-09-09. User-approved rollback; no new refactor implementation approve
 - Later documentation commit(s) change only Docs/ and Specs/, not production source.
 
 Recovery artifacts (private local operational evidence, not committed wholesale):
-`/home/gandalf/workspace/novagenesis-recovery-20260909T061553/`.
+`<local-repository-path>-recovery-20260909T061553/`.
 Includes complete Git bundle, SHA-256-verified workspace tar, two preserved
 untracked files, old builds, manifests, deployment reports, scripts and test logs.
 The bundle passed `git bundle verify`; archived regular files were compared with
@@ -47,7 +47,7 @@ with identical SHA-256 for each executable across both guests:
 | ContentApp | 0b269b937f56c8c6cf485878c19e1a399799c4038869a6f98367d2a8838f2728 |
 
 VM100 full build: success, zero compiler errors, 137 warnings in restored source.
-Tested build: `/home/gandalf/workspace/novagenesis/build-rollback-8e92e29/`.
+Tested build: `<local-repository-path>/build-rollback-8e92e29/`.
 The local `build/` symlink now resolves to this tested directory; the previous
 SPEC-033 build was retired into the recovery folder. CMake build through the
 symlink was exercised successfully. Do not use historical tracked executables
@@ -70,7 +70,7 @@ Fresh-boot guests, no previously running NG processes; launch order PGCS source,
 PGCS repository, NRNCS source, repository app, source app. Correct peer MACs;
 StressTest disabled; baseline NRNCS.ini and App.ini preserved and hashed.
 
-1000 newly staged 800x600 JPEGs delivered source36 -> repo61. Final verifier:
+1000 newly staged 800x600 JPEGs delivered source guest -> repository guest. Final verifier:
 `total / matched / missing / mismatched: 1000 / 1000 / 0 / 0`.
 The controller also checked zero extra JPEGs. Final sample was 153.16 seconds
 into post-launch monitoring (not total wall time including startup). All five
@@ -78,7 +78,7 @@ recorded NG PIDs remained alive at verification. Logs and received files were
 copied to VM100 and the independent repository VerifyDelivery.py was run there.
 
 Evidence: `photos1000-result.json`, `photos1000-manifest.sha256`, and
-`vm-192.168.0.61/photos-1000/`, `vm-192.168.0.36/photos-1000/`.
+`vm-<repository-guest-ip>/photos-1000/`, `vm-<source-guest-ip>/photos-1000/`.
 
 Native hash caveat: the baseline's CoreRunEvaluate01 still checks the application
 payload hash; no ERROR line was found in the captured repository log. However,
@@ -97,8 +97,8 @@ field. The 10-second heartbeat and burst scheduling make these rates approximate
 
 | Side | Offered delta | Received delta | Offered/s | Received/s | Max RSS KiB | Peak sampled queue | Final sampled queue |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| repo61 | 590000 | 582736 | 1931.36 | 1907.58 | 29132 | 10002 | 2 |
-| source36 | 610000 | 600000 | 1996.81 | 1964.08 | 7556 | 10002 | 265 |
+| repository guest | 590000 | 582736 | 1931.36 | 1907.58 | 29132 | 10002 | 2 |
+| source guest | 610000 | 600000 | 1996.81 | 1964.08 | 7556 | 10002 | 265 |
 
 Both processes remained alive; receive counters progressed. All sampled dropped
 and guard_reject counters were zero. The final recorded SAR error counters were

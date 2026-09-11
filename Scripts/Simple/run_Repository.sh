@@ -6,7 +6,7 @@
 
 set -e
 
-BASE=/home/gandalf/workspace/novagenesis
+BASE=${NG_REPO_PATH:-$(cd ../..; pwd)}
 IO_DIR="$BASE/IO/Repository1"
 
 echo "=== ContentApp Repository ==="

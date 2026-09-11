@@ -75,5 +75,5 @@ No changes to: bindings themselves, `PG::SendToARawSocket`, hello logic,
 
 ## 9. Pitfalls
 
-- MAC string comparison must be case-insensitive (`08:00:27:...` vs `08:00:27:...` case variants).
+- MAC string comparison must be case-insensitive (the same MAC in different case variants).
 - Do not break the `FF:FF:FF:FF:FF:FF` broadcast configuration path (it never equals local MAC).

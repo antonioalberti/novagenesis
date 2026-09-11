@@ -8,7 +8,7 @@
 
 ## 1. Objectivo
 
-Isolar a descoberta mútua e o transporte RAW entre os PGCS das VMs 101 (repo61) e 102 (source36), sem NRNCS ou ContentApp, usando o gerador interno de stress a aproximadamente 1 mensagem/s por direcção.
+Isolar a descoberta mútua e o transporte RAW entre os PGCS das VMs 101 (repository guest) e 102 (source guest), sem NRNCS ou ContentApp, usando o gerador interno de stress a aproximadamente 1 mensagem/s por direcção.
 
 ## 2. Hipótese
 

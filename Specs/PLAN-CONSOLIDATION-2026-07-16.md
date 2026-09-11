@@ -122,7 +122,7 @@ SPEC-015 e SPEC-016 **não existem**. Remover referências:
 
 #### 2.1 Docs/ — Estrutura alvo
 ```
-/home/gandalf/workspace/novagenesis/Docs/
+<local-repository-path>/Docs/
 ├── ARCHITECTURE/
 │   ├── NG-INVERTED-PUB-SUB-MODEL.md          (existente — manter)
 │   └── NGAL-ARCHITECTURE.md                  (NOVO — extrair de SPEC-013 E1-E3)
@@ -139,7 +139,7 @@ SPEC-015 e SPEC-016 **não existem**. Remover referências:
 
 #### 2.2 Issues/ — Estrutura alvo
 ```
-/home/gandalf/workspace/novagenesis/Issues/
+<local-repository-path>/Issues/
 ├── OPEN/
 │   └── ISSUE-001-nrinfopayload01-cache-miss.md  (existente)
 ├── CLOSED/

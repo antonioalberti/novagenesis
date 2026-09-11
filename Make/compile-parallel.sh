@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Parallel Compile script for NovaGenesis
-# Run from: /home/gandalf/workspace/novagenesis/Make/
+# Run from: <workspace-root>/novagenesis/Make/
 # Usage: bash compile-parallel.sh [jobs] [service1] [service2] ...
 #   If no arguments: compiles all 5 services with max parallel jobs
 #   First numeric arg = max parallel jobs (default: number of CPU cores)

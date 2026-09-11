@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_PGCS_on_Repo_VM.sh — Start PGCS on Repo VM (192.168.0.61)
+# run_PGCS_on_Repo_VM.sh — Start PGCS on the repository guest
 #
 # Opens a dedicated SSH terminal to the Repo Alpine VM and starts PGCS
 # in deterministic mode (-p) targeting the Source VM's MAC address for
@@ -7,8 +7,8 @@
 #
 # Usage: bash run_PGCS_on_Repo_VM.sh
 # Prerequisites:
-#   - Repo VM (101) must be running
-#   - SSH key ~/.ssh/id_ed25519_hermes deployed on the VM
+#   - The repository guest must be running
+#   - An operator-selected SSH key must be available
 #   - PGCS binary compiled (AIOPT2 branch)
 #
 # Order: run after run_PGCS_on_Source_VM.sh (Terminal 2), wait ~2s

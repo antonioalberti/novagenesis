@@ -106,7 +106,7 @@ Against unchanged production at `c38eb08`, using the public `Process`/`GW` lifec
 
 The complete test-only files and logs are retained in:
 
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/`
+`<workspace-root>/ng-spec033-characterization-20260909/`
 
 - fixture: `gw_b2_input_queue.cpp`;
 - runner: `run-gw-b2-fixture.py`;

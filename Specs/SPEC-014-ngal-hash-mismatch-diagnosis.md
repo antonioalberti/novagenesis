@@ -133,7 +133,7 @@ A abordagem correcta era: analisar a diferença **estrutural** entre o pipeline 
 
 ## 7. Como Testar (P4)
 
-Os binários corrigidos estão em `/home/gandalf/workspace/novagenesis/cmake-build-ngal/`.
+Os binários corrigidos estão em `<local-repository-path>/cmake-build-ngal/`.
 
 Copiar para o path de produção ou executar directamente:
 
@@ -142,7 +142,7 @@ Copiar para o path de produção ou executar directamente:
 ./Scripts/Simple/clean.sh
 
 # Executar com binários corrigidos (ajustar paths conforme script do cenário)
-sudo /home/gandalf/workspace/novagenesis/cmake-build-ngal/PGCS /home/gandalf/workspace/novagenesis/IO/PGCS/ 0 Intra_Domain -lc
+sudo <local-repository-path>/cmake-build-ngal/PGCS <local-repository-path>/IO/PGCS/ 0 Intra_Domain -lc
 # + ContentApp, NRNCS, etc.
 ```
 

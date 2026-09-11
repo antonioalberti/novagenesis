@@ -8,21 +8,22 @@ set -e
 echo "=== NovaGenesis Phase 5: Source VM Setup ==="
 
 # Configuration
-IO_PATH="/root/workspace/novagenesis/IO"
+: "${NG_REPO_PATH:?Set NG_REPO_PATH before running}"
+: "${REPO_VM_IP:?Set REPO_VM_IP before running}"
+IO_PATH="${NG_REPO_PATH}/IO"
 PGCS_PORT="5000"
 PGCS_ROLE="Source"
-REPO_VM_IP="192.168.0.61"
-SOURCE_VM_IP="192.168.0.36"
+
 
 # Change to build directory
-cd /root/workspace/novagenesis/cmake-build-debug
+cd "${NG_REPO_PATH}/cmake-build-debug"
 
 # Start PGCS with peer information (communicating with repo VM)
 # Parameters: Path Port Role -p Stack Role Interface Identifier Size
 echo "Starting PGCS (Source)..."
 ./PGCS "$IO_PATH" "$PGCS_PORT" "$PGCS_ROLE" -p \
     "Ethernet" "Repository" "eth0" "$REPO_VM_IP" "1500" \
-    > /root/workspace/novagenesis/IO/logs/PGCS.log 2>&1 &
+    > "${IO_PATH}/logs/PGCS.log" 2>&1 &
 
 sleep 2
 
@@ -30,7 +31,7 @@ sleep 2
 # Parameters: Path Role
 echo "Starting ContentApp (Source)..."
 ./ContentApp "$IO_PATH/Source1" "Source" \
-    > /root/workspace/novagenesis/IO/logs/ContentApp.log 2>&1 &
+    > "${IO_PATH}/logs/ContentApp.log" 2>&1 &
 
 sleep 2
 
@@ -38,4 +39,4 @@ echo "=== NovaGenesis Source services started ==="
 echo "PGCS PID: $(pgrep PGCS)"
 echo "ContentApp PID: $(pgrep ContentApp)"
 echo ""
-echo "To monitor: tail -f /root/workspace/novagenesis/IO/logs/*.log"
+echo "To monitor: tail -f ${IO_PATH}/logs/*.log"

@@ -130,7 +130,7 @@ The correct approach was: analyse the **structural** difference between old and 
 
 ## 7. How to Test (P4)
 
-Corrected binaries are in `/home/gandalf/workspace/novagenesis/cmake-build-ngal/`.
+Corrected binaries are in `<local-repository-path>/cmake-build-ngal/`.
 
 Copy to production path or run directly:
 
@@ -139,7 +139,7 @@ Copy to production path or run directly:
 ./Scripts/Simple/clean.sh
 
 # Run with corrected binaries (adjust paths per scenario script)
-sudo /home/gandalf/workspace/novagenesis/cmake-build-ngal/PGCS /home/gandalf/workspace/novagenesis/IO/PGCS/ 0 Intra_Domain -lc
+sudo <local-repository-path>/cmake-build-ngal/PGCS <local-repository-path>/IO/PGCS/ 0 Intra_Domain -lc
 # + ContentApp, NRNCS, etc.
 ```
 

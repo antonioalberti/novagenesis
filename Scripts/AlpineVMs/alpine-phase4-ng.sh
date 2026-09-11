@@ -3,6 +3,7 @@
 # Usage: ash /mnt/alpine-phase4-ng.sh <source|repo>
 
 set -e
+: "${NG_REPO_PATH:?Set NG_REPO_PATH before running}"
 
 VM_TYPE="$1"
 
@@ -18,16 +19,16 @@ echo "=== Installing build tools ==="
 apk add build-base cmake git linux-headers libstdc++-dev python3 py3-pip py3-numpy py3-pillow
 
 # Create workspace
-mkdir -p /root/workspace
-cd /root/workspace
+mkdir -p "$(dirname "$NG_REPO_PATH")"
+cd "$(dirname "$NG_REPO_PATH")"
 
 # Clone NovaGenesis
-if [ ! -d "novagenesis" ]; then
+if [ ! -d "$NG_REPO_PATH" ]; then
     echo "=== Cloning NovaGenesis ==="
     git clone https://github.com/antonioalberti/novagenesis.git
 fi
 
-cd novagenesis
+cd "$NG_REPO_PATH"
 
 # Build
 echo "=== Building NovaGenesis ==="
@@ -46,24 +47,24 @@ make -j1
 
 # Create IO directories
 echo "=== Setting up directories ==="
-mkdir -p /root/workspace/novagenesis/IO/logs
+mkdir -p "$NG_REPO_PATH/IO/logs"
 if [ "$VM_TYPE" = "source" ]; then
-    mkdir -p /root/workspace/novagenesis/IO/Source1
+    mkdir -p "$NG_REPO_PATH/IO/Source1"
     # Create startup script for source
-    cat > /root/start-ng.sh <<'EOF'
+    cat > /root/start-ng.sh <<EOF
 #!/bin/ash
-cd /root/workspace/novagenesis/cmake-build-debug
+cd $NG_REPO_PATH/cmake-build-debug
 ./PGCS &
 ./NRNCS &
 ./ContentApp &
 echo "NovaGenesis Source started"
 EOF
 else
-    mkdir -p /root/workspace/novagenesis/IO/Repository1
+    mkdir -p "$NG_REPO_PATH/IO/Repository1"
     # Create startup script for repo
-    cat > /root/start-ng.sh <<'EOF'
+    cat > /root/start-ng.sh <<EOF
 #!/bin/ash
-cd /root/workspace/novagenesis/cmake-build-debug
+cd $NG_REPO_PATH/cmake-build-debug
 ./PGCS &
 ./ContentApp &
 echo "NovaGenesis Repository started"

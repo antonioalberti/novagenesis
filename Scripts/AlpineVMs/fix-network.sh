@@ -11,23 +11,19 @@ ip addr show 2>/dev/null || echo "No IP"
 cat /etc/network/interfaces 2>/dev/null || echo "No interfaces file"
 cat /etc/hostname 2>/dev/null || echo "No hostname"
 
-# 2. Determine IP from argument or hostname
-IP_ARG="$1"
+# 2. Determine IP from an explicit operator argument or environment
+IP_ARG="${1:-${VM_IP:-}}"
 HOSTNAME=$(cat /etc/hostname 2>/dev/null || echo "localhost")
 
 if [ -n "$IP_ARG" ]; then
     IP="$IP_ARG"
     echo "Using provided IP: $IP"
-elif [ "$HOSTNAME" = "source36" ]; then
-    IP="192.168.0.36"
-elif [ "$HOSTNAME" = "repo61" ]; then
-    IP="192.168.0.61"
 else
-    echo "ERROR: Unknown hostname '$HOSTNAME'"
-    echo "Please specify IP manually:"
-    echo "  ash /mnt/fix-network.sh 192.168.0.36"
+    echo "ERROR: provide VM_IP or an explicit IP argument" >&2
+    echo "  VM_IP=<guest-ip> GATEWAY=<gateway-ip> ash /mnt/fix-network.sh" >&2
     exit 1
 fi
+: "${GATEWAY:?Set GATEWAY before running}"
 
 echo "Hostname: $HOSTNAME"
 echo "IP: $IP"
@@ -42,7 +38,7 @@ auto eth0
 iface eth0 inet static
     address $IP
     netmask 255.255.255.0
-    gateway 192.168.0.1
+    gateway $GATEWAY
 EOF
 
 # 4. Fix DNS

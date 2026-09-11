@@ -8,7 +8,7 @@
 
 ## 1. Evidence and objective
 
-The measured SPEC-031 run sustained approximately 7.7 minutes at 2000 msg/s bidirectional with zero observed loss, but repo61 outstanding peaked at **2762**, returning to **2 within approximately 130 seconds**.
+The measured SPEC-031 run sustained approximately 7.7 minutes at 2000 msg/s bidirectional with zero observed loss, but repository guest outstanding peaked at **2762**, returning to **2 within approximately 130 seconds**.
 The RX path kept up; GW processing accumulated work.
 The current consumer pops only one due message per outer loop despite its “pop all” comment.
 Each message therefore incurs repeated queue checks, mutex operations, scheduling, and outer-loop housekeeping.
@@ -154,7 +154,7 @@ Confirm publication identity and invalidation semantics in a separate reproducti
 
 ## 1. Evidence and objective
 
-The measured SPEC-031 run sustained approximately 7.7 minutes at 2000 msg/s bidirectional with zero observed loss, but repo61 outstanding peaked at **2762**, returning to **2 within approximately 130 seconds**.
+The measured SPEC-031 run sustained approximately 7.7 minutes at 2000 msg/s bidirectional with zero observed loss, but repository guest outstanding peaked at **2762**, returning to **2 within approximately 130 seconds**.
 The RX path kept up; GW processing accumulated work.
 The current consumer pops only one due message per outer loop despite its “pop all” comment.
 Each message therefore incurs repeated queue checks, mutex operations, scheduling, and outer-loop housekeeping.

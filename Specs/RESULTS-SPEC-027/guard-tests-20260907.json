@@ -24,7 +24,7 @@
    "result": "PASS"
   },
   "Peer restart recovery": {
-   "method": "kill PGCS on repo61, restart, resume stress",
+   "method": "kill PGCS on repository guest, restart, resume stress",
    "observed": "1 client socket after restart, 0 errors, bidirectional delivery resumed (loss ~1.5-3.7%)",
    "result": "PASS"
   },

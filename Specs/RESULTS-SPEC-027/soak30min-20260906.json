@@ -2,7 +2,7 @@
   "test": "SPEC-027 Phase 1 \u2014 30-min soak at 500 msg/s (StressInterval=0.002, 2500 msgs/5s period, both PGCS)",
   "date": "2026-09-06 18:52\u201319:22 UTC-ish (30 samples, 60s interval)",
   "config": {
-    "vms": "101 repo61 + 102 source36, upsized to 4 cores / 4GB (pre-authorized)",
+    "vms": "101 repository guest + 102 source guest, upsized to 4 cores / 4GB (pre-authorized)",
     "build": "commit 8a9d2bf (AMEND-3 fixes 1396c62 + DEBUG off), built on both VMs via pull-and-build",
     "debug": "OFF (all noisy macros disabled)",
     "core_dumps": "enabled, /root/cores/ (persistent), verified pattern set"

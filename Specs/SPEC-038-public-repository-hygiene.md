@@ -17,7 +17,7 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 
 ### Critical
 
-- Literal root password `novagenesis` appears in public Alpine setup/diagnostic scripts, including `alpine-install-repo.sh`, `alpine-install-source.sh`, `alpine-phase2-packages.sh` and `check-vm-state.sh`.
+- A literal default root password appears in public Alpine setup/diagnostic scripts, including `alpine-install-repo.sh`, `alpine-install-source.sh`, `alpine-phase2-packages.sh` and `check-vm-state.sh`.
 - Password authentication is enabled by setup scripts. This must be removed or made explicitly local-only; normal deployment must use SSH keys and an operator-provided credential flow.
 - The password must be treated as compromised and must not be reused.
 

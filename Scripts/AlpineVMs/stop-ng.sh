@@ -1,9 +1,10 @@
 #!/bin/sh
 # NovaGenesis Stop Script
+: "${NG_REPO_PATH:?Set NG_REPO_PATH before running}"
 echo "Stopping NovaGenesis processes..."
 
 # Kill processes by PID files
-for pidfile in /root/workspace/novagenesis/IO/logs/*.pid; do
+for pidfile in "$NG_REPO_PATH"/IO/logs/*.pid; do
     if [ -f "$pidfile" ]; then
         pid=$(cat "$pidfile")
         echo "Killing process $pid..."

@@ -18,24 +18,24 @@ No cleanup may delete, mark, unmark or resubmit the output from the failed alloc
 
 These are proposed paths only; no production hook or caller change is authorized:
 
-1. `/home/gandalf/workspace/ng-spec033-characterization-20260909/c1_reused_output_fixture.cpp`
+1. `<workspace-root>/ng-spec033-characterization-20260909/c1_reused_output_fixture.cpp`
    - public-lifecycle fixture;
    - two success-then-failure iterations for each target loop;
    - real `Process::NewMessage()` capacity exhaustion;
    - valid PGCS tuples, stack/interface/identifier data, Core/GW/HT blocks and command lines.
 
-2. `/home/gandalf/workspace/ng-spec033-characterization-20260909/run-c1-reused-output-fixture.py`
+2. `<workspace-root>/ng-spec033-characterization-20260909/run-c1-reused-output-fixture.py`
    - external watchdog;
    - baseline and future post-fix phases;
    - durable per-trial logs;
    - exact IPC/process cleanup;
    - fail-closed timeout/unexpected-exit handling.
 
-3. `/home/gandalf/workspace/ng-spec033-characterization-20260909/c1_event_trace.harness.md`
+3. `<workspace-root>/ng-spec033-characterization-20260909/c1_event_trace.harness.md`
    - event-to-assertion mapping for allocation, builders, SCN generation, serialization, send, queue submission and marking;
    - identifies which observations are public and which remain unavailable.
 
-4. `/home/gandalf/workspace/ng-spec033-characterization-20260909/c1-results.json`
+4. `<workspace-root>/ng-spec033-characterization-20260909/c1-results.json`
    - source revision and build identity;
    - per-function/per-trial allocation results;
    - downstream-event counts;

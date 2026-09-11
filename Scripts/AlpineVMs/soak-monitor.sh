@@ -12,17 +12,21 @@
 #
 # Usage: bash soak-monitor.sh [duration_min] [log_file]
 #   duration_min default 30; log_file default Specs/RESULTS-SPEC-027/soak-<date>.log
-# Requires: SSH key ~/.ssh/id_ed25519_hermes deployed on both VMs (root).
+# Requires: SSH key configured through NG_SSH_KEY and access to both guests.
 #
-# Expected inventory: VM 102 = PGCS+NRNCS+ContentApp, VM 101 = PGCS+ContentApp.
+# Expected inventory: source guest = PGCS+NRNCS+ContentApp, repository guest = PGCS+ContentApp.
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_SRC=192.168.0.36
-VM_REPO=192.168.0.61
+: "${SOURCE_VM_IP:?Set SOURCE_VM_IP before running}"
+: "${REPO_VM_IP:?Set REPO_VM_IP before running}"
+: "${NG_REPO_PATH:?Set NG_REPO_PATH before running}"
+SSH_KEY=${NG_SSH_KEY:-$HOME/.ssh/id_ed25519}
+SSH_USER=${NG_SSH_USER:-root}
+VM_SRC="$SOURCE_VM_IP"
+VM_REPO="$REPO_VM_IP"
 DURATION_MIN=${1:-30}
-BASE=/root/workspace/novagenesis
+BASE="$NG_REPO_PATH"
 
-REPO_LOCAL=/home/gandalf/workspace/novagenesis
+REPO_LOCAL=${NG_LOCAL_REPO_PATH:-$PWD}
 OUT_DEFAULT="$REPO_LOCAL/Specs/RESULTS-SPEC-027/soak-$(date +%Y%m%d-%H%M%S).log"
 OUT=${2:-$OUT_DEFAULT}
 mkdir -p "$(dirname "$OUT")"
@@ -35,14 +39,14 @@ log() { echo "$(date +%H:%M:%S) $*" | tee -a "$OUT"; }
 
 # completed-counter snapshot for one VM (all PGCS markers)
 completed_count() {
-  ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "root@$1" \
+  ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "${SSH_USER}@$1" \
     "grep -c 'COMPLETE MN' $BASE/../..//tmp/pgcs.log 2>/dev/null || grep -c 'COMPLETE MN' /tmp/pgcs.log 2>/dev/null" 2>/dev/null
 }
 
 # per-process PID validation: exactly one PID per name, exe matches
 inventory_check() { # $1=VM, $2="PGCS NRNCS ContentApp"
   for name in $2; do
-    n=$(ssh -i "$SSH_KEY" -o BatchMode=yes "root@$1" "pidof $name | wc -w" 2>/dev/null)
+    n=$(ssh -i "$SSH_KEY" -o BatchMode=yes "${SSH_USER}@$1" "pidof $name | wc -w" 2>/dev/null)
     if [ "$n" != "1" ]; then
       log "INVENTORY_FAIL $1 $name count=$n (expected 1)"
       return 1
@@ -53,7 +57,7 @@ inventory_check() { # $1=VM, $2="PGCS NRNCS ContentApp"
 
 grab_failure_evidence() { # $1=VM
   log "=== FAILURE EVIDENCE $1 ==="
-  ssh -i "$SSH_KEY" -o BatchMode=yes "root@$1" \
+  ssh -i "$SSH_KEY" -o BatchMode=yes "${SSH_USER}@$1" \
     "ls -la /root/cores/ 2>/dev/null; dmesg 2>/dev/null | tail -5; df -h /tmp | tail -1; free -m | head -2" 2>&1 | tee -a "$OUT"
 }
 
@@ -72,9 +76,9 @@ while [ "$(date +%s)" -lt "$END" ]; do
   i=$((i+1))
   sleep 60
 
-  SRC=$(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "root@$VM_SRC" \
+  SRC=$(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "${SSH_USER}@$VM_SRC" \
     'P=$(pidof PGCS); if [ $(echo $P | wc -w) -ne 1 ]; then echo MULTIPID; else awk "{printf \"cpu=%.1f rss=%d\", (\$14+\$15)/'"$(getconf CLK_TCK)"', \$24*'"$(getconf PAGESIZE/1024)"'"}" /proc/$P/stat; fi; echo -n " done=$(grep -c "COMPLETE MN" /tmp/pgcs.log 2>/dev/null)"; pidof PGCS >/dev/null && echo -n " UP" || echo -n " DOWN"' 2>/dev/null)
-  RPO=$(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "root@$VM_REPO" \
+  RPO=$(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=10 "${SSH_USER}@$VM_REPO" \
     'P=$(pidof PGCS); if [ $(echo $P | wc -w) -ne 1 ]; then echo MULTIPID; else awk "{printf \"cpu=%.1f rss=%d\", (\$14+\$15)/'"$(getconf CLK_TCK)"', \$24*'"$(getconf PAGESIZE/1024)"'"}" /proc/$P/stat; fi; echo -n " done=$(grep -c "COMPLETE MN" /tmp/pgcs.log 2>/dev/null)"; pidof PGCS >/dev/null && echo -n " UP" || echo -n " DOWN"' 2>/dev/null)
 
   log "min$i src[$SRC] repo[$RPO]"

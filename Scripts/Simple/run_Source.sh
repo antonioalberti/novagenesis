@@ -11,7 +11,7 @@
 
 set -e
 
-BASE=/home/gandalf/workspace/novagenesis
+BASE=${NG_REPO_PATH:-$(cd ../..; pwd)}
 PHOTOS=${1:-100}
 WIDTH=${2:-800}
 HEIGHT=${3:-600}

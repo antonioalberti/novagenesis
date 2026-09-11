@@ -12,8 +12,8 @@ production edit.
 
 Files:
 
-- Fixture: `/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp`
-- Watchdog: `/home/gandalf/workspace/ng-spec033-characterization-20260909/run-gw-b1-fixture.py`
+- Fixture: `<workspace-root>/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp`
+- Watchdog: `<workspace-root>/ng-spec033-characterization-20260909/run-gw-b1-fixture.py`
 - SPEC: `Specs/SPEC-033-R3-B-gw-caller-safety.md`
 
 ## Changes
@@ -98,7 +98,7 @@ Astra confirmed:
 - production acceptance still requires the post-change RED→GREEN assertions.
 
 The current-source ASAN report is preserved at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/exhaustion-current-asan.log`.
+`<workspace-root>/ng-spec033-characterization-20260909/exhaustion-current-asan.log`.
 
 ## Remaining gates
 
@@ -162,7 +162,7 @@ Astra reviewed the exact committed change `e086868` and the post-change
 results. Verdict: **PASS — B1 accepted independently**.
 
 - Local fixture: PASS, including normal, ASAN and runner-negative tests.
-- Matched Alpine runtime: PASS on repo61/source36 after fresh VM restart;
+- Matched Alpine runtime: PASS on repository guest/source guest after fresh VM restart;
   100/100 JPEGs matched the publish-time manifest, with zero missing or
   mismatched files.
 - Scope: only `Common/src/GW.cpp::ReadFromSharedMemory3()`, original lines
@@ -170,4 +170,4 @@ results. Verdict: **PASS — B1 accepted independently**.
 - B2/B3/C remain blocked and are not accepted by this verdict.
 - This does not constitute broader merge/release approval.
 
-Durable evidence: `/home/gandalf/workspace/novagenesis/IO/NG-018-B1-runtime-20260910/sha256-verification.json`.
+Durable evidence: `<local-repository-path>/IO/NG-018-B1-runtime-20260910/sha256-verification.json`.

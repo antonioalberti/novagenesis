@@ -136,7 +136,7 @@ else
 ## 6. Verificação
 
 1. Compilar: `cd build && cmake .. && make -j$(nproc) NRNCS`
-2. Deploy para source36 e repo61
+2. Deploy para source guest e repository guest
 3. Source36: verificar `IO/NRNCS/` contém os ficheiros cacheados
 4. Repo61: verificar que recebe conteúdo com hash correcto
 5. Log: verificar `(Cached file: ...)` no NRNCS source

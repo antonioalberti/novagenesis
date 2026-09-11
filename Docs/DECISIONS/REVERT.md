@@ -17,14 +17,14 @@ Dois commits relacionados, ambos na chain de fixes para o memory leak observado 
 
 **Opção 1: `git revert` (recomendado, preserva histórico)**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git revert 64b7ef7 --no-edit
 git push origin AIOPT2
 ```
 
 **Opção 2: `git reset --hard` (apaga o commit, mais agressivo)**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git reset --hard 6994e84    # volta para o commit NG-042-04
 git push origin AIOPT2 --force-with-lease
 ```
@@ -75,14 +75,14 @@ O fix assume que:
 
 **Opção 1: `git revert`**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git revert 6994e84 --no-edit
 git push origin AIOPT2
 ```
 
 **Opção 2: `git reset --hard`**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git reset --hard 0172339    # volta para o commit anterior (após o log LN)
 git push origin AIOPT2 --force-with-lease
 ```
@@ -102,21 +102,21 @@ _ReceivedMessage->MarkToDelete();
 
 **Reverter NG-042-05 e NG-042-04 em uma operação:**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git revert 64b7ef7 6994e84 --no-edit
 git push origin AIOPT2
 ```
 
 **Voltar para o estado pré-leak-fixes (apenas log LN ativo):**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git reset --hard 0172339
 git push origin AIOPT2 --force-with-lease
 ```
 
 **Voltar para o estado pré-leak-investigation (último commit estável):**
 ```bash
-cd /home/gandalf/workspace/novagenesis
+cd <local-repository-path>
 git reset --hard 9b411e1    # último build antes do log LN
 git push origin AIOPT2 --force-with-lease
 ```

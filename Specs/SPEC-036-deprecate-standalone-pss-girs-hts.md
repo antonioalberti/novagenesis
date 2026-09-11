@@ -183,7 +183,7 @@ GPT-6 Astra returned **CONDITIONAL GO** for the implementation/profile stage. Th
 
 The normal-profile cross-process gate passed on `5ab91ce` with the corrected canonical peer MACs. Both PGCS peers registered each other, NRNCS and Source were discovered, and 100 fresh JPEGs were delivered from Source through NRNCS to Repository with identical SHA-256 maps at all three points, no missing/extra files, and zero `ERROR`, `ALARM` or `FATAL` matches.
 
-Evidence: `/home/gandalf/workspace/novagenesis/IO/NG-037-cross-process-20260911-100-photos/`.
+Evidence: `<local-repository-path>/IO/NG-037-cross-process-20260911-100-photos/`.
 
 The first malformed-MAC attempt is excluded from acceptance evidence. Functional legacy runtime tests remain on demand as specified in §5; the legacy build profile was validated separately.
 

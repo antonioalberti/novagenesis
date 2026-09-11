@@ -54,7 +54,7 @@ as production code in this draft.
 ## B1 characterization result
 
 A public-lifecycle fixture was added at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp`.
+`<workspace-root>/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp`.
 It constructs `Process` and `GW` normally, fills the Process after GW startup,
 creates a valid shared-memory segment, injects a bounded message, and drives the
 public `Gateway()` with normal stop/teardown.
@@ -120,7 +120,7 @@ post-patch cleanup assertions are exercised.
 
 
 A RED fixture was added at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b0_constructor.cpp`.
+`<workspace-root>/ng-spec033-characterization-20260909/gw_b0_constructor.cpp`.
 Against the baseline, normal control preserved the historical `+3` message and
 `+1` marked behavior, while full capacity caused constructor exit `139`.
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_NRNCS_on_Source_VM.sh — Start NRNCS on Source VM (192.168.0.36)
+# run_NRNCS_on_Source_VM.sh — Start NRNCS on the source guest
 #
 # Opens a dedicated SSH terminal to the Source Alpine VM and starts NRNCS.
 # Must start AFTER both PGCS processes are running and have discovered

@@ -8,7 +8,7 @@
 ## 1. Evidence
 
 The production-linked exhaustion harness at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/process_exhaustion.cpp`
+`<workspace-root>/ng-spec033-characterization-20260909/process_exhaustion.cpp`
 reproduced the same result three times against the restored baseline:
 
 ```text

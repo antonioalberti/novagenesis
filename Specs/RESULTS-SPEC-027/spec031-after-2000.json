@@ -2,15 +2,15 @@
  "benchmark": "SPEC-031 AFTER \u2014 2000 msg/s bidirectional with recvmmsg batching",
  "date": "2026-09-07T13:26:52Z",
  "build": "c638292",
- "note": "outstanding on repo61 elevated (128) = backlog forming at GW input queue \u2014 receiver is the bottleneck at 2000 msg/s",
+ "note": "outstanding on repository guest elevated (128) = backlog forming at GW input queue \u2014 receiver is the bottleneck at 2000 msg/s",
  "final": {
-  "source36": {
+  "source guest": {
    "stats": "SPEC028_STATS run=00B50E23 pid=12592 elapsed_s=310 offered=590000 sent_ok=590000 received=589916 completed=589946 dropped=0 guard_reject=0 outstanding=956 sar_completed_all=589946 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
    "alive": "1",
    "rss": "10384",
    "cores": "0"
   },
-  "repo61": {
+  "repository guest": {
    "stats": "SPEC028_STATS run=00B50E23 pid=10169 elapsed_s=310 offered=600000 sent_ok=600000 received=589815 completed=589845 dropped=0 guard_reject=0 outstanding=2762 sar_completed_all=589845 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
    "alive": "1",
    "rss": "3096",
@@ -18,9 +18,9 @@
   }
  },
  "final_steady": {
-  "source36": "SPEC028_STATS run=00B50E23 pid=12592 elapsed_s=460 offered=880000 sent_ok=880000 received=879916 completed=879961 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=879961 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
-  "repo61": "SPEC028_STATS run=00B50E23 pid=10169 elapsed_s=460 offered=890000 sent_ok=890000 received=879520 completed=879565 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=879565 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0"
+  "source guest": "SPEC028_STATS run=00B50E23 pid=12592 elapsed_s=460 offered=880000 sent_ok=880000 received=879916 completed=879961 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=879961 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
+  "repository guest": "SPEC028_STATS run=00B50E23 pid=10169 elapsed_s=460 offered=890000 sent_ok=890000 received=879520 completed=879565 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=879565 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0"
  },
- "analysis": "2000 msg/s bidirectional: ZERO loss, zero drops, zero guard hits. Backlog burst (outstanding 2762 on repo61) drained to 2 within ~130s. The bottleneck is the GW input queue processing rate, NOT the recvmmsg receive path. RX path keeps up cleanly at 2000 msg/s.",
+ "analysis": "2000 msg/s bidirectional: ZERO loss, zero drops, zero guard hits. Backlog burst (outstanding 2762 on repository guest) drained to 2 within ~130s. The bottleneck is the GW input queue processing rate, NOT the recvmmsg receive path. RX path keeps up cleanly at 2000 msg/s.",
  "result": "PASS - stable, zero loss, backlog transient"
 }

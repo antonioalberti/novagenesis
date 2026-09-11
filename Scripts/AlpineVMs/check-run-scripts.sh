@@ -3,7 +3,7 @@
 # Run this script after any edits to verify script syntax
 
 ERRORS=0
-DIR=/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs
+DIR=<workspace-root>/novagenesis/Scripts/AlpineVMs
 
 echo "=== Syntax check for all run_ scripts ==="
 for script in run_PGCS_on_Source_VM.sh run_PGCS_on_Repo_VM.sh \

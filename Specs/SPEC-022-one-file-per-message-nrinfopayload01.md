@@ -11,7 +11,7 @@
 
 Após SPEC-021, o `NRSubBind01` cria mensagens separadas por key. O HT responde com uma mensagem por ficheiro. Cada resposta tem EXACTAMENTE UM `-info --payload` + UM payload. **Contudo, no NRNCS source-side, o `NRInfoPayload01` acumula todos os `-info --payload` no mesmo `InlineResponseMessage` — mesmo RC5, novo local.**
 
-### 1.1 Log do NRNCS source (source36)
+### 1.1 Log do NRNCS source (source guest)
 
 ```
 [11918.182s] (NRNCS forwarding payload: file=00003...)
@@ -22,7 +22,7 @@ Após SPEC-021, o `NRSubBind01` cria mensagens separadas por key. O HT responde 
 
 3 `-info --payload` processados no mesmo `Block::Run()`, todos no mesmo `InlineResponseMessage`.
 
-### 1.2 Log do ContentApp repo (repo61)
+### 1.2 Log do ContentApp repo (repository guest)
 
 ```
 [11922.845s] file=00009 hash=6A17D369 ERROR: not same (got 59A88EAD)
@@ -56,7 +56,7 @@ Após N iterações, o `InlineResponseMessage` contém N CLs `-info --payload` m
 ## 2. Fluxo Actual do Problema
 
 ```
-SOURCE VM (source36)                          REPO VM (repo61)
+SOURCE VM (source guest)                          REPO VM (repository guest)
 ────────────────────                          ────────────────
 ContentApp Source publica 100 ficheiros
      │
@@ -228,7 +228,7 @@ SPEC-022 é compatível com SPEC-014/015/017/018/019/020/021. Nenhuma destas é 
 1. Aplicar SPEC-022 em `NRInfoPayload01.cpp`
 2. Adicionar `friend class NRInfoPayload01;` em `NR.h`
 3. Compilar: `cd build && make -j$(nproc)`
-4. Deploy para source36 via `git pull` + `make`
+4. Deploy para source guest via `git pull` + `make`
 5. Testar com `--publish 0.1` (100 ficheiros)
 6. Verificar: **ZERO** erros "hash of the file is not the same"
 7. Verificar: cada timestamp no NRNCS log mostra APENAS 1 "forwarding payload" (não 3-4 em lote)

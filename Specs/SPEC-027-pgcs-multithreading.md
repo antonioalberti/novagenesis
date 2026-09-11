@@ -492,8 +492,8 @@ Use a dedicated release benchmark build with identical flags before and after. B
 
 | Role | Address | Resources |
 |---|---|---|
-| Repository VM | `192.168.0.61` | 2 vCPUs, 2 GB RAM |
-| Source VM | `192.168.0.36` | 2 vCPUs, 2 GB RAM |
+| Repository VM | `<repository-guest-ip>` | 2 vCPUs, 2 GB RAM |
+| Source VM | `<source-guest-ip>` | 2 vCPUs, 2 GB RAM |
 
 Record kernel, Alpine, musl, GCC, CMake, commit, optimization flags, NIC/MTU, socket buffer settings, logging level, CPU utilization, RSS, and VM scheduling/steal time.
 

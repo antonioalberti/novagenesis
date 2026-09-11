@@ -24,7 +24,7 @@ safety amendment; no production source changes are authorised by this document.
 ## 2.1 Confirmed MessageBuilder blocker
 
 A production-linked external fixture was added at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/wrapper_exhaustion.cpp`.
+`<workspace-root>/ng-spec033-characterization-20260909/wrapper_exhaustion.cpp`.
 It fills the real Process to 30,000 messages and invokes each of the five
 MessageBuilder wrappers with an independently retained live output pointer.
 Against the restored baseline, compilation succeeded and execution returned:
@@ -90,7 +90,7 @@ observed occupancy do not clear an `ERROR` path.
 
 Allowed before production approval:
 
-- strengthen `/home/gandalf/workspace/ng-spec033-characterization-20260909/process_exhaustion.cpp`;
+- strengthen `<workspace-root>/ng-spec033-characterization-20260909/process_exhaustion.cpp`;
 - add test-only fixtures/runners in that external characterization directory;
 - add/update decision documents under `novagenesis/Docs/DECISIONS/`;
 - update this SPEC and the R2 matrix.
@@ -223,13 +223,13 @@ injection after successful allocation remains a required gate before claiming A
 complete if a controlled production-linked mechanism can be provided.
 
 Evidence files are preserved in
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/`.
+`<workspace-root>/ng-spec033-characterization-20260909/`.
 Post-implementation Astra review is mandatory before B or C.
 
 ## 11. Construction-failure gate
 
 A production-linked fixture was added at
-`/home/gandalf/workspace/ng-spec033-characterization-20260909/wrapper_construction_failure.cpp`.
+`<workspace-root>/ng-spec033-characterization-20260909/wrapper_construction_failure.cpp`.
 It keeps allocation available, forces the first construction builder to return
 `ERROR` with empty routing vectors, and then uses public reclamation to verify
 that only the newly allocated working message is reclaimed.

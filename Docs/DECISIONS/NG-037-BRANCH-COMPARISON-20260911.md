@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-11
 **Repository:** `antonioalberti/novagenesis`
-**Working tree:** `/home/gandalf/workspace/novagenesis`
+**Working tree:** `<local-repository-path>`
 **Scope:** Compare `master` and `AIOPT3` before changing the remote default branch.
 
 ## 1. Branch and remote state

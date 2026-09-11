@@ -14,7 +14,7 @@ Add NG hash logging (MurmurHash3_x86_32, seed 3571) at every point where a paylo
 ## 2. Payload Pipeline with Hash Logging
 
 ```ascii
-Source (VM 102)                    Repo (VM 101)
+Source (source guest)                    Repo (repository guest)
 ───────────────                    ──────────────
 ContentApp Source
   └─ Publishes file (JPG, TXT)
@@ -88,12 +88,12 @@ Note: Calculates hash of payload **in-memory** before copying to InlineResponseM
 
 NRNCS and Repo logs confirm hash logging works:
 
-**NRNCS (source36):**
+**NRNCS (source guest):**
 ```
 (NRNCS cached payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 ```
 
-**ContentApp (repo61):**
+**ContentApp (repository guest):**
 ```
 (ContentApp received payload: file=Service_Offer_1046744630.txt, size=36 bytes, hash=789703CA)
 ```

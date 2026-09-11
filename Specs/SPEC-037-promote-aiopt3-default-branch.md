@@ -16,7 +16,7 @@ The promotion is allowed to proceed with explicitly accepted imperfections. Acce
 
 ## 2. Current Baseline and Evidence
 
-Observed in `/home/gandalf/workspace/novagenesis` on 2026-09-11:
+Observed in `<local-repository-path>` on 2026-09-11:
 
 | Item | Current state |
 |---|---|

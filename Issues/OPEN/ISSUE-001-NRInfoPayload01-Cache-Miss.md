@@ -13,7 +13,7 @@ Test with 500 JPG files (~289 KB each) published via ContentApp Source. NRInfoPa
 
 ## 2. Evidence
 
-### ContentApp Log (source36)
+### ContentApp Log (source guest)
 
 **Fast phase — 470 files delivered in ~25s:**
 ```

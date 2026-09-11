@@ -1,5 +1,5 @@
 #!/bin/bash
-# Start ContentApp Source on Source VM (192.168.0.36).
+# Start ContentApp Source on the source guest.
 # Run LAST, after PGCS/NRNCS and Repository are running.
 #
 # Usage: bash run_Source_on_Source_VM.sh [num_photos] [width] [height]

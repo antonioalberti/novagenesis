@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_Repository_on_Repo_VM.sh — Start ContentApp Repository on Repo VM (192.168.0.61)
+# run_Repository_on_Repo_VM.sh — Start ContentApp Repository on the repository guest
 #
 # Opens a dedicated SSH terminal to the Repo Alpine VM and starts ContentApp
 # in Repository mode. Must start AFTER both PGCS processes are running.

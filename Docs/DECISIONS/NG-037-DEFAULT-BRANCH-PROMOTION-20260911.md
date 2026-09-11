@@ -8,16 +8,16 @@
 
 ## Runtime gate
 
-The first cross-process attempt was invalidated because the test command used the Source peer MAC in uppercase and the transmitted Ethernet destination became `08:00:27:79:00:15`. Proxmox `tcpdump` confirmed the malformed destination. No NovaGenesis code defect was inferred from that attempt.
+The first cross-process attempt was invalidated because the test command used the Source peer MAC in uppercase and the transmitted Ethernet destination became `<malformed-peer-mac>`. hypervisor `tcpdump` confirmed the malformed destination. No NovaGenesis code defect was inferred from that attempt.
 
-The corrected 10-photo smoke test used the canonical literal `08:00:27:79:bb:15` and passed bidirectional PGCS discovery, NRNCS/Source discovery and 10/10 byte-exact delivery.
+The corrected 10-photo smoke test used the canonical literal `<repository-peer-mac>` and passed bidirectional PGCS discovery, NRNCS/Source discovery and 10/10 byte-exact delivery.
 
 The required 100-photo retest then used:
 
 - commit `5ab91ce` on both guests;
 - normal runtime profile with no standalone PSS/GIRS/HTS processes;
 - clean VM/process/IPC preparation;
-- peer MACs `08:00:27:65:00:08` and `08:00:27:79:bb:15`;
+- peer MACs `<source-peer-mac>` and `<repository-peer-mac>`;
 - `StressTest=1`, `StressInterval=1`;
 - 100 fresh unique JPEGs.
 

@@ -56,7 +56,7 @@ Após N iterações, o InlineResponseMessage tem N pares de `[-d --b] + [-info -
 ## 3. Fluxo Completo do Problema
 
 ```
-ContentApp Repo (VM 101)                     ContentApp Source (VM 102)
+ContentApp Repo (repository guest)                     ContentApp Source (source guest)
 ────────────────────────                     ────────────────────────
                                              Publica 100 ficheiros (JPG)
                                              NRNCS source recebe notificação

@@ -10,7 +10,7 @@
 #   bash run_PGCS.sh                              # -de (broadcast discovery)
 #   bash run_PGCS.sh 02:42:ac:14:00:0b            # -p (peer MAC)
 
-BASE=/home/gandalf/workspace/novagenesis
+BASE=${NG_REPO_PATH:-$(cd ../..; pwd)}
 
 # Auto-detect the first Ethernet interface (enp*, eth*, ens*)
 IFACE=$(ip link show | grep -E "^[0-9]+: e" | head -1 | awk -F': ' '{print $2}' | awk '{print $1}')

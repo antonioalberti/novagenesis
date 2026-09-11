@@ -3,13 +3,13 @@
   "date": "2026-09-10",
   "branch": "AIOPT3",
   "baseline_production_source_changed": false,
-  "fixture": "/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp",
-  "runner": "/home/gandalf/workspace/ng-spec033-characterization-20260909/run-gw-b1-fixture.py",
+  "fixture": "<workspace-root>/ng-spec033-characterization-20260909/gw_b1_shm_exhaustion.cpp",
+  "runner": "<workspace-root>/ng-spec033-characterization-20260909/run-gw-b1-fixture.py",
   "fixture_modes": ["valid", "malformed-zero", "malformed-max", "exhaustion"],
   "build": {
     "command": "g++ -std=c++20 -O0 -g -Wno-deprecated -pthread gw_b1_shm_exhaustion.cpp Common/src/*.cpp -I Common/src -lrt",
     "result": "PASS",
-    "binary": "/home/gandalf/workspace/ng-spec033-characterization-20260909/gw_b1_controls"
+    "binary": "<workspace-root>/ng-spec033-characterization-20260909/gw_b1_controls"
   },
   "controls": {
     "valid_serialized_message": {
@@ -38,7 +38,7 @@
     "exit": 134,
     "result": "ASAN abort",
     "stack": "Message.cpp:865 -> GW.cpp:857 -> GW.cpp:649",
-    "log": "/home/gandalf/workspace/ng-spec033-characterization-20260909/exhaustion-current-asan-final2.log"
+    "log": "<workspace-root>/ng-spec033-characterization-20260909/exhaustion-current-asan-final2.log"
   },
   "cleanup": {
     "valid_and_malformed_runner_trials": "all 9 normal trials completed rc=0; fixture cleanup_ok=1",
@@ -64,7 +64,7 @@
     "asan": "valid, malformed-zero, malformed-max and exhaustion all exit 0 with no sanitizer report",
     "matched_alpine_runtime": {
       "revision": "e086868",
-      "build_hosts": ["repo61 (192.168.0.61)", "source36 (192.168.0.36)"],
+      "build_hosts": ["repository guest (<repository-guest-ip>)", "source guest (<source-guest-ip>)"],
       "build": "both guests built e086868 successfully; PGCS/NRNCS/ContentApp static-pie",
       "workflow": "fresh VM stop/start; PGCS -> NRNCS -> Repository -> Source",
       "source_manifest": "100 files",

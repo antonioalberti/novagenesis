@@ -27,11 +27,11 @@ Novos scripts em `Scripts/AlpineVMs/`:
 
 | Script | Processo | VM alvo | 
 |--------|----------|---------|
-| `run_PGCS_on_Source_VM.sh` | PGCS | 102 Source (192.168.0.36) |
-| `run_PGCS_on_Repo_VM.sh` | PGCS | 101 Repo (192.168.0.61) |
-| `run_NRNCS_on_Source_VM.sh` | NRNCS | 102 Source (192.168.0.36) |
-| `run_Source_on_Source_VM.sh` | ContentApp Source | 102 Source (192.168.0.36) |
-| `run_Repository_on_Repo_VM.sh` | ContentApp Repository | 101 Repo (192.168.0.61) |
+| `run_PGCS_on_Source_VM.sh` | PGCS | 102 Source (<source-guest-ip>) |
+| `run_PGCS_on_Repo_VM.sh` | PGCS | 101 Repo (<repository-guest-ip>) |
+| `run_NRNCS_on_Source_VM.sh` | NRNCS | 102 Source (<source-guest-ip>) |
+| `run_Source_on_Source_VM.sh` | ContentApp Source | 102 Source (<source-guest-ip>) |
+| `run_Repository_on_Repo_VM.sh` | ContentApp Repository | 101 Repo (<repository-guest-ip>) |
 | `README-ssh-run.md` | Documentação | — |
 
 ### OUT (DO NOT TOUCH)
@@ -55,16 +55,16 @@ Novos scripts em `Scripts/AlpineVMs/`:
 | Fact | Detail |
 |------|--------|
 | **PGCS deterministic mode** | `./PGCS <Path> <Port> <Role> -p Ethernet <Peer_Role> <Interface> <Peer_MAC> <MTU>` — verificado em `Scripts/Simple/run_PGCS.sh:31` e `Scripts/AlpineVMs/start-ng-source.sh:24` |
-| **Source VM MAC** | `08:00:27:79:bb:15` (eth0) — verificado `ip addr` 2026-06-26 |
-| **Repo VM MAC** | `08:00:27:65:00:08` (eth0) — verificado `ip addr` 2026-06-26 |
-| **Source VM IP** | `192.168.0.36` — verificado |
-| **Repo VM IP** | `192.168.0.61` — verificado |
-| **PGCS Source → Repo** | `-p Ethernet Intra_Domain eth0 08:00:27:65:00:08 1200` |
-| **PGCS Repo → Source** | `-p Ethernet Intra_Domain eth0 08:00:27:79:bb:15 1200` |
+| **Source VM MAC** | `<repository-peer-mac>` (eth0) — verificado `ip addr` 2026-06-26 |
+| **Repo VM MAC** | `<source-peer-mac>` (eth0) — verificado `ip addr` 2026-06-26 |
+| **Source VM IP** | `<source-guest-ip>` — verificado |
+| **Repo VM IP** | `<repository-guest-ip>` — verificado |
+| **PGCS Source → Repo** | `-p Ethernet Intra_Domain eth0 <source-peer-mac> 1200` |
+| **PGCS Repo → Source** | `-p Ethernet Intra_Domain eth0 <repository-peer-mac> 1200` |
 | **gdb disponível** | `/usr/bin/gdb` em ambas as VMs — verificado 2026-06-26 |
 || **Branch AIOPT3** | Commit `cd804a7` em ambas as VMs — verificado 2026-07-16 |
-| **NRNCS presente na VM 102** | `cmake-build-debug/NRNCS` (5.5 MB) — verificado 2026-06-26. Apenas Source VM precisa de NRNCS. |
-| **SSH key** | `id_ed25519_hermes` em `~/.ssh/`, deployada em ambas as VMs — verificado |
+| **NRNCS presente na source guest** | `cmake-build-debug/NRNCS` (5.5 MB) — verificado 2026-06-26. Apenas Source VM precisa de NRNCS. |
+| **SSH key** | `<operator-ssh-key>` em `~/.ssh/`, deployada em ambas as VMs — verificado |
 | **PGCS precisa de sudo** | PGCS usa SHM + raw sockets — necessita de root em ambas as VMs Alpine |
 | **NRNCS/ContentApp sem sudo** | Correm como root via SSH por simplicidade (já são SSH como root) |
 
@@ -78,19 +78,19 @@ Novos scripts em `Scripts/AlpineVMs/`:
 Terminal 1         Terminal 2         Terminal 3
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │ ssh -t      │    │ ssh -t      │    │ ssh -t      │
-│ VM 102      │    │ VM 101      │    │ VM 102      │
+│ source guest      │    │ repository guest      │    │ source guest      │
 │ PGCS -p     │    │ PGCS -p     │    │ NRNCS       │
 │ Source MAC  │    │ Repo MAC    │    │ foreground  │
 └──────┬──────┘    └──────┬──────┘    └──────┬──────┘
        │                  │                  │
        ▼                  ▼                  ▼
    eth0 bridge ProxMox ─────────────────────────
-   (192.168.0.0/24)
+   (<private-test-subnet>)
 
 Terminal 4         Terminal 5
 ┌─────────────┐    ┌─────────────┐
 │ ssh -t      │    │ ssh -t      │
-│ VM 102      │    │ VM 101      │
+│ source guest      │    │ repository guest      │
 │ ContentApp  │    │ ContentApp  │
 │ Source      │    │ Repository  │
 └─────────────┘    └─────────────┘
@@ -123,17 +123,17 @@ Isto captura backtrace automático em caso de crash sem bloquear — o processo 
 
 ```bash
 #!/bin/bash
-# run_PGCS_on_Source_VM.sh — Start PGCS on Source VM (192.168.0.36)
+# run_PGCS_on_Source_VM.sh — Start PGCS on Source VM (<source-guest-ip>)
 # Opens a dedicated SSH terminal. PGCS uses deterministic mode (-p)
 # targeting the Repo VM's MAC address for inter-VM raw socket discovery.
 #
 # Usage: bash run_PGCS_on_Source_VM.sh
-# Requires: ssh key ~/.ssh/id_ed25519_hermes
+# Requires: ssh key ~/.ssh/<operator-ssh-key>
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_IP=192.168.0.36
-PEER_MAC=08:00:27:65:00:08  # Repo VM MAC
-BASE=/root/workspace/novagenesis
+SSH_KEY=~/.ssh/<operator-ssh-key>
+VM_IP=<source-guest-ip>
+PEER_MAC=<source-peer-mac>  # Repo VM MAC
+BASE=<guest-repository-path>
 
 echo "=== PGCS on Source VM (${VM_IP}) ==="
 echo "Peer MAC: ${PEER_MAC}"
@@ -147,25 +147,25 @@ ssh -t -i ${SSH_KEY} root@${VM_IP} \
 
 ### 5.2 `run_PGCS_on_Repo_VM.sh`
 
-Same pattern, but targets VM 101 with Source MAC as peer:
+Same pattern, but targets repository guest with Source MAC as peer:
 
 ```bash
-VM_IP=192.168.0.61
-PEER_MAC=08:00:27:79:bb:15  # Source VM MAC
+VM_IP=<repository-guest-ip>
+PEER_MAC=<repository-peer-mac>  # Source VM MAC
 ```
 
 ### 5.3 `run_NRNCS_on_Source_VM.sh`
 
 ```bash
 #!/bin/bash
-# run_NRNCS_on_Source_VM.sh — Start NRNCS on Source VM (192.168.0.36)
+# run_NRNCS_on_Source_VM.sh — Start NRNCS on Source VM (<source-guest-ip>)
 # Opens a dedicated SSH terminal. Must start after PGCS.
 #
 # Usage: bash run_NRNCS_on_Source_VM.sh
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_IP=192.168.0.36
-BASE=/root/workspace/novagenesis
+SSH_KEY=~/.ssh/<operator-ssh-key>
+VM_IP=<source-guest-ip>
+BASE=<guest-repository-path>
 
 ssh -t -i ${SSH_KEY} root@${VM_IP} \
   "cd ${BASE}/cmake-build-debug && \
@@ -177,18 +177,18 @@ ssh -t -i ${SSH_KEY} root@${VM_IP} \
 
 ```bash
 #!/bin/bash
-# run_Source_on_Source_VM.sh — Start ContentApp Source on Source VM (192.168.0.36)
+# run_Source_on_Source_VM.sh — Start ContentApp Source on Source VM (<source-guest-ip>)
 # Opens a dedicated SSH terminal. Requires PGCS already running.
 # Generates photos, then starts ContentApp.
 #
 # Usage: bash run_Source_on_Source_VM.sh [num_photos] [width] [height]
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_IP=192.168.0.36
+SSH_KEY=~/.ssh/<operator-ssh-key>
+VM_IP=<source-guest-ip>
 PHOTOS=${1:-100}
 WIDTH=${2:-800}
 HEIGHT=${3:-600}
-BASE=/root/workspace/novagenesis
+BASE=<guest-repository-path>
 IO_DIR=${BASE}/IO/Source1
 
 ssh -t -i ${SSH_KEY} root@${VM_IP} \
@@ -204,7 +204,7 @@ ssh -t -i ${SSH_KEY} root@${VM_IP} \
 
 ### 5.5 `run_Repository_on_Repo_VM.sh`
 
-Similar to Source but on VM 101, Repository role, no photo generation.
+Similar to Source but on repository guest, Repository role, no photo generation.
 
 ### 5.6 `README-ssh-run.md`
 
@@ -224,10 +224,10 @@ Documentation covering:
 **Comando:**
 ```bash
 # Verificar VMs ligadas
-ssh root@192.168.0.200 "qm status 101 && qm status 102"
+ssh root@<control-host> "qm status 101 && qm status 102"
 # Verificar branch
-ssh -i ~/.ssh/id_ed25519_hermes root@192.168.0.36 "cd /root/workspace/novagenesis && git log --oneline -1"
-ssh -i ~/.ssh/id_ed25519_hermes root@192.168.0.61 "cd /root/workspace/novagenesis && git log --oneline -1"
+ssh -i ~/.ssh/<operator-ssh-key> root@<source-guest-ip> "cd <guest-repository-path> && git log --oneline -1"
+ssh -i ~/.ssh/<operator-ssh-key> root@<repository-guest-ip> "cd <guest-repository-path> && git log --oneline -1"
 ```
 
 **Done when:** Both VMs report AIOPT3 branch at commit `cd804a7`.
@@ -287,7 +287,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 |-------|-------|---------|-----------|
 | SSH pede password | Baixa | Médio | Chave já deployada; verificar authorized_keys |
 | VM não tem Python/Pillow | Baixa | Médio | Alpine pode ter Python mas sem Pillow — verificar com `python3 -c "from PIL import Image"` |
-| gdb não encontra binário | Baixa | Alto | BASE path é `/root/workspace/novagenesis` — verificado |
+| gdb não encontra binário | Baixa | Alto | BASE path é `<guest-repository-path>` — verificado |
 | Ordem de arranque errada | Média | Médio | Documentado no README com `sleep 2` entre passos |
 | PGCS precisa de raw socket | Baixa | Alto | `-p` deterministic mode funciona em bridge ProxMox — confirmado nos scripts existentes |
 
@@ -303,7 +303,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 
 ## 10. Decisões Aprovadas
 
-- **Apenas NRNCS na Source VM** (2026-06-26) — A Repo VM (101) não precisa de NRNCS. Apenas o Source VM corre NRNCS. Elimina a necessidade de copiar o binário NRNCS para a VM 101.
+- **Apenas NRNCS na Source VM** (2026-06-26) — A Repo VM (101) não precisa de NRNCS. Apenas o Source VM corre NRNCS. Elimina a necessidade de copiar o binário NRNCS para a repository guest.
 
 ---
 

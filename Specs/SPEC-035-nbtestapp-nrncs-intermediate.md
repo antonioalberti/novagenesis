@@ -19,7 +19,7 @@ Se o caminho NRNCS estiver funcional, o `NBTestApp` deverá publicar bindings, r
 ### Incluído
 
 - PGCS nas VMs 101/102.
-- NRNCS no Source (VM 102).
+- NRNCS no Source (source guest).
 - `NBTestApp` como aplicação de teste, substituindo ContentApp.
 - Bindings sem payload de ficheiro.
 - Discovery, exposição, publicação, subscrição e entrega de bindings.
