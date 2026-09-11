@@ -3,7 +3,7 @@
 **Version:** v1.0
 **Date:** 2026-09-11
 **Author:** Antonio Alberti, with GPT-6 Astra review
-**Status:** Proposal
+**Status:** In Progress
 **Branch:** AIOPT3
 **Baseline:** `4ff9ec9`
 **Task:** `NG-036-deprecacao-standalone-v1-20260911.md`
@@ -170,6 +170,10 @@ These criteria are proposed gates; no implementation or test result is claimed b
 | D4 | Existing PSS launcher requires `NG_RUNTIME_PROFILE=legacy` and fails closed otherwise | Accepted for implementation |
 | D5 | Keep historical evidence immutable | Required preservation rule |
 | D6 | Do not change shared HT implementation, protocol or payload semantics | Required scope boundary |
+
+### Implementation gate review — 2026-09-11
+
+GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. Remaining acceptance gates are the cross-process normal/legacy discovery matrix, normal-mode NRNCS byte-exact ContentApp delivery, clean Docker builds, VM 101/102 validation, and the LoRa/EPGS runtime. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
 
 ## 9. Pitfalls
 
