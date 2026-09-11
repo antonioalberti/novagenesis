@@ -76,7 +76,7 @@ NovaGenesis currently targets Linux. For compilation and normal execution, insta
 - Docker, if using the Docker scenarios;
 - SSH and the configured key, if using the Alpine VM scenarios.
 
-The Alpine guests use Alpine Linux with musl libc and GCC 15. The supported VM roles are documented in Section 7.
+The Alpine guests use Alpine Linux with musl libc and GCC 15. The supported VM roles are documented in Section 7. The concrete VM numbers, hostnames, addresses and hardware addresses are deployment-specific and must be replaced in local launchers.
 
 # 4. Build profiles
 
@@ -168,18 +168,18 @@ The Docker path uses shared memory for intra-container IPC and raw Ethernet fram
 
 # 7. Alpine VM cross-process scenarios
 
-The verified two-VM arrangement is:
+The cross-process scenario uses two Alpine Linux guests and a separate control host. Use deployment-local names and addresses; the table below intentionally contains no site-specific network identity:
 
-| VM | Hostname | Address | Role | Ethernet MAC |
+| Role | Hostname | Address | Ethernet MAC |
 |---|---|---|---|---|
-| 101 | `repo61` | `192.168.0.61` | PGCS + ContentApp Repository | `08:00:27:65:00:08` |
-| 102 | `source36` | `192.168.0.36` | PGCS + NRNCS + ContentApp Source | `08:00:27:79:bb:15` |
+| Repository guest | `<repository-host>` | `<repository-ip>` | `<repository-mac>` |
+| Source guest | `<source-host>` | `<source-ip>` | `<source-mac>` |
 
-The peer MAC values must be copied literally, including lowercase hexadecimal letters. In particular, use `08:00:27:79:bb:15`, not an uppercased variant. An uppercased `BB` has previously produced a wrong Ethernet destination (`08:00:27:79:00:15`) and one-way discovery.
+Each PGCS must receive the other guest's actual Ethernet MAC as its peer argument. Preserve the literal representation through SSH and launcher layers, including lowercase hexadecimal letters where the local parser requires them. Before testing, verify the actual values with `ip link show <interface>` or the equivalent platform tool. Never copy the example placeholders into a real deployment.
 
 ## 7.1 Build and deploy
 
-From VM 100, the profile-aware deployment helper is:
+From the control host, the profile-aware deployment helper is:
 
 ```bash
 NG_BUILD_PROFILE=normal bash Scripts/AlpineVMs/pull-and-build-vms.sh
@@ -204,9 +204,9 @@ Before every run:
 3. Verify exactly one intended process per role.
 4. Start PGCS on both VMs with the peer MACs above.
 5. Wait for bidirectional PGCS peer registration.
-6. Start NRNCS on VM 102 and wait for operational/shared-memory discovery markers.
-7. Start Repository ContentApp on VM 101.
-8. Generate fresh unique JPEGs and start Source ContentApp on VM 102.
+6. Start NRNCS on the Source guest and wait for operational/shared-memory discovery markers.
+7. Start Repository ContentApp on the Repository guest.
+8. Generate fresh unique JPEGs and start Source ContentApp on the Source guest.
 
 The corresponding helpers are:
 
@@ -232,15 +232,15 @@ A photo-transfer run is accepted only when:
 
 For a 100-photo gate, exactly 100 fresh JPEGs must be present and byte-exact at all three locations. File counts or textual delivery messages alone are not sufficient evidence.
 
-For asymmetric discovery, inspect the actual frames on the Proxmox bridge before changing NovaGenesis code:
+For asymmetric discovery, inspect the actual frames on the hypervisor or host bridge before changing NovaGenesis code. Substitute the interface that carries traffic for `<bridge-interface>`:
 
 ```bash
-tcpdump -eni vmbr0 ether proto 0x1234
+tcpdump -eni <bridge-interface> ether proto 0x1234
 ```
 
 First verify that each transmitted Ethernet destination matches the peer VM MAC. A wrong destination is a test/deployment configuration error, not evidence of a NovaGenesis runtime defect.
 
-After evidence collection, stop all NG processes and leave VMs 101 and 102 stopped unless another test is actively running.
+After evidence collection, stop all NG processes and leave both test guests stopped unless another test is actively running.
 
 # 8. Documentation and reproducibility
 
@@ -255,7 +255,7 @@ The repository contains the durable technical record of the project:
 - `Scripts/AlpineVMs/` — reproducible multi-VM build and launch procedures;
 - `Scripts/Simple/` and `Scripts/Docker/` — local and containerized scenarios.
 
-Runtime evidence from VM 100 and Alpine VMs is kept in external evidence directories and linked from the relevant task, SPEC or decision record. Evidence should include the tested commit, configuration, process logs, manifests and programmatic hash comparisons. Local VM paths, credentials and temporary runtime state are deliberately not embedded in this public README.
+Runtime evidence from the control host and Alpine guests is kept in external evidence directories and linked from the relevant task, SPEC or decision record. Evidence should include the tested commit, configuration, process logs, manifests and programmatic hash comparisons. Local VM paths, credentials, private addresses and temporary runtime state are deliberately not embedded in this public README.
 
 The current operational baseline is the `AIOPT3` branch. The remote default branch is also `AIOPT3`; `master` is preserved as a secondary historical/compatibility branch.
 
@@ -269,6 +269,6 @@ The current operational baseline is the `AIOPT3` branch. The remote default bran
 - The prototype is Linux-only and does not provide a complete security layer.
 - Historical Docker, local and standalone-service instructions may remain in `Docs/HISTORICAL`; they do not override the normal NRNCS policy documented here.
 
-# 9. Licence and historical material
+# 10. Licence and historical material
 
 Read the licence files included in the repository and in the `Common` library before redistribution or use. Historical source, scripts and documents are retained for reproducibility; active normal deployment follows the NRNCS profile and the current AIOPT3 branch.
