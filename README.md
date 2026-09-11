@@ -2,7 +2,7 @@
 
 NovaGenesis (NG) is a convergent information-processing, storage and exchange architecture developed at INATEL - Instituto Nacional de Telecomunicações, Santa Rita do Sapucaí, Minas Gerais, Brazil.
 
-The project currently continues at the University of Leeds under the leadership of Prof. Antônio Marcos Alberti. Its foundations were selected in 2008, first specified in 2011, and prototyped in C/C++ during 2012–2013.
+The project currently continues at the University of Leeds under the leadership of [Prof. Antônio Marcos Alberti](https://eps.leeds.ac.uk/computing/staff/15735/dr-antonio-alberti). Its foundations were selected in 2008, first specified in 2011, and prototyped in C/C++ during 2012–2013.
 
 NovaGenesis is an event-driven Linux prototype in which services organize themselves through names, name bindings and contracts. Communication uses the NovaGenesis message model over raw Ethernet sockets. This prototype does not support other operating systems and does not provide a complete security layer. The software is provided as-is under its applicable open-source licences.
 
