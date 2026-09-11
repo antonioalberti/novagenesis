@@ -3,9 +3,9 @@
 **Version:** v1.0
 **Date:** 2026-09-11
 **Author:** Antonio Alberti + Hermes Agent
-**Status:** Proposal
+**Status:** Implemented
 **Branch:** AIOPT3
-**Implementation commit:** —
+**Implementation commit:** `5ab91ce` baseline; final promotion result recorded in `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
 **Related:** SPEC-036-deprecate-standalone-pss-girs-hts.md; Docs/DECISIONS/SPEC-STATUS-REGISTER.md
 
 ## 1. Problem / Objective
@@ -143,6 +143,7 @@ No candidate is accepted until its impact and evidence are recorded in the NG-03
 | D2 | Retain master as a secondary branch | 2026-09-11 | Preserve history, compatibility and rollback |
 | D3 | Permit bounded, explicit imperfections | 2026-09-11 | Avoid blocking the branch promotion on unrelated or non-critical unfinished work |
 | D4 | No source/protocol change in this SPEC | 2026-09-11 | Keep branch administration separate from production implementation |
+| D5 | Promote AIOPT3 after corrected 100-photo evidence and remote read-back | 2026-09-11 | Runtime and administration gates passed; master remains preserved |
 
 ## 11. Implementation Notes
 
