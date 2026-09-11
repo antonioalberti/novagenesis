@@ -1,9 +1,9 @@
 # SPEC-036: Staged deprecation of standalone PSS, GIRS and HTS
 
-**Version:** v1.1
+**Version:** v1.2
 **Date:** 2026-09-11
 **Author:** Antonio Alberti, with GPT-6 Astra review
-**Status:** In Progress
+**Status:** Implemented
 **Branch:** AIOPT3
 **Baseline:** `4ff9ec9`
 **Task:** `NG-036-deprecacao-standalone-v2-20260911.md`
@@ -177,7 +177,17 @@ These criteria are proposed gates; no implementation or test result is claimed b
 
 ### Implementation gate review — 2026-09-11
 
-GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. The remaining active gate is normal-profile cross-process discovery/selection; prior NRNCS byte-exact and Docker/VM evidence is reused from earlier tasks and is not repeated here. Functional legacy runtime testing is deferred until the legacy profile is actually needed. LoRa/EPGS is explicitly out of scope and is being handled in a separate repository. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
+GPT-6 Astra returned **CONDITIONAL GO** for the implementation/profile stage. The remaining condition was the normal-profile cross-process discovery/selection gate. That gate was subsequently executed on `5ab91ce` with the corrected canonical peer MACs and passed at 100/100 byte-exact JPEG delivery; the conditional gate is therefore closed. Functional legacy runtime testing remains deferred until the legacy profile is actually needed. LoRa/EPGS is explicitly out of scope and is handled in a separate repository. The initial result review is recorded in the Codex tracker with label `NG-036-results-review`.
+
+### Final runtime gate result — 2026-09-11
+
+The normal-profile cross-process gate passed on `5ab91ce` with the corrected canonical peer MACs. Both PGCS peers registered each other, NRNCS and Source were discovered, and 100 fresh JPEGs were delivered from Source through NRNCS to Repository with identical SHA-256 maps at all three points, no missing/extra files, and zero `ERROR`, `ALARM` or `FATAL` matches.
+
+Evidence: `/home/gandalf/workspace/novagenesis/IO/NG-037-cross-process-20260911-100-photos/`.
+
+The first malformed-MAC attempt is excluded from acceptance evidence. Functional legacy runtime tests remain on demand as specified in §5; the legacy build profile was validated separately.
+
+The SPEC is now implemented. No protocol, inverted pub/sub or shared HT semantic change was introduced by the deprecation work.
 
 ## 9. Pitfalls
 
