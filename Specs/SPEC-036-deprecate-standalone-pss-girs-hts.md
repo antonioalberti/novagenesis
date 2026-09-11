@@ -125,17 +125,17 @@ The implementation inventory must use tracked-file searches and classify every r
 3. A fresh legacy build succeeds for all three standalone executables and reports the deprecation warning.
 4. Normal images and scripts do not package or launch standalone services.
 5. Retained legacy routes are explicit and separately labelled.
-6. The discovery matrix is validated:
+6. The normal-profile rows of the discovery matrix are validated. Legacy rows remain documented as on-demand compatibility checks and are not current release gates:
 
 | Profile | Available services | Required result |
 |---|---|---|
 | Normal | NRNCS only | Discovery and readiness succeed |
 | Normal | Standalone only | No standalone selection and no false NRNCS readiness |
 | Normal | Both | NRNCS selected; no active standalone exposition by normal path |
-| Legacy | Standalone only | Existing compatibility path remains functional |
-| Legacy | Both | Approved legacy precedence is demonstrated |
+| Legacy | Standalone only | On-demand compatibility check; not a current release gate |
+| Legacy | Both | On-demand precedence check; not a current release gate |
 
-7. All three relevant applications are covered by the normal/legacy discovery tests.
+7. All three relevant applications are covered by the normal discovery tests; legacy application behaviour remains available for on-demand validation.
 8. NRNCS publication, resolution and ContentApp delivery remain functional with byte-exact manifests and hashes.
 9. LoRa/EPGS validation is explicitly out of scope for this repository task; the in-repository EPGS implementation and launchers are absent, and the external scenario is handled in a separate repository.
 10. Active documentation contains no unqualified recommendation or requirement for standalone deployment.
