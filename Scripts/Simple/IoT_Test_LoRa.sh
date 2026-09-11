@@ -45,12 +45,12 @@ start_in_terminal() {
 # Start PGCS
 start_in_terminal "PGCS" "cd $BASE/cmake-build-debug; ./PGCS $BASE/IO/PGCS/ 1 Intra_Domain -pc Wi-Fi Intra_Domain wlp63s0 e0:e2:e6:00:71:0c 200; exec bash"
 
-# Wait 10 seconds before starting HTS
-echo "Waiting 10 seconds before starting HTS..."
+# Wait 10 seconds before starting NRNCS
+echo "Waiting 10 seconds before starting NRNCS..."
 sleep 10
 
-# Start HTS
-start_in_terminal "HTS" "cd $BASE/cmake-build-debug; ./HTS $BASE/IO/NRNCS/; exec bash"
+# Start NRNCS (the replacement for deprecated standalone HTS)
+start_in_terminal "NRNCS" "cd $BASE/cmake-build-debug; ./NRNCS $BASE/IO/NRNCS/; exec bash"
 
 # Wait 60 seconds before starting IoTTestApp
 echo "Waiting 60 seconds before starting IoTTestApp..."

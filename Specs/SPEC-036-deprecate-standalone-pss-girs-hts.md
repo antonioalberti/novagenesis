@@ -97,6 +97,7 @@ Disposition classes:
 | Area | Locations | Class | Required disposition |
 |---|---|---:|---|
 | Standalone source | `PSS/src`, `GIRS/src`, `HTS/src`, `exec*.cpp` | R | Retain; legacy-only buildability |
+| Runtime profile helper | `Common/src/NGRuntimeProfile.h` | M | Default `normal`; explicit `NG_RUNTIME_PROFILE=legacy` enables legacy selection |
 | Shared implementation | `Common/src/HT*`, messaging, GW | N | No retirement or semantic change from this SPEC |
 | NRNCS data path | `NRNCS/src`, `Common/src/HTGetBind01.cpp` | N | Preserve cache and delivery semantics |
 | Root build | `CMakeLists.txt` | M | Add explicit OFF-by-default legacy profile and scoped includes |
@@ -163,10 +164,10 @@ These criteria are proposed gates; no implementation or test result is claimed b
 
 | ID | Proposed decision | State |
 |---|---|---|
-| D1 | Retain standalone source trees with an OFF-by-default legacy build profile | User confirmation required |
-| D2 | Use NRNCS-only discovery/exposition in normal mode | User confirmation required |
-| D3 | Preserve legacy compatibility only in explicit legacy mode | User confirmation required |
-| D4 | Convert the existing PSS launcher into a migration notice or explicitly named legacy launcher | User confirmation required |
+| D1 | Retain standalone source trees with an OFF-by-default legacy build profile | Accepted for implementation |
+| D2 | Use NRNCS-only discovery/exposition in normal mode | Accepted for implementation |
+| D3 | Preserve legacy compatibility only in explicit `NG_RUNTIME_PROFILE=legacy` mode; build capability and runtime selection remain separate | Accepted for implementation |
+| D4 | Existing PSS launcher requires `NG_RUNTIME_PROFILE=legacy` and fails closed otherwise | Accepted for implementation |
 | D5 | Keep historical evidence immutable | Required preservation rule |
 | D6 | Do not change shared HT implementation, protocol or payload semantics | Required scope boundary |
 

@@ -47,6 +47,10 @@
 #include "NameGenerator.h"
 #endif
 
+#ifndef _NGRUNTIMEPROFILE_H
+#include "NGRuntimeProfile.h"
+#endif
+
 // #define DEBUG
 // #define DEBUG
 
@@ -180,16 +184,16 @@ int PGRunPeriodic01::PSAwareness()
 
 #endif
 
-  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", ProcessesTuples, PB) == ERROR)
+  if (NGUseLegacyStandaloneRuntime())
   {
+    if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", ProcessesTuples, PB) == ERROR)
+    {
 
 #ifdef DEBUG
-    PB->S << Offset1 << "(Not aware of any PSS.)" << endl;
+      PB->S << Offset1 << "(Not aware of any PSS.)" << endl;
 #endif
-  }
-  else
-  {
-    if (ProcessesTuples.size() > 0)
+    }
+    else if (ProcessesTuples.size() > 0)
     {
       for (unsigned int i = 0; i < ProcessesTuples.size(); i++)
       {
@@ -207,7 +211,6 @@ int PGRunPeriodic01::PSAwareness()
         {
           if (ProcessesTuples[i]->Values[2] == PPG->PSTuples[j]->Values[2])
           {
-            // Change the flag
             NewPSDetected = false;
           }
         }
@@ -224,17 +227,16 @@ int PGRunPeriodic01::PSAwareness()
           if (PPGCS->HasCore == true)
           {
             Block* PCoreB = NULL;
-
             PPGCS->GetBlock("Core", PCoreB);
-
             Core* PCore = (Core*)PCoreB;
-
             PCore->PSTuples.push_back(ProcessesTuples[i]);
           }
         }
       }
     }
   }
+
+  ProcessesTuples.clear();
 
   if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("NRNCS", "NR", ProcessesTuples, PB) == ERROR)
   {

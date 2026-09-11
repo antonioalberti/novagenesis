@@ -45,6 +45,10 @@
 #include "NameGenerator.h"
 #endif
 
+#ifndef _NGRUNTIMEPROFILE_H
+#include "NGRuntimeProfile.h"
+#endif
+
 // #define DEBUG // This debug is important to follow PGCS running
 
 PGRunExposition01::PGRunExposition01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -151,7 +155,8 @@ int PGRunExposition01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
             // Get the local bindings to be exposed
             // *****************************************************************************
 
-            if (PB->PP
+            if (NGUseLegacyStandaloneRuntime() &&
+                PB->PP
                     ->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("HTS", "DHT", HTSs, PB) == OK)
             {
               for (unsigned int f = 0; f < HTSs.size(); f++)
@@ -169,7 +174,8 @@ int PGRunExposition01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               }
             }
 
-            if (PB->PP
+            if (NGUseLegacyStandaloneRuntime() &&
+                PB->PP
                     ->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("GIRS", "IR", GIRSs, PB) == OK)
             {
               for (unsigned int g = 0; g < GIRSs.size(); g++)
@@ -187,7 +193,8 @@ int PGRunExposition01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               }
             }
 
-            if (PB->PP
+            if (NGUseLegacyStandaloneRuntime() &&
+                PB->PP
                     ->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", PSSs, PB) == OK)
             {
               for (unsigned int h = 0; h < PSSs.size(); h++)
@@ -223,9 +230,10 @@ int PGRunExposition01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
               }
             }
 
-            if ((HTS_OK == true && HTS_ERROR == false) ||
-                (GIRS_OK == true && GIRS_ERROR == false) ||
-                (PSS_OK == true && PSS_ERROR == false) ||
+            if ((NGUseLegacyStandaloneRuntime() &&
+                 ((HTS_OK == true && HTS_ERROR == false) ||
+                  (GIRS_OK == true && GIRS_ERROR == false) ||
+                  (PSS_OK == true && PSS_ERROR == false))) ||
                 (NRNCS_OK == true && NRNCS_ERROR == false))
             {
               // Creating a new message

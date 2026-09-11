@@ -45,6 +45,10 @@
 #include "NameGenerator.h"
 #endif
 
+#ifndef _NGRUNTIMEPROFILE_H
+#include "NGRuntimeProfile.h"
+#endif
+
 // #define DEBUG // To follow message processing
 
 CoreRunEvaluate01::CoreRunEvaluate01(string _LN, Block* _PB, MessageBuilder* _PMB)
@@ -97,14 +101,18 @@ int CoreRunEvaluate01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
     // *************************************************************
     // Check for NRNCS discovery first Step
     // *************************************************************
-    if (PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, "PSS", PB) == ERROR &&
+    if ((!NGUseLegacyStandaloneRuntime() ||
+         PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, "PSS", PB) == ERROR) &&
         PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, "NRNCS", PB) == ERROR)
     {
       vector<string> Cat2Keywords;
 
       Cat2Keywords.push_back("OS");
-      Cat2Keywords.push_back("PSS");
-      Cat2Keywords.push_back("PS");
+      if (NGUseLegacyStandaloneRuntime())
+      {
+        Cat2Keywords.push_back("PSS");
+        Cat2Keywords.push_back("PS");
+      }
       Cat2Keywords.push_back("NRNCS");
       Cat2Keywords.push_back("NR");
 
@@ -138,14 +146,18 @@ int CoreRunEvaluate01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<
     // *************************************************************
     // Check for NRNCS discovery second Step
     // *************************************************************
-    if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", PSs, PB) == ERROR &&
+    if ((!NGUseLegacyStandaloneRuntime() ||
+         PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("PSS", "PS", PSs, PB) == ERROR) &&
         PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("NRNCS", "NR", PSs, PB) == ERROR)
     {
       vector<string> Cat2Keywords;
 
       Cat2Keywords.push_back("OS");
-      Cat2Keywords.push_back("PSS");
-      Cat2Keywords.push_back("PS");
+      if (NGUseLegacyStandaloneRuntime())
+      {
+        Cat2Keywords.push_back("PSS");
+        Cat2Keywords.push_back("PS");
+      }
       Cat2Keywords.push_back("NRNCS");
       Cat2Keywords.push_back("NR");
 
