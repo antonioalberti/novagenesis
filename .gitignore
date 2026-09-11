@@ -31,3 +31,4 @@ Scripts/AlpineVMs/ng-vm.env
 Temp/
 Make/out.txt
 **/*.bak
+IO/NG-*/
