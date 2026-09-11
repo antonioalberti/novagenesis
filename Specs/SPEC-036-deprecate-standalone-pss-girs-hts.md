@@ -6,7 +6,7 @@
 **Status:** In Progress
 **Branch:** AIOPT3
 **Baseline:** `4ff9ec9`
-**Task:** `NG-036-deprecacao-standalone-v1-20260911.md`
+**Task:** `NG-036-deprecacao-standalone-v2-20260911.md`
 **Related:** `SPEC-008-ht-bid-raw-socket-discovery.md`, `SPEC-018-payload-sticks-on-reused-inline-response.md`, `SPEC-021-one-message-per-file.md`, `SPEC-022-nrinfopayload01-separate-messages.md`
 
 ## 1. Problem / Objective
