@@ -10,10 +10,10 @@ BASE=`cd ../..; pwd`;
 #	ESP32-02 MAC: 24:6f:28:22:2c:88
 
 # Topology
-# NG (install in a PC) <=> Wi-Fi Ap <=> GW (LoRa <=> WiFi) <=> EPGS (NG embeded)
+# NG (install in a PC) <=> Wi-Fi Ap <=> GW (LoRa <=> WiFi) <=> external LoRa device
 #  ____________		     ____________		_______________             ___________
 #  |           |		|           |		|             |            |          |
-#  |   NG      |	    |    WIFI	|       |  LORA-WIFI  |	LoRA	   |   EPGS_  |
+#  |   NG      |	    |    WIFI	|       |  LORA-WIFI  |	LoRA	   | external |
 #  |           |		|    AP     |       |   GATEWAY   |            | LORA_NODE|
 #  |___________|		|___________|		|_____________|            |__________|
 

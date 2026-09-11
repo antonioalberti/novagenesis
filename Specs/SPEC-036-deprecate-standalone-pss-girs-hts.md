@@ -21,8 +21,9 @@ This SPEC establishes a staged deprecation policy:
 4. Normal builds, images, scripts, tests and operational documentation use NRNCS.
 5. Legacy mode is retained for compatibility and historical research, without an implied feature-parity commitment or removal date.
 6. Historical evidence remains immutable.
+7. The deprecated embedded EPGS implementation is removed from this main repository; external IoT interoperability code is not treated as an in-repository EPGS implementation.
 
-This SPEC is a repository-consistency and lifecycle change. It does not delete the standalone implementations and does not change the inverted pub/sub model.
+This SPEC is a repository-consistency and lifecycle change. It does not delete the standalone PSS/GIRS/HTS implementations and does not change the inverted pub/sub model. The separate EPGS removal is limited to the main repository's embedded implementation and launchers.
 
 ## 2. Root Cause
 
@@ -113,6 +114,7 @@ Disposition classes:
 | Active SPECs/diagnostics | SPEC-008, SPEC-018, SPEC-021, timer diagnostic | M | Add applicability/classification without erasing evidence |
 | Historical documentation | `Docs/HISTORICAL/` | N/R | Preserve contents; external classification permitted |
 | Untracked evidence | existing `IO/NG-*` evidence directories | N | Do not modify or commit as part of this SPEC |
+| Embedded EPGS component | `EPGS/`, `Docker/EPGS/`, `Scripts/Docker/run-EPGS.sh` | M | Remove from AIOPT3; external device interoperability remains outside this repository |
 
 The implementation inventory must use tracked-file searches and classify every relevant remaining reference. A zero-match requirement is invalid: legitimate legacy and historical references are allowed when explicitly classified.
 
@@ -135,7 +137,7 @@ The implementation inventory must use tracked-file searches and classify every r
 
 7. All three relevant applications are covered by the normal/legacy discovery tests.
 8. NRNCS publication, resolution and ContentApp delivery remain functional with byte-exact manifests and hashes.
-9. LoRa/EPGS validation is explicitly out of scope for this repository task and remains a dependency/reference to the separate repository where that scenario is being handled.
+9. LoRa/EPGS validation is explicitly out of scope for this repository task; the in-repository EPGS implementation and launchers are absent, and the external scenario is handled in a separate repository.
 10. Active documentation contains no unqualified recommendation or requirement for standalone deployment.
 11. Historical evidence and excluded untracked IO evidence are unchanged.
 12. Build, runtime and documentation changes are independently revertible.
@@ -170,6 +172,7 @@ These criteria are proposed gates; no implementation or test result is claimed b
 | D4 | Existing PSS launcher requires `NG_RUNTIME_PROFILE=legacy` and fails closed otherwise | Accepted for implementation |
 | D5 | Keep historical evidence immutable | Required preservation rule |
 | D6 | Do not change shared HT implementation, protocol or payload semantics | Required scope boundary |
+| D7 | Remove the embedded EPGS implementation, Docker image and launchers from this repository; retain external-peer interoperability paths | Accepted for implementation |
 
 ### Implementation gate review — 2026-09-11
 

@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Example for physical experiment with NXP 1588 or ESP32 
 # sh run-iottest-application.sh -pc Wi-Fi wlp7s0 00:23:a7:23:06:b2
 #
-# Example for emulated experiment with EPGS container(s)
+# Example for an emulated external device/container
 # sh run-iottest-application.sh -dec Ethernet eth0 FF:FF:FF:FF:FF:FF
 
 docker container prune -f
@@ -25,10 +25,3 @@ echo "A PGCS with enabled Core block for contract establishment"
 echo "A NRNCS for temporary IoT data caching in the network" 
 
 sh "$SCRIPT_DIR/run-PGCS-NRNCS-IoTTestApp.sh" $1 $2 $3 $4
-
-if [ "$1" = "-dec" ];
-then
-  echo "Creating EPGS" 
-
-  sh "$SCRIPT_DIR/run-EPGS.sh"
-fi

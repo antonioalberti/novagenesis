@@ -14,10 +14,6 @@ docker exec Client cat /home/ng/workspace/novagenesis/supervisorIoTTestApp.log >
 
 docker exec Client ps -a > Results/0_Client_PROCESSES_RUNNING_LIST.txt
 
-# Copy results from EPGS
-
-docker exec EPGS cat /home/ng/workspace/novagenesis/supervisorEPGS.log > Results/0_EPGS.txt
-
 Path=$(pwd)
 
 echo $Path

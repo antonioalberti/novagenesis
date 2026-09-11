@@ -20,7 +20,7 @@
 ├── NRNCS/              # NRNCS component
 ├── ContentApp/         # ContentApp component
 ├── HTS/                # HTS component
-├── EPGS/               # EPGS component
+├── ...                 # Embedded/IoT components are maintained externally
 └── ... (other components)
 ```
 

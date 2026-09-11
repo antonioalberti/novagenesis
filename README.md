@@ -20,7 +20,7 @@ ContentApp - It is an important NG content distribution application that has two
 
 Docker - This folder contains the folders and subsequent files required to prepare NG Docker container images. A CMakeLists.txt file is provided for each image, as well as a Dockerfile, a running script (Run.sh, which is the entrypoint for Docker a container) and a supervisord.conf, which contains Supervisord instructions to start NG services inside a container. Supervisord is required since more than one process runs in a container. This folder stores include files when running make-all-docker-images.sh.
 
-EPGS - It is a lightweight version of PGCS aimed to be embedded into IoT devices. EPGS has its own structure and compilation procedures that are not required to run NG in Linux OS. There is a way to run an emulated EPGS in Linux, but it is under development. More details are given here: https://ieeexplore.ieee.org/document/7970111
+EPGS - The embedded EPGS implementation is no longer maintained in this main NovaGenesis repository. Its source, Docker image and launchers have been removed from branch AIOPT3. The IoT applications may still interoperate with an externally maintained device implementation.
 
 GIRS - It is a generic indirection resolution service that is integrated into NRNCS. The standalone GIRS executable, like standalone PSS and HTS, is deprecated and retained only for explicitly selected legacy builds and historical compatibility. New deployments must use NRNCS.
 
@@ -28,7 +28,7 @@ HTS - HTS provides a mechanism to retrieve already published bindings and delive
 
 IO - This folder is employed to store input files required to run NG services as well as to store services outputs. All the programs have a .ini file, which contains customizable features of these services. 
 
-IoTTestApp - This application was developed to work as a client of IoT or I4.0 devices. It generates demands for sensors or actuators that embedd EPGS. All the operation is contract-based from embedded EPGS, PGCS and IoTTestApp. Therefore, it is useless to run IoTtestApp without an EPGS instance and a PGCS that represents it in NG core (like a digital twin). The PGCS must be configured in -pc mode for this IoT/I4.0 scenario. For more detail in this application, check https://ieeexplore.ieee.org/document/7970111.
+IoTTestApp - This application was developed to work as a client of IoT or I4.0 devices. It generates demands for sensors or actuators that may be implemented by an externally maintained embedded device. The operation is contract-based between the external device, PGCS and IoTTestApp. The PGCS must be configured in -pc mode for this IoT/I4.0 scenario. For more detail in this application, check https://ieeexplore.ieee.org/document/7970111.
 
 Make - This folder contains some alternative C/C++ compilation scripts. It can used, but it is better to use cmake or clion with the CMakeLists.txt. To directly compile NG service use Compile.sh. Be sure to have GCC/G++ installed.
 
