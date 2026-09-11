@@ -10,13 +10,17 @@
 
 set -u
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-BASE=/root/workspace/novagenesis
+: "${REPO_VM_IP:?Repository VM IP is required; source ng-vm.env}"
+: "${SOURCE_VM_IP:?Source VM IP is required; source ng-vm.env}"
+: "${NG_REPO_PATH:?NG_REPO_PATH is required; source ng-vm.env}"
+SSH_KEY=${NG_SSH_KEY:-$HOME/.ssh/id_ed25519}
+SSH_USER=${NG_SSH_USER:-root}
+BASE="$NG_REPO_PATH"
 BRANCH=AIOPT3
 PROFILE=${NG_BUILD_PROFILE:-normal}
 
-VM101="root@192.168.0.61"
-VM102="root@192.168.0.36"
+VM101="${SSH_USER}@${REPO_VM_IP}"
+VM102="${SSH_USER}@${SOURCE_VM_IP}"
 
 case "$PROFILE" in
     normal)
@@ -82,11 +86,11 @@ run_build() {
     ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$vm" "$BUILD_CMD"
 }
 
-echo "=== VM 101 (Repository — 192.168.0.61) ==="
+echo "=== Repository guest (${REPO_VM_IP}) ==="
 run_build "$VM101" > /tmp/ng-build-vm101.log 2>&1 &
 PID101=$!
 
-echo "=== VM 102 (Source — 192.168.0.36) ==="
+echo "=== Source guest (${SOURCE_VM_IP}) ==="
 run_build "$VM102"
 STATUS102=$?
 
@@ -94,8 +98,8 @@ wait "$PID101"
 STATUS101=$?
 
 printf '\n=== Results ===\n'
-printf 'VM 101 (Repository @ 192.168.0.61): %s\n' "$([ "$STATUS101" -eq 0 ] && echo OK || echo FAILED)"
-printf 'VM 102 (Source @ 192.168.0.36):     %s\n' "$([ "$STATUS102" -eq 0 ] && echo OK || echo FAILED)"
+printf 'Repository guest (%s): %s\n' "$REPO_VM_IP" "$([ "$STATUS101" -eq 0 ] && echo OK || echo FAILED)"
+printf 'Source guest (%s):     %s\n' "$SOURCE_VM_IP" "$([ "$STATUS102" -eq 0 ] && echo OK || echo FAILED)"
 
 if [ "$STATUS101" -eq 0 ] && [ "$STATUS102" -eq 0 ]; then
     echo "=== BUILD SUCCESS on both VMs ==="

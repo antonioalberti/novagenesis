@@ -10,12 +10,15 @@
 
 set -euo pipefail
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_IP=192.168.0.36
+: "${SOURCE_VM_IP:?Source VM IP is required; source ng-vm.env}"
+: "${NG_REPO_PATH:?NG_REPO_PATH is required; source ng-vm.env}"
+SSH_KEY=${NG_SSH_KEY:-$HOME/.ssh/id_ed25519}
+SSH_USER=${NG_SSH_USER:-root}
+VM_IP="$SOURCE_VM_IP"
 PHOTOS=${1:-100}
 WIDTH=${2:-800}
 HEIGHT=${3:-600}
-BASE=/root/workspace/novagenesis
+BASE="$NG_REPO_PATH"
 
 if (( $# > 3 )); then
     echo "Usage: $0 [num_photos] [width] [height]" >&2
@@ -33,7 +36,7 @@ echo "Photos: ${PHOTOS} (${WIDTH}x${HEIGHT})"
 echo "Opening SSH terminal... (Ctrl+C to stop ContentApp)"
 echo ""
 
-ssh -t -i "${SSH_KEY}" "root@${VM_IP}" "
+ssh -t -i "${SSH_KEY}" "${SSH_USER}@${VM_IP}" "
     set -eu
     cd '${BASE}'
     RUN_ID=\$(python3 -c 'import uuid; print(uuid.uuid4().hex)')

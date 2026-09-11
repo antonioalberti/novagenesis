@@ -12,15 +12,18 @@
 #
 # Order: run after both PGCS scripts (Terminal 3), wait ~2s
 
-SSH_KEY=~/.ssh/id_ed25519_hermes
-VM_IP=192.168.0.36
-BASE=/root/workspace/novagenesis
+: "${SOURCE_VM_IP:?Source VM IP is required; source ng-vm.env}"
+: "${NG_REPO_PATH:?NG_REPO_PATH is required; source ng-vm.env}"
+SSH_KEY=${NG_SSH_KEY:-$HOME/.ssh/id_ed25519}
+SSH_USER=${NG_SSH_USER:-root}
+VM_IP="$SOURCE_VM_IP"
+BASE="$NG_REPO_PATH"
 
 echo "=== NRNCS on Source VM (${VM_IP}) ==="
 echo "Opening SSH terminal... (Ctrl+C to stop NRNCS)"
 echo ""
 
-ssh -t -i ${SSH_KEY} root@${VM_IP} \
+ssh -t -i "${SSH_KEY}" "${SSH_USER}@${VM_IP}" \
   "cd ${BASE}/cmake-build-debug && \
    gdb -batch -ex \"run\" -ex \"bt\" -ex \"quit\" --args \
    ./NRNCS ${BASE}/IO/NRNCS/"

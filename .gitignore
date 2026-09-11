@@ -23,3 +23,11 @@ Thumbs.db
 *.jpg
 *.dat
 build/
+
+# Local deployment configuration
+Scripts/AlpineVMs/ng-vm.env
+
+# Generated/debug artefacts
+Temp/
+Make/out.txt
+**/*.bak

@@ -5,17 +5,10 @@
 set -e
 
 VM_TYPE="$1"
-
-if [ "$VM_TYPE" = "source" ]; then
-    IP="192.168.0.36"
-    HOSTNAME="source36"
-elif [ "$VM_TYPE" = "repo" ]; then
-    IP="192.168.0.61"
-    HOSTNAME="repo61"
-else
-    echo "Usage: autoconfig.sh <source|repo>"
-    exit 1
-fi
+: "${VM_IP:?Set VM_IP for this guest}"
+: "${VM_HOSTNAME:?Set VM_HOSTNAME for this guest}"
+: "${GATEWAY:?Set GATEWAY for this network}"
+NETMASK=${NETMASK:-255.255.255.0}
 
 # Check if running on live system (tmpfs root)
 if mount | grep -q ' / type tmpfs'; then
@@ -34,11 +27,11 @@ if [ -z "$IFACE" ]; then
 fi
 echo "Detected network interface: $IFACE"
 
-echo "=== Configuring $HOSTNAME with IP $IP ==="
+echo "=== Configuring $VM_HOSTNAME with IP $VM_IP ==="
 
 # 1. Hostname (persistent)
-echo "$HOSTNAME" > /etc/hostname
-hostname "$HOSTNAME"
+echo "$VM_HOSTNAME" > /etc/hostname
+hostname "$VM_HOSTNAME"
 
 # 2. Network config (persistent)
 cat > /etc/network/interfaces <<EOF
@@ -47,9 +40,9 @@ iface lo inet loopback
 
 auto $IFACE
 iface $IFACE inet static
-    address $IP
-    netmask 255.255.255.0
-    gateway 192.168.0.1
+    address $VM_IP
+    netmask $NETMASK
+    gateway $GATEWAY
 EOF
 
 # 3. DNS (persistent)
@@ -75,12 +68,18 @@ rc-service sshd start 2>/dev/null || true
 # 8. Configure SSH keys
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINOXuWtHOWOqPDlbt+HFrXPZ5o7hDksW4keGFR0LsAmh scalifax@TILLION" > /root/.ssh/authorized_keys
+if [ ! -f /mnt/authorized_keys ]; then
+    echo "ERROR: provide operator-managed /mnt/authorized_keys before enabling SSH" >&2
+    exit 1
+fi
+cp /mnt/authorized_keys /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 
 # 9. Configure sshd
 sed -i 's/#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/#*KbdInteractiveAuthentication.*/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/#*PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
 rc-service sshd restart 2>/dev/null || true
 
 # 10. Verify SSH
@@ -89,5 +88,5 @@ rc-service sshd status 2>/dev/null || echo "sshd status unknown"
 
 echo "=== Config complete ==="
 echo "Hostname: $(hostname)"
-echo "IP: $IP"
+echo "IP: $VM_IP"
 echo "Test: ping -c 1 8.8.8.8"

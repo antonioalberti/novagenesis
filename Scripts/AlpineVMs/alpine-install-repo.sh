@@ -6,8 +6,14 @@
 echo 'KEYMAP="us"' > /etc/conf.d/keymaps
 rc-update add keymaps boot 2>/dev/null || true
 
+# Deployment-specific values must be supplied by the operator.
+: "${VM_HOSTNAME:?Set VM_HOSTNAME for this guest}"
+: "${VM_IP:?Set VM_IP for this guest}"
+: "${GATEWAY:?Set GATEWAY for this network}"
+NETMASK=${NETMASK:-255.255.255.0}
+
 # Hostname
-setup-hostname repo61
+setup-hostname "$VM_HOSTNAME"
 
 # Network - STATIC IP on eth0 (permanent)
 cat > /etc/network/interfaces <<'EOF'
@@ -16,9 +22,9 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet static
-    address 192.168.0.61
-    netmask 255.255.255.0
-    gateway 192.168.0.1
+    address $VM_IP
+    netmask $NETMASK
+    gateway $GATEWAY
 EOF
 
 # Timezone
@@ -27,8 +33,9 @@ setup-timezone -z UTC
 # Install OpenRC and OpenSSH
 apk add openrc openssh
 
-# Root password
-echo "root:novagenesis" | chpasswd
+# Do not embed or assign a password. Set a local console credential or install
+# an operator-managed SSH key before enabling remote administration.
+echo "No root password is configured by this script; use local operator setup."
 
 # Enable and start SSH
 rc-update add sshd default

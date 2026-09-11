@@ -179,7 +179,15 @@ Each PGCS must receive the other guest's actual Ethernet MAC as its peer argumen
 
 ## 7.1 Build and deploy
 
-From the control host, the profile-aware deployment helper is:
+From the control host, prepare a local ignored configuration from `Scripts/AlpineVMs/ng-vm.env.example`, fill in the two guest addresses/MACs and local repository path, then source it:
+
+```bash
+cp Scripts/AlpineVMs/ng-vm.env.example Scripts/AlpineVMs/ng-vm.env
+$EDITOR Scripts/AlpineVMs/ng-vm.env
+. Scripts/AlpineVMs/ng-vm.env
+```
+
+The profile-aware deployment helper is:
 
 ```bash
 NG_BUILD_PROFILE=normal bash Scripts/AlpineVMs/pull-and-build-vms.sh

@@ -11,13 +11,10 @@ if [ "$VM_TYPE" != "source" ] && [ "$VM_TYPE" != "repo" ]; then
     exit 1
 fi
 
-if [ "$VM_TYPE" = "source" ]; then
-    IP="192.168.0.36"
-    HOSTNAME="source36"
-else
-    IP="192.168.0.61"
-    HOSTNAME="repo61"
-fi
+: "${VM_IP:?Set VM_IP for this guest}"
+: "${VM_HOSTNAME:?Set VM_HOSTNAME for this guest}"
+: "${GATEWAY:?Set GATEWAY for this network}"
+NETMASK=${NETMASK:-255.255.255.0}
 
 # Detect network interface (first non-loopback) - BusyBox compatible
 IFACE=$(ip link show | grep -v "lo:" | head -1 | cut -d: -f2 | tr -d ' ')
@@ -27,10 +24,10 @@ if [ -z "$IFACE" ]; then
 fi
 echo "Detected network interface: $IFACE"
 
-echo "=== Phase1: Installing $HOSTNAME to disk ==="
+echo "=== Phase1: Installing $VM_HOSTNAME to disk ==="
 
 # 1. Hostname
-setup-hostname "$HOSTNAME"
+setup-hostname "$VM_HOSTNAME"
 
 # 2. Network - STATIC IP
 cat > /etc/network/interfaces <<EOF
@@ -39,9 +36,9 @@ iface lo inet loopback
 
 auto $IFACE
 iface $IFACE inet static
-    address $IP
-    netmask 255.255.255.0
-    gateway 192.168.0.1
+    address $VM_IP
+    netmask $NETMASK
+    gateway $GATEWAY
 EOF
 
 # 3. DNS
@@ -67,7 +64,7 @@ mkdir -p /mnt/target/etc/network
 cp /etc/network/interfaces /mnt/target/etc/network/interfaces
 # Also copy to target's network interfaces
 cp /etc/resolv.conf /mnt/target/etc/resolv.conf
-echo "$HOSTNAME" > /mnt/target/etc/hostname
+echo "$VM_HOSTNAME" > /mnt/target/etc/hostname
 
 # 8. Ensure networking service is enabled in installed system
 chroot /mnt/target rc-update add networking boot 2>/dev/null || true

@@ -33,8 +33,8 @@ apk add openssh
 rc-update add sshd default
 rc-service sshd start
 
-# Set root password
-echo "root:novagenesis" | chpasswd
+# Do not embed a root password in a public script. Set credentials locally
+# through the console or an approved secret-management procedure.
 
 # Skip Guest Additions (causes hangs)
 echo "=== Skipping Guest Additions (use PS/2 mouse) ==="
@@ -44,5 +44,4 @@ echo "=== Installing Python ==="
 apk add python3 py3-pip py3-numpy py3-pillow
 
 echo "=== Phase2 complete ==="
-echo "Password: novagenesis"
 echo "Mouse: Use Right Ctrl to release (PS/2 mouse set)"

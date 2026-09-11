@@ -83,7 +83,7 @@ if mount | grep -q ' / type tmpfs'; then
     echo "  1. Run: ash /mnt/alpine-phase1-install.sh source   (or 'repo')"
     echo "  2. Wait for installation to complete (~2 minutes)"
     echo "  3. VM will reboot automatically"
-    echo "  4. After reboot, login as root (password: novagenesis)"
+    echo "  4. After reboot, authenticate with the operator-managed console credential or SSH key"
     echo "  5. Run: ash /mnt/alpine-phase2-packages.sh"
     echo "  6. Continue with phase3, phase4 as needed"
     echo ""
