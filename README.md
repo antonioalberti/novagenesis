@@ -20,8 +20,6 @@ ContentApp - It is an important NG content distribution application that has two
 
 Docker - This folder contains the folders and subsequent files required to prepare NG Docker container images. A CMakeLists.txt file is provided for each image, as well as a Dockerfile, a running script (Run.sh, which is the entrypoint for Docker a container) and a supervisord.conf, which contains Supervisord instructions to start NG services inside a container. Supervisord is required since more than one process runs in a container. This folder stores include files when running make-all-docker-images.sh.
 
-EPGS - The embedded EPGS implementation is no longer maintained in this main NovaGenesis repository. Its source, Docker image and launchers have been removed from branch AIOPT3. The IoT applications may still interoperate with an externally maintained device implementation.
-
 GIRS - It is a generic indirection resolution service that is integrated into NRNCS. The standalone GIRS executable, like standalone PSS and HTS, is deprecated and retained only for explicitly selected legacy builds and historical compatibility. New deployments must use NRNCS.
 
 HTS - HTS provides a mechanism to retrieve already published bindings and deliver them directly to an authorized subscriber. Its standalone executable is deprecated; the current recommended implementation is the HT/data path integrated into NRNCS. Every HT instance contains a hash table data structure where name bindings are stored in a key/value(s) format.
