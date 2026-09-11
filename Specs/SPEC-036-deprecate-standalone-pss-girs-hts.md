@@ -19,7 +19,7 @@ This SPEC establishes a staged deprecation policy:
 2. Standalone PSS, GIRS and HTS source trees remain available.
 3. Standalone binaries are available only through an explicit legacy build profile.
 4. Normal builds, images, scripts, tests and operational documentation use NRNCS.
-5. Legacy mode is retained for compatibility and historical research, without an implied feature-parity commitment or removal date.
+5. Legacy mode is retained for compatibility and historical research, without an implied feature-parity commitment or removal date; functional legacy runtime validation is on demand and is not a release gate for this task.
 6. Historical evidence remains immutable.
 7. The deprecated embedded EPGS implementation is removed from this main repository; external IoT interoperability code is not treated as an in-repository EPGS implementation.
 
@@ -173,10 +173,11 @@ These criteria are proposed gates; no implementation or test result is claimed b
 | D5 | Keep historical evidence immutable | Required preservation rule |
 | D6 | Do not change shared HT implementation, protocol or payload semantics | Required scope boundary |
 | D7 | Remove the embedded EPGS implementation, Docker image and launchers from this repository; retain external-peer interoperability paths | Accepted for implementation |
+| D8 | Do not run functional legacy runtime tests now; retain build validation and test legacy behaviour on demand when the profile is needed | Accepted for implementation |
 
 ### Implementation gate review — 2026-09-11
 
-GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. Remaining acceptance gates are the cross-process normal/legacy discovery matrix, normal-mode NRNCS byte-exact ContentApp delivery, and clean Docker/VM validation. LoRa/EPGS is explicitly out of scope and is being handled in a separate repository. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
+GPT-6 Astra returned **CONDITIONAL GO**. The build/profile and static policy evidence is sufficient to continue, but not to mark this SPEC Implemented. The remaining active gate is normal-profile cross-process discovery/selection; prior NRNCS byte-exact and Docker/VM evidence is reused from earlier tasks and is not repeated here. Functional legacy runtime testing is deferred until the legacy profile is actually needed. LoRa/EPGS is explicitly out of scope and is being handled in a separate repository. The result review is recorded in the Codex tracker with label `NG-036-results-review`.
 
 ## 9. Pitfalls
 
