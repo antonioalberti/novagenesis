@@ -1,0 +1,39 @@
+{
+  "run": "baseline-AIOPT3-e714ab1-static",
+  "date": "2026-09-06T12:26-12:30Z",
+  "config": "N=1 receiver, single mutex absent (per-dispatcher SAR), StressTest=1 both sides, interval=5s, MTU 1200",
+  "commit": "bca1b20+DEBUG patches (AIOPT3 + e714ab1 cherry-pick)",
+  "window_samples": [
+    {
+      "t": "12:26:59",
+      "src_sent": 251,
+      "repo_received": 21
+    },
+    {
+      "t": "12:27:39",
+      "src_sent": 259,
+      "repo_received": 29
+    },
+    {
+      "t": "12:28:20",
+      "src_sent": 267,
+      "repo_received": 37
+    },
+    {
+      "t": "12:29:00",
+      "src_sent": 275,
+      "repo_received": 45
+    },
+    {
+      "t": "12:29:41",
+      "src_sent": 283,
+      "repo_received": 53
+    }
+  ],
+  "window_delta": {
+    "sent": 32,
+    "received": 32,
+    "loss_pct": 0.0
+  },
+  "notes": "Wire pings 217B each, 1 msg/5s per direction (src->repo counted). Steady state, zero loss, low rate (idle scenario). Repo stress receipt path verified: GWMsgCl01->ForwardMessageInsideProcess->PG block->PGStresstestPing01."
+}

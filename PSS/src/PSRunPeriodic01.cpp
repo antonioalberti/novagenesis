@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PSRunPeriodic01
-	Object:		PSRunPeriodic01
-	File:		PSRunPeriodic01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PSRunPeriodic01
+        Object:		PSRunPeriodic01
+        File:		PSRunPeriodic01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -41,38 +41,42 @@
 #include "PSS.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 ////#define DEBUG
 
-PSRunPeriodic01::PSRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+PSRunPeriodic01::PSRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
   PGCSPID = "unknown";
 
   PGCSHT = "unknown";
 }
 
-PSRunPeriodic01::~PSRunPeriodic01 ()
+PSRunPeriodic01::~PSRunPeriodic01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --periodic _Version
-int
-PSRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int PSRunPeriodic01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
-  PS *PPS = 0;
-  CommandLine *PCL = 0;
-  Message *RunPeriodic = 0;
+  PS* PPS = 0;
+  CommandLine* PCL = 0;
+  Message* RunPeriodic = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
 
-  PPS = (PS *)PB;
+  PPS = (PS*)PB;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
@@ -81,55 +85,55 @@ PSRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
   // ******************************************************
 
   if (PGCSPID == "unknown" && PGCSHT == "unknown")
-	{
-	  GetPGCSNames ();
-	}
+  {
+    GetPGCSNames();
+  }
 
   if (PGCSPID != "unknown" && PGCSHT != "unknown")
-	{
-	  Exposition ();
+  {
+    Exposition();
 
-	  DiscoveryFirst ();
+    DiscoveryFirst();
 
-	  DiscoverySecond ();
+    DiscoverySecond();
 
-	  Operational ();
-	}
+    Operational();
+  }
 
   // ******************************************************
   // Schedule a message to run periodic again
   // ******************************************************
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the block SCN as the destination SCN
-  Destinations.push_back (PB->GetSelfCertifyingName ());
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime () + PPS->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
+  PB->PP->NewMessage(GetTime() + PPS->DelayBeforeRunPeriodic, 1, false, RunPeriodic);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
 
   // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  RunPeriodic->NewCommandLine("-run", "--periodic", "0.1", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunPeriodic);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunPeriodic, PCL);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Push the message to the GW input queue
-  PPS->PGW->PushToInputQueue (RunPeriodic);
+  PPS->PGW->PushToInputQueue(RunPeriodic);
 
   // ******************************************************
   // Clean the messages container
@@ -137,44 +141,46 @@ PSRunPeriodic01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Messa
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl << endl << endl;
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 
   return Status;
 }
 
-int PSRunPeriodic01::GetPGCSNames ()
+int PSRunPeriodic01::GetPGCSNames()
 {
   int Status = ERROR;
-  vector<string> *PGCSBIDs = new vector<string>;
+  vector<string>* PGCSBIDs = new vector<string>;
 
-  if (PB->PP->DiscoverHomonymsBlocksBIDsFromProcessLegibleName ("PGCS", "HT", PGCSPID, PGCSBIDs, PB) == OK)
-	{
-	  if (PGCSBIDs->size () > 0)
-		{
-		  PGCSHT = PGCSBIDs->at (0);
-		}
-	}
+  if (PB->PP->DiscoverHomonymsBlocksBIDsFromProcessLegibleName("PGCS", "HT", PGCSPID, PGCSBIDs, PB) == OK)
+  {
+    if (PGCSBIDs->size() > 0)
+    {
+      PGCSHT = PGCSBIDs->at(0);
+    }
+  }
 
   return Status;
 }
 
-int PSRunPeriodic01::Exposition ()
+int PSRunPeriodic01::Exposition()
 {
   int Status = ERROR;
   string Offset = "                    ";
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Message *ExposingInitialBinds = NULL;
-  PS *PPS = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
+  Message* ExposingInitialBinds = NULL;
+  PS* PPS = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
 
-  PPS = (PS *)PB;
+  PPS = (PS*)PB;
 
-  PHTB = (Block *)PPS->PHT;
+  PHTB = (Block*)PPS->PHT;
 
 #ifdef DEBUG
 
@@ -187,48 +193,47 @@ int PSRunPeriodic01::Exposition ()
   // ***************************************************
 
   // Setting up the OSID as the space limiter
-  Limiters.push_back (PB->PP->Intra_OS);
+  Limiters.push_back(PB->PP->Intra_OS);
 
   // Setting up the this process as the first source SCN
-  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+  Sources.push_back(PB->PP->GetSelfCertifyingName());
 
   // Setting up the IR block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the PGCS PID as the destination SCN
-  Destinations.push_back (PGCSPID);
+  Destinations.push_back(PGCSPID);
 
   // Setting up the PGCS::HT BID as the destination SCN
-  Destinations.push_back (PGCSHT);
+  Destinations.push_back(PGCSHT);
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, ExposingInitialBinds);
+  PB->PP->NewMessage(GetTime(), 0, false, ExposingInitialBinds);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, ExposingInitialBinds, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, ExposingInitialBinds, PCL);
 
   // ***************************************************
   // Generate the bindings to be store on PGCS
   // ***************************************************
 
-  PMB->NewStoreBindingCommandLineFromOSIDToPID ("0.1", ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromOSIDToPID("0.1", ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PB, ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PHTB, ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PHTB, ExposingInitialBinds, PCL);
 
-  //PMB->NewStoreBindingCommandLineFromPIDToBID("0.1",PGWB,ExposingInitialBinds,PCL);
+  // PMB->NewStoreBindingCommandLineFromPIDToBID("0.1",PGWB,ExposingInitialBinds,PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "PS", PB
-	  ->GetSelfCertifyingName (), ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLNToSCN("0.1", 2, "PS", PB->GetSelfCertifyingName(), ExposingInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, PB->GetSelfCertifyingName (), "PS", ExposingInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineSCNToHashLN("0.1", 3, PB->GetSelfCertifyingName(), "PS", ExposingInitialBinds, PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (ExposingInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(ExposingInitialBinds);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, ExposingInitialBinds, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, ExposingInitialBinds, PCL);
 
   // ******************************************************
   // Finish
@@ -243,14 +248,14 @@ int PSRunPeriodic01::Exposition ()
 #endif
 
   // Push the message to the GW input queue
-  PPS->PGW->PushToInputQueue (ExposingInitialBinds);
+  PPS->PGW->PushToInputQueue(ExposingInitialBinds);
 
   Status = OK;
 
   return Status;
 }
 
-int PSRunPeriodic01::DiscoveryFirst ()
+int PSRunPeriodic01::DiscoveryFirst()
 {
   int Status = ERROR;
   string Offset = "                    ";
@@ -258,14 +263,14 @@ int PSRunPeriodic01::DiscoveryFirst ()
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Message *Discovery = NULL;
-  PS *PPS = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
+  Message* Discovery = NULL;
+  PS* PPS = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
 
-  PPS = (PS *)PB;
+  PPS = (PS*)PB;
 
-  PHTB = (Block *)PPS->PHT;
+  PHTB = (Block*)PPS->PHT;
 
 #ifdef DEBUG
 
@@ -287,57 +292,57 @@ int PSRunPeriodic01::DiscoveryFirst ()
   string Key3;
   string Key4;
 
-  PMB->GenerateSCNFromCharArrayBinaryPatterns (LN1, Key1);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns (LN2, Key2);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns (LN3, Key3);
-  PMB->GenerateSCNFromCharArrayBinaryPatterns (LN4, Key4);
+  Key1 = NameGenerator::GetInstance().GenerateFromString(LN1);
+  Key2 = NameGenerator::GetInstance().GenerateFromString(LN2);
+  Key3 = NameGenerator::GetInstance().GenerateFromString(LN3);
+  Key4 = NameGenerator::GetInstance().GenerateFromString(LN4);
 
   // ***************************************************
   // Prepare the first command line
   // ***************************************************
 
   // Setting up the OSID as the space limiter
-  Limiters.push_back (PB->PP->Intra_OS);
+  Limiters.push_back(PB->PP->Intra_OS);
 
   // Setting up the this process as the first source SCN
-  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+  Sources.push_back(PB->PP->GetSelfCertifyingName());
 
   // Setting up the PS block SCN as the source SCN
-  Sources.push_back (PHTB->GetSelfCertifyingName ());
+  Sources.push_back(PHTB->GetSelfCertifyingName());
 
   // Setting up the PGCS PID as the destination SCN
-  Destinations.push_back (PGCSPID);
+  Destinations.push_back(PGCSPID);
 
   // Setting up the PGCS::HT BID as the destination SCN
-  Destinations.push_back (PGCSHT);
+  Destinations.push_back(PGCSHT);
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, Discovery);
+  PB->PP->NewMessage(GetTime(), 0, false, Discovery);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, Discovery, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, Discovery, PCL);
 
   // ***************************************************
   // Generate the get bindings to be ask on PGCS
   // ***************************************************
-  PMB->NewGetCommandLine ("0.1", 9, LN1, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, LN2, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, LN3, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, LN4, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 9, Key1, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, Key2, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, Key3, Discovery, PCL);
-  PMB->NewGetCommandLine ("0.1", 2, Key4, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 9, LN1, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, LN2, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, LN3, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, LN4, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 9, Key1, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, Key2, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, Key3, Discovery, PCL);
+  PMB->NewGetCommandLine("0.1", 2, Key4, Discovery, PCL);
 
   // ******************************************************
   // Setting up the SCN command line
   // ******************************************************
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (Discovery, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, Discovery, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);
 
   // ******************************************************
   // Finish
@@ -350,35 +355,34 @@ int PSRunPeriodic01::DiscoveryFirst ()
 #endif
 
   // Push the message to the GW input queue
-  PPS->PGW->PushToInputQueue (Discovery);
+  PPS->PGW->PushToInputQueue(Discovery);
 
   return Status;
 }
 
-int PSRunPeriodic01::DiscoverySecond ()
+int PSRunPeriodic01::DiscoverySecond()
 {
   int Status = ERROR;
   string Offset = "                    ";
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Message *Discovery = NULL;
-  PS *PPS = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  vector<string> *HIDs = new vector<string>;
-  vector<string> *ADIs = new vector<string>;
+  Message* Discovery = NULL;
+  PS* PPS = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  vector<string>* HIDs = new vector<string>;
+  vector<string>* ADIs = new vector<string>;
 
-  PPS = (PS *)PB;
+  PPS = (PS*)PB;
 
-  PHTB = (Block *)PPS->PHT;
+  PHTB = (Block*)PPS->PHT;
 
 #ifdef DEBUG
 
   PB->S << Offset << "(3. Discovery GIRS names: second step.)" << endl;
 
 #endif
-
 
   // ***************************************************
   // Set up the keywords for the discovery state
@@ -389,84 +393,84 @@ int PSRunPeriodic01::DiscoverySecond ()
   string LN3 = "GIRS";
   string LN4 = "IR";
 
-  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (9, LN1, HIDs, PB);
-  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, LN2, ADIs, PB);
-  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, LN3, ADIs, PB);
-  PB->PP->DiscoverHomonymsEntitiesIDsFromLN (2, LN4, ADIs, PB);
+  PB->PP->DiscoverHomonymsEntitiesIDsFromLN(9, LN1, HIDs, PB);
+  PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, LN2, ADIs, PB);
+  PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, LN3, ADIs, PB);
+  PB->PP->DiscoverHomonymsEntitiesIDsFromLN(2, LN4, ADIs, PB);
 
 #ifdef DEBUG
-  PB->S << Offset << "(Size of HIDs = " << HIDs->size () << ")" << endl;
-  PB->S << Offset << "(Size of ADIs = " << ADIs->size () << ")" << endl;
+  PB->S << Offset << "(Size of HIDs = " << HIDs->size() << ")" << endl;
+  PB->S << Offset << "(Size of ADIs = " << ADIs->size() << ")" << endl;
 #endif
 
-  if (HIDs->size () > 0 && ADIs->size () > 0)
-	{
-	  // ***************************************************
-	  // Prepare the first command line
-	  // ***************************************************
+  if (HIDs->size() > 0 && ADIs->size() > 0)
+  {
+    // ***************************************************
+    // Prepare the first command line
+    // ***************************************************
 
-	  // Setting up the OSID as the space limiter
-	  Limiters.push_back (PB->PP->Intra_OS);
+    // Setting up the OSID as the space limiter
+    Limiters.push_back(PB->PP->Intra_OS);
 
-	  // Setting up the this process as the first source SCN
-	  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+    // Setting up the this process as the first source SCN
+    Sources.push_back(PB->PP->GetSelfCertifyingName());
 
-	  // Setting up the PS block SCN as the source SCN
-	  Sources.push_back (PHTB->GetSelfCertifyingName ());
+    // Setting up the PS block SCN as the source SCN
+    Sources.push_back(PHTB->GetSelfCertifyingName());
 
-	  // Setting up the PGCS PID as the destination SCN
-	  Destinations.push_back (PGCSPID);
+    // Setting up the PGCS PID as the destination SCN
+    Destinations.push_back(PGCSPID);
 
-	  // Setting up the PGCS::HT BID as the destination SCN
-	  Destinations.push_back (PGCSHT);
+    // Setting up the PGCS::HT BID as the destination SCN
+    Destinations.push_back(PGCSHT);
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 0, false, Discovery);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 0, false, Discovery);
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, Discovery, PCL);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, Discovery, PCL);
 
-	  // ***************************************************
-	  // Generate the get bindings to be ask on PGCS
-	  // ***************************************************
+    // ***************************************************
+    // Generate the get bindings to be ask on PGCS
+    // ***************************************************
 
-	  for (unsigned int i = 0; i < HIDs->size (); i++)
-		{
-		  PMB->NewGetCommandLine ("0.1", 6, HIDs->at (i), Discovery, PCL);
-		}
+    for (unsigned int i = 0; i < HIDs->size(); i++)
+    {
+      PMB->NewGetCommandLine("0.1", 6, HIDs->at(i), Discovery, PCL);
+    }
 
-	  for (unsigned int i = 0; i < ADIs->size (); i++)
-		{
-		  PMB->NewGetCommandLine ("0.1", 5, ADIs->at (i), Discovery, PCL);
-		}
+    for (unsigned int i = 0; i < ADIs->size(); i++)
+    {
+      PMB->NewGetCommandLine("0.1", 5, ADIs->at(i), Discovery, PCL);
+    }
 
-	  // ******************************************************
-	  // Setting up the SCN command line
-	  // ******************************************************
+    // ******************************************************
+    // Setting up the SCN command line
+    // ******************************************************
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (Discovery, SCN);
+    // Generate the SCN
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(Discovery);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, Discovery, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, Discovery, PCL);
 
-	  // ******************************************************
-	  // Finish
-	  // ******************************************************
+    // ******************************************************
+    // Finish
+    // ******************************************************
 
 #ifdef DEBUG
-	  PB->S << Offset << "(The following message was scheduled.)" << endl;
+    PB->S << Offset << "(The following message was scheduled.)" << endl;
 
-	  PB->S << *Discovery << endl;
+    PB->S << *Discovery << endl;
 #endif
 
-	  // Push the message to the GW input queue
-	  PPS->PGW->PushToInputQueue (Discovery);
-	}
+    // Push the message to the GW input queue
+    PPS->PGW->PushToInputQueue(Discovery);
+  }
   else
-	{
-	  PB->S << Offset << "(ERROR: Does not found result from categories 2 and 9)" << endl;
-	}
+  {
+    PB->S << Offset << "(ERROR: Does not found result from categories 2 and 9)" << endl;
+  }
 
   delete HIDs;
   delete ADIs;
@@ -474,21 +478,21 @@ int PSRunPeriodic01::DiscoverySecond ()
   return Status;
 }
 
-int PSRunPeriodic01::Operational ()
+int PSRunPeriodic01::Operational()
 {
   int Status = ERROR;
   string Offset = "                    ";
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  PS *PPS = 0;
-  CommandLine *PCL = 0;
-  Message *IPCUpdate = NULL;
-  vector<Tuple *> LocalGIRSTuples;
+  PS* PPS = 0;
+  CommandLine* PCL = 0;
+  Message* IPCUpdate = NULL;
+  vector<Tuple*> LocalGIRSTuples;
   bool StoreNewGIRS;
   bool GoToOperational = false;
 
-  PPS = (PS *)PB;
+  PPS = (PS*)PB;
 
 #ifdef DEBUG
 
@@ -496,130 +500,121 @@ int PSRunPeriodic01::Operational ()
 
 #endif
 
-  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames ("GIRS", "IR", LocalGIRSTuples, PB) == OK)
-	{
-	  for (unsigned int i = 0; i < LocalGIRSTuples.size (); i++)
-		{
+  if (PB->PP->DiscoverHomonymsEntitiesTuplesFromProcessAndBlockLegibleNames("GIRS", "IR", LocalGIRSTuples, PB) == OK)
+  {
+    for (unsigned int i = 0; i < LocalGIRSTuples.size(); i++)
+    {
 #ifdef DEBUG
-		  PB->S << Offset << "Tuple = " << endl;
+      PB->S << Offset << "Tuple = " << endl;
 
-		  PB->S << Offset << "(HID = " << LocalGIRSTuples[i]->Values[0] << ")" << endl;
+      PB->S << Offset << "(HID = " << LocalGIRSTuples[i]->Values[0] << ")" << endl;
 
-		  PB->S << Offset << "(OSID = " << LocalGIRSTuples[i]->Values[1] << ")" << endl;
+      PB->S << Offset << "(OSID = " << LocalGIRSTuples[i]->Values[1] << ")" << endl;
 
-		  PB->S << Offset << "(PID = " << LocalGIRSTuples[i]->Values[2] << ")" << endl;
+      PB->S << Offset << "(PID = " << LocalGIRSTuples[i]->Values[2] << ")" << endl;
 
-		  PB->S << Offset << "(BID = " << LocalGIRSTuples[i]->Values[3] << ")" << endl;
+      PB->S << Offset << "(BID = " << LocalGIRSTuples[i]->Values[3] << ")" << endl;
 
 #endif
 
-		  StoreNewGIRS = true;
+      StoreNewGIRS = true;
 
-		  for (unsigned int z = 0; z < PPS->GIRSTuples.size (); z++)
-			{
-			  if (PPS->GIRSTuples[z]->Values[2] == LocalGIRSTuples[i]->Values[2])
-				{
-				  StoreNewGIRS = false;
-				}
-			}
+      for (unsigned int z = 0; z < PPS->GIRSTuples.size(); z++)
+      {
+        if (PPS->GIRSTuples[z]->Values[2] == LocalGIRSTuples[i]->Values[2])
+        {
+          StoreNewGIRS = false;
+        }
+      }
 
-		  if (StoreNewGIRS == true)
-			{
-			  PPS->GIRSTuples.push_back (LocalGIRSTuples[i]);
+      if (StoreNewGIRS == true)
+      {
+        PPS->GIRSTuples.push_back(LocalGIRSTuples[i]);
 
-			  PB->S << Offset << "(Added a new GIRS)" << endl;
+        PB->S << Offset << "(Added a new GIRS)" << endl;
 
-			  GoToOperational = true;
-			}
-		}
-	}
+        GoToOperational = true;
+      }
+    }
+  }
   else
-	{
-	  GoToOperational = false;
+  {
+    GoToOperational = false;
 
-	  PB->S << Offset << "(Warning: Empty GIRS tuples vector)" << endl;
-	}
+    PB->S << Offset << "(Warning: Empty GIRS tuples vector)" << endl;
+  }
 
   if (GoToOperational == true)
-	{
-	  // Change the state from initialization to exposition
-	  PB->State = "operational";
+  {
+    // Change the state from initialization to exposition
+    PB->State = "operational";
 
-	  // ******************************************************************
-	  // Reset gateway statistics
-	  // ******************************************************************
+    PB->S << Offset
+          << "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
+          << endl;
 
-	  PPS->PGW->ResetStatistics ();
+    Limiters.clear();
+    Sources.clear();
+    Destinations.clear();
 
-	  PB->S << Offset
-			<< "(--------------------------------------------------------------------------OPERATIONAL: Everything ok!)"
-			<< endl;
+    // ***************************************************************************************
+    // Creating a message to discover the PGCS aiming to discover the shared memory of peers
+    // ***************************************************************************************
 
-	  Limiters.clear ();
-	  Sources.clear ();
-	  Destinations.clear ();
+    // ***************************************************
+    // Setup the PGCS::HT table as the destination
+    // ***************************************************
 
-	  // ***************************************************************************************
-	  // Creating a message to discover the PGCS aiming to discover the shared memory of peers
-	  // ***************************************************************************************
+    // Setting up the OSID as the space limiter
+    Limiters.push_back(PB->PP->Intra_OS);
 
-	  // ***************************************************
-	  // Setup the PGCS::HT table as the destination
-	  // ***************************************************
+    // Setting up the this process as the first source SCN
+    Sources.push_back(PB->PP->GetSelfCertifyingName());
 
-	  // Setting up the OSID as the space limiter
-	  Limiters.push_back (PB->PP->Intra_OS);
+    // Setting up the IR block SCN as the source SCN
+    Sources.push_back(PB->GetSelfCertifyingName());
 
-	  // Setting up the this process as the first source SCN
-	  Sources.push_back (PB->PP->GetSelfCertifyingName ());
+    // Setting up the PGCS PID as the destination SCN
+    Destinations.push_back(PGCSPID);
 
-	  // Setting up the IR block SCN as the source SCN
-	  Sources.push_back (PB->GetSelfCertifyingName ());
+    // Setting up the PGCS::HT BID as the destination SCN
+    Destinations.push_back(PGCSHT);
 
-	  // Setting up the PGCS PID as the destination SCN
-	  Destinations.push_back (PGCSPID);
+    // Creating a new message
+    PB->PP->NewMessage(GetTime(), 0, false, IPCUpdate);
 
-	  // Setting up the PGCS::HT BID as the destination SCN
-	  Destinations.push_back (PGCSHT);
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, IPCUpdate, PCL);
 
-	  // Creating a new message
-	  PB->PP->NewMessage (GetTime (), 0, false, IPCUpdate);
+    // ***************************************************
+    // Generate the get to discover peer SHM Key on PGCS
+    // ***************************************************
 
-	  // Creating the ng -cl -m command line
-	  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, IPCUpdate, PCL);
+    PMB->NewGetCommandLine("0.1", 19, PPS->GIRSTuples[0]->Values[2], IPCUpdate, PCL);
 
-	  // ***************************************************
-	  // Generate the get to discover peer SHM Key on PGCS
-	  // ***************************************************
+    // Generate the SCN
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(IPCUpdate);
 
-	  PMB->NewGetCommandLine ("0.1", 13, PPS->GIRSTuples[0]->Values[2], IPCUpdate, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, IPCUpdate, PCL);
 
-	  // Generate the SCN
-	  PB->GenerateSCNFromMessageBinaryPatterns (IPCUpdate, SCN);
-
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, IPCUpdate, PCL);
-
-	  // ******************************************************
-	  // Finish
-	  // ******************************************************
+    // ******************************************************
+    // Finish
+    // ******************************************************
 
 #ifdef DEBUG
 
-	  PB->S << Offset << "(The following message was scheduled.)" << endl;
+    PB->S << Offset << "(The following message was scheduled.)" << endl;
 
-	  PB->S << *IPCUpdate << endl;
+    PB->S << *IPCUpdate << endl;
 
 #endif
 
-	  // Push the message to the GW input queue
-	  PPS->PGW->PushToInputQueue (IPCUpdate);
+    // Push the message to the GW input queue
+    PPS->PGW->PushToInputQueue(IPCUpdate);
 
-	  Status = OK;
-
-	}
+    Status = OK;
+  }
 
   return Status;
 }
-
-

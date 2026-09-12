@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Application's core action to prepare a ng -pub --notify
-	Object:		CoreRunPublish03
-	File:		CoreRunPublish03.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.2
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Application's core action to prepare a ng -pub --notify
+        Object:		CoreRunPublish03
+        File:		CoreRunPublish03.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.2
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -61,27 +61,21 @@
 
 class Block;
 
-class CoreRunPublish03 : public Action {
- public:
-
+class CoreRunPublish03 : public Action
+{
+public:
   // Constructor
-  CoreRunPublish03 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  CoreRunPublish03(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~CoreRunPublish03 ();
+  virtual ~CoreRunPublish03();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Auxiliary function
-  void CreatePublishMessage (string _FileName, vector<Tuple *> &_PubNotify, vector<Tuple *> &_SubNotify);
+  void CreatePublishMessage(string _FileName, vector<Tuple*>& _PubNotify, vector<Tuple*>& _SubNotify);
 };
 
 #endif
-
-
-
-
-
-

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		CoreRunInvitate01
-	Object:		CoreRunInvitate01
-	File:		CoreRunInvitate01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		CoreRunInvitate01
+        Object:		CoreRunInvitate01
+        File:		CoreRunInvitate01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -61,27 +61,21 @@
 
 class Block;
 
-class CoreRunInvite01 : public Action {
- public:
-
+class CoreRunInvite01 : public Action
+{
+public:
   // Constructor
-  CoreRunInvite01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  CoreRunInvite01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~CoreRunInvite01 ();
+  virtual ~CoreRunInvite01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // This function enables you to change the content of the service offer.
-  int CreateServiceOffer (string &_OfferFileName);
+  int CreateServiceOffer(string& _OfferFileName);
 };
 
 #endif
-
-
-
-
-
-

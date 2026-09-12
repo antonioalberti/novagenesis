@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Proxy, Gateway and Controller System
-	Object:		PGCS
-	File:		PGCS.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.3
+        Name:		Proxy, Gateway and Controller System
+        Object:		PGCS
+        File:		PGCS.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.3
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -29,20 +29,21 @@
 #include "PGCS.h"
 #endif
 
-PGCS::PGCS (string _LN, key_t _Key, string _flag, string _Port, string _Role, vector<string> *_Stacks, vector<string> *_Roles,
-			vector<string> *_Interfaces, vector<string> *_Identifiers, vector<unsigned int> *_Sizes,
-			string _Path) : Process (_LN, _Key, _Path)
+PGCS::PGCS(string _LN, key_t _Key, string _flag, string _Port, string _Role, vector<string>* _Stacks, vector<string>* _Roles,
+           vector<string>* _Interfaces, vector<string>* _Identifiers, vector<unsigned int>* _Sizes,
+           string _Path)
+    : Process(_LN, _Key, _Path)
 {
   // For PG
-  Block *PPGB = 0;
+  Block* PPGB = 0;
 
   // For Core
-  Block *PCoreB = 0;
+  Block* PCoreB = 0;
 
   for (unsigned int f = 0; f < MAX_NUMBER_OF_THREADS; f++)
-	{
-	  Threads[f] = NULL;
-	}
+  {
+    Threads[f] = NULL;
+  }
 
   NoT = 0;
 
@@ -65,63 +66,63 @@ PGCS::PGCS (string _LN, key_t _Key, string _flag, string _Port, string _Role, ve
   HasCore = false;
 
   // TODO: FIXP/Update - The following call brings problem in Docker Containers. Commenting it. Please, provide the run of this script clean.sh before running PGCS
-  //string _Command = "sh clean.sh";
-  //FILE *f1;
-  //char OUTPUT[2048];
+  // string _Command = "sh clean.sh";
+  // FILE *f1;
+  // char OUTPUT[2048];
 
-  //cout << endl << "Running the following command to clean previous NG runs = " << _Command << endl << endl;
+  // cout << endl << "Running the following command to clean previous NG runs = " << _Command << endl << endl;
 
-  //f1 = popen (_Command.c_str (), "r");
+  // f1 = popen (_Command.c_str (), "r");
 
-  //if (fgets (OUTPUT, sizeof (OUTPUT) - 1, f1) != NULL)
-//	{
-//	  cout << OUTPUT;
+  // if (fgets (OUTPUT, sizeof (OUTPUT) - 1, f1) != NULL)
+  //	{
+  //	  cout << OUTPUT;
 
-//	  cout << "Cleaned shared memory buffers from previous NG run in this system..." << endl << endl;
-//	}
-//  else
-//	{
-//	  cout << "Nothing to clean or file not found..." << endl << endl;
-//	}
+  //	  cout << "Cleaned shared memory buffers from previous NG run in this system..." << endl << endl;
+  //	}
+  //  else
+  //	{
+  //	  cout << "Nothing to clean or file not found..." << endl << endl;
+  //	}
 
   // Close the file
-  //pclose (f1);
+  // pclose (f1);
 
-  NewBlock ("PG", PPGB);
+  NewBlock("PG", PPGB);
 
   // Cast to PG pointer
-  PG *PPG = (PG *)PPGB;
+  PG* PPG = (PG*)PPGB;
 
   if (_flag == "Create_Core")
-	{
-	  HasCore = true;
+  {
+    HasCore = true;
 
-	  NewBlock ("Core", PCoreB);
+    NewBlock("Core", PCoreB);
 
-	  // Cast to PG pointer
-	  Core *PCore = (Core *)PCoreB;
-	}
+    // Cast to PG pointer
+    Core* PCore = (Core*)PCoreB;
+  }
 
-  Stacks->size ();
+  Stacks->size();
 
   // Run the base class GW
-  RunGateway ();
+  RunGateway();
 
   delete SSIDs;
 
   // Wait for the threads to finish
   for (unsigned int j = 0; j < MAX_NUMBER_OF_THREADS; j++)
-	{
-	  if (Threads[j] != 0)
-		{
-		  Threads[j]->join ();
+  {
+    if (Threads[j] != 0)
+    {
+      Threads[j]->join();
 
-		  delete Threads[j];
-		}
-	}
+      delete Threads[j];
+    }
+  }
 }
 
-PGCS::~PGCS ()
+PGCS::~PGCS()
 {
   delete SSIDs; // TODO: FIXP/Update - adding delete to these vectors.
 
@@ -129,73 +130,67 @@ PGCS::~PGCS ()
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int PGCS::NewBlock (string _LN, Block *&_PB)
+int PGCS::NewBlock(string _LN, Block*& _PB)
 {
   if (_LN == "PG")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW = 0;
+    HT* PHT = 0;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index = 0;
+    unsigned int Index = 0;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  PG *PPG = new PG (_LN, this, Index, PGW, PHT, GetPath ());
+    PG* PPG = new PG(_LN, this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PPG;
+    _PB = (Block*)PPG;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   if (_LN == "Core")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW = 0;
+    HT* PHT = 0;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index = 0;
+    unsigned int Index = 0;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  Core *PCore = new Core (_LN, "Core", this, Index, PGW, PHT, GetPath ());
+    Core* PCore = new Core(_LN, "Core", this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PCore;
+    _PB = (Block*)PCore;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
-
-
-
-
-
-

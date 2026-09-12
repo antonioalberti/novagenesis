@@ -1,5 +1,12 @@
 BASE=`cd ../..; pwd`;
 
+if [ "${NG_RUNTIME_PROFILE:-}" != "legacy" ]; then
+    echo "PSS/GIRS/HTS topology is deprecated. Set NG_RUNTIME_PROFILE=legacy to run this legacy test."
+    exit 2
+fi
+
+export NG_RUNTIME_PROFILE=legacy;
+
 
 gnome-terminal --tab -e "/bin/bash -c 'cd $BASE/cmake-build-debug;./PGCS $BASE/IO/PGCS/ 0 Intra_Domain -l;exec bash'" \
 --tab -e "/bin/bash -c 'cd $BASE/cmake-build-debug;sleep 2;./HTS $BASE/IO/HTS/;exec bash'" \

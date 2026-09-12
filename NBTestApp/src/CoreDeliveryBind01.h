@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Core delivery binding
-	Object:		CoreDeliveryBind01
-	File:		CoreDeliveryBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Core delivery binding
+        Object:		CoreDeliveryBind01
+        File:		CoreDeliveryBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -61,24 +61,18 @@
 
 class Block;
 
-class CoreDeliveryBind01 : public Action {
- public:
-
+class CoreDeliveryBind01 : public Action
+{
+public:
   // Constructor
-  CoreDeliveryBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  CoreDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~CoreDeliveryBind01 ();
+  virtual ~CoreDeliveryBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

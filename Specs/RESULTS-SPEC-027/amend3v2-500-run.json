@@ -1,0 +1,30 @@
+{
+ "test": "SPEC-027 AMEND-3 v2 \u2014 500 msg/s bidirectional real load",
+ "started": "2026-09-07T08:50:07Z",
+ "config": {
+  "StressInterval": 0.002,
+  "vms": "36(source)+61(repo), 4c/4GB",
+  "build": "e75b112 (AMEND-3 v2 + SPEC-029)"
+ },
+ "result": "SURVIVED 37+ min at ~500 msg/s bidirectional (rate verified by counter delta: 497 msg/s over 12.2min window); 520k+ msgs sent per direction; receiver-side delivery verified; loss stable 1.8-2.2%; 0 cores; RSS bounded 4.2-4.5MB",
+ "ended": "2026-09-07T09:05:23Z",
+ "final": {
+  "source guest": {
+   "stats": "4036.99 NPeers=1 Sent=452500 Recv=451500 Expected=460257 Loss=1.90263% DelayAvg=0.000129989 DelaySigma=0.00157082 DelayME=4.58199e-06 DelayLower=0.000125407 DelayUp=0.000134571",
+   "procs": "1",
+   "cores": "0",
+   "rss": "VmRSS:\t    4524 kB"
+  },
+  "repository guest": {
+   "stats": "4037.93 NPeers=1 Sent=455000 Recv=448100 Expected=458324 Loss=2.23074% DelayAvg=0.643918 DelaySigma=0.0500126 DelayME=0.000146436 DelayLower=0.643772 DelayUp=0.644065",
+   "procs": "1",
+   "cores": "0",
+   "rss": "VmRSS:\t    4176 kB"
+  }
+ },
+ "notes": [
+  "Stats timestamp is PGCS-internal GetTime, not wall clock (Astra reconciliation: use counter deltas)",
+  "Delay units = seconds: source guest 0.13ms, repository guest 0.644ms \u2014 asymmetry real, to investigate with loss counters (Astra item 2)",
+  "Astra verdict: IMPLEMENTED, sign-off pending evidence reconciliation + directed guards (SPEC-028-D list)"
+ ]
+}

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		CoreRunEvaluate01
-	Object:		CoreRunEvaluate01
-	File:		CoreRunEvaluate01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		CoreRunEvaluate01
+        Object:		CoreRunEvaluate01
+        File:		CoreRunEvaluate01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -69,44 +69,37 @@
 
 class Block;
 
-class CoreRunEvaluate01 : public Action {
- public:
-
+class CoreRunEvaluate01 : public Action
+{
+public:
   // Auxiliary
   double TimeToExpose;
 
   // Constructor
-  CoreRunEvaluate01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  CoreRunEvaluate01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~CoreRunEvaluate01 ();
+  virtual ~CoreRunEvaluate01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
-  int CheckForPSAwareness (vector<Message *> &_ScheduledMessages, bool &_ClearScheduledMessage);
+  int CheckForPSAwareness(vector<Message*>& _ScheduledMessages, bool& _ClearScheduledMessage);
 
-  int CheckForNewPeerApplication (vector<Message *> &_ScheduledMessages, bool &_ClearScheduledMessage);
+  int CheckForNewPeerApplication(vector<Message*>& _ScheduledMessages, bool& _ClearScheduledMessage);
 
-  int ShowTheDiscoveredPeers ();
+  int ShowTheDiscoveredPeers();
 
-  int CheckSubscriptions (vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
+  int CheckSubscriptions(vector<Message*>& _ScheduledMessages, bool _ClearScheduledMessage);
 
-  int ScheduleASubscription (Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
+  int ScheduleASubscription(Subscription* _PS, vector<Message*>& _ScheduledMessages, bool _ClearScheduledMessage);
 
-  int
-  ProcessASubscribedPayload (string _Publisher_LN, unsigned int _Index, Subscription *_PS, vector<Message *> &_ScheduledMessages, bool _ClearScheduledMessage);
+  int ProcessASubscribedPayload(string _Publisher_LN, unsigned int _Index, Subscription* _PS, vector<Message*>& _ScheduledMessages, bool _ClearScheduledMessage);
 
-  int ProcessTXTFile (string _Publisher_LN, unsigned int _Index, Subscription *_PS, string _FileName);
+  int ProcessTXTFile(string _Publisher_LN, unsigned int _Index, Subscription* _PS, string _FileName);
 
-  bool Run (string _Command, FILE *&_f);
+  bool Run(string _Command, FILE*& _f);
 };
 
 #endif
-
-
-
-
-
-

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Message
-	Object:		Message
-	File:		Message.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Message
+        Object:		Message
+        File:		Message.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -34,13 +34,13 @@
 ////#define DEBUG // To follow message processing
 ////#define DEBUG1 // To follow message deletion
 
-Message::Message (double _Time, short _Type, bool _HasPayload)
+Message::Message(double _Time, short _Type, bool _HasPayload)
 {
-  //HeaderFile.SetName("");
-  PayloadFile.SetName ("");
-  //MessageFile.SetName("");
+  // HeaderFile.SetName("");
+  PayloadFile.SetName("");
+  // MessageFile.SetName("");
 
-  InstantiationTime = GetSystemTime ();
+  InstantiationTime = GetSystemTime();
 
   SCN = "";
   Time = _Time;
@@ -48,15 +48,15 @@ Message::Message (double _Time, short _Type, bool _HasPayload)
   Tag = 0;
   HasPayloadFlag = _HasPayload;
 
-  //HeaderSize=0;
+  // HeaderSize=0;
   PayloadSize = 0;
   MessageSize = 0;
 
-  //DeleteHeaderArray=false;
+  // DeleteHeaderArray=false;
   DeletePayloadArray = false;
   DeleteMessageArray = false;
 
-  //Header=0;
+  // Header=0;
   Payload = 0;
   Msg = 0;
 
@@ -69,16 +69,16 @@ Message::Message (double _Time, short _Type, bool _HasPayload)
   CommandLines = NULL;
 }
 
-Message::Message (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _Path)
+Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _Path)
 {
-  //HeaderFile.SetName(_HeaderFileName);
-  //HeaderFile.SetPath(_Path);
-  //HeaderFile.SetOption("BINARY");
+  // HeaderFile.SetName(_HeaderFileName);
+  // HeaderFile.SetPath(_Path);
+  // HeaderFile.SetOption("BINARY");
 
-  PayloadFile.SetName ("");
-  //MessageFile.SetName("");
+  PayloadFile.SetName("");
+  // MessageFile.SetName("");
 
-  InstantiationTime = GetSystemTime ();
+  InstantiationTime = GetSystemTime();
 
   SCN = "";
   Time = _Time;
@@ -86,15 +86,15 @@ Message::Message (double _Time, short _Type, bool _HasPayload, string _HeaderFil
   Tag = 0;
   HasPayloadFlag = _HasPayload;
 
-  //HeaderSize=0;
+  // HeaderSize=0;
   PayloadSize = 0;
   MessageSize = 0;
 
-  //DeleteHeaderArray=false;
+  // DeleteHeaderArray=false;
   DeletePayloadArray = false;
   DeleteMessageArray = false;
 
-  //Header=0;
+  // Header=0;
   Payload = 0;
   Msg = 0;
 
@@ -107,38 +107,38 @@ Message::Message (double _Time, short _Type, bool _HasPayload, string _HeaderFil
   CommandLines = NULL;
 }
 
-Message::Message (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path)
+Message::Message(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path)
 {
-  //HeaderFile.SetName(_HeaderFileName);
-  //HeaderFile.SetPath(_Path);
-  //HeaderFile.SetOption("BINARY");
+  // HeaderFile.SetName(_HeaderFileName);
+  // HeaderFile.SetPath(_Path);
+  // HeaderFile.SetOption("BINARY");
 
-  PayloadFile.SetName (_PayloadFileName);
-  PayloadFile.SetPath (_Path);
-  PayloadFile.SetOption ("BINARY");
+  PayloadFile.SetName(_PayloadFileName);
+  PayloadFile.SetPath(_Path);
+  PayloadFile.SetOption("BINARY");
 
-  //MessageFile.SetName(_MessageFileName);
-  //MessageFile.SetPath(_Path);
-  //MessageFile.SetOption("BINARY");
+  // MessageFile.SetName(_MessageFileName);
+  // MessageFile.SetPath(_Path);
+  // MessageFile.SetOption("BINARY");
 
   SCN = "";
 
-  InstantiationTime = GetSystemTime ();
+  InstantiationTime = GetSystemTime();
 
   Time = _Time;
   Type = _Type;
   Tag = 0;
   HasPayloadFlag = _HasPayload;
 
-  //HeaderSize=0;
+  // HeaderSize=0;
   PayloadSize = 0;
   MessageSize = 0;
 
-  //DeleteHeaderArray=false;
+  // DeleteHeaderArray=false;
   DeletePayloadArray = false;
   DeleteMessageArray = false;
 
-  //Header=0;
+  // Header=0;
   Payload = 0;
   Msg = 0;
 
@@ -152,156 +152,155 @@ Message::Message (double _Time, short _Type, bool _HasPayload, string _HeaderFil
 }
 
 // Message copy constructor
-Message::Message (const Message &M)
+Message::Message(const Message& M)
 {
-  //Header=0;
+  // Header=0;
   Payload = 0;
   Msg = 0;
 
   string Option = "BINARY";
 
-  //HeaderFile.SetName(M.HeaderFile.GetName());
-  //HeaderFile.SetPath(M.HeaderFile.GetPath());
-  //HeaderFile.SetOption(Option);
+  // HeaderFile.SetName(M.HeaderFile.GetName());
+  // HeaderFile.SetPath(M.HeaderFile.GetPath());
+  // HeaderFile.SetOption(Option);
 
-  PayloadFile.SetName (M.PayloadFile.GetName ());
-  PayloadFile.SetPath (M.PayloadFile.GetPath ());
-  PayloadFile.SetOption (Option);
+  PayloadFile.SetName(M.PayloadFile.GetName());
+  PayloadFile.SetPath(M.PayloadFile.GetPath());
+  PayloadFile.SetOption(Option);
 
-  //MessageFile.SetName(M.MessageFile.GetName());
-  //MessageFile.SetPath(M.MessageFile.GetPath());
-  //MessageFile.SetOption(Option);
+  // MessageFile.SetName(M.MessageFile.GetName());
+  // MessageFile.SetPath(M.MessageFile.GetPath());
+  // MessageFile.SetOption(Option);
 
-  SetHasPayloadFlag (M.GetHasPayloadFlag ());
+  SetHasPayloadFlag(M.GetHasPayloadFlag());
 
-  InstantiationTime = GetSystemTime ();
+  InstantiationTime = GetSystemTime();
 
   NoCL = 0;
   CommandLines = NULL;
 
   for (unsigned int i = 0; i < M.NoCL; i++)
-	{
-	  CommandLine *PCL1 = 0;
-	  CommandLine *PCL2 = 0;
+  {
+    CommandLine* PCL1 = 0;
+    CommandLine* PCL2 = 0;
 
-	  PCL1 = M.CommandLines[i];
+    PCL1 = M.CommandLines[i];
 
-	  if (PCL1 != 0)
-		{
-		  NewCommandLine (PCL1, PCL2);
-		}
-	}
+    if (PCL1 != 0)
+    {
+      NewCommandLine(PCL1, PCL2);
+    }
+  }
 
   /*
 
   if (M.HeaderSize > 0)
-	  {
-		  HeaderSize=M.HeaderSize;
+          {
+                  HeaderSize=M.HeaderSize;
 
-		  Header=new char[HeaderSize];
+                  Header=new char[HeaderSize];
 
-		  for (int j=0; j<HeaderSize ;j++)
-			  {
-				  Header[j]=M.Header[j];
-			  }
-	  }*/
+                  for (int j=0; j<HeaderSize ;j++)
+                          {
+                                  Header[j]=M.Header[j];
+                          }
+          }*/
 
   if (M.PayloadSize > 0)
-	{
-	  PayloadSize = M.PayloadSize;
+  {
+    PayloadSize = M.PayloadSize;
 
-	  Payload = new char[PayloadSize];
+    Payload = new char[PayloadSize];
 
-	  for (int k = 0; k < PayloadSize; k++)
-		{
-		  Payload[k] = M.Payload[k];
-		}
-	}
+    for (int k = 0; k < PayloadSize; k++)
+    {
+      Payload[k] = M.Payload[k];
+    }
+  }
 
   // Do not initialize those values, because after that it is not possible to change the array
   MessageSize = 0;
   DeleteMessageArray = false;
 
-  SCN = M.GetSelfCertifyingName ();
-  Time = M.GetTime ();
-  Type = M.GetType ();
-  Tag = M.GetTag ();
+  SCN = M.GetSelfCertifyingName();
+  Time = M.GetTime();
+  Type = M.GetType();
+  Tag = M.GetTag();
 
   Delete = M.Delete;
   ApplicationDeleted = M.ApplicationDeleted;
 
-  //DeleteHeaderArray=M.DeleteHeaderArray;
+  // DeleteHeaderArray=M.DeleteHeaderArray;
   DeletePayloadArray = M.DeletePayloadArray;
 
   InstantiationNumber = 0;
 }
 
-Message::~Message ()
+Message::~Message()
 {
-  //cout << "(" << endl << *this << ")"<< endl << endl << endl;
+  // cout << "(" << endl << *this << ")"<< endl << endl << endl;
 
-  //cout << "(The message instantion number is "<<InstantiationNumber<<")"<<endl;
-  //cout << "(The size of the header is "<<HeaderSize<<" bytes)"<<endl;
-  //cout << "(The size of the payload is "<<PayloadSize<<" bytes)"<<endl;
-  //cout << "(The size of the message is "<<MessageSize<<" bytes)"<<endl;
-  //cout << "(The delete header flag is "<<DeleteHeaderArray<<" (0=false, 1=true))"<<endl;
-  //cout << "(The delete payload flag is "<<DeletePayloadArray<<" (0=false, 1=true))"<<endl;
-  //cout << "(The delete message flag is "<<DeleteMessageArray<<" (0=false, 1=true))"<<endl;
+  // cout << "(The message instantion number is "<<InstantiationNumber<<")"<<endl;
+  // cout << "(The size of the header is "<<HeaderSize<<" bytes)"<<endl;
+  // cout << "(The size of the payload is "<<PayloadSize<<" bytes)"<<endl;
+  // cout << "(The size of the message is "<<MessageSize<<" bytes)"<<endl;
+  // cout << "(The delete header flag is "<<DeleteHeaderArray<<" (0=false, 1=true))"<<endl;
+  // cout << "(The delete payload flag is "<<DeletePayloadArray<<" (0=false, 1=true))"<<endl;
+  // cout << "(The delete message flag is "<<DeleteMessageArray<<" (0=false, 1=true))"<<endl;
 
   /*
 
   if (DeleteHeaderArray == true && Header != 0 && HeaderSize > 0)
-	  {
-		  delete[] Header;
-	  }
+          {
+                  delete[] Header;
+          }
   else
-	  {
-		  //cout << "(Warning: The header array pointer is null)"<<endl;
-	  } */
+          {
+                  //cout << "(Warning: The header array pointer is null)"<<endl;
+          } */
 
   if (DeletePayloadArray == true && Payload != 0 && PayloadSize > 0)
-	{
-	  delete[] Payload;
-	}
+  {
+    delete[] Payload;
+  }
   else
-	{
-	  //cout << "(Warning: The payload array pointer is null)"<<endl;
-	}
+  {
+    // cout << "(Warning: The payload array pointer is null)"<<endl;
+  }
 
   if (DeleteMessageArray == true && Msg != 0 && MessageSize > 0)
-	{
-	  delete[] Msg;
-	}
+  {
+    delete[] Msg;
+  }
   else
-	{
-	  //cout << "(Warning: The message array pointer is null)"<<endl;
-	}
+  {
+    // cout << "(Warning: The message array pointer is null)"<<endl;
+  }
 
   if (CommandLines != NULL)
-	{
-	  for (unsigned int i = 0; i < NoCL; i++)
-		{
-		  delete CommandLines[i];
-		}
+  {
+    for (unsigned int i = 0; i < NoCL; i++)
+    {
+      delete CommandLines[i];
+    }
 
-	  delete[] CommandLines;
-	}
+    delete[] CommandLines;
+  }
 }
 
-void
-Message::SetMessage (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path)
+void Message::SetMessage(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path)
 {
-  //HeaderFile.SetName(_HeaderFileName);
-  //HeaderFile.SetPath(_Path);
-  //HeaderFile.SetOption("BINARY");
+  // HeaderFile.SetName(_HeaderFileName);
+  // HeaderFile.SetPath(_Path);
+  // HeaderFile.SetOption("BINARY");
 
-  PayloadFile.SetName (_PayloadFileName);
-  PayloadFile.SetPath (_Path);
-  PayloadFile.SetOption ("BINARY");
+  PayloadFile.SetName(_PayloadFileName);
+  PayloadFile.SetPath(_Path);
+  PayloadFile.SetOption("BINARY");
 
-  //MessageFile.SetName(_MessageFileName);
-  //MessageFile.SetPath(_Path);
-  //MessageFile.SetOption("BINARY");
+  // MessageFile.SetName(_MessageFileName);
+  // MessageFile.SetPath(_Path);
+  // MessageFile.SetOption("BINARY");
 
   Time = _Time;
   Type = _Type;
@@ -310,30 +309,30 @@ Message::SetMessage (double _Time, short _Type, bool _HasPayload, string _Header
 }
 
 // Set message's SCN
-void Message::SetSelfCertifyingName (string _SCN)
+void Message::SetSelfCertifyingName(string _SCN)
 {
   SCN = _SCN;
 }
 
 // Set message's type
-void Message::SetType (short _Type)
+void Message::SetType(short _Type)
 {
   Type = _Type;
 }
 
-void Message::SetHasPayloadFlag (bool _Flag)
+void Message::SetHasPayloadFlag(bool _Flag)
 {
   HasPayloadFlag = _Flag;
 }
 
 // Set time
-void Message::SetTime (double _Time)
+void Message::SetTime(double _Time)
 {
   Time = _Time;
 }
 
 // Set tag
-void Message::SetTag (unsigned int _Tag)
+void Message::SetTag(unsigned int _Tag)
 {
   Tag = _Tag;
 }
@@ -343,39 +342,39 @@ void Message::SetTag (unsigned int _Tag)
 // Set header file name
 void Message::SetHeaderFileName(string _Name)
 {
-	HeaderFile.SetName(_Name);
+        HeaderFile.SetName(_Name);
 } */
 
 // Set payload file name
-void Message::SetPayloadFileName (string _Name)
+void Message::SetPayloadFileName(string _Name)
 {
-  PayloadFile.SetName (_Name);
+  PayloadFile.SetName(_Name);
 }
 
 /*
 // Set payload file name
 void Message::SetMessageFileName(string _Name)
 {
-	MessageFile.SetName(_Name);
+        MessageFile.SetName(_Name);
 }*/
 
 /*
 // Get header file name
 string Message::GetHeaderFileName()
 {
-	string Temp;
+        string Temp;
 
-	HeaderFile.GetName(Temp);
+        HeaderFile.GetName(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 // Get payload file name
-string Message::GetPayloadFileName ()
+string Message::GetPayloadFileName()
 {
   string Temp;
 
-  PayloadFile.GetName (Temp);
+  PayloadFile.GetName(Temp);
 
   return Temp;
 }
@@ -385,50 +384,50 @@ string Message::GetPayloadFileName ()
 // Get message file name
 string Message::GetMessageFileName()
 {
-	string Temp;
+        string Temp;
 
-	MessageFile.GetName(Temp);
+        MessageFile.GetName(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 /*
 // Set header file path
 void Message::SetHeaderFilePath(string _Path)
 {
-	HeaderFile.SetPath(_Path);
+        HeaderFile.SetPath(_Path);
 }*/
 
 // Set payload file path
-void Message::SetPayloadFilePath (string _Path)
+void Message::SetPayloadFilePath(string _Path)
 {
-  PayloadFile.SetPath (_Path);
+  PayloadFile.SetPath(_Path);
 }
 
 /*
 // Set payload file path
 void Message::SetMessageFilePath(string _Path)
 {
-	MessageFile.SetPath(_Path);
+        MessageFile.SetPath(_Path);
 }*/
 
 /*
 // Get header file path
 string Message::GetHeaderFilePath()
 {
-	string Temp;
+        string Temp;
 
-	HeaderFile.GetPath(Temp);
+        HeaderFile.GetPath(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 // Get payload file path
-string Message::GetPayloadFilePath ()
+string Message::GetPayloadFilePath()
 {
   string Temp;
 
-  PayloadFile.GetPath (Temp);
+  PayloadFile.GetPath(Temp);
 
   return Temp;
 }
@@ -437,40 +436,41 @@ string Message::GetPayloadFilePath ()
 // Get message file path
 string Message::GetMessageFilePath()
 {
-	string Temp;
+        string Temp;
 
-	MessageFile.GetPath(Temp);
+        MessageFile.GetPath(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 // Set message to be deleted
-void Message::MarkToDelete ()
+void Message::MarkToDelete()
 {
   // Only mark to delete if the Application Deleted flag was false.
   // If true, the application should make the Application Deleted flag false first to enable automatic deletion.
   // If the application does not turn the Application Deleted flag false the message will be never deleted.
   // SetApplicationDeletedFlag(DELETED_BY_CORE)
   if (ApplicationDeleted == DELETED_BY_CORE)
-	{
-	  Delete = true;
+  {
+    Delete = true;
 
 #ifdef DEBUG1
-	  cout<<"Marking the following message to delete"<<endl;
+    cout << "Marking the following message to delete" << endl;
 
-	  cout << "(" << endl << *this << ")"<< endl;
+    cout << "(" << endl
+         << *this << ")" << endl;
 #endif
-	}
+  }
 }
 
 // Avoid a message to be deleted
-void Message::UnmarkToDelete ()
+void Message::UnmarkToDelete()
 {
   Delete = false;
 }
 
 // Set application driven deletion
-void Message::SetApplicationDeletedFlag (bool _Flag)
+void Message::SetApplicationDeletedFlag(bool _Flag)
 {
   ApplicationDeleted = _Flag;
 }
@@ -479,39 +479,39 @@ void Message::SetApplicationDeletedFlag (bool _Flag)
 // Set header file option
 void Message::SetHeaderFileOption(string _Option)
 {
-	HeaderFile.SetOption(_Option);
+        HeaderFile.SetOption(_Option);
 }*/
 
 // Set payload file option
-void Message::SetPayloadFileOption (string _Option)
+void Message::SetPayloadFileOption(string _Option)
 {
-  PayloadFile.SetOption (_Option);
+  PayloadFile.SetOption(_Option);
 }
 
 /*
 // Set payload file option
 void Message::SetMessageFileOption(string _Option)
 {
-	MessageFile.SetOption(_Option);
+        MessageFile.SetOption(_Option);
 }*/
 
 /*
 // Get header file option
 string Message::GetHeaderFileOption()
 {
-	string Temp;
+        string Temp;
 
-	HeaderFile.GetOption(Temp);
+        HeaderFile.GetOption(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 // Get payload file option
-string Message::GetPayloadFileOption ()
+string Message::GetPayloadFileOption()
 {
   string Temp;
 
-  PayloadFile.GetOption (Temp);
+  PayloadFile.GetOption(Temp);
 
   return Temp;
 }
@@ -520,73 +520,73 @@ string Message::GetPayloadFileOption ()
 // Get message file option
 string Message::GetMessageFileOption()
 {
-	string Temp;
+        string Temp;
 
-	MessageFile.GetOption(Temp);
+        MessageFile.GetOption(Temp);
 
-	return Temp;
+        return Temp;
 }*/
 
 // Get message's SCN
-string Message::GetSelfCertifyingName () const
+string Message::GetSelfCertifyingName() const
 {
   return SCN;
 }
 
 // Get message's type
-short Message::GetType () const
+short Message::GetType() const
 {
   return Type;
 }
 
-bool Message::GetHasPayloadFlag () const
+bool Message::GetHasPayloadFlag() const
 {
   return HasPayloadFlag;
 }
 
 // Get time
-double Message::GetTime () const
+double Message::GetTime() const
 {
   return Time;
 }
 
 // Get tag
-unsigned int Message::GetTag () const
+unsigned int Message::GetTag() const
 {
   return Tag;
 }
 
 // Set message to be deleted
-bool Message::GetDeleteFlag ()
+bool Message::GetDeleteFlag()
 {
   return Delete;
 }
 
 // Set application driven deletion
-bool Message::GetApplicationDeletedFlag ()
+bool Message::GetApplicationDeletedFlag()
 {
   return ApplicationDeleted;
 }
 
-int Message::NewCommandLine (CommandLine *&CL)
+int Message::NewCommandLine(CommandLine*& CL)
 {
-  CommandLine *PCL = new CommandLine;
+  CommandLine* PCL = new CommandLine;
 
   CL = PCL;
 
-  CommandLine **Temp = new CommandLine *[NoCL + 1];
+  CommandLine** Temp = new CommandLine*[NoCL + 1];
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  Temp[i] = CommandLines[i];
-	}
+  {
+    Temp[i] = CommandLines[i];
+  }
 
   Temp[NoCL] = PCL;
 
   if (CommandLines != NULL)
-	{
-	  delete[] CommandLines;
-	}
+  {
+    delete[] CommandLines;
+  }
 
   CommandLines = Temp;
 
@@ -595,25 +595,25 @@ int Message::NewCommandLine (CommandLine *&CL)
   return OK;
 }
 
-int Message::NewCommandLine (CommandLine *_PCL, CommandLine *&CL)
+int Message::NewCommandLine(CommandLine* _PCL, CommandLine*& CL)
 {
-  CommandLine *PCL = new CommandLine (*_PCL);
+  CommandLine* PCL = new CommandLine(*_PCL);
 
   CL = PCL;
 
-  CommandLine **Temp = new CommandLine *[NoCL + 1];
+  CommandLine** Temp = new CommandLine*[NoCL + 1];
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  Temp[i] = CommandLines[i];
-	}
+  {
+    Temp[i] = CommandLines[i];
+  }
 
   Temp[NoCL] = PCL;
 
   if (CommandLines != NULL)
-	{
-	  delete[] CommandLines;
-	}
+  {
+    delete[] CommandLines;
+  }
 
   CommandLines = Temp;
 
@@ -622,25 +622,25 @@ int Message::NewCommandLine (CommandLine *_PCL, CommandLine *&CL)
   return OK;
 }
 
-int Message::NewCommandLine (string _Name, string _Alternative, string _Version, CommandLine *&C)
+int Message::NewCommandLine(string _Name, string _Alternative, string _Version, CommandLine*& C)
 {
-  CommandLine *PCL = new CommandLine (_Name, _Alternative, _Version);
+  CommandLine* PCL = new CommandLine(_Name, _Alternative, _Version);
 
   C = PCL;
 
-  CommandLine **Temp = new CommandLine *[NoCL + 1];
+  CommandLine** Temp = new CommandLine*[NoCL + 1];
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  Temp[i] = CommandLines[i];
-	}
+  {
+    Temp[i] = CommandLines[i];
+  }
 
   Temp[NoCL] = PCL;
 
   if (CommandLines != NULL)
-	{
-	  delete[] CommandLines;
-	}
+  {
+    delete[] CommandLines;
+  }
 
   CommandLines = Temp;
 
@@ -649,117 +649,114 @@ int Message::NewCommandLine (string _Name, string _Alternative, string _Version,
   return OK;
 }
 
-int Message::GetCommandLine (unsigned int _Index, CommandLine *&CL)
+int Message::GetCommandLine(unsigned int _Index, CommandLine*& CL)
 {
   if (_Index < NoCL)
-	{
-	  CL = CommandLines[_Index];
-	}
+  {
+    CL = CommandLines[_Index];
+  }
 
   return OK;
 }
 
 // Get a CommandLine by its name and alternative
-int Message::GetCommandLine (string _Name, string _Alternative, CommandLine *&CL)
+int Message::GetCommandLine(string _Name, string _Alternative, CommandLine*& CL)
 {
   int Status = ERROR;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
 
-  //cout << "NCL = "<< NCL <<endl;
+  // cout << "NCL = "<< NCL <<endl;
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  // Select a command line
-	  GetCommandLine (i, PCL);
+  {
+    // Select a command line
+    GetCommandLine(i, PCL);
 
-	  if (PCL->Name == _Name && PCL->Alternative == _Alternative)
-		{
-		  CL = PCL;
+    if (PCL->Name == _Name && PCL->Alternative == _Alternative)
+    {
+      CL = PCL;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
-	}
+      break;
+    }
+  }
 
   return Status;
 }
 
 // Get a CommandLine Index
-int Message::GetCommandLineIndex (CommandLine *CL, unsigned int &_Index)
+int Message::GetCommandLineIndex(CommandLine* CL, unsigned int& _Index)
 {
   int Status = ERROR;
-  vector<CommandLine *>::iterator it;
+  vector<CommandLine*>::iterator it;
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  if (CommandLines[i] == CL)
-		{
-		  _Index = i;
+  {
+    if (CommandLines[i] == CL)
+    {
+      _Index = i;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
+      break;
+    }
 
-	  i++;
-	}
+    i++;
+  }
 
   return Status;
 }
 
-int Message::GetNumberofCommandLines (unsigned int &_Number)
+int Message::GetNumberofCommandLines(unsigned int& _Number)
 {
   _Number = NoCL;
 
   return OK;
 }
 
-int Message::GetNumberofCommandLineArguments (unsigned int _CommandLine, unsigned int &_Number)
+int Message::GetNumberofCommandLineArguments(unsigned int _CommandLine, unsigned int& _Number)
 {
   if (_CommandLine < NoCL)
-	{
-	  return CommandLines[_CommandLine]->GetNumberofArguments (_Number);
-	}
+  {
+    return CommandLines[_CommandLine]->GetNumberofArguments(_Number);
+  }
 
   return ERROR;
 }
 
-int
-Message::GetNumberofCommandLineArgumentElements (unsigned int _CommandLine, unsigned int _Argument, unsigned int &_Number)
+int Message::GetNumberofCommandLineArgumentElements(unsigned int _CommandLine, unsigned int _Argument, unsigned int& _Number)
 {
   if (_CommandLine < NoCL)
-	{
-	  return CommandLines[_CommandLine]->GetNumberofArgumentElements (_Argument, _Number);
-	}
+  {
+    return CommandLines[_CommandLine]->GetNumberofArgumentElements(_Argument, _Number);
+  }
 
   return ERROR;
 }
 
-int
-Message::SetCommandLineArgumentElement (unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string _Value)
+int Message::SetCommandLineArgumentElement(unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string _Value)
 {
   int Status = ERROR;
 
   if (_CommandLine < NoCL)
-	{
-	  CommandLines[_CommandLine]->SetArgumentElement (_Argument, _Element, _Value);
+  {
+    CommandLines[_CommandLine]->SetArgumentElement(_Argument, _Element, _Value);
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
-int
-Message::GetCommandLineArgumentElement (unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string &_Value)
+int Message::GetCommandLineArgumentElement(unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string& _Value)
 {
   if (_CommandLine < NoCL)
-	{
-	  CommandLines[_CommandLine]->GetArgumentElement (_Argument, _Element, _Value);
+  {
+    CommandLines[_CommandLine]->GetArgumentElement(_Argument, _Element, _Value);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
@@ -767,12 +764,12 @@ Message::GetCommandLineArgumentElement (unsigned int _CommandLine, unsigned int 
 /*
  int Message::GetHeaderFile(File& _F)
 {
-	_F=HeaderFile;
+        _F=HeaderFile;
 
-	return OK;
+        return OK;
 }*/
 
-int Message::GetPayloadFile (File &_F)
+int Message::GetPayloadFile(File& _F)
 {
   _F = PayloadFile;
 
@@ -782,94 +779,109 @@ int Message::GetPayloadFile (File &_F)
 /*
 int Message::GetMessageFile(File& _F)
 {
-	_F=MessageFile;
+        _F=MessageFile;
 
-	return OK;
+        return OK;
 }*/
 
 /*
 // Set *Header from char array. A copy of the char array is done.
 int Message::SetHeaderFromCharArray(char* _Value, long _Size)
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (HeaderSize == 0 && DeleteHeaderArray == false)
-		{
-			if (_Size > 0)
-				{
-					HeaderSize=_Size;
+        if (HeaderSize == 0 && DeleteHeaderArray == false)
+                {
+                        if (_Size > 0)
+                                {
+                                        HeaderSize=_Size;
 
-					Header=new char[HeaderSize];
+                                        Header=new char[HeaderSize];
 
-					for (long j=0; j<HeaderSize ; j++)
-						{
-							Header[j]=_Value[j];
-						}
+                                        for (long j=0; j<HeaderSize ; j++)
+                                                {
+                                                        Header[j]=_Value[j];
+                                                }
 
-					Status=OK;
+                                        Status=OK;
 
-					DeleteHeaderArray=true;
-				}
-		}
+                                        DeleteHeaderArray=true;
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 */
 
+// SPEC-018: Reset payload state so a new payload can be loaded on a reused Message.
+// Frees the existing Payload array and resets the flags that prevent re-loading.
+void Message::ResetPayload()
+{
+  if (DeletePayloadArray == true && Payload != 0 && PayloadSize > 0)
+  {
+    delete[] Payload;
+  }
+
+  Payload = 0;
+  PayloadSize = 0;
+  DeletePayloadArray = false;
+  HasPayloadFlag = false;
+}
+
 // Set *Payload from char array. A copy of the char array is done.
-int Message::SetPayloadFromCharArray (char *_Value, long long _Size)
+int Message::SetPayloadFromCharArray(char* _Value, long long _Size)
 {
   int Status = ERROR;
 
   if (PayloadSize == 0 && DeletePayloadArray == false)
-	{
-	  if (_Size > 0)
-		{
-		  PayloadSize = _Size;
+  {
+    if (_Size > 0)
+    {
+      PayloadSize = _Size;
 
-		  Payload = new char[PayloadSize];
+      Payload = new char[PayloadSize];
 
-		  for (long long j = 0; j < PayloadSize; j++)
-			{
-			  Payload[j] = _Value[j];
-			}
+      for (long long j = 0; j < PayloadSize; j++)
+      {
+        Payload[j] = _Value[j];
+      }
 
-		  Status = OK;
+      Status = OK;
 
-		  DeletePayloadArray = true;
+      DeletePayloadArray = true;
 
-		  HasPayloadFlag = true;
-		}
-	}
+      HasPayloadFlag = true;
+    }
+  }
 
   return Status;
 }
 
 // Set *Msg from char array. A copy of the char array is done.
-int Message::SetMessageFromCharArray (char *_Value, long long _Size)
+int Message::SetMessageFromCharArray(char* _Value, long long _Size)
 {
   int Status = ERROR;
 
   if (MessageSize == 0 && DeleteMessageArray == false)
-	{
-	  if (_Size > 0)
-		{
-		  MessageSize = _Size;
+  {
+    if (_Size > 0)
+    {
+      MessageSize = _Size;
 
-		  Msg = new char[MessageSize];
+      Msg = new char[MessageSize];
 
-		  for (long long j = 0; j < MessageSize; j++)
-			{
-			  Msg[j] = (char)_Value[j];
+      for (long long j = 0; j < MessageSize; j++)
+      {
+        Msg[j] = (char)_Value[j];
 
-			  //printf("%i %d %c \n",j,Msg[j],Msg[j]);
-			}
+        // printf("%i %d %c \n",j,Msg[j],Msg[j]);
+      }
 
-		  Status = OK;
+      Status = OK;
 
-		  DeleteMessageArray = true;
-		}
-	}
+      DeleteMessageArray = true;
+    }
+  }
 
   return Status;
 }
@@ -878,78 +890,77 @@ int Message::SetMessageFromCharArray (char *_Value, long long _Size)
 // Get *Header from char array. Don't delete[] the array pointer
 int Message::GetHeaderFromCharArray(char*& _Value)
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (HeaderSize > 0 && DeleteHeaderArray == true)
-		{
-			_Value=Header;
+        if (HeaderSize > 0 && DeleteHeaderArray == true)
+                {
+                        _Value=Header;
 
-			Status=OK;
-		}
+                        Status=OK;
+                }
 
-	return Status;
+        return Status;
 }*/
 
 // Get *Payload from char array. Don't delete[] the array pointer
-int Message::GetPayloadFromCharArray (char *&_Value)
+int Message::GetPayloadFromCharArray(char*& _Value)
 {
   int Status = ERROR;
 
   if (PayloadSize > 0 && DeletePayloadArray == true)
-	{
-	  _Value = Payload;
+  {
+    _Value = Payload;
 
-	  Status = OK;
-	}
-
-  return Status;
-}
-
-// Get *Msg from char array. Don't delete[] the array pointer
-int Message::GetMessageFromCharArray (char *&_Value)
-{
-  int Status = ERROR;
-
-  if (MessageSize > 0 && DeleteMessageArray == true)
-	{
-	  _Value = Msg;
-
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
 // Get *Msg from char array. Don't delete[] the array pointer
-int Message::GetMessageFromCharArray (unsigned char *&_Value)
+int Message::GetMessageFromCharArray(char*& _Value)
 {
   int Status = ERROR;
 
   if (MessageSize > 0 && DeleteMessageArray == true)
-	{
-	  _Value = (unsigned char *)Msg;
+  {
+    _Value = Msg;
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
-double Message::GetSystemTime ()
+// Get *Msg from char array. Don't delete[] the array pointer
+int Message::GetMessageFromCharArray(unsigned char*& _Value)
+{
+  int Status = ERROR;
+
+  if (MessageSize > 0 && DeleteMessageArray == true)
+  {
+    _Value = (unsigned char*)Msg;
+
+    Status = OK;
+  }
+
+  return Status;
+}
+
+double Message::GetSystemTime()
 {
   struct timespec t;
 
-  clock_gettime (CLOCK_MONOTONIC, &t);
+  clock_gettime(CLOCK_MONOTONIC, &t);
 
   return ((t.tv_sec) + (double)(t.tv_nsec / 1e9));
 }
 
 // Get the object instantiation time in seconds
-double Message::GetInstantiationTime ()
+double Message::GetInstantiationTime()
 {
   return InstantiationTime;
 }
-
 
 // ******************************************************
 // Header format convertions
@@ -959,41 +970,41 @@ double Message::GetInstantiationTime ()
 // Convert the Header from file to a char array pointed by *Header. The HeaderFile handler needs to be properly configured.
 int Message::ConvertHeaderFromFileToCharArray()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (HeaderFile.GetName() != "")
-		{
-			Status=HeaderFile.OpenInputFile();
+        if (HeaderFile.GetName() != "")
+                {
+                        Status=HeaderFile.OpenInputFile();
 
-			if (HeaderSize == 0)
-				{
-					// Read the number of characters in the MessageFile.
-					HeaderSize=HeaderFile.tellg();
+                        if (HeaderSize == 0)
+                                {
+                                        // Read the number of characters in the MessageFile.
+                                        HeaderSize=HeaderFile.tellg();
 
-					if (HeaderSize > 0)
-						{
-							// Change the position to read from the beginning
-							HeaderFile.seekg(0);
+                                        if (HeaderSize > 0)
+                                                {
+                                                        // Change the position to read from the beginning
+                                                        HeaderFile.seekg(0);
 
-							Header=new char[HeaderSize];
+                                                        Header=new char[HeaderSize];
 
-							HeaderFile.read(Header,HeaderSize);
+                                                        HeaderFile.read(Header,HeaderSize);
 
-							//for (int i=0; i< _Size; i++)
-							//	{
-							//		printf("%i %d %c \n",i,_Value[i],_Value[i]);
-							//	}
-						}
+                                                        //for (int i=0; i< _Size; i++)
+                                                        //	{
+                                                        //		printf("%i %d %c \n",i,_Value[i],_Value[i]);
+                                                        //	}
+                                                }
 
-					HeaderFile.CloseFile();
+                                        HeaderFile.CloseFile();
 
-					DeleteHeaderArray=true;
+                                        DeleteHeaderArray=true;
 
-					Status=OK;
-				}
-		}
+                                        Status=OK;
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 */
 
@@ -1001,58 +1012,58 @@ int Message::ConvertHeaderFromFileToCharArray()
 // Convert the Header from CommandLines to a char array pointed by *Header. The CommandLines need to be properly configured.
 int Message::ConvertHeaderFromCommandLinesToCharArray()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	stringstream ss;
+        stringstream ss;
 
-	if (NoCL > 0)
-		{
-			if (HeaderSize == 0 && DeleteHeaderArray == false)
-				{
-					//cout << "CommandLines.size() = "<< CommandLines.size() << endl;
+        if (NoCL > 0)
+                {
+                        if (HeaderSize == 0 && DeleteHeaderArray == false)
+                                {
+                                        //cout << "CommandLines.size() = "<< CommandLines.size() << endl;
 
-					for (unsigned int i=0; i< NoCL; i++)
-						{
-							ss << *CommandLines[i];
+                                        for (unsigned int i=0; i< NoCL; i++)
+                                                {
+                                                        ss << *CommandLines[i];
 
-							//cout << "Command Line:"<< endl<<*CommandLines[i] << endl;
-						}
+                                                        //cout << "Command Line:"<< endl<<*CommandLines[i] << endl;
+                                                }
 
-					string tmp(ss.str());
+                                        string tmp(ss.str());
 
-					//cout <<"Header = "<<tmp<< endl;
+                                        //cout <<"Header = "<<tmp<< endl;
 
-					HeaderSize=(long)tmp.size();
+                                        HeaderSize=(long)tmp.size();
 
-					//cout <<"Header size = "<<HeaderSize<< endl;
+                                        //cout <<"Header size = "<<HeaderSize<< endl;
 
-					Header=new char[HeaderSize];
+                                        Header=new char[HeaderSize];
 
-					for (long k=0; k<HeaderSize; k++)
-						{
-							Header[k]=tmp[k];
-						}
+                                        for (long k=0; k<HeaderSize; k++)
+                                                {
+                                                        Header[k]=tmp[k];
+                                                }
 
-					DeleteHeaderArray=true;
+                                        DeleteHeaderArray=true;
 
-					//for (int i=0; i< HeaderSize; i++)
-					//	{
-					//		printf("%i %d %c \n",i,Header[i],Header[i]);
-					//	}
+                                        //for (int i=0; i< HeaderSize; i++)
+                                        //	{
+                                        //		printf("%i %d %c \n",i,Header[i],Header[i]);
+                                        //	}
 
-					Status=OK;
-				}
-			else
-				{
-					cout << "(ERROR: Header convertion error)" << endl;
-				}
-		}
-	else
-		{
-			cout << "(ERROR: Empty header)" << endl;
-		}
+                                        Status=OK;
+                                }
+                        else
+                                {
+                                        cout << "(ERROR: Header convertion error)" << endl;
+                                }
+                }
+        else
+                {
+                        cout << "(ERROR: Empty header)" << endl;
+                }
 
-	return Status;
+        return Status;
 }*/
 
 /*
@@ -1060,23 +1071,23 @@ int Message::ConvertHeaderFromCommandLinesToCharArray()
 // Convert the Header from char array to CommandLines. The char array pointed by *Header needs to be properly configured.
 int Message::ConvertHeaderFromCharArrayToCommandLines()
 {
-	int 		Status=ERROR;
+        int 		Status=ERROR;
 
-	if (HeaderSize > 0 && DeleteHeaderArray == true && Header != 0)
-		{
-			stringstream ss;
+        if (HeaderSize > 0 && DeleteHeaderArray == true && Header != 0)
+                {
+                        stringstream ss;
 
-			for (int t=0; t<HeaderSize; t++)
-				{
-					ss << Header[t];
-				}
+                        for (int t=0; t<HeaderSize; t++)
+                                {
+                                        ss << Header[t];
+                                }
 
-			ss >> *this;
+                        ss >> *this;
 
-			Status=OK;
-		}
+                        Status=OK;
+                }
 
-	return Status;
+        return Status;
 }
 
 */
@@ -1086,13 +1097,13 @@ int Message::ConvertHeaderFromCharArrayToCommandLines()
 // Convert the Header from file to CommandLines. The HeaderFile handler needs to be properly configured.
 int Message::ConvertHeaderFromFileToCommandLines()
 {
-	int Status=0;
+        int Status=0;
 
-	Status=HeaderFile.OpenInputFile();
+        Status=HeaderFile.OpenInputFile();
 
-	HeaderFile >> *this;
+        HeaderFile >> *this;
 
-	return Status;
+        return Status;
 }
 
 */
@@ -1101,30 +1112,30 @@ int Message::ConvertHeaderFromFileToCommandLines()
 // Convert the Header from char array to file. The char array pointed by *Header needs to be properly configured as well as the HeaderFile handler
 int Message::ConvertHeaderFromCharArrayToFile()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (HeaderFile.GetName() != "")
-		{
-			Status=HeaderFile.OverwriteOutputFile();
+        if (HeaderFile.GetName() != "")
+                {
+                        Status=HeaderFile.OverwriteOutputFile();
 
-			if (HeaderSize > 0 && DeleteHeaderArray == true)
-				{
-					// Change the position to read from the beginning
-					HeaderFile.seekg(0);
+                        if (HeaderSize > 0 && DeleteHeaderArray == true)
+                                {
+                                        // Change the position to read from the beginning
+                                        HeaderFile.seekg(0);
 
-					// Write char array content to the MessageFile
-					HeaderFile.write(Header,HeaderSize);
+                                        // Write char array content to the MessageFile
+                                        HeaderFile.write(Header,HeaderSize);
 
-					//for (int i=0; i< _Size; i++)
-					//	{
-					//		printf("%i %d %c \n",i,_Value[i],_Value[i]);
-					//	}
+                                        //for (int i=0; i< _Size; i++)
+                                        //	{
+                                        //		printf("%i %d %c \n",i,_Value[i],_Value[i]);
+                                        //	}
 
-					HeaderFile.CloseFile();
-				}
-		}
+                                        HeaderFile.CloseFile();
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 
 */
@@ -1133,28 +1144,28 @@ int Message::ConvertHeaderFromCharArrayToFile()
 // Convert the Header from CommandLines to file. The CommandLines need to be properly configured as well as the HeaderFile handler
 int Message::ConvertHeaderFromCommandLinesToFile()
 {
-	int Status=OK;CommandLines
+        int Status=OK;CommandLines
 
-	if (NoCL > 0)
-		{
-			if (HeaderFile.GetName() != "" && DeleteHeaderArray == false)
-				{
-					Status=HeaderFile.OverwriteOutputFile();
+        if (NoCL > 0)
+                {
+                        if (HeaderFile.GetName() != "" && DeleteHeaderArray == false)
+                                {
+                                        Status=HeaderFile.OverwriteOutputFile();
 
-					for (unsigned int i=0; i< NoCL; i++)
-						{
-							HeaderFile << *CommandLines[i];
-						}
+                                        for (unsigned int i=0; i< NoCL; i++)
+                                                {
+                                                        HeaderFile << *CommandLines[i];
+                                                }
 
-					DeleteHeaderArray=true;
+                                        DeleteHeaderArray=true;
 
-					Status=OK;
+                                        Status=OK;
 
-					HeaderFile.CloseFile();
-				}
-		}
+                                        HeaderFile.CloseFile();
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 */
 
@@ -1163,82 +1174,82 @@ int Message::ConvertHeaderFromCommandLinesToFile()
 // ******************************************************
 
 // Convert the Payload from file to a char array pointed by *Payload. The PayloadFile handler needs to be properly configured.
-int Message::ConvertPayloadFromFileToCharArray ()
+int Message::ConvertPayloadFromFileToCharArray()
 {
   int Status = OK;
   long long Length = 0;
 
-  if (PayloadFile.GetName () != "")
-	{
-	  Status = PayloadFile.OpenInputFile ();
+  if (PayloadFile.GetName() != "")
+  {
+    Status = PayloadFile.OpenInputFile();
 
-	  if (PayloadSize == 0 && DeletePayloadArray == false && Status == OK && HasPayloadFlag == true)
-		{
-		  // Stores current position
-		  Length = PayloadFile.tellg ();
+    if (PayloadSize == 0 && DeletePayloadArray == false && Status == OK && HasPayloadFlag == true)
+    {
+      // Stores current position
+      Length = PayloadFile.tellg();
 
-		  // Change position to the beginning
-		  PayloadFile.seekg (0);
+      // Change position to the beginning
+      PayloadFile.seekg(0);
 
-		  if (Length > 0)
-			{
-			  PayloadSize = Length;
+      if (Length > 0)
+      {
+        PayloadSize = Length;
 
-			  Payload = new char[PayloadSize];
+        Payload = new char[PayloadSize];
 
-			  PayloadFile.read (Payload, PayloadSize);
+        PayloadFile.read(Payload, PayloadSize);
 
-			  DeletePayloadArray = true;
+        DeletePayloadArray = true;
 
-			  PayloadFile.CloseFile ();
-			}
-		}
-	}
+        PayloadFile.CloseFile();
+      }
+    }
+  }
 
   return Status;
 }
 
 // Convert the Payload from char array to file. The char array pointed by *Payload needs to be properly configured as well as the PayloadFile handler
-int Message::ConvertPayloadFromCharArrayToFile ()
+int Message::ConvertPayloadFromCharArrayToFile()
 {
   int Status = OK;
 
-  if (PayloadFile.GetName () != "")
-	{
-	  PayloadFile.OpenOutputFile (PayloadFile.GetName (), PayloadFile.GetPath (), PayloadFile.GetOption ());
+  if (PayloadFile.GetName() != "")
+  {
+    PayloadFile.OpenOutputFile(PayloadFile.GetName(), PayloadFile.GetPath(), PayloadFile.GetOption());
 
-	  Status = PayloadFile.OverwriteOutputFile ();
+    Status = PayloadFile.OverwriteOutputFile();
 
-	  if (PayloadSize > 0 && DeletePayloadArray == true)
-		{
-		  // Change the position to read from the beginning
-		  PayloadFile.seekg (0);
+    if (PayloadSize > 0 && DeletePayloadArray == true)
+    {
+      // Change the position to read from the beginning
+      PayloadFile.seekg(0);
 
-		  // Write char array content to the PayloadFile
-		  PayloadFile.write (Payload, PayloadSize);
+      // Write char array content to the PayloadFile
+      PayloadFile.write(Payload, PayloadSize);
 
-		  for (long long i = 0; i < PayloadSize; i++)
-			{
-			  //printf("%i %d %c \n",i,Payload[i],Payload[i]);
-			}
+      for (long long i = 0; i < PayloadSize; i++)
+      {
+        // printf("%i %d %c \n",i,Payload[i],Payload[i]);
+      }
 
-		  PayloadFile.CloseFile ();
-		}
-	  else
-		{
-		  cout << "ERROR: Payload size equals to zero or delete payload arrays flag is false" << endl;
-		}
-	}
+      PayloadFile.CloseFile();
+    }
+    else
+    {
+      cout << "ERROR: Payload size equals to zero or delete payload arrays flag is false" << endl;
+    }
+  }
   else
-	{
-	  cout << "ERROR: Empty file name" << endl;
-	}
+  {
+    cout << "ERROR: Empty file name" << endl;
+  }
 
   return Status;
 }
 
 // Extract Payload char array from message char array. The Msg char array needs to be properly configured.
-int Message::ExtractPayloadCharArrayFromMessageCharArray ()
+int Message::ExtractPayloadCharArrayFromMessageCharArray()
 {
   int Status = OK;
   string Option;
@@ -1248,65 +1259,65 @@ int Message::ExtractPayloadCharArrayFromMessageCharArray ()
   long long length = 0;
   stringstream ss;
 
-  //cout << "          (Message size = " <<MessageSize<< endl;
+  // cout << "          (Message size = " <<MessageSize<< endl;
 
   for (long long i = 0; i < MessageSize; i++)
-	{
-	  ss << Msg[i];
+  {
+    ss << Msg[i];
 
-	  //printf("%i %d %c \n",i,Msg[i],Msg[i]);
-	}
+    // printf("%i %d %c \n",i,Msg[i],Msg[i]);
+  }
 
-  ss.seekg (0);
+  ss.seekg(0);
 
   char Line[4096];
 
-  while (ss.getline (Line, sizeof (Line), '\n'))
-	{
-	  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-		{
-		}
-	  else
-		{
-		  break;
-		}
-	}
+  while (ss.getline(Line, sizeof(Line), '\n'))
+  {
+    if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+    {
+    }
+    else
+    {
+      break;
+    }
+  }
 
   // Stores current position
-  Position = ss.tellg ();
+  Position = ss.tellg();
 
   // Get the total size
-  Size = ss.str ().length ();
+  Size = ss.str().length();
 
-  //cout << "Size = " << Size << endl;
+  // cout << "Size = " << Size << endl;
 
   // Calculates the length of the payload portion
   length = Size - Position;
 
-  //cout << "length = " << length << endl;
+  // cout << "length = " << length << endl;
 
-  //cout << "Reading from position = " << Position << endl;
+  // cout << "Reading from position = " << Position << endl;
 
   if (length > 1 && Position > 0 && Size > 0)
-	{
-	  // There is a payload
-	  HasPayloadFlag = true;
+  {
+    // There is a payload
+    HasPayloadFlag = true;
 
-	  // Change the position to write at the beginning
-	  PayloadFile.seekp (0, ios::beg);
+    // Change the position to write at the beginning
+    PayloadFile.seekp(0, ios::beg);
 
-	  Payload = new char[length];
+    Payload = new char[length];
 
-	  ss.read (Payload, length);
+    ss.read(Payload, length);
 
-	  PayloadSize = length;
+    PayloadSize = length;
 
-	  //cout << "Payload size = " << PayloadSize << endl;
+    // cout << "Payload size = " << PayloadSize << endl;
 
-	  DeletePayloadArray = true;
-	}
+    DeletePayloadArray = true;
+  }
 
-  //cout << "          (The extraction of the payload was a sucess)" << endl;
+  // cout << "          (The extraction of the payload was a sucess)" << endl;
 
   return Status;
 }
@@ -1319,96 +1330,94 @@ int Message::ExtractPayloadCharArrayFromMessageCharArray ()
 // Convert the Message from file to CommandLines and Payload file. The MessageFile handler needs to be properly configured
 int Message::ConvertMessageFromFileToCommandLinesandPayloadFile()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (MessageFile.GetName() != "")
-		{
-			Status=MessageFile.OpenInputFile();
+        if (MessageFile.GetName() != "")
+                {
+                        Status=MessageFile.OpenInputFile();
 
-			MessageFile >> *this;
+                        MessageFile >> *this;
 
-			MessageFile.CloseFile();
-		}
+                        MessageFile.CloseFile();
+                }
 
-	return Status;
+        return Status;
 }
 
 */
 
-
 // Convert the Message from file to a char array pointed by *Message. The MessageFile handler needs to be properly configured.
-int Message::ConvertMessageFromFileToCharArray ()
+int Message::ConvertMessageFromFileToCharArray()
 {
   int Status = ERROR;
 
-  if (MessageFile.GetName () != "")
-	{
-	  //cout << "> Message Name = " << MessageFile.GetName() << endl;
+  if (MessageFile.GetName() != "")
+  {
+    // cout << "> Message Name = " << MessageFile.GetName() << endl;
 
-	  Status = MessageFile.OpenInputFile ();
+    Status = MessageFile.OpenInputFile();
 
-	  // Read the number of characters in the MessageFile.
-	  MessageSize = MessageFile.tellg ();
+    // Read the number of characters in the MessageFile.
+    MessageSize = MessageFile.tellg();
 
-	  //cout << "> Message Size = " << MessageSize << endl;
+    // cout << "> Message Size = " << MessageSize << endl;
 
-	  if (MessageSize > 0 && DeleteMessageArray == false)
-		{
-		  // Change the position to read from the beginning
-		  MessageFile.seekg (0);
+    if (MessageSize > 0 && DeleteMessageArray == false)
+    {
+      // Change the position to read from the beginning
+      MessageFile.seekg(0);
 
-		  Msg = new char[MessageSize];
+      Msg = new char[MessageSize];
 
-		  MessageFile.read (Msg, MessageSize);
+      MessageFile.read(Msg, MessageSize);
 
-		  //for (int i=0; i< MessageSize; i++)
-		  //	{
-		  //		printf("%i %d %c \n",i,Msg[i],Msg[i]);
-		  //	}
+      // for (int i=0; i< MessageSize; i++)
+      //	{
+      //		printf("%i %d %c \n",i,Msg[i],Msg[i]);
+      //	}
 
-		  DeleteMessageArray = true;
-		}
-	  else
-		{
-		  cout << "> ERROR: The Msg char array have been previously created. It cannot be recreated in this version."
-			   << endl;
-		}
+      DeleteMessageArray = true;
+    }
+    else
+    {
+      cout << "> ERROR: The Msg char array have been previously created. It cannot be recreated in this version."
+           << endl;
+    }
 
-	  MessageFile.CloseFile ();
-	}
+    MessageFile.CloseFile();
+  }
 
   return Status;
 }
-
 
 /*
 // Convert the Message from char array to a complete Message file. The char array pointed by *Message needs to be properly configured as well as the MessageFile handler
 int Message::ConvertMessageFromCharArrayToFile()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (MessageFile.GetName() != "")
-		{
-			Status=MessageFile.OverwriteOutputFile();
+        if (MessageFile.GetName() != "")
+                {
+                        Status=MessageFile.OverwriteOutputFile();
 
-			if (MessageSize > 0 && DeleteMessageArray == true)
-				{
-					// Change the position to read from the beginning
-					MessageFile.seekg(0);
+                        if (MessageSize > 0 && DeleteMessageArray == true)
+                                {
+                                        // Change the position to read from the beginning
+                                        MessageFile.seekg(0);
 
-					// Write char array content to the MessageFile
-					MessageFile.write(Msg,MessageSize);
+                                        // Write char array content to the MessageFile
+                                        MessageFile.write(Msg,MessageSize);
 
-					//for (int i=0; i< _Size; i++)
-					//	{
-					//		printf("%i %d %c \n",i,_Value[i],_Value[i]);
-					//	}
+                                        //for (int i=0; i< _Size; i++)
+                                        //	{
+                                        //		printf("%i %d %c \n",i,_Value[i],_Value[i]);
+                                        //	}
 
-					MessageFile.CloseFile();
-				}
-		}
+                                        MessageFile.CloseFile();
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 
 */
@@ -1417,257 +1426,256 @@ int Message::ConvertMessageFromCharArrayToFile()
 // Convert the Message from CommandLines and Payload file to a complete Message file. The CommandLines need to be properly configured as well as the MessageFile handler
 int Message::ConvertMessageFromCommandLinesandPayloadFileToFile()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (MessageFile.GetName() != "")
-		{
-			Status=MessageFile.OverwriteOutputFile();
+        if (MessageFile.GetName() != "")
+                {
+                        Status=MessageFile.OverwriteOutputFile();
 
-			char			*buffer;
-			long		    length=0;
+                        char			*buffer;
+                        long		    length=0;
 
-			for (unsigned int i=0; i<NoCL; i++)
-				{
-					MessageFile << *CommandLines[i];
-				}
+                        for (unsigned int i=0; i<NoCL; i++)
+                                {
+                                        MessageFile << *CommandLines[i];
+                                }
 
-			if (HasPayloadFlag == true && PayloadSize > 0)
-				{
-					MessageFile << endl; // Add a blank line to separate the payload from the header.
+                        if (HasPayloadFlag == true && PayloadSize > 0)
+                                {
+                                        MessageFile << endl; // Add a blank line to separate the payload from the header.
 
-					if (PayloadFile.OpenInputFile() == OK)
-						{
-							//cout << "Loading payload from file" << endl;
+                                        if (PayloadFile.OpenInputFile() == OK)
+                                                {
+                                                        //cout << "Loading payload from file" << endl;
 
-							// Read the number of characters in the Payload file.
-							length=PayloadFile.tellg();
+                                                        // Read the number of characters in the Payload file.
+                                                        length=PayloadFile.tellg();
 
-							// Change the position to read from the beginning
-							PayloadFile.seekg(0, ios::beg);
+                                                        // Change the position to read from the beginning
+                                                        PayloadFile.seekg(0, ios::beg);
 
-							if (length > 0)
-								{
-									buffer=new char[length];
+                                                        if (length > 0)
+                                                                {
+                                                                        buffer=new char[length];
 
-									PayloadFile.read(buffer,length);
+                                                                        PayloadFile.read(buffer,length);
 
-									MessageFile.write(buffer,length);
+                                                                        MessageFile.write(buffer,length);
 
-									delete[] buffer;
-								}
+                                                                        delete[] buffer;
+                                                                }
 
-							PayloadFile.CloseFile();
-						}
-					else
-						{
-							//cout << "Loading payload from char array" << endl;
+                                                        PayloadFile.CloseFile();
+                                                }
+                                        else
+                                                {
+                                                        //cout << "Loading payload from char array" << endl;
 
-							if (PayloadSize > 0)
-								{
-									buffer=new char[PayloadSize];
+                                                        if (PayloadSize > 0)
+                                                                {
+                                                                        buffer=new char[PayloadSize];
 
-									for (long long int i=0; i<PayloadSize; i++)
-										{
-											buffer[i]=(char)Payload[i];
-										}
+                                                                        for (long long int i=0; i<PayloadSize; i++)
+                                                                                {
+                                                                                        buffer[i]=(char)Payload[i];
+                                                                                }
 
-									MessageFile.write(buffer,PayloadSize);
+                                                                        MessageFile.write(buffer,PayloadSize);
 
-									delete[] buffer;
-								}
-						}
-				}
-		}
+                                                                        delete[] buffer;
+                                                                }
+                                                }
+                                }
+                }
 
-	return Status;
+        return Status;
 }
 
 */
 
 // Convert the Message from CommandLines and Payload file to a char array. The CommandLines need to be properly configured as well as the PayloadFile handler
-int Message::ConvertMessageFromCommandLinesandPayloadFileToCharArray ()
+int Message::ConvertMessageFromCommandLinesandPayloadFileToCharArray()
 {
   int Status = ERROR;
 
   if (MessageSize == 0 && DeleteMessageArray == false)
-	{
-	  ostringstream oss;
+  {
+    ostringstream oss;
 
-	  if (NoCL > 0)
-		{
-		  char *buffer;
-		  long length = 0;
+    if (NoCL > 0)
+    {
+      char* buffer;
+      long length = 0;
 
-		  for (unsigned int i = 0; i < NoCL; i++)
-			{
-			  oss << *CommandLines[i];
-			}
+      for (unsigned int i = 0; i < NoCL; i++)
+      {
+        oss << *CommandLines[i];
+      }
 
-		  if (HasPayloadFlag == true && PayloadSize > 0)
-			{
-			  oss
-				  << endl; // Add a blank line to separate the payload ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2from the header.
+      if (HasPayloadFlag == true && PayloadSize > 0)
+      {
+        oss
+            << endl; // Add a blank line to separate the payload ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2from the header.
 
-			  if (PayloadFile.OpenInputFile () == OK)
-				{
-				  //cout << "Loading payload from file" << endl;
+        if (PayloadFile.OpenInputFile() == OK)
+        {
+          // cout << "Loading payload from file" << endl;
 
-				  // Read the number of characters in the Payload file.
-				  length = PayloadFile.tellg ();
+          // Read the number of characters in the Payload file.
+          length = PayloadFile.tellg();
 
-				  // Change the position to read from the beginning
-				  PayloadFile.seekg (0, ios::beg);
+          // Change the position to read from the beginning
+          PayloadFile.seekg(0, ios::beg);
 
-				  if (length > 0)
-					{
-					  buffer = new char[length];
+          if (length > 0)
+          {
+            buffer = new char[length];
 
-					  PayloadFile.read (buffer, length);
+            PayloadFile.read(buffer, length);
 
-					  oss.write (buffer, length);
+            oss.write(buffer, length);
 
-					  delete[] buffer;
-					}
+            delete[] buffer;
+          }
 
-				  PayloadFile.CloseFile ();
-				}
-			  else
-				{
-				  //cout << "Loading payload from char array" << endl;
+          PayloadFile.CloseFile();
+        }
+        else
+        {
+          // cout << "Loading payload from char array" << endl;
 
-				  if (PayloadSize > 0)
-					{
-					  buffer = new char[PayloadSize];
+          if (PayloadSize > 0)
+          {
+            buffer = new char[PayloadSize];
 
-					  for (long long int i = 0; i < PayloadSize; i++)
-						{
-						  buffer[i] = (char)Payload[i];
-						}
+            for (long long int i = 0; i < PayloadSize; i++)
+            {
+              buffer[i] = (char)Payload[i];
+            }
 
-					  oss.write (buffer, PayloadSize);
+            oss.write(buffer, PayloadSize);
 
-					  delete[] buffer;
-					}
-				}
-			}
+            delete[] buffer;
+          }
+        }
+      }
 
-		  const std::string tmp = oss.str ();
+      const std::string tmp = oss.str();
 
-		  MessageSize = tmp.size ();
+      MessageSize = tmp.size();
 
-		  Msg = new char[MessageSize];
+      Msg = new char[MessageSize];
 
-		  for (int i = 0; i < MessageSize; i++)
-			{
-			  Msg[i] = tmp[i];
+      for (int i = 0; i < MessageSize; i++)
+      {
+        Msg[i] = tmp[i];
 
-			  //printf("%i %d %c \n",i,Msg[i],Msg[i]);
-			}
+        // printf("%i %d %c \n",i,Msg[i],Msg[i]);
+      }
 
-		  DeleteMessageArray = true;
+      DeleteMessageArray = true;
 
-		  Status = OK;
-		}
-	}
+      Status = OK;
+    }
+  }
 
   return Status;
 }
 
 // Convert the Message from CommandLines and Payload char array to a message char array. The CommandLines need to be properly configured as well as the Payload char array
-int
-Message::ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray ()
+int Message::ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray()
 {
   int Status = ERROR;
 
   if (MessageSize == 0 && DeleteMessageArray == false)
-	{
-	  ostringstream oss;
+  {
+    ostringstream oss;
 
-	  if (NoCL > 0)
-		{
-		  char *buffer;
-		  long long length = 0;
+    if (NoCL > 0)
+    {
+      char* buffer;
+      long long length = 0;
 
-		  for (unsigned int i = 0; i < NoCL; i++)
-			{
-			  oss << *CommandLines[i];
-			}
+      for (unsigned int i = 0; i < NoCL; i++)
+      {
+        oss << *CommandLines[i];
+      }
 
-		  if (HasPayloadFlag == true && PayloadSize > 0)
-			{
-			  oss << endl; // Add a blank line to separate the payload from the header.
+      if (HasPayloadFlag == true && PayloadSize > 0)
+      {
+        oss << endl; // Add a blank line to separate the payload from the header.
 
-			  if (PayloadFile.OpenInputFile () == OK)
-				{
+        if (PayloadFile.OpenInputFile() == OK)
+        {
 #ifdef DEBUG
-				  cout << "Loading payload from file" << endl;
+          cout << "Loading payload from file" << endl;
 #endif
-				  // Read the number of characters in the Payload file.
-				  length = (long long)PayloadFile.tellg ();
+          // Read the number of characters in the Payload file.
+          length = (long long)PayloadFile.tellg();
 
-				  // Change the position to read from the beginning
-				  PayloadFile.seekg (0, ios::beg);
+          // Change the position to read from the beginning
+          PayloadFile.seekg(0, ios::beg);
 
-				  if (length > 0)
-					{
-					  buffer = new char[length];
+          if (length > 0)
+          {
+            buffer = new char[length];
 
-					  PayloadFile.read (buffer, length);
+            PayloadFile.read(buffer, length);
 
-					  oss.write (buffer, length);
+            oss.write(buffer, length);
 
-					  delete[] buffer;
-					}
+            delete[] buffer;
+          }
 
-				  PayloadFile.CloseFile ();
-				}
-			  else
-				{
+          PayloadFile.CloseFile();
+        }
+        else
+        {
 #ifdef DEBUG
-				  cout << "Loading payload from char array" << endl;
+          cout << "Loading payload from char array" << endl;
 #endif
 
-				  if (PayloadSize > 0)
-					{
-					  buffer = new char[PayloadSize];
-
-#ifdef DEBUG
-					  cout << "(The size of the payload of the message with instantiation number "<<InstantiationNumber<<" is "<<PayloadSize<<" bytes)"<<endl;
-#endif
-					  for (long long i = 0; i < PayloadSize; i++)
-						{
-						  buffer[i] = (char)Payload[i];
-						}
-
-					  oss.write (buffer, PayloadSize);
-
-					  delete[] buffer;
-					}
-				}
-			}
-
-		  const std::string tmp = oss.str ();
-
-		  MessageSize = tmp.size ();
+          if (PayloadSize > 0)
+          {
+            buffer = new char[PayloadSize];
 
 #ifdef DEBUG
-		  cout << "(The size of the message with instantiation number "<<InstantiationNumber<<" is "<<MessageSize<<" bytes)"<<endl;
+            cout << "(The size of the payload of the message with instantiation number " << InstantiationNumber << " is " << PayloadSize << " bytes)" << endl;
 #endif
-		  Msg = new char[MessageSize];
+            for (long long i = 0; i < PayloadSize; i++)
+            {
+              buffer[i] = (char)Payload[i];
+            }
 
-		  for (long long j = 0; j < MessageSize; j++)
-			{
-			  Msg[j] = tmp[j];
+            oss.write(buffer, PayloadSize);
+
+            delete[] buffer;
+          }
+        }
+      }
+
+      const std::string tmp = oss.str();
+
+      MessageSize = tmp.size();
+
 #ifdef DEBUG
-			  printf("%i %d %c \n",j,Msg[j],Msg[j]);
+      cout << "(The size of the message with instantiation number " << InstantiationNumber << " is " << MessageSize << " bytes)" << endl;
 #endif
-			}
+      Msg = new char[MessageSize];
 
-		  DeleteMessageArray = true;
+      for (long long j = 0; j < MessageSize; j++)
+      {
+        Msg[j] = tmp[j];
+#ifdef DEBUG
+        printf("%i %d %c \n", j, Msg[j], Msg[j]);
+#endif
+      }
 
-		  Status = OK;
-		}
-	}
+      DeleteMessageArray = true;
+
+      Status = OK;
+    }
+  }
 
   return Status;
 }
@@ -1677,35 +1685,35 @@ Message::ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray ()
 /*
 int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadFile()
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (MessageSize > 0 && DeleteMessageArray == true)
-		{
-			stringstream ss;
+        if (MessageSize > 0 && DeleteMessageArray == true)
+                {
+                        stringstream ss;
 
-			for (int t=0; t<MessageSize; t++)
-				{
-					ss << Msg[t];
+                        for (int t=0; t<MessageSize; t++)
+                                {
+                                        ss << Msg[t];
 
-					//printf("%i %d %c \n",t,Msg[t],Msg[t]);
-				}
+                                        //printf("%i %d %c \n",t,Msg[t],Msg[t]);
+                                }
 
-			ss >> *this;
+                        ss >> *this;
 
-			Status=OK;
-		}
+                        Status=OK;
+                }
 
-	return Status;
+        return Status;
 }
 
 */
 
 // Convert the complete message char array into command lines and payload char array
-int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray ()
+int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray()
 {
 
   int Status = ERROR;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Option;
   string ng = "ng";
   long long int Position = 0;
@@ -1713,327 +1721,329 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray ()
   int length = 0;
   unsigned int i = 0;
 
-  //cout<< "Message size = "<<MessageSize<<endl;
+  // cout<< "Message size = "<<MessageSize<<endl;
 
   if (MessageSize > 0 && DeleteMessageArray == true)
-	{
-	  stringstream ss;
+  {
+    stringstream ss;
 
-	  for (int t = 0; t < MessageSize; t++)
-		{
-		  ss << Msg[t];
+    for (int t = 0; t < MessageSize; t++)
+    {
+      ss << Msg[t];
 
-		  //printf("%i %d %c \n",t,Msg[t],Msg[t]);
-		}
+      // printf("%i %d %c \n",t,Msg[t],Msg[t]);
+    }
 
-	  char Line[4096];
+    char Line[4096];
 
-	  while (ss.getline (Line, sizeof (Line), '\n'))
-		{
-		  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-			{
-			  istringstream ins (Line);
+    while (ss.getline(Line, sizeof(Line), '\n'))
+    {
+      if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+      {
+        istringstream ins(Line);
 
-			  NewCommandLine (PCL);
+        NewCommandLine(PCL);
 
-			  ins >> *CommandLines[i];
+        ins >> *CommandLines[i];
 
-			  i++;
-			}
-		  else
-			{
-			  break;
-			}
-		}
+        i++;
+      }
+      else
+      {
+        break;
+      }
+    }
 
-	  // Stores current position
-	  Position = ss.tellg ();
+    // Stores current position
+    Position = ss.tellg();
 
-	  // Get the total size
-	  Size = ss.str ().length ();
+    // Get the total size
+    Size = ss.str().length();
 
-	  //cout << "Size = " << Size << endl;
+    // cout << "Size = " << Size << endl;
 
-	  // Calculates the length of the payload portion
-	  length = Size - Position;
+    // Calculates the length of the payload portion
+    length = Size - Position;
 
-	  //cout << "length = " << length << endl;
+    // cout << "length = " << length << endl;
 
-	  //cout << "Reading from position = " << Position << endl;
+    // cout << "Reading from position = " << Position << endl;
 
-	  if (length > 1 && Position > 0 && Size > 0)
-		{
-		  // There is a payload
-		  HasPayloadFlag = true;
+    if (length > 1 && Position > 0 && Size > 0)
+    {
+      // There is a payload
+      HasPayloadFlag = true;
 
-		  // Change the position to write at the beggining
-		  PayloadFile.seekp (0);
+      // Change the position to write at the beggining
+      PayloadFile.seekp(0);
 
-		  Payload = new char[length];
+      Payload = new char[length];
 
-		  ss.read (Payload, length);
+      ss.read(Payload, length);
 
-		  PayloadSize = length;
+      PayloadSize = length;
 
-		  DeletePayloadArray = true;
-		}
+      DeletePayloadArray = true;
+    }
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
 // Convert the complete message char array into command lines and payload char array
-int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray (File *_PF)
+int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File* _PF)
 {
   int Status = ERROR;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Option;
-  long long t = 0;                // Pointer to scan the buffer
-  char *Temp;
+  long long t = 0; // Pointer to scan the buffer
+  char* Temp;
 
   if (MessageSize > 16 && DeleteMessageArray == true)
-	{
-	  //*_PF<<"MessageSize = "<< MessageSize <<endl;
+  {
+    //*_PF<<"MessageSize = "<< MessageSize <<endl;
 
-	  // While over the received buffer to delineate command lines and payload
-	  while (t < MessageSize)
-		{
-		  //*_PF<<endl<<"Jumping to position = "<<t<<endl;
+    // While over the received buffer to delineate command lines and payload
+    while (t < MessageSize)
+    {
+      //*_PF<<endl<<"Jumping to position = "<<t<<endl;
 
-		  // Search for a ng command line
-		  if (Msg[t] == 'n' && Msg[t + 1] == 'g' && Msg[t + 2] == ' ' && Msg[t + 3] == '-')
-			{
-			  //*_PF<<"A command line was found"<<endl;
+      // Search for a ng command line
+      if (Msg[t] == 'n' && Msg[t + 1] == 'g' && Msg[t + 2] == ' ' && Msg[t + 3] == '-')
+      {
+        //*_PF<<"A command line was found"<<endl;
 
-			  // Command line detected
-			  // Continues up to the end of this line
-			  for (long long u = t; u < MessageSize; u++)
-				{
-				  if (Msg[u] == '\n')
-					{
-					  int CommandLineSize = (int)(u - t + 1);
+        // Command line detected
+        // Continues up to the end of this line
+        for (long long u = t; u < MessageSize; u++)
+        {
+          if (Msg[u] == '\n')
+          {
+            int CommandLineSize = (int)(u - t + 1);
 
-					  //*_PF<<"Command line size = "<<CommandLineSize<<endl;
+            //*_PF<<"Command line size = "<<CommandLineSize<<endl;
 
-					  Temp = new char[CommandLineSize];
+            Temp = new char[CommandLineSize];
 
-					  //*_PF<<"Showing the discovered command line:"<<endl;
+            //*_PF<<"Showing the discovered command line:"<<endl;
 
-					  for (int v = 0; v < (u - t); v++)
-						{
-						  Temp[v] = Msg[t + v];
+            for (int v = 0; v < (u - t); v++)
+            {
+              Temp[v] = Msg[t + v];
 
-						  //*_PF<<Temp[v];
-						}
+              //*_PF<<Temp[v];
+            }
 
-					  //*_PF<<endl<<"Creating the new command line object"<<endl;
+            //*_PF<<endl<<"Creating the new command line object"<<endl;
 
-					  NewCommandLine (PCL);
+            NewCommandLine(PCL);
 
-					  //*_PF<<"Copying the temporary array content to command line object"<<endl;
+            //*_PF<<"Copying the temporary array content to command line object"<<endl;
 
-					  PCL->ConvertCommandLineFromCharArray (Temp, CommandLineSize);
+            PCL->ConvertCommandLineFromCharArray(Temp, CommandLineSize);
 
-					  //*_PF<<"Deleting the temporary array"<<endl;
+            //*_PF<<"Deleting the temporary array"<<endl;
 
-					  delete Temp;
+            delete Temp;
 
-					  //*_PF<<endl<<"Jumping to position = "<<u<<endl;
+            //*_PF<<endl<<"Jumping to position = "<<u<<endl;
 
-					  t = u;
+            t = u;
 
-					  break;
-					}
-				}
-			}
-		  else
-			{
-			  //*_PF<<"Jumping the blank line."<<endl;
+            break;
+          }
+        }
+      }
+      else
+      {
+        //*_PF<<"Jumping the blank line."<<endl;
 
-			  t++; // Jumps the blank line
+        t++; // Jumps the blank line
 
-			  //*_PF<<endl<<"Jumping to position = "<<t<<endl;
+        //*_PF<<endl<<"Jumping to position = "<<t<<endl;
 
-			  //*_PF<<"Start copying the payload to array and file"<<endl;
+        //*_PF<<"Start copying the payload to array and file"<<endl;
 
-			  // There is a payload
-			  HasPayloadFlag = true;
+        // There is a payload
+        HasPayloadFlag = true;
 
-			  PayloadSize = MessageSize - t;
+        PayloadSize = MessageSize - t;
 
-			  //*_PF<<"Payload size = "<<PayloadSize<<endl;
+        //*_PF<<"Payload size = "<<PayloadSize<<endl;
 
-			  Payload = new char[PayloadSize];
+        Payload = new char[PayloadSize];
 
-			  long long r = 0;
+        long long r = 0;
 
-			  // Continues up	 to the end of the buffer
-			  for (int u = t; u < MessageSize; u++)
-				{
-				  Payload[r] = Msg[u];
+        // Continues up	 to the end of the buffer
+        for (int u = t; u < MessageSize; u++)
+        {
+          Payload[r] = Msg[u];
 
-				  //*_PF<<Payload[r]<<endl;
+          //*_PF<<Payload[r]<<endl;
 
-				  r++;
-				}
+          r++;
+        }
 
-			  DeletePayloadArray = true;
+        DeletePayloadArray = true;
 
-			  t = MessageSize
-				  - 1;
+        t = MessageSize - 1;
 
-			  //*_PF<<"Passei tudo"<<endl;
-			}
+        //*_PF<<"Passei tudo"<<endl;
+      }
 
-		  t++;
-		}
+      t++;
+    }
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
 // Convert the complete message char array into command lines and payload char array
-int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2 ()
+int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
 {
 
   int Status = OK;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Option;
-  long long t = 0;                // Pointer to scan the buffer
-  char *Temp;
+  long long t = 0; // Pointer to scan the buffer
+  char* Temp;
   int Aux = OK;
 
   if (MessageSize > 16 && DeleteMessageArray == true)
-	{
+  {
 
 #ifdef DEBUG
-	  cout<<"MessageSize = "<< MessageSize <<endl;
+    cout << "MessageSize = " << MessageSize << endl;
 #endif
 
-	  // While over the received buffer to delineate command lines and payload
-	  while (t < MessageSize)
-		{
+    // While over the received buffer to delineate command lines and payload
+    while (t < MessageSize)
+    {
 #ifdef DEBUG
-		  cout << endl << "Jumping to position = "<< t << endl;
+      cout << endl
+           << "Jumping to position = " << t << endl;
 #endif
 
-
-		  // Search for a ng command line
-		  if (Msg[t] == 'n' && Msg[t + 1] == 'g' && Msg[t + 2] == ' ' && Msg[t + 3] == '-')
-			{
+      // Search for a ng command line
+      if (Msg[t] == 'n' && Msg[t + 1] == 'g' && Msg[t + 2] == ' ' && Msg[t + 3] == '-')
+      {
 #ifdef DEBUG
-			  cout<<"A command line was found"<<endl;
+        cout << "A command line was found" << endl;
 #endif
 
-			  // Command line detected
-			  // Continues up to the end of this line
-			  for (long long u = t; u < MessageSize; u++)
-				{
-				  if (Msg[u] == '\n')
-					{
-					  int CommandLineSize = (int)(u - t + 1);
-
-#ifdef DEBUG
-					  cout<<"Command line size = "<<CommandLineSize<<endl;
-#endif
-
-					  Temp = new char[CommandLineSize];
+        // Command line detected
+        // Continues up to the end of this line
+        for (long long u = t; u < MessageSize; u++)
+        {
+          if (Msg[u] == '\n')
+          {
+            int CommandLineSize = (int)(u - t + 1);
 
 #ifdef DEBUG
-					  cout<<"Showing the discovered command line:"<<endl;
+            cout << "Command line size = " << CommandLineSize << endl;
 #endif
 
-					  for (int v = 0; v < (u - t); v++)
-						{
-						  Temp[v] = Msg[t + v];
-#ifdef DEBUG
-						  cout<<Temp[v];
-#endif
-						}
+            Temp = new char[CommandLineSize];
 
 #ifdef DEBUG
-					  cout<<endl<<"Creating the new command line object"<<endl;
+            cout << "Showing the discovered command line:" << endl;
 #endif
-					  NewCommandLine (PCL);
+
+            for (int v = 0; v < (u - t); v++)
+            {
+              Temp[v] = Msg[t + v];
+#ifdef DEBUG
+              cout << Temp[v];
+#endif
+            }
 
 #ifdef DEBUG
-					  cout<<"Copying the temporary array content to command line object"<<endl;
+            cout << endl
+                 << "Creating the new command line object" << endl;
 #endif
-
-					  Aux = PCL->ConvertCommandLineFromCharArray (Temp, CommandLineSize);
-
-					  if (Aux == ERROR)
-						{
-						  Status = ERROR;
-						}
+            NewCommandLine(PCL);
 
 #ifdef DEBUG
-					  cout<<"Deleting the temporary array"<<endl;
+            cout << "Copying the temporary array content to command line object" << endl;
 #endif
-					  delete[] Temp;
+
+            Aux = PCL->ConvertCommandLineFromCharArray(Temp, CommandLineSize);
+
+            if (Aux == ERROR)
+            {
+              Status = ERROR;
+            }
 
 #ifdef DEBUG
-					  cout<<endl<<"Jumping to position = "<<u<<endl;
+            cout << "Deleting the temporary array" << endl;
 #endif
-					  t = u;
-
-					  break;
-					}
-				}
-			}
-		  else
-			{
+            delete[] Temp;
 
 #ifdef DEBUG
-			  cout<<"Jumping the blank line."<<endl;
+            cout << endl
+                 << "Jumping to position = " << u << endl;
 #endif
-			  t++; // Jumps the blank line
+            t = u;
+
+            break;
+          }
+        }
+      }
+      else
+      {
 
 #ifdef DEBUG
-			  cout<<endl<<"Jumping to position = "<<t<<endl;
-
-			  cout<<"Start copying the payload to array and file"<<endl;
+        cout << "Jumping the blank line." << endl;
 #endif
-			  // There is a payload
-			  HasPayloadFlag = true;
-
-			  PayloadSize = MessageSize - t;
+        t++; // Jumps the blank line
 
 #ifdef DEBUG
-			  cout<<"Payload size = "<<PayloadSize<<endl;
+        cout << endl
+             << "Jumping to position = " << t << endl;
+
+        cout << "Start copying the payload to array and file" << endl;
 #endif
+        // There is a payload
+        HasPayloadFlag = true;
 
-			  Payload = new char[PayloadSize];
-
-			  long long r = 0;
-
-			  // Continues up to the end of the buffer
-			  for (int u = t; u < MessageSize; u++)
-				{
-				  Payload[r] = Msg[u];
+        PayloadSize = MessageSize - t;
 
 #ifdef DEBUG
-				  cout<<Payload[r]<<endl;
+        cout << "Payload size = " << PayloadSize << endl;
 #endif
-				  r++;
-				}
 
-			  DeletePayloadArray = true;
+        Payload = new char[PayloadSize];
 
-			  t = MessageSize - 1;
+        long long r = 0;
+
+        // Continues up to the end of the buffer
+        for (int u = t; u < MessageSize; u++)
+        {
+          Payload[r] = Msg[u];
 
 #ifdef DEBUG
-			  cout<<"Finished"<<endl;
+          cout << Payload[r] << endl;
 #endif
-			}
+          r++;
+        }
 
-		  t++;
-		}
-	}
+        DeletePayloadArray = true;
+
+        t = MessageSize - 1;
+
+#ifdef DEBUG
+        cout << "Finished" << endl;
+#endif
+      }
+
+      t++;
+    }
+  }
 
   return Status;
 }
@@ -2042,123 +2052,122 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2 ()
 // Message size functions
 // ******************************************************
 
-
 /*
 // Get header size in bytes.
 int Message::GetHeaderSize(long& _Size)
 {
-	int Status=ERROR;
+        int Status=ERROR;
 
-	if (DeleteHeaderArray == true)
-		{
-			_Size=HeaderSize;
+        if (DeleteHeaderArray == true)
+                {
+                        _Size=HeaderSize;
 
-			Status=OK;
-		}
+                        Status=OK;
+                }
 
-	return Status;
+        return Status;
 }
 
 */
 
 // Get payload size in bytes
-int Message::GetPayloadSize (long long &_Size)
+int Message::GetPayloadSize(long long& _Size)
 {
   int Status = ERROR;
 
   if (DeletePayloadArray == true)
-	{
-	  _Size = PayloadSize;
+  {
+    _Size = PayloadSize;
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }
 
 // Get message size in bytes
-int Message::GetMessageSize (long long &_Size)
+int Message::GetMessageSize(long long& _Size)
 {
   int Status = ERROR;
 
   if (MessageSize > 0)
-	{
-	  _Size = MessageSize;
+  {
+    _Size = MessageSize;
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
   else
-	{
-	  ostringstream oss;
+  {
+    ostringstream oss;
 
-	  if (NoCL > 0)
-		{
-		  char *buffer;
-		  long length = 0;
+    if (NoCL > 0)
+    {
+      char* buffer;
+      long length = 0;
 
-		  for (unsigned int i = 0; i < NoCL; i++)
-			{
-			  oss << *CommandLines[i];
-			}
+      for (unsigned int i = 0; i < NoCL; i++)
+      {
+        oss << *CommandLines[i];
+      }
 
-		  if (HasPayloadFlag == true)
-			{
-			  oss << endl; // Add a blank line to separate the payload from the header.
+      if (HasPayloadFlag == true)
+      {
+        oss << endl; // Add a blank line to separate the payload from the header.
 
-			  if (PayloadFile.OpenInputFile () == OK)
-				{
-				  //cout << "Loading payload from file" << endl;
+        if (PayloadFile.OpenInputFile() == OK)
+        {
+          // cout << "Loading payload from file" << endl;
 
-				  // Read the number of characters in the Payload file.
-				  length = PayloadFile.tellg ();
+          // Read the number of characters in the Payload file.
+          length = PayloadFile.tellg();
 
-				  // Change the position to read from the beginning
-				  PayloadFile.seekg (0, ios::beg);
+          // Change the position to read from the beginning
+          PayloadFile.seekg(0, ios::beg);
 
-				  if (length > 0)
-					{
-					  buffer = new char[length];
+          if (length > 0)
+          {
+            buffer = new char[length];
 
-					  PayloadFile.read (buffer, length);
+            PayloadFile.read(buffer, length);
 
-					  oss.write (buffer, length);
+            oss.write(buffer, length);
 
-					  delete[] buffer;
-					}
+            delete[] buffer;
+          }
 
-				  PayloadFile.CloseFile ();
-				}
-			  else
-				{
-				  //cout << "Loading payload from char array" << endl;
+          PayloadFile.CloseFile();
+        }
+        else
+        {
+          // cout << "Loading payload from char array" << endl;
 
-				  if (PayloadSize > 0)
-					{
-					  buffer = new char[PayloadSize];
+          if (PayloadSize > 0)
+          {
+            buffer = new char[PayloadSize];
 
-					  for (long long int i = 0; i < PayloadSize; i++)
-						{
-						  buffer[i] = (char)Payload[i];
-						}
+            for (long long int i = 0; i < PayloadSize; i++)
+            {
+              buffer[i] = (char)Payload[i];
+            }
 
-					  oss.write (buffer, PayloadSize);
+            oss.write(buffer, PayloadSize);
 
-					  delete[] buffer;
-					}
-				}
-			}
+            delete[] buffer;
+          }
+        }
+      }
 
-		  const std::string tmp = oss.str ();
+      const std::string tmp = oss.str();
 
-		  _Size = tmp.size ();
+      _Size = tmp.size();
 
 #ifdef DEBUG
-		  cout << "Message Size = "<< _Size <<endl;
+      cout << "Message Size = " << _Size << endl;
 #endif
 
-		  Status = OK;
-		}
-	}
+      Status = OK;
+    }
+  }
 
   return Status;
 }
@@ -2166,25 +2175,25 @@ int Message::GetMessageSize (long long &_Size)
 // ******************************************************
 // Checking for command lines
 // ******************************************************
-int Message::DoesThisCommandLineExistsInMessage (string _Name, string _Alternative, bool &_Verdict)
+int Message::DoesThisCommandLineExistsInMessage(string _Name, string _Alternative, bool& _Verdict)
 {
   int Status = ERROR;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  // Select a command line
-	  GetCommandLine (i, PCL);
+  {
+    // Select a command line
+    GetCommandLine(i, PCL);
 
-	  if (PCL->Name == _Name && PCL->Alternative == _Alternative)
-		{
-		  _Verdict = true;
+    if (PCL->Name == _Name && PCL->Alternative == _Alternative)
+    {
+      _Verdict = true;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
-	}
+      break;
+    }
+  }
 
   return Status;
 }
@@ -2192,300 +2201,301 @@ int Message::DoesThisCommandLineExistsInMessage (string _Name, string _Alternati
 // ******************************************************
 // Checking for arguments
 // ******************************************************
-int Message::DoAllTheseValuesExistInSomeCommandLine (vector<string> *_Values, bool &_Verdict)
+int Message::DoAllTheseValuesExistInSomeCommandLine(vector<string>* _Values, bool& _Verdict)
 {
   int Status = ERROR;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   unsigned int NA = 0;
   vector<string> Argument;
 
   for (unsigned int i = 0; i < NoCL; i++)
-	{
-	  // Select a command line
-	  GetCommandLine (i, PCL);
+  {
+    // Select a command line
+    GetCommandLine(i, PCL);
 
-	  // Get the number of arguments in this command line
-	  GetNumberofCommandLineArguments (i, NA);
+    // Get the number of arguments in this command line
+    GetNumberofCommandLineArguments(i, NA);
 
-	  //cout << endl << "i = "<<i<<endl;
+    // cout << endl << "i = "<<i<<endl;
 
-	  vector<bool> Matches;
+    vector<bool> Matches;
 
-	  for (unsigned int m = 0; m < _Values->size (); m++)
-		{
-		  Matches.push_back (false);
-		}
+    for (unsigned int m = 0; m < _Values->size(); m++)
+    {
+      Matches.push_back(false);
+    }
 
-	  //cout << "NA = "<< NA <<endl;
+    // cout << "NA = "<< NA <<endl;
 
-	  for (unsigned int j = 0; j < NA; j++)
-		{
-		  //cout << "j = "<<j<<endl;
+    for (unsigned int j = 0; j < NA; j++)
+    {
+      // cout << "j = "<<j<<endl;
 
-		  // Select an argument
-		  PCL->GetArgument (j, Argument);
+      // Select an argument
+      PCL->GetArgument(j, Argument);
 
-		  // Select the values in this argument
-		  for (unsigned int k = 0; k < Argument.size (); k++)
-			{
-			  //cout << "k = "<<k<<endl;
+      // Select the values in this argument
+      for (unsigned int k = 0; k < Argument.size(); k++)
+      {
+        // cout << "k = "<<k<<endl;
 
-			  // Select a value at the input list
-			  for (unsigned int l = 0; l < _Values->size (); l++)
-				{
-				  //cout << "_Values-at("<<l<<") = "<<_Values->at(l) << "         Argument->at("<<k<<") = "<<Argument.at(k)<<endl;
+        // Select a value at the input list
+        for (unsigned int l = 0; l < _Values->size(); l++)
+        {
+          // cout << "_Values-at("<<l<<") = "<<_Values->at(l) << "         Argument->at("<<k<<") = "<<Argument.at(k)<<endl;
 
-				  // Check whether this value exists on the selected argument
-				  if (Argument.at (k) == _Values->at (l))
-					{
-					  Matches[l] = true;
+          // Check whether this value exists on the selected argument
+          if (Argument.at(k) == _Values->at(l))
+          {
+            Matches[l] = true;
 
-					  //cout << "Match!"<<endl;
-					}
-				  else
-					{
-					  //cout << "Do not match."<<endl;
-					}
-				}
-			}
+            // cout << "Match!"<<endl;
+          }
+          else
+          {
+            // cout << "Do not match."<<endl;
+          }
+        }
+      }
 
-		  Argument.clear ();
-		}
+      Argument.clear();
+    }
 
-	  _Verdict = true;
+    _Verdict = true;
 
-	  for (unsigned int m = 0; m < _Values->size (); m++)
-		{
-		  //cout << "Matches["<<m<<"] = "<<Matches[m]<<endl;
+    for (unsigned int m = 0; m < _Values->size(); m++)
+    {
+      // cout << "Matches["<<m<<"] = "<<Matches[m]<<endl;
 
-		  _Verdict = _Verdict && Matches[m];
-		}
+      _Verdict = _Verdict && Matches[m];
+    }
 
-	  //cout << "The Verdict was (0 = false, 1 = true) = "<<_Verdict<<endl;
+    // cout << "The Verdict was (0 = false, 1 = true) = "<<_Verdict<<endl;
 
-	  if (_Verdict == true)
-		{
-		  break;
-		}
-	}
+    if (_Verdict == true)
+    {
+      break;
+    }
+  }
 
   return Status;
 }
 
 // Convert the entire message object to an ostream
 // Converte o objeto mensagem inteiro para um ostream
-ostream &operator<< (ostream &os, Message &M)
+ostream& operator<<(ostream& os, Message& M)
 {
   for (unsigned int i = 0; i < M.NoCL; i++)
-	{
-	  os << *M.CommandLines[i];
-	}
+  {
+    os << *M.CommandLines[i];
+  }
 
   if (M.HasPayloadFlag == true && M.PayloadSize > 0)
-	{
-	  os << endl << "There is a payload of " << M.PayloadSize << " bytes" << endl;
+  {
+    os << endl
+       << "There is a payload of " << M.PayloadSize << " bytes" << endl;
 
-	  //os<<endl;
+    // os<<endl;
 
-	  //for (long long j=0;j<M.PayloadSize;j++)
-	  //	{
-	  //		os<<M.Payload[j];
-	  //	}
-	}
+    // for (long long j=0;j<M.PayloadSize;j++)
+    //	{
+    //		os<<M.Payload[j];
+    //	}
+  }
 
   return os;
 }
 
 // Convert the entire message object to a file
 // Converte o objeto mensagem inteiro para um arquivo
-fstream &operator<< (fstream &fs, Message &M)
+fstream& operator<<(fstream& fs, Message& M)
 {
 
-  char *buffer;
+  char* buffer;
   long length = 0;
 
   for (unsigned int i = 0; i < M.NoCL; i++)
-	{
-	  fs << *M.CommandLines[i];
-	}
+  {
+    fs << *M.CommandLines[i];
+  }
 
   if (M.HasPayloadFlag == 1)
-	{
-	  fs << endl; // Add a blank line to separate the payload from the header.
+  {
+    fs << endl; // Add a blank line to separate the payload from the header.
 
-	  M.PayloadFile.OpenInputFile ();
+    M.PayloadFile.OpenInputFile();
 
-	  // Read the number of characters in the Payload file.
-	  length = M.PayloadFile.tellg ();
+    // Read the number of characters in the Payload file.
+    length = M.PayloadFile.tellg();
 
-	  // Change the position to read from the beginning
-	  M.PayloadFile.seekg (0);
+    // Change the position to read from the beginning
+    M.PayloadFile.seekg(0);
 
-	  if (length > 0)
-		{
-		  buffer = new char[length];
+    if (length > 0)
+    {
+      buffer = new char[length];
 
-		  M.PayloadFile.read (buffer, length);
+      M.PayloadFile.read(buffer, length);
 
-		  fs.write (buffer, length);
+      fs.write(buffer, length);
 
-		  delete[] buffer;
-		}
+      delete[] buffer;
+    }
 
-	  M.PayloadFile.CloseFile ();
-	}
+    M.PayloadFile.CloseFile();
+  }
 
   return fs;
 }
 
 // Convert an stringstream to an objext
 // Converte um stringstream da mensagem para um objeto
-stringstream &operator>> (stringstream &ss, Message &M)
+stringstream& operator>>(stringstream& ss, Message& M)
 {
   unsigned int i = 0;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Option;
   string ng = "ng";
   long long int Position = 0;
   long int Size = 0;
   int length = 0;
-  char *buffer;
+  char* buffer;
 
-  ss.seekg (0);
+  ss.seekg(0);
 
   char Line[4096];
 
-  while (ss.getline (Line, sizeof (Line), '\n'))
-	{
-	  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-		{
-		  istringstream ins (Line);
+  while (ss.getline(Line, sizeof(Line), '\n'))
+  {
+    if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+    {
+      istringstream ins(Line);
 
-		  M.NewCommandLine (PCL);
+      M.NewCommandLine(PCL);
 
-		  ins >> *M.CommandLines[i];
+      ins >> *M.CommandLines[i];
 
-		  i++;
-		}
-	  else
-		{
-		  break;
-		}
-	}
+      i++;
+    }
+    else
+    {
+      break;
+    }
+  }
 
   // Stores current position
-  Position = ss.tellg ();
+  Position = ss.tellg();
 
   // Get the total size
-  Size = ss.str ().length ();
+  Size = ss.str().length();
 
-  //cout << "Size = " << Size << endl;
+  // cout << "Size = " << Size << endl;
 
   // Calculates the length of the payload portion
   length = Size - Position;
 
-  //cout << "length = " << length << endl;
+  // cout << "length = " << length << endl;
 
-  //cout << "Reading from position = " << Position << endl;
+  // cout << "Reading from position = " << Position << endl;
 
   if (length > 1 && Position > 0 && Size > 0)
-	{
-	  // There is a payload
-	  M.HasPayloadFlag = true;
+  {
+    // There is a payload
+    M.HasPayloadFlag = true;
 
-	  // Open the output file
-	  M.PayloadFile.OverwriteOutputFile ();
+    // Open the output file
+    M.PayloadFile.OverwriteOutputFile();
 
-	  // Change the position to write at the begining
-	  M.PayloadFile.seekp (0, ios::beg);
+    // Change the position to write at the begining
+    M.PayloadFile.seekp(0, ios::beg);
 
-	  buffer = new char[length];
+    buffer = new char[length];
 
-	  ss.read (buffer, length);
+    ss.read(buffer, length);
 
-	  M.PayloadFile.write (buffer, length);
+    M.PayloadFile.write(buffer, length);
 
-	  M.PayloadFile.CloseFile ();
+    M.PayloadFile.CloseFile();
 
-	  delete[] buffer;
-	}
+    delete[] buffer;
+  }
 
   return ss;
 }
 
 // Convert the message file to an objext
 // Converte o arquivo da mensagem para um objeto
-fstream &operator>> (fstream &fs, Message &M)
+fstream& operator>>(fstream& fs, Message& M)
 {
   unsigned int i = 0;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Option;
-  char *buffer;
+  char* buffer;
   int length = 0;
   long long int Position = 0;
   long int Size = 0;
   string ng = "ng";
 
-  fs.seekg (0);
+  fs.seekg(0);
 
   char Line[4096];
 
-  while (fs.getline (Line, sizeof (Line), '\n'))
-	{
-	  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-		{
-		  istringstream ins (Line);
+  while (fs.getline(Line, sizeof(Line), '\n'))
+  {
+    if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+    {
+      istringstream ins(Line);
 
-		  M.NewCommandLine (PCL);
+      M.NewCommandLine(PCL);
 
-		  ins >> *M.CommandLines[i];
+      ins >> *M.CommandLines[i];
 
-		  i++;
-		}
-	  else
-		{
-		  break;
-		}
-	}
+      i++;
+    }
+    else
+    {
+      break;
+    }
+  }
 
   // Stores current position
-  Position = fs.tellg ();
+  Position = fs.tellg();
 
   // Change position to the end
-  fs.seekg (ios::cur, ios::end);
+  fs.seekg(ios::cur, ios::end);
 
   // Get the total size
-  Size = fs.tellg ();
+  Size = fs.tellg();
 
   // Calculates the length of the payload portion
   length = Size - Position;
 
   // Returns the reading pointer to the correct position
-  fs.seekg (Position, ios::beg);
+  fs.seekg(Position, ios::beg);
 
   // cout << "Reading from position = " << Position << endl;
 
   if (length > 0 && Position > 0 && Size > 0)
-	{
-	  // There is a payload
-	  M.HasPayloadFlag = true;
+  {
+    // There is a payload
+    M.HasPayloadFlag = true;
 
-	  // Open the output file
-	  M.PayloadFile.OverwriteOutputFile ();
+    // Open the output file
+    M.PayloadFile.OverwriteOutputFile();
 
-	  // Change the position to write at the beginning
-	  M.PayloadFile.seekp (0, ios::beg);
+    // Change the position to write at the beginning
+    M.PayloadFile.seekp(0, ios::beg);
 
-	  buffer = new char[length];
+    buffer = new char[length];
 
-	  fs.read (buffer, length);
+    fs.read(buffer, length);
 
-	  M.PayloadFile.write (buffer, length);
+    M.PayloadFile.write(buffer, length);
 
-	  M.PayloadFile.CloseFile ();
+    M.PayloadFile.CloseFile();
 
-	  delete[] buffer;
-	}
+    delete[] buffer;
+  }
 
   return fs;
 }

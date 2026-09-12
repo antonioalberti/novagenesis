@@ -1,249 +1,282 @@
-Thank you for your interest in NovaGenesis. 
+# NovaGenesis
 
-# 1. What is NovaGenesis (NG)?
+NovaGenesis (NG) is a convergent information-processing, storage and exchange architecture developed at INATEL - Instituto Nacional de Telecomunicações, Santa Rita do Sapucaí, Minas Gerais, Brazil.
 
-NG is a convergent information processing, storage and exchanging architecture developed at INATEL - Instituto Nacional de Telecomunicações, Santa Rita do Sapucaí, MG, Brazil. Nowadays, NovaGenesis is kept by Information and Communications Technologies (ICT) Lab.
+The project currently continues at the University of Leeds under the leadership of [Prof. Antônio Marcos Alberti](https://eps.leeds.ac.uk/computing/staff/15735/dr-antonio-alberti). Its foundations were selected in 2008, first specified in 2011, and prototyped in C/C++ during 2012–2013.
 
-Its design started in 2008, when Prof. Antônio Marcos Alberti selected project requirements, design principles, guidelines and main foundations. Alberti also did its first specification in 2011 and coded this prototype in C/C++ in 2012-2013. The key idea of NovaGenesis can be summarized in the following statement: services (including protocol implementations) that organize themselves based on names, name bindings, and contracts to meet semantically rich goals and policies. Every component of the architecture is offered to others by publishing several name-bindings. NovaGenesis is also an event-driven simulator. NG implements a novel Internet stack which runs over raw sockets in Linux. There is no support for other operating systems. A security layer is also missing in this prototype. Please read our open source license in order to use it. All the source code is offered as it is. There is no guarantee of any kind. NG is a registered software.
+NovaGenesis is an event-driven Linux prototype in which services organize themselves through names, name bindings and contracts. Communication uses the NovaGenesis message model over raw Ethernet sockets. This prototype does not support other operating systems and does not provide a complete security layer. The software is provided as-is under its applicable open-source licences.
 
-More details about NG design can be found in the following paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. 
+Current project branch
 
-All the papers regarding NG are accessible here: https://www.researchgate.net/profile/Antonio-Alberti-2. 
+- Principal/default branch: `AIOPT3`
+- `master`: preserved as a secondary historical/compatibility branch
+- Current development path: NRNCS-based normal runtime
+- Standalone PSS, GIRS and HTS: deprecated; available only through an explicit legacy profile
 
-# 2. NovaGenesis folder structure
+Research references
 
-c-make-building - It is where the executable program appear after compilation with cmake or clion. We prepared a project in clion for compiling all the source code using a CMakeLists.txt file in NG root folder. 
+- NovaGenesis design paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643
+- Publications: https://www.researchgate.net/profile/Antonio-Alberti-2
 
-Common - It is the source code of NG main and unique library. NG employs a fractal coding approach. This library employs a GNU LESSER GENERAL PUBLIC LICENSE. Please read the Copying.txt file in this folder for more information. This library implements base objects for all the NG services, including messaging, events, queues, structural blocks, etc. The compilation of the source code in this folder generates the libCommon.a library, which is linked to other NG services.
+# 1. Architecture overview
 
-ContentApp - It is an important NG content distribution application that has two types of instances: sources and repositories. Files (e.g. .jpg photos) are published and subscribed by this service. It requires a NG core services to be running before it. This application employs NG publish/subscribe API to distribute contents among instance. The compilation of this folder results in a NG application called ContentApp. Its previous name was just App. Please, configure the App.ini file in the folder Scripts/Docker/Includes-ContentApp before running to customize default parameters. 
+NovaGenesis services exchange self-certifying names, bindings and messages. The main components are:
 
-Docker - This folder contains the folders and subsequent files required to prepare NG Docker container images. A CMakeLists.txt file is provided for each image, as well as a Dockerfile, a running script (Run.sh, which is the entrypoint for Docker a container) and a supervisord.conf, which contains Supervisord instructions to start NG services inside a container. Supervisord is required since more than one process runs in a container. This folder stores include files when running make-all-docker-images.sh.
+- `Common` — shared message, command-line, process, queue, gateway and naming infrastructure.
+- `PGCS` — proxy/gateway/controller service responsible for local IPC, bootstrapping, discovery and raw Ethernet forwarding.
+- `NRNCS` — normal domain service integrating the former PSS, GIRS and HTS functions. It stores domain bindings and cached payload files.
+- `ContentApp` — named-content publisher/subscriber with Source and Repository instances.
+- `NBTestApp` — name-binding publication and subscription workload for the NRNCS path.
+- `IoTTestApp` — contract-based client for externally maintained IoT/I4.0 devices.
 
-EPGS - It is a lightweight version of PGCS aimed to be embedded into IoT devices. EPGS has its own structure and compilation procedures that are not required to run NG in Linux OS. There is a way to run an emulated EPGS in Linux, but it is under development. More details are given here: https://ieeexplore.ieee.org/document/7970111
+The normal content path is:
 
-GIRS - It is a generic indirection resolution service (GIRS), which is nowadays integrated into NRNCS. GIRS selects which hash table service (HTS) will finally stores the name bindings and/or contents. GIRS selects the HTS service that is serving a certain name (or key) binary range, i.e. a subset of all possible binary numbers according to the number of bits of the key of a content or a name binding. Typically, a local domain can have several PSS, GIRS, and HTS instances. This approach has been replaced in 2021 by NRNCS. However, GIRS is an independent service that could be used together with PSS and HTS to replace the NRNCS in a distributed way. In other words, NRNCS integrates PSS, GIRS and HTS in a unique service. 
+```text
+ContentApp Source
+    -> local PGCS
+        -> raw Ethernet PGCS-to-PGCS transport
+            -> PGCS on the peer VM
+                -> NRNCS
+                    -> Repository ContentApp
+```
 
-HTS - HTS provides a mechanism to retrieve already published bindings and deliver them directly to an authorized subscriber. Every HTS instance contains a hash table data structure where
-name bindings are stored in a key/value(s) format. GIRS determines to where a certain ID range will be stored by a division remainder.
+NRNCS follows the inverted pub/sub model: published payloads are cached locally first; later subscription requests retrieve the cached content through the binding service. `NRInfoPayload01` must not forward payloads prematurely.
 
-IO - This folder is employed to store input files required to run NG services as well as to store services outputs. All the programs have a .ini file, which contains customizable features of these services. 
+# 2. Repository layout
 
-IoTTestApp - This application was developed to work as a client of IoT or I4.0 devices. It generates demands for sensors or actuators that embedd EPGS. All the operation is contract-based from embedded EPGS, PGCS and IoTTestApp. Therefore, it is useless to run IoTtestApp without an EPGS instance and a PGCS that represents it in NG core (like a digital twin). The PGCS must be configured in -pc mode for this IoT/I4.0 scenario. For more detail in this application, check https://ieeexplore.ieee.org/document/7970111.
+| Directory | Purpose |
+|---|---|
+| `Common/` | Shared C++ library and NovaGenesis message infrastructure |
+| `PGCS/` | Proxy/Gateway/Controller service |
+| `NRNCS/` | Normal Name Resolution and Network Cache Service |
+| `ContentApp/` | Named-content Source and Repository application |
+| `NBTestApp/` | NRNCS name-binding workload |
+| `IoTTestApp/` | External IoT/I4.0 contract client |
+| `PSS/`, `GIRS/`, `HTS/` | Deprecated standalone implementations, retained for legacy builds |
+| `Docker/` | Docker build contexts and service images |
+| `Scripts/AlpineVMs/` | Alpine VM build and process launch helpers |
+| `Scripts/Docker/` | Docker scenarios and log/stop helpers |
+| `Scripts/Simple/` | Local host scenarios, cleanup and validation helpers |
+| `IO/` | Runtime configuration and generated output; test evidence is kept outside Git |
+| `Docs/` | Architecture, decisions, diagnostics and historical records |
+| `Specs/` | SPEC-driven design and acceptance documents |
+| `Issues/` | Open and closed issue records |
+| `Plots/` | Plotting helpers for generated service statistics |
+| `Make/` | Alternative direct compilation scripts |
 
-Make - This folder contains some alternative C/C++ compilation scripts. It can used, but it is better to use cmake or clion with the CMakeLists.txt. To directly compile NG service use Compile.sh. Be sure to have GCC/G++ installed.
+# 3. Requirements
 
-	makedirs create the folders to store compiled code inside service source files' folders. 
-	
-	Therefore, run it first. 
+NovaGenesis currently targets Linux. For compilation and normal execution, install:
 
-NBTestApp - This application performs a NRNCS (unique process version) or PSS/GIRS/HTS (distributed version) testing by publishing thousands of name bindings and latter subscribing some of them randomly. This application was previously used in the paper: https://www.sciencedirect.com/science/article/abs/pii/S0167739X16302643. Its previous name was NBSimpleTestApp. Please, configure the App.ini file in the folder Scripts/Docker/Includes-NBTestApp before running to customize default parameters. 
+- CMake;
+- GCC/G++ with C++20 support;
+- POSIX shared memory and semaphore support;
+- raw Ethernet socket capability for inter-VM PGCS tests;
+- Python 3 for photo-generation helpers;
+- Docker, if using the Docker scenarios;
+- SSH and the configured key, if using the Alpine VM scenarios.
 
-NRNCS - It is 2021 service that integrates PSS, GIRS and HTS in a unique service. NRNCS offers a publish/subscribe API for NG services. It also implements a Hash Table data structure to store domain level name bindings and employs Linux file system to store associated content files (e.g. .jpg photos). Every NG domain must have at least one NRNCS instance, or alternatively, one PSS, GIRS and HTS.
+The Alpine guests use Alpine Linux with musl libc and GCC 15. The supported VM roles are documented in Section 7. The concrete VM numbers, hostnames, addresses and hardware addresses are deployment-specific and must be replaced in local launchers.
 
-Plots - Contais a script for plotting NG output files in GNU Plot. Some NG services generate statistics of their operations that can be plotted by a script like this. 
+# 4. Build profiles
 
-PGCS - It is aimed at message forwarding and routing over link layer. It provides: message  encapsulation  over  already  established  networking technologies,  such  as Ethernet, Wi-Fi, LoRa  or  Bluetooth;  a  proxy  service  to represent other NG services inside an OS; and bootstrapping functionalities  to  initialize  a  domain.  PGCS  enables  PSS,GIRS  and  HTS  discovery  during  initialization.  Since  an  address is a name that denotes the position to where an existence can inhabit or be attached, PGCS relays on HTS to store name-bindings among already established address formats (e.g. a physical world  or  an  emulated  MAC  Ethernet)  and/or  NG  addresses. PGCS also has an internal hash table in which it copies/locally stores  discovered  NBs.  Independently  of  the  address  formatused to connect PGCSes, inside NG all the communication is ID-oriented. Additionally to the gateway functionality, PGCS publishes  NBs  about  NG  services  inside  an  OS  to  other PGCSes in the same domain. PGCS can also represent physical things, acting as a digital twin. See more here: (PDF) Advancing NovaGenesis Architecture Towards Future Internet of Things. Available from: https://www.researchgate.net/publication/318279437_Advancing_NovaGenesis_Architecture_Towards_Future_Internet_of_Things [accessed Sep 25 2021].
+## 4.1 Normal profile
 
-PSS - By using PSS, other NG services or applications can expose its NBs to other services or discover how published names are related one another. Eventually, services can successively subscribe NBs to identify and locate other existences, storing these NBs in their local hash tables (every NG service also has a hash table), and routing/forwarding information based on them. The NB/content subscription model also employs transfer of digitally signed hash table keys. In 2021, PSS was integrated into NRNCS process.
+The normal profile is the default. It builds the recommended NRNCS path and does not create standalone PSS, GIRS or HTS executables.
 
-Scripts - This folder stores some new and old bash scripts to run NG. It has:
+From the repository root:
 
-	Docker - This folder is the newest way to run NG developed in 2021. A description o how to use such scripts to run NG is further provided in this document.
-	
-	Old releases - This folder contains scripts from older releases. These scripts will be probably useless for the majorituy of users.
-	
-	Python - Contains some scripts used in applications scenarios.
-	
-	Simple - This folder has some local host running scripts without Docker. These scripts could be usefull and will also be discussed bellow.
-	
-.git - Contains git realted files.
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug \
+  -DNG_ENABLE_LEGACY_STANDALONE=OFF
+cmake --build build -j"$(nproc)"
+```
 
-.idea - Contains clion related files.
+Expected normal executables include:
 
-CMakeLists - Contains instructions for clion or cmake. To compile NG without clion locally (i.e. you are not going to use Docker images to run) just open a terminal and go to the folder novagenesis. Then, run:
+```text
+build/PGCS
+build/NRNCS
+build/ContentApp
+build/NBTestApp
+build/IoTTestApp
+```
 
-	sudo cmake --build cmake-build-debug --target all           
-	
-For this approach of running, go to How to run NG in the host OS (Section 4) for further instructions. Or alternativally, create Docker images and run NG inside Docker containers. In this case, see How to run NG with Docker containers (Section 3). 
+`build/PSS`, `build/GIRS` and `build/HTS` must not be produced by the normal profile.
 
-Dockerfile - This Dockerfile is employed to create a ng-generic:latest container image. It includes and compiles all the NG services. Therefore, it is a generic approach without an specific running objective. This image has a larger overhead. If you don't need it for developing purposes, just comment the docker -build line in the make-all-images.sh script bellow. Otherwise, this image will be generated by default.
+## 4.2 Explicit legacy build
 
-make-all-docker-images.sh - Prepare all the NG docker container images automatically. At the end of the process, chech the images created with: $sudo docker images
+The deprecated standalone services can be compiled only by opting in explicitly:
 
-make-generic-docker-image.sh - This script builds the ng-generic Docker image only. 
+```bash
+cmake -S . -B build-legacy -DCMAKE_BUILD_TYPE=Debug \
+  -DNG_ENABLE_LEGACY_STANDALONE=ON
+cmake --build build-legacy -j"$(nproc)"
+```
 
-remove-all-docker-images.sh - Remove all NG Docker images created.
+The legacy build emits a deprecation warning. Legacy runtime selection is also explicit:
 
-.dockerignore - A file to avoid some problems when building Docker images. 
+```bash
+export NG_RUNTIME_PROFILE=legacy
+```
 
-.gitignore - A file to avoid git to keep some type of files and folders.
+Do not use the legacy profile as evidence for normal NRNCS operation. Functional legacy runtime tests are compatibility checks performed on demand.
 
+## 4.3 Direct compilation scripts
 
+`Make/compile.sh` and related scripts remain available for environments where the direct GCC build is useful. For Alpine VM deployments, prefer the profile-aware workflow in `Scripts/AlpineVMs/pull-and-build-vms.sh` and verify the resulting executables independently.
 
-# 3. How to run NG with Docker containers
+# 5. Runtime cleanup and local scenarios
 
+Before a new local or VM test, stop stale NovaGenesis processes and remove stale IPC resources:
 
+```bash
+bash Scripts/Simple/clean.sh
+```
 
-First of all, you need to generate the NG images. For this purpose, just run:
+Do not delete configuration files when only payload/cache data must be removed. Preserve test evidence outside the active runtime directories.
 
-	sudo sh make-all-docker-images.sh
+The local scripts include:
 
-Observe that you do not need to compile NG in the host OS to compile NovaGenesis inside the containers. 
+- `Scripts/Simple/run_PGCS.sh`
+- `Scripts/Simple/run_NRNCS.sh`
+- `Scripts/Simple/run_Repository.sh`
+- `Scripts/Simple/run_Source.sh`
+- `Scripts/Simple/run_IoTTestApp.sh`
+- `Scripts/Simple/stop_test.sh`
 
-These are separeted things. If you want to run NovaGenesis in your local host, without containers, go to Section 4.
+Inspect a launcher before using it. Confirm its executable path, configuration path and runtime profile; stale binaries and incorrect IO paths can produce misleading results.
 
-After running this scripts, you can check the created images with:
+# 6. Docker scenarios
 
-	sudo docker images
+Docker scenarios are available under `Scripts/Docker/`. The main scenario families are:
 
-The following images will be available:
+- `run-multiple-content-distribution-applications.sh` — multiple Source and Repository ContentApp instances;
+- `run-name-binding-resolution-application.sh` — NBTestApp/NRNCS name-binding workload;
+- `run-PGCS-NRNCS.sh` and related helpers — core service scenarios;
+- `run-PGCS-ContentApp-Source.sh` and `run-PGCS-ContentApp-Repository.sh` — content distribution components;
+- `run-PGCS-NBTestApp.sh` — binding workload;
+- `stop-*` and `log-*` scripts — teardown and evidence collection.
 
-	ng-generic:latest - This is a complete image if all services, but not prepared to run any demostration.
+Build or update images with the repository-level scripts only after inspecting their current arguments:
 
-	ng-nrncs:latest - This is a NovaGenesis core image. It includes two services: PGCS and a NRNCS. Since NRNCS is important to store evey name binding and content available in a Domain, you should run this image in all NG demonstration/example scenarios.
+```bash
+bash make-all-docker-images.sh
+```
 
-	ng-contentapp:latest - This image has the named-content distribution application for NG demo.
+The Docker path uses shared memory for intra-container IPC and raw Ethernet framing for PGCS communication. The NG wire protocol uses EtherType `0x1234`; HTTP, TCP and UDP are not substitutes for the NG data path.
 
-	ng-nbtestapp:latest - This image has the name bindings testing applicatio for NG demo.
+# 7. Alpine VM cross-process scenarios
 
-If you want to remove the NovaGenesis images, trun:
+The cross-process scenario uses two Alpine Linux guests and a separate control host. Use deployment-local names and addresses; the table below intentionally contains no site-specific network identity:
 
-	sudo sh remove-all-docker-images.sh
+| Role | Hostname | Address | Ethernet MAC |
+|---|---|---|---|---|
+| Repository guest | `<repository-host>` | `<repository-ip>` | `<repository-mac>` |
+| Source guest | `<source-host>` | `<source-ip>` | `<source-mac>` |
 
-Be sure to have stopped all running containers before doing this action.
+Each PGCS must receive the other guest's actual Ethernet MAC as its peer argument. Preserve the literal representation through SSH and launcher layers, including lowercase hexadecimal letters where the local parser requires them. Before testing, verify the actual values with `ip link show <interface>` or the equivalent platform tool. Never copy the example placeholders into a real deployment.
 
-After you have generated the images, you could now run the demonstrations/examples bellow.
+## 7.1 Build and deploy
 
-In this NG running option, NG programs run inside containers and use containers shared memory for Interprocess communication. Docker bridge is employed for PGCSes communication using raw Ethernet socket. No HTTP/TCP/UDP/IP is employed at all. Only NovaGenesis and Ethernet.
+From the control host, prepare a local ignored configuration from `Scripts/AlpineVMs/ng-vm.env.example`, fill in the two guest addresses/MACs and local repository path, then source it:
 
+```bash
+cp Scripts/AlpineVMs/ng-vm.env.example Scripts/AlpineVMs/ng-vm.env
+$EDITOR Scripts/AlpineVMs/ng-vm.env
+. Scripts/AlpineVMs/ng-vm.env
+```
 
+The profile-aware deployment helper is:
 
-# 3.1. Content Distribution
+```bash
+NG_BUILD_PROFILE=normal bash Scripts/AlpineVMs/pull-and-build-vms.sh
+```
 
-Go to the running folder:
+Use `NG_BUILD_PROFILE=legacy` only when explicitly testing the deprecated standalone profile.
 
-	cd /Scripts/Docker
+The guests must independently verify:
 
-Run the script:
+- the expected Git commit;
+- healthy Git objects;
+- executable format and nonzero size;
+- executable SHA-256 values;
+- the NRNCS cache marker (`strings NRNCS | grep 'cached payload'`).
 
-	sudo sh run-multiple-content-distribution-applications.sh $1 $2 $3 $4 $5
+## 7.2 Normal launch order
 
-$1 is the number of content repository apps
-$2 is the number of content source apps
-$3 paramenter is the amount of photos to be created in a Source
-$4 paramenter is the width of the photos to be created in a Source
-$5 paramenter is the height of the photos to be created in a Source
+Before every run:
 
-For instance, type:
+1. Stop and start both VMs cleanly.
+2. Run `Scripts/Simple/clean.sh` on both guests.
+3. Verify exactly one intended process per role.
+4. Start PGCS on both VMs with the peer MACs above.
+5. Wait for bidirectional PGCS peer registration.
+6. Start NRNCS on the Source guest and wait for operational/shared-memory discovery markers.
+7. Start Repository ContentApp on the Repository guest.
+8. Generate fresh unique JPEGs and start Source ContentApp on the Source guest.
 
-	sudo sh run-multiple-content-distribution-applications.sh 2 2 100 50 50
+The corresponding helpers are:
 
-This call creates two sources that will publish 100 .jpg photos with size 50 x 50 pixels to the two photo repositories. 
+```text
+Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh
+Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh
+Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh
+Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh
+Scripts/AlpineVMs/run_Source_on_Source_VM.sh
+```
 
-This demonstrates NG content distributed approach with NRNCS.
+## 7.3 Acceptance evidence
 
-If you want to collect what happened inside the containers just type:
+A photo-transfer run is accepted only when:
 
-	sudo sh  log-multiple-content-distribution-applications.sh $1 $2
+- Source, NRNCS and Repository contain the expected number of fresh JPEGs;
+- filenames match at all three locations;
+- programmatic SHA-256 maps satisfy `Source == NRNCS == Repository`;
+- there are no missing or extra files;
+- logs contain no unexplained `ERROR`, `ALARM` or `FATAL` entries;
+- the tested commit and configuration are recorded;
+- logs, manifests and hash comparisons are preserved in a durable evidence directory.
 
-$1 is the number of content repository apps
-$2 is the number of content source apps
+For a 100-photo gate, exactly 100 fresh JPEGs must be present and byte-exact at all three locations. File counts or textual delivery messages alone are not sufficient evidence.
 
-A banch of files will be created in this folder with results.
+For asymmetric discovery, inspect the actual frames on the hypervisor or host bridge before changing NovaGenesis code. Substitute the interface that carries traffic for `<bridge-interface>`:
 
-Check photo publishing (pub) and subscription (sub) to/from NRNCS, respectivelly.
+```bash
+tcpdump -eni <bridge-interface> ether proto 0x1234
+```
 
-It is also possible to check the logs of the programs in each container, the amount of content received, the network cache (NRNCS), delays, etc. 
+First verify that each transmitted Ethernet destination matches the peer VM MAC. A wrong destination is a test/deployment configuration error, not evidence of a NovaGenesis runtime defect.
 
-To stop the containers, type:
+After evidence collection, stop all NG processes and leave both test guests stopped unless another test is actively running.
 
-	sudo sh stop-multiple-content-distribution-applications.sh $1 $2
+# 8. Documentation and reproducibility
 
-You can also use Wireshark tool to check NovaGenesis packets using the docker0 (Docker Bridge) interface. Select eth.type == 0x1234 filter to reduce the log exclusively to NG packets. After contract establishment, you can se the photos frames passing in the Wireshark.
+The repository contains the durable technical record of the project:
 
-If you want to test NG transferring other files, for instance, video data chunks, just copy them to the container as indicated bellow: 
+- `Docs/ARCHITECTURE/` — architecture and the inverted pub/sub model;
+- `Docs/DECISIONS/` — implementation decisions, baselines, reviews and acceptance packets;
+- `Docs/DIAGNOSTICS/` — root-cause analyses and runtime diagnostics;
+- `Docs/HISTORICAL/` — historical attempts and evidence that must not be treated as the current baseline;
+- `Specs/` — SPEC-driven design, implementation scope and acceptance criteria;
+- `Issues/` — open and closed issue records;
+- `Scripts/AlpineVMs/` — reproducible multi-VM build and launch procedures;
+- `Scripts/Simple/` and `Scripts/Docker/` — local and containerized scenarios.
 
-	#Copy files to a source container instance named Source$1
-	docker cp/Downloads/. Source$1:/home/ng/workspace/novagenesis/IO/Source$1/
+Runtime evidence from the control host and Alpine guests is kept in external evidence directories and linked from the relevant task, SPEC or decision record. Evidence should include the tested commit, configuration, process logs, manifests and programmatic hash comparisons. Local VM paths, credentials, private addresses and temporary runtime state are deliberately not embedded in this public README.
 
-The Source$1 will detect the new files in its folder and start transferring to the existent Repository container(s).
- 
+The current operational baseline is the `AIOPT3` branch. The remote default branch is also `AIOPT3`; `master` is preserved as a secondary historical/compatibility branch.
 
-# 3.2. Name Binding Resolution
+# 9. Troubleshooting and limitations
 
-In this demonstration a large amount of name bindings is published by NBTestApp to the NRNCS. Name bindings are published in thousands per message. After some time, the cache is full of name bindings. Then, the application starts to subscribe one of them randomly. The demo finishes after 1440 subscriptions, closing the NBTestApp. 
+- If PGCS discovery is asymmetric, verify literal MAC arguments and capture EtherType `0x1234` on the bridge before inspecting application code.
+- If NRNCS is unknown, confirm PGCS and NRNCS readiness markers before starting ContentApp.
+- If files arrive with mismatching hashes, inspect cache state and filename reuse before attributing the issue to transport.
+- Always compare against a publish-time manifest; do not compare a received file against a mutable live Source directory.
+- `NG_RUNTIME_PROFILE=legacy` is not the normal deployment path.
+- The prototype is Linux-only and does not provide a complete security layer.
+- Historical Docker, local and standalone-service instructions may remain in `Docs/HISTORICAL`; they do not override the normal NRNCS policy documented here.
 
-Go to the running folder:
+# 10. Licence and historical material
 
-	cd /Scripts/Docker
-
-Run the script:
-
-	sudo sh run-name-binding-resolution-application.sh
-
-To access the results in the demonastration, type:
-
-	sudo sh log-name-binding-resolution-application.sh
-
-You can use this latter script every time you want to check what is going one in the containers. Novel results and log files versions are copied to this folder.
-
-To stop the containers, type:
-
-	sudo sh stop-name-binding-application.sh
-
-You can also use Wireshark tool to check NovaGenesis packets using the docker0 (Docker Bridge) interface. Select eth.type == 0x1234 filter to reduce the log exclusively to NG packets. You can see NBs publishing in the beginning of the demo. After the publication phase finishes, subscription starts. 
-
-
-
-
-# 4. How to run NG in the host OS
-
-In this option, NG programs run locally using host OS shared memory for Interprocess communication. No socket is required. 
-
-Before running, you should compile the code. First, create the directory:
-
-Go to the running folder:
-
-	cd workspace/novagenesis/
-
-	sudo mkdir cmake-build-debug
-	
-Then, generate the required cmake files. Please, verify you have cmake installed in your OS. 
-	
-	sudo cmake -B cmake-build-debug 
-
-Following, just go to /novagenesis folder and type the command bellow to compile NovaGenesis services:
-
-	sudo cmake --build cmake-build-debug --target all
-	
-Now, go to the running folder and prepare to run NovaGenesis:
-
-	/Scripts/Simple
-
-	sudo sh clean.sh
-
-This script is required to clean the POSIX semaphores from previous NG runnings.
-
-# 4.1. Content Distribution
-
-Now, run the NG services locally:
-
-	sudo sh Intra_OS_Content_Test_NRNCS.sh
-
-In this case, results will be placed locally in the /IO folder for each program.
-
-Another important thing in this running option, is that you will need to copy some .jpg photos (smaller than 33 Mbytes) to the /IO/Source1 folder to be transferred for the Repository1.
-
-This test never ends, so you need to close the programs when photos/files finished transferring from Source1 to Repository1.
-
-
-# 4.2. Name Binding Resolution
-
-Now, run the NG services locally:
-
-	sudo sh Intra_OS_NBTest.sh
-
-In this case, results will be placed locally in the /IO/NBTestApp folder.
-
-When the test finishes, the NBTestApp stops runnig by itself.
+Read the licence files included in the repository and in the `Common` library before redistribution or use. Historical source, scripts and documents are retained for reproducibility; active normal deployment follows the NRNCS profile and the current AIOPT3 branch.

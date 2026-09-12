@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Hash Table System
-	Object:		HTS
-	File:		HTS.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Hash Table System
+        Object:		HTS
+        File:		HTS.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,57 +33,54 @@
 #include "DHT.h"
 #endif
 
-HTS::HTS (string _LN, key_t _Key, string _Path) : Process (_LN, _Key, _Path)
+HTS::HTS(string _LN, key_t _Key, string _Path)
+    : Process(_LN, _Key, _Path)
 {
-  Block *PDHTB = 0;
+  Block* PDHTB = 0;
   string DHTLN = "DHT";
 
-  NewBlock (DHTLN, PDHTB);
+  NewBlock(DHTLN, PDHTB);
 
   // Run the base class GW
-  RunGateway ();
+  RunGateway();
 }
 
-HTS::~HTS ()
+HTS::~HTS()
 {
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int HTS::NewBlock (string _LN, Block *&_PB)
+int HTS::NewBlock(string _LN, Block*& _PB)
 {
   if (_LN == "DHT")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW = 0;
+    HT* PHT = 0;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index = 0;
+    unsigned int Index = 0;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  DHT *PDHT = new DHT (_LN, this, Index, PGW, PHT, GetPath ());
+    DHT* PDHT = new DHT(_LN, this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PDHT;
+    _PB = (Block*)PDHT;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
-
-
-
-

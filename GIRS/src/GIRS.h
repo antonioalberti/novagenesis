@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Generic Indirecteion Resolution System
-	Object:		GIRS
-	File:		GIRS.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Generic Indirecteion Resolution System
+        Object:		GIRS
+        File:		GIRS.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,23 +33,17 @@
 #define ERROR 1
 #define OK 0
 
-class GIRS : public Process {
- public:
-
+class GIRS : public Process
+{
+public:
   // Constructor
-  GIRS (string _LN, key_t _Key, string _Path);
+  GIRS(string _LN, key_t _Key, string _Path);
 
   // Destructor
-  ~GIRS ();
+  ~GIRS();
 
   // Allocate a new block based on a name and add a Block on Blocks container
-  int NewBlock (string _LN, Block *&_PB);
+  int NewBlock(string _LN, Block*& _PB);
 };
 
 #endif
-
-
-
-
-
-

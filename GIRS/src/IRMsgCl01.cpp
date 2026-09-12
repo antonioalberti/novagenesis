@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		IRMsgCl01
-	Object:		IRMsgCl01
-	File:		IRMsgCl01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		IRMsgCl01
+        Object:		IRMsgCl01
+        File:		IRMsgCl01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -39,18 +39,18 @@
 
 ////#define DEBUG
 
-IRMsgCl01::IRMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+IRMsgCl01::IRMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-IRMsgCl01::~IRMsgCl01 ()
+IRMsgCl01::~IRMsgCl01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -m --cl _Version [ < _LimitersSize string S_1 ... S_LimitersSize > < _SourcesSize string S_1 ... S_SourcesSize > < _DestinationsSize string S_1 ... S_Destinations > ]
-int
-IRMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int IRMsgCl01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   unsigned int NA = 0;
@@ -60,21 +60,21 @@ IRMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> 
   vector<string> StoreBindingsLimiters;
   vector<string> StoreBindingsSources;
   vector<string> StoreBindingsDestinations;
-  Message *StoreBindings = 0;
-  CommandLine *PCL;
+  Message* StoreBindings = 0;
+  CommandLine* PCL;
   string Offset = "                    ";
-  IR *PIR = 0;
-  Block *PHTB = 0;
+  IR* PIR = 0;
+  Block* PHTB = 0;
   string Key;
-  vector<string> *Values = new vector<string>;
+  vector<string>* Values = new vector<string>;
 
-  PIR = (IR *)PB;
+  PIR = (IR*)PB;
 
-  PHTB = (Block *)PIR->PHT;
+  PHTB = (Block*)PIR->PHT;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
@@ -83,7 +83,9 @@ IRMsgCl01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> 
 
 #ifdef DEBUG
 
-  PB->S << Offset << "(Done)" << endl << endl << endl;
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 

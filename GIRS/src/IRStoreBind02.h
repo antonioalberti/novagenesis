@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Indirection resolution block store binding action
-	Object:		IRStoreBind02
-	File:		IRStoreBind02.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.2
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Indirection resolution block store binding action
+        Object:		IRStoreBind02
+        File:		IRStoreBind02.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.2
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,27 +61,21 @@
 
 class Block;
 
-class IRStoreBind02 : public Action {
- public:
-
+class IRStoreBind02 : public Action
+{
+public:
   // Constructor
-  IRStoreBind02 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  IRStoreBind02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~IRStoreBind02 ();
+  virtual ~IRStoreBind02();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Function to select the proper HTS instance for a name binding
-  int SelectHTS (string _Key, int _NumberOfInstances, int &_Index);
+  int SelectHTS(string _Key, int _NumberOfInstances, int& _Index);
 };
 
 #endif
-
-
-
-
-
-

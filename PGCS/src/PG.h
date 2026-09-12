@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Proxy and Gateway for underlying resources
-	Object:		PG
-	File:		PG.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Proxy and Gateway for underlying resources
+        Object:		PG
+        File:		PG.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -28,12 +28,22 @@
 #ifndef _PG_H
 #define _PG_H
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
 #ifndef _BLOCK_H
 #include "Block.h"
 #endif
 
 #ifndef _GW_H
 #include "GW.h"
+#endif
+
+#ifndef __OUTPUTVARIABLE_H
+#include "OutputVariable.h"
 #endif
 
 #ifndef _HT_H
@@ -141,46 +151,33 @@
 
 using namespace std;
 
-struct TBuffer1 {
-  long long MessageSize;
-  char *TheMessage;
-};
-
-class PG : public Block {
- private:
-
-  // Gateway pointer
-  GW *PGW;
+class PG : public Block
+{
+public:
+  // Gateway pointer (public for NGAL access)
+  GW* PGW;
 
   // HT pointer
-  HT *PHT;
-
- public:
+  HT* PHT;
 
   // Define the maximum segment size on shared memory
   size_t MaxSegmentSize;
 
   // Constructor
-  PG (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path);
+  PG(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path);
 
   // Destructor
-  ~PG ();
+  ~PG();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary containers
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  // Stores the discovered PSS/NRNCS tuples
-  vector<Tuple *> PSTuples;
+  // Stores the discovered NRNCS tuples
+  vector<Tuple*> PSTuples;
 
   // Stores the informed peer PGCS tuples
-  vector<Tuple *> PGCSTuples;
-
-  // Container to temporarily store content received in a socket
-  map<std::string, vector<TBuffer1 *> > TemporaryBuffers1;
-
-  // Container to store status of a thread reading process. True=congested at source; false=not congested
-  bool BufferStatus[NUMBER_OF_THREADS_AT_SOCKET_DISPATCHER]; //
+  vector<Tuple*> PGCSTuples;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Main functions
@@ -189,43 +186,31 @@ class PG : public Block {
   // ************************** Adaptation Layer **************************
 
   // Get the host IPv4 or IPv6 address
-  void GetHostIPAddress (string _Stack, string _Interface, string &_Address);
+  void GetHostIPAddress(string _Stack, string _Interface, string& _Address);
 
   // Get the host MAC address
-  void GetHostRawAddress (string _Interface, string &_Address);
+  void GetHostRawAddress(string _Interface, string& _Address);
 
-  // Create an Raw socket
-  int CreateRawSocket (int &_SID);
+  // Create a Raw socket
+  int CreateRawSocket(int& _SID);
 
   // Send a message to another machine using a Raw socket
-  int SendToARawSocket (string _Interface, string _Identifier, unsigned int _Size, Message *M);
+  // Delegates to NGAL_SAR + NGAL_Transport_RAW internally
+  int SendToARawSocket(string _Interface, string _Identifier, unsigned int _Size, Message* M);
 
-  void SocketDispatcher3 ();
-
-  // Receive a message from another machine using a Raw socket. Multi thread implementation done in April 2021
-  void ReceiveFromARawSocketThread (unsigned int Index, unsigned int BlockSize);
-
-  // Receive a message from another machine using a Raw socket. Multi thread implementation done in April 2021
-  void FinishReceivingThread (unsigned int Index);
-
-  // Create a UDP socket
-  int CreateUDPSocket (string _Type, string _URI);
-
-  // Send a message to another machine using a UDP socket
-  int SendToAUDPSocket (string _Identifier, unsigned int _Size, Message *M);
-
-  // Receive a message from another machine using a UDP socket.
-  void ReceiveFromAUDPSocket ();
+  // Socket dispatcher — replaced by NGAL_Transport_RAW::ReceiveDispatcher
+  // Kept as a thin wrapper for backward compatibility
+  void SocketDispatcher3();
 
   // ********************************************************************** // Adaptation
 
-  // Finish the reception of a message
-  int WriteToSharedMemory3 (File *_PF, char *_MessageCharArray, long long _MessageSize);
+  // Finish the reception of a message via SHM (inter-process IPC)
+  int WriteToSharedMemory3(File* _PF, char* _MessageCharArray, long long _MessageSize);
 
-  long long int OpenHeaderMessageSizeField (unsigned char *_Buffer);
+  long long int OpenHeaderMessageSizeField(unsigned char* _Buffer);
 
   void
-  OpenHeaderSegmentationField (unsigned char *_Buffer, unsigned int &_MessageNumber, unsigned int &_SequenceNumber);
+  OpenHeaderSegmentationField(unsigned char* _Buffer, unsigned int& _MessageNumber, unsigned int& _SequenceNumber);
 
   // The message sequence number
   unsigned int Number_Of_Threads_At_Socket_Dispatcher;
@@ -244,13 +229,7 @@ class PG : public Block {
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
-
-  // Get an Action
-  int GetAction (string _LN, Action *&_PA);
-
-  // Delete an Action
-  int DeleteAction (string _LN);
+  void NewAction(const string _LN, Action*& _PA);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary
@@ -265,20 +244,17 @@ class PG : public Block {
   // Auxiliary variable to avoid publishing more than once PGCS basic bindings at NRNCS
   bool AlreadyPublishedBasicBindings;
 
-  // Wrapper function for ReceiveFromAnIPv4UDPSocket() thread
-  static void ReceiveFromAUDPSocketThreadWrapper (void *_PPG);
+  // Wrapper function for ReceiveDispatcher() thread (NGAL)
+  static void ReceiveDispatcherWrapper(void* _PPG);
 
   // Wrapper function for EthernetWiFiSocketDispatcher() thread
-  static void EthernetWiFiSocketDispatcherThreadWrapper (void *_PPG);
-
-  // Wrapper function for ReceiveFromARawSocketThread() thread
-  static void FinishReceivingThreadWrapper (void *_Param);
+  static void EthernetWiFiSocketDispatcherThreadWrapper(void* _PPG);
 
   // Get IP address function
-  void *get_in_addr (struct sockaddr *sa);
+  void* get_in_addr(struct sockaddr* sa);
 
   // Auxiliary to convert from 'e8' to 232
-  void Hex2Char (char *szHex, unsigned char &rch);
+  void Hex2Char(char* szHex, unsigned char& rch);
 
   // The name of my domain
   string MyDomainName;
@@ -297,19 +273,39 @@ class PG : public Block {
   // ------------------------------------------------------------------------------------------------------------------------------
   double DelayBeforeRunPeriodic;
   double DelayBetweenMessageEmissions;
-  double DelayBetweenHellos01; //TODO: Added in Feb. 2022 to optimize interval between hellos in LoRaWAN. It is defined as an integer number of DelayBeforeRunPeriodic parameter.
+  double DelayBetweenHellos01;
   double DelayBetweenHellos02;
   double DelayBetweenExpositions;
 
   // ------------------------------------------------------------------------------------------------------------------------------
-  // Statistic variables and functions
+  // Stress test counters and configuration
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  OutputVariable *rtt;            // IHC Round trip time (seconds)
-  OutputVariable *tsmidown;        // Delay since instantiation up to IHC message forwarding (seconds)
-  OutputVariable *tsmidown1;        // Delay since instantiation up to IHC message forwarding (seconds) for message type 1
+  bool StressEnabled;
+  double StressInterval;
+  std::atomic<unsigned long long> StressOffered{0};
+  std::atomic<unsigned long long> StressSent{0};
+  std::atomic<unsigned long long> StressReceived{0};
+  std::atomic<unsigned long long> StressDropped{0};
+  int StressDelayCount;
+  File StressStats;
+  OutputVariable* DelayStats;
+  OutputVariable* Loss;
 
-  void ResetStatistics ();
+  // Validate the same admission predicate as GW before calling its void API. (SPEC-028-B)
+  bool PushStressMessage(Message* M);
+
+private:
+  std::thread HeartbeatThread;
+  std::mutex HeartbeatMutex;
+  std::condition_variable HeartbeatCV;
+  bool HeartbeatStop = false; // Protected by HeartbeatMutex.
+  std::chrono::steady_clock::time_point HeartbeatStart;
+  std::string HeartbeatRun;
+  void HeartbeatLoop();
+  void EmitHeartbeat(const char* prefix);
+
+public:
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes
@@ -326,10 +322,13 @@ class PG : public Block {
   friend class PGRunPublishing01;
   friend class PGRunPeriodic01;
   friend class PGRunExposition01;
+  friend class PGRunStresstest01;
+  friend class PGStresstestPing01;
 };
 
-struct PARAMETERS1 {
-  PG *_PPG;
+struct PARAMETERS1
+{
+  PG* _PPG;
   unsigned int _Index;
 };
 

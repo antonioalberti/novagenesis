@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Gateway
-	Object:		GW
-	File:		GW.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Gateway
+        Object:		GW
+        File:		GW.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -100,16 +100,28 @@
 #include <semaphore.h>
 #endif
 
-#ifndef __OUTPUTVARIABLE_H
-#include "OutputVariable.h"
-#endif
-
 #ifndef __FCNTL_H
 #include <fcntl.h>
 #endif
 
 #ifndef __MAP_H
 #include <map>
+#endif
+
+#ifndef _CONDITION_VARIABLE
+#include <condition_variable>
+#endif
+
+#ifndef _MUTEX
+#include <mutex>
+#endif
+
+#ifndef _ATOMIC_H
+#include <atomic>
+#endif
+
+#ifndef _UTILITY_H
+#include <utility>
 #endif
 
 #ifndef _TINYTHREAD_H
@@ -122,34 +134,35 @@
 using namespace std;
 using namespace tthread;
 
-struct DereferenceCompareNode : public binary_function<const Message *, const Message *, bool> {
-  bool operator() (const Message *M1, const Message *M2) const
+struct DereferenceCompareNode : public binary_function<const Message*, const Message*, bool>
+{
+  bool operator()(const Message* M1, const Message* M2) const
   {
-	if (M1->GetTime () != M2->GetTime ())
-	  {
-		return M1->GetTime () > M2->GetTime ();
-	  }
-	else
-	  {
-		return M1->GetTag () > M2->GetTag ();
-	  }
+    if (M1->GetTime() != M2->GetTime())
+    {
+      return M1->GetTime() > M2->GetTime();
+    }
+    else
+    {
+      return M1->GetTag() > M2->GetTag();
+    }
   }
 };
 
 class HT;
 
-class GW : public Block {
- private:
-
+class GW : public Block
+{
+private:
   // ------------------------------------------------------------------------------------------------------------------------------
   // Priority queues
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Input message queue
-  priority_queue<Message *, vector<Message *>, DereferenceCompareNode> InputQueue;
+  priority_queue<Message*, vector<Message*>, DereferenceCompareNode> InputQueue;
 
   // Per key output message queue
-  map<std::string, priority_queue<Message *, vector<Message *>, DereferenceCompareNode> > OutputQueues;
+  map<std::string, priority_queue<Message*, vector<Message*>, DereferenceCompareNode>> OutputQueues;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary variables
@@ -162,30 +175,49 @@ class GW : public Block {
   unsigned int OutputQueueTag;
 
   // Stop gateway flag
-  bool StopGateway;
+  std::atomic<bool> StopGateway;
+
+  // Mutex and condition variable for input queue synchronization
+  std::mutex InputQueueMutex;
+  std::condition_variable InputQueueCV;
+
+  // ── NGAL: Network Receive Queue ──
+  // Thread-safe intermediate queue for raw char buffers from the NGAL
+  // ReceiveDispatcher. The GW thread drains this queue in Gateway().
+  // These are public so that NGAL_CS::DeliverToGateway() can access them.
+  // Marked as public: but contained within the private: section above.
+public:
+  std::queue<std::pair<char*, long long>> NetworkReceiveQueue;
+  std::mutex NetworkReceiveQueueMutex;
+  std::condition_variable NetworkReceiveQueueCV;
+  // ⚠ Access returns to private for everything below ⚠
+private:
+
+  // Mutex and condition variable for output queue synchronization
+  std::mutex OutputQueueMutex;
+  std::condition_variable OutputQueueCV;
+
+  // Flag to notify output thread of new messages
+  bool NewOutputMessage;
+
+  // Cached semaphores for shared memory IPC
+  std::map<std::string, sem_t*> CachedSemaphores;
 
   // Pointer to the HT block
-  HT *PHT;
+  HT* PHT;
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // OS Shared Memory IPC functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  int ReadFromSharedMemory3 ();
+  int ReadFromSharedMemory3();
 
   // Write to the shared memory
-  int WriteToSharedMemory3 (std::string OQS, Message *M);
+  int WriteToSharedMemory3(std::string OQS, Message* M);
 
-  // First attachment to learned shared memory
-  int ReturnIPCSHMID (key_t _Key, int &_shmid);
-
-  // Sent messages counter
-  unsigned long MessagesSent;
-
-  // Received messages counter
-  unsigned long MessagesReceived;
-
- public:
+public:
+  // First attachment to learned shared memory (public for PG access)
+  int ReturnIPCSHMID(key_t _Key, int& _shmid);
 
   // Define the maximum segment size on shared memory
   size_t MaxSegmentSize;
@@ -194,146 +226,72 @@ class GW : public Block {
   bool ScheduleStatusFlag;
 
   // Constructor
-  GW (string _LN, Process *_PP, unsigned int _Index, string _Path);
+  GW(string _LN, Process* _PP, unsigned int _Index, string _Path);
 
   // Destructor
-  ~GW ();
+  ~GW();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Core public functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Push a Message into the input message priority queue
-  void PushToInputQueue (Message *M);
+  void PushToInputQueue(Message* M);
 
   // Monitor IPC, read Messages from other processes and pushes to the InputQueue
   // Read Messages from the InputQueue and call the GW::Run(Message *M)
   // Read Messages from the OutputQueue and forward to other processes via IPC
-  void Gateway ();
+  void Gateway();
 
   // Push a Message into the output message priority queue. Only the GW can push messages at the output queue
-  void PushToOutputQueue (std::string OQS, Message *M);
+  void PushToOutputQueue(std::string OQS, Message* M);
 
   // Read a Message from output message priority queues. Only the GW can forward messages to shared memory instances
-  void ReadFromOutputQueue ();
+  void ReadFromOutputQueue();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
-  void SetStopGatewayFlag (bool _F);
+  void SetStopGatewayFlag(bool _F);
 
   // Get the values behind a key
-  int GetHTBindingValues (unsigned int _Category, string _Key, vector<string> *&_Values);
+  int GetHTBindingValues(unsigned int _Category, string _Key, vector<string>*& _Values);
 
   // Set a value behind a key
-  int StoreHTBindingValues (unsigned int _Category, string _Key, vector<string> *_Values);
+  int StoreHTBindingValues(unsigned int _Category, string _Key, vector<string>* _Values);
 
   // Wrapper function for ReadFromOutputQueue() thread
-  static void ReadFromOutputQueueThreadWrapper (void *_PGW);
+  static void ReadFromOutputQueueThreadWrapper(void* _PGW);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Delay parameters
-  // ------------------------------------------------------------------------------------------------------------------------------
+  // Delay parameters
   double DelayBeforeStatusIPC;
-
-  // Discrete timers
-  double DiscreteTime;
-  double PreviousDiscreteTime;
-
-  // ------------------------------------------------------------------------------------------------------------------------------
-  // Statistic variables and functions
-  // ------------------------------------------------------------------------------------------------------------------------------
-
-  // **************************************************
-  // All messages statistics
-  // **************************************************
-
-  // Input system
-  OutputVariable *twi;        // Waiting time (seconds/message)
-  OutputVariable *wi;        // Queue occupation (messages)
-  OutputVariable *tsi;        // Service time (seconds)
-  OutputVariable *si;        // Service occupation (messages)
-  OutputVariable *mii;        // Service rate (messages/second)
-  OutputVariable *ri;        // Service rate (bytes/second)
-  OutputVariable *li;        // Message length (bytes/message)
-
-  // Output system
-  OutputVariable *two;        // Waiting time (seconds/message)
-  OutputVariable *wo;        // Queue occupation (messages)
-  OutputVariable *tso;        // Service time (seconds)
-  OutputVariable *so;        // Service occupation (messages)
-  OutputVariable *mio;        // Service rate (messages/second)
-  OutputVariable *ro;        // Service rate (bytes/second)
-  OutputVariable *lo;        // Message length (bytes/message)
-
-  // Transit in the shared memory
-  OutputVariable *tshm;        // Service time (seconds/message)
-
-  // Shared memory
-  OutputVariable *tss;        // Service time (seconds/message)
-
-  // **************************************************
-  // Type 1 messages statistics
-  // **************************************************
-
-  // Input system
-  OutputVariable *twi1;        // Waiting time (seconds/message)
-  OutputVariable *wi1;        // Queue occupation (messages)
-  OutputVariable *tsi1;        // Service time (seconds)
-  OutputVariable *si1;        // Service occupation (messages)
-  OutputVariable *mii1;        // Service rate (messages/second)
-  OutputVariable *ri1;        // Service rate (bytes/second)
-  OutputVariable *li1;        // Message length (bytes/message)
-
-  // Output system
-  OutputVariable *two1;        // Waiting time (seconds/message)
-  OutputVariable *wo1;        // Queue occupation (messages)
-  OutputVariable *tso1;        // Service time (seconds)
-  OutputVariable *so1;        // Service occupation (messages)
-  OutputVariable *mio1;        // Service rate (messages/second)
-  OutputVariable *ro1;        // Service rate (bytes/second)
-  OutputVariable *lo1;        // Message length (bytes/message)
-
-  // Transit in the shared memory
-  OutputVariable *tshm1;        // Service time (seconds/message)
-
-  // Shared memory
-  OutputVariable *tss1;        // Service time (seconds/message)
-
-  void ResetStatistics ();
-
-  void SamplingBeforePushingToInputQueue (Message *PM1);
-  void SamplingAfterRemovingFromInputQueue (Message *PM1);
-  void SamplingBeforePushingToOutputQueue (Message *PM1);
-  void SamplingBeforeWritingToSHM (Message *PM1);
-  void SamplingAfterSHMService (Message *PM1);
-  void SamplingBeforeRun (Message *PM1);
-  void SamplingAfterRun (Message *PM1);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes
   // ------------------------------------------------------------------------------------------------------------------------------
   friend class GWMsgCl01;
   friend class GWRunInitialization01;
-  friend class GWHelloIPC01;
-  friend class GWSCNAck01;
-  friend class GWStatusS01;
-  friend class GWStatusSCNS01;
+  friend class GWHelloIPC02;
+  friend class GWRunHelloIPC02;
+  friend class GWExposition02;
   friend class Message;
+  friend class PG; // SPEC-028-B: heartbeat reads InputQueue depth under InputQueueMutex.
 };
 
 #endif

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Name binding testing application
-	Object:		App
-	File:		App.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Name binding testing application
+        Object:		App
+        File:		App.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,56 +33,54 @@
 #include "Core.h"
 #endif
 
-NBTestApp::NBTestApp (string _LN, key_t _Key, string _Path) : Process (_LN, _Key, _Path)
+NBTestApp::NBTestApp(string _LN, key_t _Key, string _Path)
+    : Process(_LN, _Key, _Path)
 {
-  Block *PCoreB = 0;
+  Block* PCoreB = 0;
   string CoreLN = "Core";
 
-  NewBlock (CoreLN, PCoreB);
+  NewBlock(CoreLN, PCoreB);
 
   // Run the base class GW
-  RunGateway ();
+  RunGateway();
 }
 
-NBTestApp::~NBTestApp ()
+NBTestApp::~NBTestApp()
 {
 }
 
 // Allocate a new block based on a name and add a Block on Blocks container
-int NBTestApp::NewBlock (string _LN, Block *&_PB)
+int NBTestApp::NewBlock(string _LN, Block*& _PB)
 {
   if (_LN == "Core")
-	{
-	  Block *PGWB = 0;
-	  Block *PHTB = 0;
-	  GW *PGW = 0;
-	  HT *PHT = 0;
-	  string GWLN = "GW";
-	  string HTLN = "HT";
+  {
+    Block* PGWB = 0;
+    Block* PHTB = 0;
+    GW* PGW = 0;
+    HT* PHT = 0;
+    string GWLN = "GW";
+    string HTLN = "HT";
 
-	  GetBlock (GWLN, PGWB);
+    GetBlock(GWLN, PGWB);
 
-	  PGW = (GW *)PGWB;
+    PGW = (GW*)PGWB;
 
-	  GetBlock (HTLN, PHTB);
+    GetBlock(HTLN, PHTB);
 
-	  PHT = (HT *)PHTB;
+    PHT = (HT*)PHTB;
 
-	  unsigned int Index = 0;
+    unsigned int Index = 0;
 
-	  Index = GetBlocksSize ();
+    Index = GetBlocksSize();
 
-	  Core *PCore = new Core (_LN, this, Index, PGW, PHT, GetPath ());
+    Core* PCore = new Core(_LN, this, Index, PGW, PHT, GetPath());
 
-	  _PB = (Block *)PCore;
+    _PB = (Block*)PCore;
 
-	  InsertBlock (_PB);
+    InsertBlock(_PB);
 
-	  return OK;
-	}
+    return OK;
+  }
 
   return ERROR;
 }
-
-
-

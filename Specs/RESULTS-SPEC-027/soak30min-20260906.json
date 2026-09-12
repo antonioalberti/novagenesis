@@ -1,0 +1,28 @@
+{
+  "test": "SPEC-027 Phase 1 \u2014 30-min soak at 500 msg/s (StressInterval=0.002, 2500 msgs/5s period, both PGCS)",
+  "date": "2026-09-06 18:52\u201319:22 UTC-ish (30 samples, 60s interval)",
+  "config": {
+    "vms": "101 repository guest + 102 source guest, upsized to 4 cores / 4GB (pre-authorized)",
+    "build": "commit 8a9d2bf (AMEND-3 fixes 1396c62 + DEBUG off), built on both VMs via pull-and-build",
+    "debug": "OFF (all noisy macros disabled)",
+    "core_dumps": "enabled, /root/cores/ (persistent), verified pattern set"
+  },
+  "result": "SURVIVED \u2014 all processes UP for the full 30 min",
+  "metrics": {
+    "cpu_time_src": "0s -> 1871s over 30 min (steady ~60s/min, i.e. ~1 core busy)",
+    "cpu_time_repo": "0s -> 1866s (symmetric)",
+    "rss": "2436KB -> 2564-2692KB (bounded; +~120-260KB drift over 30 min, no runaway growth)",
+    "log_volume": "/tmp/pgcs.log static at ~3.8-4.8KB (buffered stdout; DEBUG off)",
+    "tmpfs": "1.9G total, <20KB used \u2014 no exhaustion",
+    "core_dumps": "0",
+    "inventory": "3 procs (36) + 2 procs (61) intact at end"
+  },
+  "caveats": [
+    "PER ASTRA VERDICT (2026-09-06): status is IMPLEMENTED - Pending Test, NOT test sign-off. Evidence covers 30-min survival + bounded RSS only — NOT verified throughput, losslessness, or absence of stalls/livelock (bounded RSS does not exclude livelock).",
+    "'No stall' claim REMOVED per Astra; 'zero guard hits' recorded as UNVERIFIED (guards not independently observable without DEBUG).",
+    "Offered/completed counters NOT collected this run: StressTest_Stats.txt and loss/delay .dat files created but 0 bytes. Counter plumbing deferred to SPEC-028-B: minimal one flushed greppable stderr line every 10s (SPEC028_STATS offered/sent_ok/received/completed/dropped/guard_reject/outstanding), active with DEBUG off, race-safe cumulative counters, no histograms/frameworks.",
+    "This run used the OLD inline monitor (pre-hardened). Next soaks must use Scripts/AlpineVMs/soak-monitor.sh (commit b358abb).",
+    "Directed guard tests remain tracked debt (not waived): SPEC-028 item D. SSIDs race investigation takes priority over guard tests per Astra."
+  ],
+  "verdict": "Phase 1 = IMPLEMENTED — Pending Test (Astra-accepted with reduced rigor per user decision). 30-min stability + bounded memory demonstrated. Phase 2 branch (AMEND-1/2/5/6) approved to start now, separate branch, acceptance independent."
+}

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		HTStoreBind01
-	Object:		HTStoreBind01
-	File:		HTStoreBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		HTStoreBind01
+        Object:		HTStoreBind01
+        File:		HTStoreBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,24 +49,18 @@
 
 class Block;
 
-class HTStoreBind01 : public Action {
- public:
-
+class HTStoreBind01 : public Action
+{
+public:
   // Constructor
-  HTStoreBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  HTStoreBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~HTStoreBind01 ();
+  virtual ~HTStoreBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

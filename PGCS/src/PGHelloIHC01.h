@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Proxy/Gateway Interhost Communication Hello version 0.1
-	Object:		PGHelloIHC01
-	File:		PGHelloIHC01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Proxy/Gateway Interhost Communication Hello version 0.1
+        Object:		PGHelloIHC01
+        File:		PGHelloIHC01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,27 +49,21 @@
 
 class Block;
 
-class PGHelloIHC01 : public Action {
- public:
-
+class PGHelloIHC01 : public Action
+{
+public:
   // Constructor
-  PGHelloIHC01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PGHelloIHC01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PGHelloIHC01 ();
+  virtual ~PGHelloIHC01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Original scheduling of hello name bindings
-  int ScheduleStoreBindings ( string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack);
+  int ScheduleStoreBindings(string _Case, vector<string>& _ReceivedElements, string _PeerIdentifier, string _PeerStack);
 };
 
 #endif
-
-
-
-
-
-

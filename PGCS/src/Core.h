@@ -1,12 +1,12 @@
 /*
-	NovaGenesis
-	
-	Name:		Application's core
-	Object:		Core
-	File:		Core.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
+
+        Name:		Application's core
+        Object:		Core
+        File:		Core.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
     Copyright (C) 2021  Antonio Marcos Alberti
 
@@ -57,11 +57,11 @@
 #endif
 
 #ifndef _DOCUMENT_H
-#include "rapidjson/document.h"     // rapidjson's DOM-style API
+#include "rapidjson/document.h" // rapidjson's DOM-style API
 #endif
 
 #ifndef _WRITER_H
-#include "rapidjson/writer.h"        // for stringify JSON
+#include "rapidjson/writer.h" // for stringify JSON
 #endif
 
 #define ERROR 1
@@ -71,22 +71,21 @@ using namespace std;
 
 using namespace rapidjson;
 
-class Core : public Block {
- private:
-
+class Core : public Block
+{
+private:
   // Gateway pointer
-  GW *PGW;
+  GW* PGW;
 
   // HT pointer
-  HT *PHT;
+  HT* PHT;
 
- public:
-
-  // Auxiliary PSS/NRNCS tuples container
-  vector<Tuple *> PSTuples;
+public:
+  // Auxiliary NRNCS tuples container
+  vector<Tuple*> PSTuples;
 
   // Auxiliary peer tuples container
-  vector<Tuple *> PeerTuples;
+  vector<Tuple*> PeerTuples;
 
   // Store the hash of available content
   vector<string> Content;
@@ -98,10 +97,10 @@ class Core : public Block {
   vector<string> KeywordHashes;
 
   // Stores the category to be subscribed after a ng -notify -s command line among other things
-  vector<Subscription *> Subscriptions;
+  vector<Subscription*> Subscriptions;
 
   // Stores the ng -scn --seq and a timestamp for publishing messages
-  vector<Publication *> Publications;
+  vector<Publication*> Publications;
 
   // Stores the Keys successfully subscribed. Added during Carnival 2017
   vector<string> KeysOfReceivedPayloads;
@@ -126,42 +125,42 @@ class Core : public Block {
   File Debug;
 
   // Constructor
-  Core (string _LN, string _ULN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path);
+  Core(string _LN, string _ULN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path);
 
   // Destructor
-  ~Core ();
+  ~Core();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Subscription related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add a Subscription on Subscriptions container
-  void NewSubscription (Subscription *&_PS);
+  void NewSubscription(Subscription*& _PS);
 
   // Delete a Subscription
-  int DeleteSubscription (Subscription *_PS);
+  int DeleteSubscription(Subscription* _PS);
 
   // Allocate and add a Publication on Publications container
-  void NewPublication (Publication *&_PP);
+  void NewPublication(Publication*& _PP);
 
   // Get a Publication
-  int GetPublication (string _Key, Publication *&_PP);
+  int GetPublication(string _Key, Publication*& _PP);
 
   // Delete a Subscription
-  int DeletePublication (Publication *_PP);
+  int DeletePublication(Publication* _PP);
 
   // Delays
   double DelayBeforePublishingServiceOffer;
@@ -174,44 +173,43 @@ class Core : public Block {
   // ------------------------------------------------------------------------------------------------------------------------------
   // Statistic variables
   // ------------------------------------------------------------------------------------------------------------------------------
-  OutputVariable *pubrtt;
-  OutputVariable *subrtt;
-  OutputVariable *tsmiup1; // Delay since instantiation at arriving on PGCS up to the final -run --evaluate for message type 1 (seconds)
+  OutputVariable* pubrtt;
+  OutputVariable* subrtt;
+  OutputVariable* tsmiup1; // Delay since instantiation at arriving on PGCS up to the final -run --evaluate for message type 1 (seconds)
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary functions
   // ------------------------------------------------------------------------------------------------------------------------------
-  unsigned int GetSequenceNumber ();
+  unsigned int GetSequenceNumber();
 
   // Discover a 4-tuple inside a space defined the limiter: first step
   void
-  DiscoveryFirstStep (string _Limiter, vector<string> *_Cat2Keywords, vector<string> *_Cat9Keywords, vector<Message *> ScheduledMessages);
+  DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, vector<string>* _Cat9Keywords, vector<Message*> ScheduledMessages);
 
   // Discover a 4-tuple inside a space defined the limiter: second step
-  int
-  DiscoverySecondStep (string _Limiter, vector<string> *_Cat2Keywords, vector<string> *_Cat9Keywords, vector<Message *> ScheduledMessages);
+  int DiscoverySecondStep(string _Limiter, vector<string>* _Cat2Keywords, vector<string>* _Cat9Keywords, vector<Message*> ScheduledMessages);
 
-  int Exposition (string _Limiter, vector<Message *> ScheduledMessages);
+  int Exposition(string _Limiter, vector<Message*> ScheduledMessages);
 
   // Add a limiter on the ng -run --discovery command line
-  void NewLimiterCommandLineArgument (string _Limiter, CommandLine *&_PCL);
+  void NewLimiterCommandLineArgument(string _Limiter, CommandLine*& _PCL);
 
   // Add a pair <category, key> on the ng -run --x command line
-  void NewPairCommandLineArgument (unsigned int _Category, string _Key, CommandLine *&_PCL);
+  void NewPairCommandLineArgument(unsigned int _Category, string _Key, CommandLine*& _PCL);
 
   // Add a terna <category, key, value> on the ng -run --x command line
-  void NewTernaCommandLineArgument (unsigned int _Category, string _Key, string _Value, CommandLine *&_PCL);
+  void NewTernaCommandLineArgument(unsigned int _Category, string _Key, string _Value, CommandLine*& _PCL);
 
   // Get Index of a Peer Application Tuple
-  int GetPeerAppTupleIndex (string PID, unsigned int &_Index);
+  int GetPeerAppTupleIndex(string PID, unsigned int& _Index);
 
   // Get file content hash
-  int GetFileContentHash (string FileName, string &_SCN);
+  int GetFileContentHash(string FileName, string& _SCN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Functions to customize the application
   // ------------------------------------------------------------------------------------------------------------------------------
-  void SetKeywordsAndTheirHashes ();
+  void SetKeywordsAndTheirHashes();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Friend classes
@@ -237,9 +235,3 @@ class Core : public Block {
 };
 
 #endif
-
-
-
-
-
-

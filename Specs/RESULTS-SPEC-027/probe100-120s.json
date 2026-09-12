@@ -1,0 +1,13 @@
+{
+  "probe": "100msg/s-120s",
+  "deltas": {
+    "ss": 14500,
+    "rr": 15000,
+    "rs": 15000,
+    "sr": 15458
+  },
+  "loss_sr_pct": -3.45,
+  "loss_rs_pct": -3.05,
+  "rate_sr": 120.8,
+  "rate_rs": 125.0
+}

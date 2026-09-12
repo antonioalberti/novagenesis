@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		HTRunInitialization01
-	Object:		HTRunInitialization01
-	File:		HTRunInitialization01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		HTRunInitialization01
+        Object:		HTRunInitialization01
+        File:		HTRunInitialization01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,18 +33,22 @@
 #include "HT.h"
 #endif
 
-HTRunInitialization01::HTRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
+HTRunInitialization01::HTRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-HTRunInitialization01::~HTRunInitialization01 ()
+HTRunInitialization01::~HTRunInitialization01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --initialization 0.1
-int
-HTRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int HTRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
 
@@ -52,7 +56,7 @@ HTRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   string Key;
   string Value;
   vector<string> Values;
-  HT *PHT = 0;
+  HT* PHT = 0;
   string PID = "";
   string BID = "";
   string MyBlockIndexString = "";
@@ -62,198 +66,202 @@ HTRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   string Offset = "                    ";
   string HashBlockLegibleName;
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
   // ******************************************************
   // Calculate auxiliary variables and required input data
   // ******************************************************
 
-  PID = PB->PP->GetSelfCertifyingName ();
+  PID = PB->PP->GetSelfCertifyingName();
 
-  //cout << "MyProcessSCN = "<< MyProcessSCN << endl;
+  // cout << "MyProcessSCN = "<< MyProcessSCN << endl;
 
-  BID = PB->GetSelfCertifyingName ();
+  BID = PB->GetSelfCertifyingName();
 
-  //cout << "MyBlockSCN = "<< MyBlockSCN << endl;
+  // cout << "MyBlockSCN = "<< MyBlockSCN << endl;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns ("Process", ProcessLegibleNameSCN);
+  ProcessLegibleNameSCN = NameGenerator::GetInstance().GenerateFromString("Process");
 
-  //cout << "ProcessLegibleNameSCN = "<< ProcessLegibleNameSCN << endl;
+  // cout << "ProcessLegibleNameSCN = "<< ProcessLegibleNameSCN << endl;
 
   ss << Index;
 
-  MyBlockIndexString = ss.str ();
+  MyBlockIndexString = ss.str();
 
-  //cout << "MyBlockIndexString = "<< MyBlockIndexString << endl;
+  // cout << "MyBlockIndexString = "<< MyBlockIndexString << endl;
 
-  PHT = (HT *)PB;
+  PHT = (HT*)PB;
 
-  PB->GenerateSCNFromCharArrayBinaryPatterns (PB->GetLegibleName (), HashBlockLegibleName);
+  HashBlockLegibleName = NameGenerator::GetInstance().GenerateFromString(PB->GetLegibleName());
 
-  //PB->S << Offset <<  "(HashBlockLegibleName = " << HashBlockLegibleName << ")" <<endl;
+  // PB->S << Offset <<  "(HashBlockLegibleName = " << HashBlockLegibleName << ")" <<endl;
 
   if (PID != "" && BID != "" && ProcessLegibleNameSCN != "" && MyBlockIndexString != "" && PHT != 0)
-	{
-	  PB->S << Offset << "(Moving to operational state)" << endl;
+  {
+    PB->S << Offset << "(Moving to operational state)" << endl;
 
-	  // ******************************************************
-	  // Binding Hash("GW") to "GW"
-	  // ******************************************************
+    // ******************************************************
+    // Binding Hash("GW") to "GW"
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 1;
+    // Setting up the category
+    Category = 1;
 
-	  // Setting up the binding key
-	  Key = HashBlockLegibleName;
+    // Setting up the binding key
+    Key = HashBlockLegibleName;
 
-	  // Setting up the binding value
-	  Values.push_back ("HT");
+    // Setting up the binding value
+    Values.push_back("HT");
 
-	  // Creating the ng -sr --b 0.1 command line
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Creating the ng -sr --b 0.1 command line
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clearing the values container
-	  Values.clear ();
+    // Clearing the values container
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding Hash("HT") to BID
-	  // ******************************************************
+    // ******************************************************
+    // Binding Hash("HT") to BID
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 2;
+    // Setting up the category
+    Category = 2;
 
-	  // Setting up the binding key
-	  Key = HashBlockLegibleName;
+    // Setting up the binding key
+    Key = HashBlockLegibleName;
 
-	  // Setting up the binding value
-	  Values.push_back (BID);
+    // Setting up the binding value
+    Values.push_back(BID);
 
-	  // Creating the ng -sr --b 0.1 command line
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Creating the ng -sr --b 0.1 command line
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding BID to Hash("HT")
-	  // ******************************************************
+    // ******************************************************
+    // Binding BID to Hash("HT")
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 3;
+    // Setting up the category
+    Category = 3;
 
-	  // Setting up the binding key
-	  Key = BID;
+    // Setting up the binding key
+    Key = BID;
 
-	  // Setting up the binding value
-	  Values.push_back (HashBlockLegibleName);
+    // Setting up the binding value
+    Values.push_back(HashBlockLegibleName);
 
-	  // Creating the ng -sr --b 0.1 command line
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Creating the ng -sr --b 0.1 command line
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding BID to HT index on Blocks container
-	  // ******************************************************
+    // ******************************************************
+    // Binding BID to HT index on Blocks container
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 13;
+    // Setting up the category
+    Category = 13;
 
-	  // Setting up the binding key
-	  Key = BID;
+    // Setting up the binding key
+    Key = BID;
 
-	  // Setting up the value
-	  Values.push_back (MyBlockIndexString);
+    // Setting up the value
+    Values.push_back(MyBlockIndexString);
 
-	  // Store the binding
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Store the binding
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding Hash("Process") to "Process"
-	  // ******************************************************
+    // ******************************************************
+    // Binding Hash("Process") to "Process"
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 1;
+    // Setting up the category
+    Category = 1;
 
-	  // Setting up the binding key
-	  Key = ProcessLegibleNameSCN;
+    // Setting up the binding key
+    Key = ProcessLegibleNameSCN;
 
-	  // Setting up the value
-	  Values.push_back ("Process");
+    // Setting up the value
+    Values.push_back("Process");
 
-	  PHT->StoreBinding (Category, Key, &Values);
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  Values.clear ();
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding PID to Hash("Process")
-	  // ******************************************************
+    // ******************************************************
+    // Binding PID to Hash("Process")
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 3;
+    // Setting up the category
+    Category = 3;
 
-	  // Setting up the binding key
-	  Key = PID;
+    // Setting up the binding key
+    Key = PID;
 
-	  // Setting up the value
-	  Values.push_back (ProcessLegibleNameSCN);
+    // Setting up the value
+    Values.push_back(ProcessLegibleNameSCN);
 
-	  // Store the binding
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Store the binding
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding Hash("Process") to Process SCN
-	  // ******************************************************
+    // ******************************************************
+    // Binding Hash("Process") to Process SCN
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 2;
+    // Setting up the category
+    Category = 2;
 
-	  // Setting up the binding key
-	  Key = ProcessLegibleNameSCN;
+    // Setting up the binding key
+    Key = ProcessLegibleNameSCN;
 
-	  // Setting up the value
-	  Values.push_back (PID);
+    // Setting up the value
+    Values.push_back(PID);
 
-	  // Store the binding
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Store the binding
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  // ******************************************************
-	  // Binding PID to BID
-	  // ******************************************************
+    // ******************************************************
+    // Binding PID to BID
+    // ******************************************************
 
-	  // Setting up the category
-	  Category = 5;
+    // Setting up the category
+    Category = 5;
 
-	  // Setting up the binding key
-	  Key = PID;
+    // Setting up the binding key
+    Key = PID;
 
-	  // Setting up the value
-	  Values.push_back (BID);
+    // Setting up the value
+    Values.push_back(BID);
 
-	  // Store the binding
-	  PHT->StoreBinding (Category, Key, &Values);
+    // Store the binding
+    PHT->StoreBinding(Category, Key, &Values);
 
-	  // Clear the values
-	  Values.clear ();
+    // Clear the values
+    Values.clear();
 
-	  PB->State = "operational";
+    PB->State = "operational";
 
-	  PB->S << Offset << "(State: Operational)" << endl << endl << endl;
+    PB->S << Offset << "(State: Operational)" << endl
+          << endl
+          << endl;
 
-	  PB->S << Offset << "(Done)" << endl << endl << endl;
+    PB->S << Offset << "(Done)" << endl
+          << endl
+          << endl;
 
-	  Status = OK;
-	}
+    Status = OK;
+  }
 
   return Status;
 }

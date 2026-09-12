@@ -3,17 +3,23 @@ project(novagenesis)
 
 set(CMAKE_CXX_STANDARD 20)
 
+option(NG_ENABLE_LEGACY_STANDALONE
+       "Build deprecated standalone PSS, GIRS and HTS services"
+       OFF)
+
+if(NG_ENABLE_LEGACY_STANDALONE)
+    message(WARNING
+            "NG_ENABLE_LEGACY_STANDALONE=ON: PSS, GIRS and HTS are deprecated; use NRNCS")
+endif()
+
 include_directories(ContentApp/src)
 include_directories(Common/src)
 include_directories(Common/src/rapidjson)
 include_directories(Common/src/rapidjson/error)
 include_directories(Common/src/rapidjson/internal)
-include_directories(GIRS/src)
-include_directories(HTS/src)
 include_directories(IoTTestApp/src)
 include_directories(NBTestApp/src)
 include_directories(PGCS/src)
-include_directories(PSS/src)
 include_directories(NRNCS/src)
 
 add_library(Common
@@ -64,20 +70,16 @@ add_library(Common
         Common/src/File.h
         Common/src/GW.cpp
         Common/src/GW.h
-        Common/src/GWHelloIPC01.cpp
-        Common/src/GWHelloIPC01.h
+        Common/src/GWHelloIPC02.cpp
+        Common/src/GWHelloIPC02.h
         Common/src/GWMsgCl01.cpp
         Common/src/GWMsgCl01.h
         Common/src/GWRunInitialization01.cpp
         Common/src/GWRunInitialization01.h
-        Common/src/GWSCNAck01.cpp
-        Common/src/GWSCNAck01.h
-        Common/src/GWSCNSeq01.cpp
-        Common/src/GWSCNSeq01.h
-        Common/src/GWStatusS01.cpp
-        Common/src/GWStatusS01.h
-        Common/src/GWStatusSCNS01.cpp
-        Common/src/GWStatusSCNS01.h
+        Common/src/GWRunHelloIPC02.cpp
+        Common/src/GWRunHelloIPC02.h
+        Common/src/GWExposition02.cpp
+        Common/src/GWExposition02.h
         Common/src/HashMultimaps.h
         Common/src/HT.cpp
         Common/src/HT.h
@@ -114,6 +116,18 @@ add_library(Common
         Common/src/MessageReceiving.h
         Common/src/MurmurHash3.cpp
         Common/src/MurmurHash3.h
+        Common/src/MurmurHash3Strategy.cpp
+        Common/src/MurmurHash3Strategy.h
+        Common/src/NameGenerator.cpp
+        Common/src/NameGenerator.h
+        Common/src/NGAL_SAR.cpp
+        Common/src/NGAL_SAR.h
+        Common/src/NGAL_CS.cpp
+        Common/src/NGAL_CS.h
+        Common/src/NameStrategy.h
+        Common/src/DefaultNameStrategy.cpp
+        Common/src/DefaultNameStrategy.h
+        Common/src/HashFunction.h
         Common/src/OutputVariable.cpp
         Common/src/OutputVariable.h
         Common/src/Process.cpp
@@ -127,7 +141,8 @@ add_library(Common
         Common/src/tinythread.h
         Common/src/Tuple.h)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -p -pg -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
 
 add_executable(ContentApp
         ContentApp/src/ContentApp.cpp
@@ -174,6 +189,7 @@ add_executable(ContentApp
 
 target_link_libraries(ContentApp LINK_PRIVATE Common)
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(GIRS
         GIRS/src/execGIRS.cpp
         GIRS/src/GIRS.cpp
@@ -215,8 +231,11 @@ add_executable(GIRS
         GIRS/src/IRStoreBind02.cpp
         GIRS/src/IRStoreBind02.h)
 
+target_include_directories(GIRS PRIVATE GIRS/src)
 target_link_libraries(GIRS LINK_PRIVATE Common)
+endif()
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(HTS
         HTS/src/DHT.cpp
         HTS/src/DHT.h
@@ -232,7 +251,9 @@ add_executable(HTS
         HTS/src/HTS.cpp
         HTS/src/HTS.h)
 
+target_include_directories(HTS PRIVATE HTS/src)
 target_link_libraries(HTS LINK_PRIVATE Common)
+endif()
 
 add_executable(IoTTestApp
         IoTTestApp/src/Core.cpp
@@ -354,6 +375,8 @@ add_executable(PGCS
         PGCS/src/PGHelloIHC02.h
         PGCS/src/PGHelloIHC03.cpp
         PGCS/src/PGHelloIHC03.h
+        PGCS/src/NGAL_Transport_RAW.cpp
+        PGCS/src/NGAL_Transport_RAW.h
         PGCS/src/PGMsgCl01.cpp
         PGCS/src/PGMsgCl01.h
         PGCS/src/PGRunExposition01.cpp
@@ -369,10 +392,15 @@ add_executable(PGCS
         PGCS/src/PGRunPeriodic01.cpp
         PGCS/src/PGRunPeriodic01.h
         PGCS/src/PGRunPublishing01.cpp
-        PGCS/src/PGRunPublishing01.h)
+        PGCS/src/PGRunPublishing01.h
+        PGCS/src/PGRunStresstest01.cpp
+        PGCS/src/PGRunStresstest01.h
+        PGCS/src/PGStresstestPing01.cpp
+        PGCS/src/PGStresstestPing01.h)
 
 target_link_libraries(PGCS LINK_PRIVATE Common)
 
+if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(PSS
         PSS/src/execPSS.cpp
         PSS/src/PS.cpp
@@ -406,7 +434,9 @@ add_executable(PSS
         PSS/src/PSSubBind01.cpp
         PSS/src/PSSubBind01.h)
 
+target_include_directories(PSS PRIVATE PSS/src)
 target_link_libraries(PSS LINK_PRIVATE Common)
+endif()
 
 add_executable(NRNCS
         NRNCS/src/execNRNCS.cpp

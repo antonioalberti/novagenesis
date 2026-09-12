@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		IRMessageSeq01
-	Object:		IRMessageSeq01
-	File:		IRMessageSeq01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		IRMessageSeq01
+        Object:		IRMessageSeq01
+        File:		IRMessageSeq01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,30 +33,29 @@
 #include "IR.h"
 #endif
 
-IRMessageSeq01::IRMessageSeq01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+IRMessageSeq01::IRMessageSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-IRMessageSeq01::~IRMessageSeq01 ()
+IRMessageSeq01::~IRMessageSeq01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -message --seq _Version [ < 1 string _Seq > ]
-int
-IRMessageSeq01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int IRMessageSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
-  CommandLine *PTemp;
+  CommandLine* PTemp;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Copy the received command line to the InlineResponseMessage
-  InlineResponseMessage->NewCommandLine (_PCL, PTemp);
+  InlineResponseMessage->NewCommandLine(_PCL, PTemp);
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
-

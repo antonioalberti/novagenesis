@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		NRInfoPayload01
-	Object:		NRInfoPayload01
-	File:		NRInfoPayload01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		NRInfoPayload01
+        Object:		NRInfoPayload01
+        File:		NRInfoPayload01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,82 +33,143 @@
 #include "NR.h"
 #endif
 
-NRInfoPayload01::NRInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
+#ifndef _FILE_H
+#include "File.h"
+#endif
+
+#define DEBUG
+
+NRInfoPayload01::NRInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-NRInfoPayload01::~NRInfoPayload01 ()
+NRInfoPayload01::~NRInfoPayload01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -info --payload _Version [ < n string _ValuesSize string S_1 ... S_ValuesSize > ]
-int
-NRInfoPayload01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+//
+// NG inverted pub/sub model:
+//   This action does NOT forward the content. It ONLY caches the payload
+//   to disk in the NRNCS cache path. The actual delivery (ng -d --b) is
+//   triggered later when the subscriber sends ng -s --b and the HT serves
+//   the cached file via HTGetBind01 (category 18).
+int NRInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
   unsigned int NA = 0;
   vector<string> Values;
-  char *Payload = 0;
-  CommandLine *PCL = 0;
+  char* Payload = 0;
   long long Size = 0;
+  string CachePath;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+#ifdef DEBUG
+
+  PB->S << Offset << this->GetLegibleName() << endl;
+
+#endif
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of arguments
-	  if (NA == 1)
-		{
-		  // Get received command line argument
-		  if (_PCL->GetArgument (0, Values) == OK)
-			{
-			  if (Values.size () > 0)
-				{
-				  if (PB->State == "operational")
-					{
-					  // Get the payload size
-					  _ReceivedMessage->GetPayloadSize (Size);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of arguments
+    if (NA == 1)
+    {
+      // Get received command line argument
+      if (_PCL->GetArgument(0, Values) == OK)
+      {
+        if (Values.size() > 0)
+        {
+          if (PB->State == "operational")
+          {
+            // Get the payload size
+            _ReceivedMessage->GetPayloadSize(Size);
 
-					  if (Size > 0)
-						{
-						  // Get the pointer of the received message payload char array
-						  _ReceivedMessage->GetPayloadFromCharArray (Payload);
+            if (Size > 0)
+            {
+              // Get the pointer of the received message payload char array
+              _ReceivedMessage->GetPayloadFromCharArray(Payload);
 
-						  //PB->S <<"Plotting the message payload recovered by NRNCS"<<endl;
+              // Check for error
+              if (Payload != 0)
+              {
+                // ============================================================
+                // Cache the payload to disk in the NRNCS path.
+                // The HTGetBind01 (category 18) will read this file later
+                // when the subscriber's ng -s --b triggers a ng -g --b.
+                // ============================================================
 
-						  // Check for error
-						  if (Payload != 0)
-							{
-							  // Copy the payload from received message *Payload array to the new message
-							  InlineResponseMessage->SetPayloadFromCharArray (Payload, Size);
+                CachePath = PB->GetPath();
 
-							  // Copy the ng -info --payload to the new message
-							  InlineResponseMessage->NewCommandLine (_PCL, PCL);
+                // Check if file already exists (idempotent cache)
+                {
+                  File F;
+                  if (F.OpenInputFile(Values.at(0), CachePath, "BINARY") == OK)
+                  {
+                    // File already cached — skip
+                    F.CloseFile();
+                    Status = OK;
 
-							  // Change to 0.2 version
-							  PCL->Version = "0.1";
+#ifdef DEBUG
+                    PB->S << Offset << "(Cache hit: " << Values.at(0) << " already exists at " << CachePath << ")" << endl;
+#endif
 
-							  //PB->S <<"A new pub for the file "<<Values.at(0)<<" was received with size "<<Size<<" bytes"<<endl; // TODO: FIXP/Update - Added this line to follow files being published
-							}
-						  else
-							{
-							  PB->S << Offset << "(ERROR: Unable to copy the payload)" << endl;
-							}
-						}
-					  else
-						{
-						  PB->S << Offset << "(ERROR: The payload size is zero)" << endl;
-						}
-					}
-				}
-			}
-		}
-	}
+                    return Status;
+                  }
+                }
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+                _ReceivedMessage->SetPayloadFileName(Values.at(0));
+                _ReceivedMessage->SetPayloadFilePath(CachePath);
+                _ReceivedMessage->SetPayloadFileOption("BINARY");
+                _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
+
+                // SPEC-019: Log hash for traceability
+                {
+                  string PayloadHash;
+                  if (Payload != 0 && Size > 0)
+                  {
+                    PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(
+                        (const char*)Payload, Size);
+                  }
+                  PB->S << Offset << "(NRNCS cached payload: file=" << Values.at(0)
+                        << ", size=" << Size << " bytes, hash=" << PayloadHash << ")" << endl;
+                }
+
+#ifdef DEBUG
+                PB->S << Offset << "(Cached file: " << Values.at(0) << ", size=" << Size << " bytes, at " << CachePath << ")" << endl;
+#endif
+
+                Status = OK;
+              }
+              else
+              {
+                PB->S << Offset << "(ERROR: Unable to copy the payload)" << endl;
+              }
+            }
+            else
+            {
+              PB->S << Offset << "(ERROR: The payload size is zero)" << endl;
+            }
+          }
+        }
+      }
+    }
+  }
+
+#ifdef DEBUG
+
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
+
+#endif
 
   return Status;
 }
