@@ -82,6 +82,7 @@ Criar um runner bounded para testes multi-VM que controle explicitamente o ciclo
 ## 8. Evidência inicial
 
 - `Specs/RESULTS-SPEC-044/vm-101-102-100-photo-20260912.md`
+- `Specs/RESULTS-SPEC-046/pgcs-only-20260912.md`.
 - Commit publicado: `c71c191`.
 - PGCS VM101/VM102: exit 255 com `shmat/shmdt Invalid argument` após cleanup.
 - NRNCS/ContentApp Source/Repository: warnings equivalentes; Source launcher SIGTERM.
