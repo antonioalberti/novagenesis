@@ -2,7 +2,7 @@
 
 **Author:** Antonio Alberti / Hermes
 **Date:** 2026-09-12
-**Status:** Proposal
+**Status:** In Progress
 **Branch:** AIOPT3
 **Implementation commit:** —
 **Related:** SPEC-044-core-run-evaluate-invalid-pg-downcast.md, SPEC-041-gw-deadline-aware-wait.md
@@ -67,7 +67,7 @@ Explicitamente proibido:
 
 ## 5. Critérios de aceitação
 
-- [ ] Caminho de entrada e criação de subscriptions documentado a partir do código real.
+- [x] Caminho de entrada e criação de subscriptions documentado a partir do código real.
 - [ ] Interface E2E escolhida ou seam test-only justificado com evidence gap explícito.
 - [ ] Runner reproduz o baseline RED da SPEC-044 ou documenta por que o diagnóstico só é reproduzível no smoke completo.
 - [ ] Runner falha em timeout, cleanup incerto, identidade ausente, exit inesperado ou marcador ausente.
@@ -118,7 +118,23 @@ Explicitamente proibido:
 - `Specs/RESULTS-SPEC-044/preliminary-red-20260912.md`.
 - `Specs/RESULTS-SPEC-044/post-fix-20260912.md`.
 
-## 10. Estado da investigação
+## 10. Mapa confirmado da entrada funcional
+
+A partir do código real, a entrada do caller alvo é:
+
+```text
+CoreStatusS01::Run
+  recebe `-sr --b` com status `0`
+  agenda a mensagem recebida com `-run --evaluate`
+  CoreRunEvaluate01::Run
+    chama CheckSubscriptions(...)
+```
+
+A criação de subscriptions no `NBTestApp` ocorre em `NBTestApp/src/CoreRunSubscribe01.cpp::Run`, através de `NewSubscriptionCommandLine`, gerando `-s --bind` para as categorias 18, 2 e 9. A configuração histórica observada em `Scripts/Docker/Includes-NBTestApp/App.ini` define `DelayBeforeDiscovery 3`, `DelayBeforeRunPeriodic 38`, `NumberOfPublications 200000`, `NumberOfSubscriptions 1440`, `NumberOfMessagesPerBurst 200` e `NumberOfPubsPerMessage 250`.
+
+Este mapa demonstra a origem e o encadeamento do caller, mas não demonstra ainda a matriz funcional da SPEC-044. A interface E2E e os oráculos determinísticos continuam em investigação.
+
+## 11. Estado da investigação
 
 O caminho E2E candidato foi localizado, mas ainda não foi convertido em harness determinístico. Os scripts existentes usam terminais interactivos e delays fixos; isso não é suficiente como runner científico. A próxima etapa é extrair os comandos, substituir delays por gates observáveis, isolar IO/IPC e definir oráculos ligados à mesma subscription/publisher.
 
