@@ -50,29 +50,9 @@ echo "=== Setting up directories ==="
 mkdir -p "$NG_REPO_PATH/IO/logs"
 if [ "$VM_TYPE" = "source" ]; then
     mkdir -p "$NG_REPO_PATH/IO/Source1"
-    # Create startup script for source
-    cat > /root/start-ng.sh <<EOF
-#!/bin/ash
-cd $NG_REPO_PATH/cmake-build-debug
-./PGCS &
-./NRNCS &
-./ContentApp &
-echo "NovaGenesis Source started"
-EOF
 else
     mkdir -p "$NG_REPO_PATH/IO/Repository1"
-    # Create startup script for repo
-    cat > /root/start-ng.sh <<EOF
-#!/bin/ash
-cd $NG_REPO_PATH/cmake-build-debug
-./PGCS &
-./ContentApp &
-echo "NovaGenesis Repository started"
-EOF
 fi
 
-chmod +x /root/start-ng.sh
-
 echo "=== Setup complete ==="
-echo "To start: /root/start-ng.sh"
-echo "To stop: ash /mnt/stop-ng.sh"
+echo "Start the AIOPT3 scenario from the control host using Scripts/AlpineVMs/run_*.sh."

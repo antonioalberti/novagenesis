@@ -74,7 +74,7 @@ tthread::thread t1(&CLI::PromptThreadWrapper,PCLI);  // ← FIXED
 | **E1** | Aplicar patch: `thread` → `tthread::thread` | Process.cpp:1031 |
 | **E2** | Recompilar PGCS + NRNCS + ContentApp na VM Source | `make -j2` na Source VM |
 | **E3** | Recompilar PGCS + ContentApp na VM Repo | `make -j2` na Repo VM |
-| **E4** | Executar cenário de teste | start-ng-source.sh + start-ng-repo.sh |
+| **E4** | Executar cenário de teste | `run_PGCS_on_Source_VM.sh`, `run_PGCS_on_Repo_VM.sh`, `run_NRNCS_on_Source_VM.sh`, `run_Repository_on_Repo_VM.sh`, `run_Source_on_Source_VM.sh` |
 | **E5** | Verificar logs | PGCS.log, NRNCS.log, ContentApp.log |
 | **E6** | Repetir no Docker se necessário | docker build + docker run |
 

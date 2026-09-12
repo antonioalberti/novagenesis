@@ -34,16 +34,6 @@ make -j$(nproc)
 # Create IO directories
 mkdir -p "$NG_REPO_PATH/IO/Repository1" "$NG_REPO_PATH/IO/logs"
 
-# Create startup script for Repository VM
-cat > /root/start-ng-repo.sh <<EOF
-#!/bin/ash
-cd $NG_REPO_PATH/cmake-build-debug
-./PGCS &
-./ContentApp &
-echo "NovaGenesis Repository processes started"
-EOF
-chmod +x /root/start-ng-repo.sh
-
 # Make network interface persistent - STATIC IP
 cat > /etc/network/interfaces <<'EOF'
 auto lo
@@ -60,4 +50,4 @@ EOF
 rc-update add networking boot
 
 echo "=== Setup complete ==="
-echo "To start NovaGenesis: /root/start-ng-repo.sh"
+echo "Setup complete. Start the AIOPT3 scenario from the control host using Scripts/AlpineVMs/run_*.sh."

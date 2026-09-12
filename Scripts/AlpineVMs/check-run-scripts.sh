@@ -3,7 +3,8 @@
 # Run this script after any edits to verify script syntax
 
 ERRORS=0
-DIR=<workspace-root>/novagenesis/Scripts/AlpineVMs
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+DIR="$SCRIPT_DIR"
 
 echo "=== Syntax check for all run_ scripts ==="
 for script in run_PGCS_on_Source_VM.sh run_PGCS_on_Repo_VM.sh \

@@ -32,13 +32,13 @@ Novos scripts em `Scripts/AlpineVMs/`:
 | `run_NRNCS_on_Source_VM.sh` | NRNCS | 102 Source (<source-guest-ip>) |
 | `run_Source_on_Source_VM.sh` | ContentApp Source | 102 Source (<source-guest-ip>) |
 | `run_Repository_on_Repo_VM.sh` | ContentApp Repository | 101 Repo (<repository-guest-ip>) |
-| `README-ssh-run.md` | Documentação | — |
+| `README.md` §§ 7.1–7.3 | Documentação | — |
 
 ### OUT (DO NOT TOUCH)
 
 - Todos os scripts existentes em `Scripts/Simple/run_*.sh` — permanecem intactos
-- Todos os scripts existentes em `Scripts/AlpineVMs/start-ng-*.sh` — permanecem intactos
-- `Scripts/AlpineVMs/README.md` — não alterar (criar ficheiro separado `README-ssh-run.md`)
+- Os antigos wrappers `start-ng-*.sh` e `stop-ng.sh` foram removidos pela NG-046; o setup não os gera mais
+- `README.md` §§ 7.1–7.3 — documentação operacional canónica da branch AIOPT3
 - Código fonte C++ do NovaGenesis (PGCS, NRNCS, ContentApp, Common, GW) — NENHUMA alteração
 - CMakeLists.txt, Make/compile-*.sh — NENHUMA alteração
 - IO directories e ficheiros de configuração — NENHUMA alteração
@@ -46,7 +46,7 @@ Novos scripts em `Scripts/AlpineVMs/`:
 
 ### MINIMAL TOUCH
 
-- **Scripts/AlpineVMs/stop-ng.sh:** Pode ser estendido para aceitar `--ssh` (mata processos via SSH em vez de local) — baixa prioridade, apenas se necessário
+- O controlo de paragem fica a cargo dos terminais `run_*.sh` e de PIDs verificados; não há wrapper global de `killall` no fluxo AIOPT3
 
 ---
 
@@ -54,7 +54,7 @@ Novos scripts em `Scripts/AlpineVMs/`:
 
 | Fact | Detail |
 |------|--------|
-| **PGCS deterministic mode** | `./PGCS <Path> <Port> <Role> -p Ethernet <Peer_Role> <Interface> <Peer_MAC> <MTU>` — verificado em `Scripts/Simple/run_PGCS.sh:31` e `Scripts/AlpineVMs/start-ng-source.sh:24` |
+| **PGCS deterministic mode** | `./PGCS <Path> <Port> <Role> -p Ethernet <Peer_Role> <Interface> <Peer_MAC> <MTU>` — verificado nos scripts `run_PGCS_on_Source_VM.sh` e `run_PGCS_on_Repo_VM.sh` |
 | **Source VM MAC** | `<repository-peer-mac>` (eth0) — verificado `ip addr` 2026-06-26 |
 | **Repo VM MAC** | `<source-peer-mac>` (eth0) — verificado `ip addr` 2026-06-26 |
 | **Source VM IP** | `<source-guest-ip>` — verificado |
@@ -206,7 +206,7 @@ ssh -t -i ${SSH_KEY} root@${VM_IP} \
 
 Similar to Source but on repository guest, Repository role, no photo generation.
 
-### 5.6 `README-ssh-run.md`
+### 5.6 Documentação operacional no README raiz
 
 Documentation covering:
 - Pré-requisitos (VMs ligadas, SSH key)
@@ -252,9 +252,9 @@ ssh -i ~/.ssh/<operator-ssh-key> root@<repository-guest-ip> "cd <guest-repositor
 
 **Done when:** Script escrito e syntax-checked.
 
-### Etapa E6: Criar `README-ssh-run.md`
+### Etapa E6: Documentar o fluxo no README raiz
 
-**Done when:** Documento em `Scripts/AlpineVMs/README-ssh-run.md` com instruções completas.
+**Done when:** `README.md` §§ 7.1–7.3 contém pré-requisitos, ordem, uso dos scripts e evidência de aceitação.
 
 ### Etapa E7: Smoke test E2E (utilizador executa)
 
@@ -325,5 +325,5 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 - [ ] `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh` — executa NRNCS na Source VM via SSH, foreground
 - [ ] `Scripts/AlpineVMs/run_Source_on_Source_VM.sh` — gera fotos + ContentApp Source via SSH
 - [ ] `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh` — ContentApp Repository via SSH
-- [ ] `Scripts/AlpineVMs/README-ssh-run.md` documenta ordem, pré-requisitos
+- [x] `README.md` §§ 7.1–7.3 documenta ordem, pré-requisitos e evidência
 - [ ] Smoke test E2E: utilizador consegue abrir 5 terminais, arrancar tudo, ver fotos a serem publicadas

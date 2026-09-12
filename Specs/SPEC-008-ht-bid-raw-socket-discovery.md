@@ -130,7 +130,7 @@ A intersecção faz `BottomUpBIDs[i] == TopDownBIDs[j]` (string equality). Cat[5
 | **E1** | Adicionar log temporário em `HTStoreBind01::Run()`: imprimir Category, Key e Values de cada binding armazenada | HTStoreBind01.cpp |
 | **E2** | Adicionar log temporário em `ScheduleStoreBindings`: imprimir `_ReceivedElements.at(5)` (HT_BID recebido) | PGHelloIHC01.cpp |
 | **E3** | Compilar (g++ -fsyntax-only para verificação, depois compilar nas VMs) | Make/compile-parallel.sh |
-| **E4** | Executar cenário 1core-1repo-1source nas VMs Alpine 101/102 | Scripts/AlpineVMs/start-ng-*.sh |
+| **E4** | Executar cenário 1core-1repo-1source nas VMs Alpine 101/102 | `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`, `run_PGCS_on_Repo_VM.sh`, `run_NRNCS_on_Source_VM.sh`, `run_Repository_on_Repo_VM.sh`, `run_Source_on_Source_VM.sh` |
 | **E5** | Analisar logs: confirmar se as bindings chegam ao HT, se o PID está correcto, se o HT_BID não é vazio | IO/logs/*.log |
 | **E6** | Com base nos logs, identificar qual hipótese (H1-H5) é a correcta | — |
 | **E7** | Escrever a correcção específica e testar | — |
