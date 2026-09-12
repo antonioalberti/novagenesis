@@ -102,6 +102,7 @@ Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture,
 - `/tmp/spec044-pgcs-sanitizer-postfix.log` — smoke pós-correção; timeout controlado, Core/Gateway alcançados, diagnóstico alvo ausente e ASan errors = 0.
 - `Specs/RESULTS-SPEC-044/preliminary-red-20260912.md` — baseline RED e análise de ownership.
 - `Specs/RESULTS-SPEC-044/post-fix-20260912.md` — qualificação pós-correção e hashes.
+- `Specs/RESULTS-SPEC-044/vm-101-102-100-photo-20260912.md` — runtime multi-VM normal-path no commit rebuilt; não substitui a matriz de subscriptions.
 - SPEC relacionada: `Specs/SPEC-041-gw-deadline-aware-wait.md`.
 
 ## 10. Estado
