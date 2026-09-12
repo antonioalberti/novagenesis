@@ -412,17 +412,10 @@ int CoreRunEvaluate01::CheckSubscriptions(vector<Message*>& _ScheduledMessages, 
   string Offset = "                    ";
   string Offset1 = "                              ";
   Core* PCore = 0;
-  PGCS* PPGCS = 0;
-  unsigned int Index;
+  unsigned int Index = 0;
   Subscription* PS = 0;
 
   PCore = (Core*)PB;
-
-  PPGCS = (PGCS*)PB->PP;
-
-  PG* PPGB = 0;
-
-  PPGB = (PG*)PB;
 
   PB->S << Offset << "(4. Check subscriptions)" << endl;
 
@@ -440,62 +433,74 @@ int CoreRunEvaluate01::CheckSubscriptions(vector<Message*>& _ScheduledMessages, 
 
       PB->S << Offset1 << "(Subscription status is " << PS->Status << ")" << endl;
 
-      if (PCore->GetPeerAppTupleIndex(PS->Publisher.Values[2], Index) != OK)
+      bool PeerResolved = false;
+      if (PCore->GetPeerAppTupleIndex(PS->Publisher.Values[2], Index) == OK)
+      {
+        PeerResolved = true;
+      }
+      else
       {
         PB->S << Offset1 << "(Warning: The publisher is unknown)" << endl;
 
-        // **********************************************************************************
-        //
-        // Check if this source was already discovered as a candidate peer
-        // (This code need to be improved to only accept peers that fit on keywords)
-        //
-        // **********************************************************************************
-
-        bool StoreFlag = true;
-
-        // Loop over the already stored peer tuples
-        for (unsigned int h = 0; h < PPGB->PGCSTuples.size(); h++)
+        // Check the sibling PG block for an already informed PGCS publisher.
+        Block* PGBlock = 0;
+        PG* PPGB = 0;
+        if (PB->PP->GetBlock("PG", PGBlock) != OK || PGBlock == 0 ||
+            (PPGB = dynamic_cast<PG*>(PGBlock)) == 0)
         {
-          // Is the EPGS already stored?
-          if (PS->Publisher.Values.at(2) == PPGB->PGCSTuples[h]->Values[2])
-          {
-            StoreFlag = false;
-          }
-          else
-          {
-            PB->S << Offset << "(The candidate EPGS is already stored)" << endl;
-          }
-        }
-
-        if (StoreFlag == true && PS->Publisher.Values.at(3) == "NULL")
-        {
-          Tuple* PPeer = new Tuple;
-
-          PPeer->Values.push_back(PS->Publisher.Values.at(0));
-          PPeer->Values.push_back(PS->Publisher.Values.at(1));
-          PPeer->Values.push_back(PS->Publisher.Values.at(2));
-          PPeer->Values.push_back(PS->Publisher.Values.at(3));
-
-          // Store the learned tuple on the peer app tuples
-          PCore->PeerTuples.push_back(PPeer);
-
-          PPeer->LN = "EPGS";
-
-          Index = PCore->PeerTuples.size() - 1;
-
-          PPeer->ULN = PB->IntToString(Index);
-
-          PCore->DelayBeforeRunPeriodic = 60;
-
-          PCore->RunExpose = false;
-
-          // TODO: Here, SLA clause verification should be added in future
-          PB->S << Offset << "(Registered the EPGS application as a peer with index " << Index << ", since a contract was received.)" << endl;
+          PB->S << Offset1 << "(ERROR: The sibling PG block is unavailable or has an unexpected type)" << endl;
         }
         else
         {
-          PB->S << Offset << "(The PGCS is already aware of this peer)" << endl;
+          bool StoreFlag = true;
+
+          // Loop over the already stored peer PGCS tuples.
+          for (unsigned int h = 0; h < PPGB->PGCSTuples.size(); h++)
+          {
+            if (PS->Publisher.Values.at(2) == PPGB->PGCSTuples[h]->Values[2])
+            {
+              StoreFlag = false;
+              break;
+            }
+          }
+
+          if (StoreFlag == true && PS->Publisher.Values.at(3) == "NULL")
+          {
+            Tuple* PPeer = new Tuple;
+
+            PPeer->Values.push_back(PS->Publisher.Values.at(0));
+            PPeer->Values.push_back(PS->Publisher.Values.at(1));
+            PPeer->Values.push_back(PS->Publisher.Values.at(2));
+            PPeer->Values.push_back(PS->Publisher.Values.at(3));
+
+            // Store the learned tuple on the peer app tuples.
+            PCore->PeerTuples.push_back(PPeer);
+
+            PPeer->LN = "EPGS";
+            Index = PCore->PeerTuples.size() - 1;
+            PPeer->ULN = PB->IntToString(Index);
+            PCore->DelayBeforeRunPeriodic = 60;
+            PCore->RunExpose = false;
+            PeerResolved = true;
+
+            PB->S << Offset << "(Registered the EPGS application as a peer with index " << Index << ", since a contract was received.)" << endl;
+          }
+          else
+          {
+            PB->S << Offset << "(The PGCS is already aware of this peer or its BID is not NULL)" << endl;
+          }
         }
+      }
+
+      if (PeerResolved == false)
+      {
+        PB->S << Offset1 << "(Publisher remains unresolved; peer-dependent processing skipped)" << endl;
+        if (PS->Status == "Delete")
+        {
+          PB->S << Offset1 << "(Deleting the unresolved subscription with index = " << i << ")" << endl;
+          PCore->DeleteSubscription(PS);
+        }
+        continue;
       }
 
       PS->LN = PCore->PeerTuples[Index]->LN;
