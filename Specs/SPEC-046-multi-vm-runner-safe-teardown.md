@@ -4,7 +4,7 @@
 **Date:** 2026-09-12
 **Status:** In Progress
 **Branch:** AIOPT3
-**Implementation commit:** —
+**Implementation commit:** c132e23
 **Related:** SPEC-045-core-evaluate-functional-harness.md, SPEC-044-core-run-evaluate-invalid-pg-downcast.md
 
 ## 1. Problema

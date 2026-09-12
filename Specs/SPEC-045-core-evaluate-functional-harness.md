@@ -138,6 +138,6 @@ Este mapa demonstra a origem e o encadeamento do caller, mas não demonstra aind
 
 O caminho E2E candidato foi localizado, mas ainda não foi convertido em harness determinístico. Os scripts existentes usam terminais interactivos e delays fixos; isso não é suficiente como runner científico. A próxima etapa é extrair os comandos, substituir delays por gates observáveis, isolar IO/IPC e definir oráculos ligados à mesma subscription/publisher.
 
-## 11. Relação com SPEC-044
+## 12. Relação com SPEC-044
 
 SPEC-044 pode permanecer implementada em `In Progress`, mas não pode ser marcada concluída enquanto os critérios funcionais desta SPEC-045 não produzirem evidência suficiente. Esta SPEC não autoriza alterações adicionais de produção por si só.
