@@ -1,0 +1,22 @@
+{
+ "test": "SPEC-030 runtime verification — 1000-photo delivery with immutable staging + sha256 manifest",
+ "date": "2026-09-07T11:47:00Z",
+ "build": "faa6c4e (AMEND-3 v2 + SPEC-029 + SPEC-030 tooling)",
+ "setup": {
+  "staging": "IO/SourceStaging/run-20260907-1000/ (read-only, manifest.sha256 included)",
+  "generator": "BuildPhotos.py --staging (Astra stdlib JPEG encoder, ~9.9KB per 800x600 grayscale photo)",
+  "contentapp_io_arg": "staging path passed directly as ContentApp IO argument (Astra Phase 0 decision)"
+ },
+ "result": {
+  "delivered": "1000/1000",
+  "verify": "total/matched/missing/mismatched = 1000/1000/0/0 (VerifyDelivery.py vs publish-time manifest)",
+  "byte_integrity": "PERFECT — every received file byte-identical to what was published"
+ },
+ "findings_during_test": [
+  "First attempt delivered OLD content (288KB files): NRNCS cache from the morning run served stale photos.",
+  "Second defect: Repository kept old files until both NRNCS cache and Repository1 dir were cleared and the full stack restarted in strict order (PGCS 36 -> PGCS 61 -> NRNCS -> Repository -> Source).",
+  "Discovery cycle takes ~3-5 min after full restart (periodic expositions); expect this in future test plans.",
+  "The 288KB-vs-9.9KB discrepancy is how the stale-cache serving was DETECTED — the manifest method works."
+ ],
+ "action_item": "NRNCS cache invalidation on content update / subscription chain stale-serving is a product defect candidate — register as issue for Astra (relates to SPEC-020/022/023 lineage)."
+}

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		CoreSCNAck01
-	Object:		CoreSCNAck01
-	File:		CoreSCNAck01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		CoreSCNAck01
+        Object:		CoreSCNAck01
+        File:		CoreSCNAck01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -37,18 +37,22 @@
 #include "Core.h"
 #endif
 
-CoreSCNAck01::CoreSCNAck01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
+CoreSCNAck01::CoreSCNAck01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-CoreSCNAck01::~CoreSCNAck01 ()
+CoreSCNAck01::~CoreSCNAck01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -scn --ack 0.1 [ < 2 string SCN AckSCN > ]
-int
-CoreSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int CoreSCNAck01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   unsigned int NA = 0;
@@ -57,142 +61,142 @@ CoreSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message 
   vector<string> PStoredA;
   string AckSCN;
   string Offset = "                    ";
-  Core *PCore = 0;
-  Message *Run = 0;
-  CommandLine *PCL = 0;
-  Publication *PP = 0;
+  Core* PCore = 0;
+  Message* Run = 0;
+  CommandLine* PCL = 0;
+  Publication* PP = 0;
   unsigned int NoCL = 0;
 
-  PCore = (Core *)PB;
+  PCore = (Core*)PB;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // ************************************************************************
   // Sample the round trip time to publish on NRNCS
   // ************************************************************************
 
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of arguments
-	  if (NA == 1)
-		{
-		  // Get the fist argument
-		  _PCL->GetArgument (0, PReceivedA);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of arguments
+    if (NA == 1)
+    {
+      // Get the fist argument
+      _PCL->GetArgument(0, PReceivedA);
 
-		  // Get received message SCN
-		  ReceivedSCN = PReceivedA.at (0);
+      // Get received message SCN
+      ReceivedSCN = PReceivedA.at(0);
 
-		  // Get ack message SCN
-		  AckSCN = PReceivedA.at (1);
+      // Get ack message SCN
+      AckSCN = PReceivedA.at(1);
 
-		  //PB->S << Offset <<"(AckSCN = "<< AckSCN << ")"<< endl;
+      // PB->S << Offset <<"(AckSCN = "<< AckSCN << ")"<< endl;
 
-		  if (ReceivedSCN != "" && AckSCN != "")
-			{
-			  if (PCore->GetPublication (AckSCN, PP) == OK)
-				{
-				  if (PP != 0)
-					{
-					  double Now = GetTime ();
+      if (ReceivedSCN != "" && AckSCN != "")
+      {
+        if (PCore->GetPublication(AckSCN, PP) == OK)
+        {
+          if (PP != 0)
+          {
+            double Now = GetTime();
 
-					  double DeltaT = Now - PP->Timestamp;
+            double DeltaT = Now - PP->Timestamp;
 
-					  //PB->S << Offset << setprecision(10) <<"(The publication round trip time to NRNCS was "<<DeltaT<<")"<< endl;
+            // PB->S << Offset << setprecision(10) <<"(The publication round trip time to NRNCS was "<<DeltaT<<")"<< endl;
 
-					  PCore->pubrtt->Sample (DeltaT);
+            PCore->pubrtt->Sample(DeltaT);
 
-					  PCore->pubrtt->CalculateArithmetic ();
+            PCore->pubrtt->CalculateArithmetic();
 
-					  PCore->pubrtt->SampleToFile (Now);
+            PCore->pubrtt->SampleToFile(Now);
 
-					  PCore->DeletePublication (PP);
-					}
-				  else
-					{
-					  PB->S << Offset << "(ERROR: Null publication object)" << endl;
+            PCore->DeletePublication(PP);
+          }
+          else
+          {
+            PB->S << Offset << "(ERROR: Null publication object)" << endl;
 
-					  Status = ERROR;
-					}
-				}
-			}
-		  else
-			{
-			  PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
+            Status = ERROR;
+          }
+        }
+      }
+      else
+      {
+        PB->S << Offset << "(ERROR: Unable to read the arguments)" << endl;
 
-			  Status = ERROR;
-			}
-		}
-	  else
-		{
-		  PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
+        Status = ERROR;
+      }
+    }
+    else
+    {
+      PB->S << Offset << "(ERROR: Wrong number of arguments)" << endl;
 
-		  Status = ERROR;
-		}
-	}
+      Status = ERROR;
+    }
+  }
   else
-	{
-	  PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
-	}
+  {
+    PB->S << Offset << "(ERROR: Unable to read the number of arguments)" << endl;
+  }
 
   // ************************************************************************
   // Generate the ng -scn -seq if required for the ng -run --evaluation case
   // ************************************************************************
 
-  if (ScheduledMessages.size () > 0)
-	{
-	  if (PCore->GenerateRunXSCNSeq01 == true)
-		{
-		  //PB->S << Offset <<  "(There is a scheduled message)" << endl;
+  if (ScheduledMessages.size() > 0)
+  {
+    if (PCore->GenerateRunXSCNSeq01 == true)
+    {
+      // PB->S << Offset <<  "(There is a scheduled message)" << endl;
 
-		  Run = ScheduledMessages.at (0);
+      Run = ScheduledMessages.at(0);
 
-		  if (Run != 0)
-			{
-			  // Generate the SCN
-			  PB->GenerateSCNFromMessageBinaryPatterns (Run, SCN);
+      if (Run != 0)
+      {
+        // Generate the SCN
+        SCN = NameGenerator::GetInstance().GenerateFromMessage(Run);
 
-			  // Creating the ng -scn --s command line
-			  PMB->NewSCNCommandLine ("0.1", SCN, Run, PCL);
+        // Creating the ng -scn --s command line
+        PMB->NewSCNCommandLine("0.1", SCN, Run, PCL);
 
-			  //PB->S << "(" << endl << *Run << ")"<< endl;
-			  if (Run->GetNumberofCommandLines (NoCL) == OK)
-				{
-				  if (NoCL > 2)
-					{
-					  // Push the message to the GW input queue
-					  PCore->PGW->PushToInputQueue (Run);
+        // PB->S << "(" << endl << *Run << ")"<< endl;
+        if (Run->GetNumberofCommandLines(NoCL) == OK)
+        {
+          if (NoCL > 2)
+          {
+            // Push the message to the GW input queue
+            PCore->PGW->PushToInputQueue(Run);
 
-					  PCore->GenerateRunXSCNSeq01 = false;
+            PCore->GenerateRunXSCNSeq01 = false;
 
-					  Status = OK;
-					}
-				}
-			}
-		}
-	}
+            Status = OK;
+          }
+        }
+      }
+    }
+  }
 
   // ************************************************************************
   // Generate the ng -scn -seq if required for the ng -sr --b case
   // ************************************************************************
 
   if (PCore->GenerateStoreBindingsSCNSeq01 == true)
-	{
-	  //PB->S << Offset <<  "(There is an inline storage message)" << endl;
+  {
+    // PB->S << Offset <<  "(There is an inline storage message)" << endl;
 
-	  // Generate the ng -scn -seq
-	  PB->GenerateSCNFromMessageBinaryPatterns (InlineResponseMessage, SCN);
+    // Generate the ng -scn -seq
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(InlineResponseMessage);
 
-	  // Creating the ng -scn --s command line
-	  PMB->NewSCNCommandLine ("0.1", SCN, InlineResponseMessage, PCL);
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, InlineResponseMessage, PCL);
 
-	  // Set for false. Wait another ng -d --b to go to true again
-	  PCore->GenerateStoreBindingsSCNSeq01 = false;
+    // Set for false. Wait another ng -d --b to go to true again
+    PCore->GenerateStoreBindingsSCNSeq01 = false;
 
-	  // Set for true. Enable next message to be processed at ng -d --b
-	  PCore->GenerateStoreBindingsMsgCl01 = true;
-	}
+    // Set for true. Enable next message to be processed at ng -d --b
+    PCore->GenerateStoreBindingsMsgCl01 = true;
+  }
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		DHTRunPeriodic01
-	Object:		DHTRunPeriodic01
-	File:		DHTRunPeriodic01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		DHTRunPeriodic01
+        Object:		DHTRunPeriodic01
+        File:		DHTRunPeriodic01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,14 +61,14 @@
 
 class Block;
 
-class DHTRunPeriodic01 : public Action {
- public:
-
+class DHTRunPeriodic01 : public Action
+{
+public:
   // Constructor
-  DHTRunPeriodic01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  DHTRunPeriodic01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~DHTRunPeriodic01 ();
+  virtual ~DHTRunPeriodic01();
 
   string PGCSPID;
 
@@ -76,27 +76,21 @@ class DHTRunPeriodic01 : public Action {
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
-  int GetPGCSNames ();
+  int GetPGCSNames();
 
   // Exposes NRNCS names
-  int Exposition ();
+  int Exposition();
 
   // Discovery GIRS names on Category 2 and 9
-  int DiscoveryFirst ();
+  int DiscoveryFirst();
 
   // Discovery GIRS names on Category 5 and 6
-  int DiscoverySecond ();
+  int DiscoverySecond();
 
   // Change to operational
-  int Operational ();
+  int Operational();
 };
 
 #endif
-
-
-
-
-
-

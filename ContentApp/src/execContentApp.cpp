@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Content distribution application.  Executable for a simple content distribution application using publish/subscribe web
-	Object:		ContentApp
-	File:		ContentApp.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Content distribution application.  Executable for a simple content distribution application using publish/subscribe web
+        Object:		ContentApp
+        File:		ContentApp.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -27,6 +27,8 @@
 
 #include "ContentApp.h"
 
+// #define DEBUG // To follow message processing
+
 #ifndef _TIME_H
 #include <time.h>
 #endif
@@ -35,78 +37,75 @@
 #include <sys/time.h>
 #endif
 
-int main (int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   int R = 0;
   bool Problem = false;
 
   if (argc != 0)
-	{
-	  if (argc == 3)
-		{
-		  string Path = argv[1];
+  {
+    if (argc == 3)
+    {
+      string Path = argv[1];
 
-		  cout << "*******************************************************************" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*  NovaGenesis(NG) Content Distribution Application v0.2          *" << endl;
-		  cout << "*  Copyright Antonio Marcos Alberti - Inatel - April 2021         *" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*                                                                 *" << endl;
-		  cout << "*******************************************************************" << endl << endl;
+      cout << "*******************************************************************" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*  NovaGenesis(NG) Content Distribution Application v0.2          *" << endl;
+      cout << "*  Copyright Antonio Marcos Alberti - April 2021         *" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*                                                                 *" << endl;
+      cout << "*******************************************************************" << endl
+           << endl;
 
-		  cout << "(The I/O path is " << Path << ")" << endl;
+      cout << "(The I/O path is " << Path << ")" << endl;
 
-		  string Temp1 = argv[2];
+      string Temp1 = argv[2];
 
-		  if (Temp1 == "Source" || Temp1 == "Repository")
-			{
-			  cout << "(This is a " << Temp1 << " process.)" << endl;
+      if (Temp1 == "Source" || Temp1 == "Repository")
+      {
+        cout << "(This is a " << Temp1 << " process.)" << endl;
 
-			  long long Temp = (long long)&R;
+        long long Temp = (long long)&R;
 
-			  // Initialize the random generator
-			  srand ((unsigned int)Temp * time (NULL));
+        // Initialize the random generator
+        srand((unsigned int)Temp * time(NULL));
 
-			  // Generates a random key
-			  R = 1 + (rand () % 2147483647);
+        // Generates a random key
+        R = 1 + (rand() % 2147483647);
 
-			  // Set the shm key
-			  key_t Key = R;
+        // Set the shm key
+        key_t Key = R;
 
-			  // Create a process instance
-			  ContentApp execApp ("ContentApp", Temp1, Key, Path);
-			}
-		  else
-			{
-			  Problem = true;
+        // Create a process instance
+        ContentApp execApp("ContentApp", Temp1, Key, Path);
+      }
+      else
+      {
+        Problem = true;
 
-			  cout << "(ERROR: Empty role)" << endl;
-			}
-		}
-	  else
-		{
-		  Problem = true;
+        cout << "(ERROR: Empty role)" << endl;
+      }
+    }
+    else
+    {
+      Problem = true;
 
-		  cout << "(ERROR: Wrong number of main() arguments)" << endl;
-		}
-	}
+      cout << "(ERROR: Wrong number of main() arguments)" << endl;
+    }
+  }
   else
-	{
-	  Problem = true;
+  {
+    Problem = true;
 
-	  cout << "(ERROR: No argument supplied)" << endl;
-	}
+    cout << "(ERROR: No argument supplied)" << endl;
+  }
 
   if (Problem == true)
-	{
-	  cout << "(Usage: ./ContentApp Path Role)" << endl;
-	  cout << "(Path example: /home/myprofile/workspace/novagenesis/IO/Client1/)" << endl;
-	  cout << "(Role can be \"Source\" or \"Repository\")" << endl;
-	}
+  {
+    cout << "(Usage: ./ContentApp Path Role)" << endl;
+    cout << "(Path example: /home/myprofile/workspace/novagenesis/IO/Client1/)" << endl;
+    cout << "(Role can be \"Source\" or \"Repository\")" << endl;
+  }
 
   return 0;
 }
-
-
-
-

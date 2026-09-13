@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		HTBindReport01
-	Object:		HTBindReport01
-	File:		HTBindReport01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		HTBindReport01
+        Object:		HTBindReport01
+        File:		HTBindReport01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,26 +49,20 @@
 
 class Block;
 
-class HTBindReport01 : public Action {
- public:
-
+class HTBindReport01 : public Action
+{
+public:
   // Constructor
-  HTBindReport01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  HTBindReport01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~HTBindReport01 ();
+  virtual ~HTBindReport01();
 
   File F1;
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

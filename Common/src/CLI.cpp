@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Command Line Interface
-	Object:		CLI
-	File:		CLI.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Command Line Interface
+        Object:		CLI
+        File:		CLI.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,91 +49,91 @@
 #include "CLISCNAck01.h"
 #endif
 
-CLI::CLI (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path)
-	: Block (_LN, _PP, _Index, _Path)
+CLI::CLI(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path)
+    : Block(_LN, _PP, _Index, _Path)
 {
   Version = "0.1";
   PGW = _PGW;
   PHT = _PHT;
   State = "initialization";
 
-  Message *PIM = 0;
-  CommandLine *PCL = 0;
-  Action *PA = 0;
-  Message *InlineResponseMessage = NULL;
+  Message* PIM = 0;
+  CommandLine* PCL = 0;
+  Action* PA = 0;
+  Message* InlineResponseMessage = NULL;
 
-  NewAction ("-run --initialization 0.1", PA);
-  NewAction ("-scn --ack 0.1", PA);
+  NewAction("-run --initialization 0.1", PA);
+  NewAction("-scn --ack 0.1", PA);
 
   // Creating a -run --initialization message
-  PP->NewMessage (GetTime (), 0, false, PIM);
+  PP->NewMessage(GetTime(), 0, false, PIM);
 
   // Adding only the run initialization command line
-  PIM->NewCommandLine ("-run", "--initialization", "0.1", PCL);
+  PIM->NewCommandLine("-run", "--initialization", "0.1", PCL);
 
   // Push the message to the GW input queue
-  PGW->PushToInputQueue (PIM);
+  PGW->PushToInputQueue(PIM);
 
   // Run
-  Run (PIM, InlineResponseMessage);
+  Run(PIM, InlineResponseMessage);
 
   // Mark to delete
-  PIM->MarkToDelete ();
+  PIM->MarkToDelete();
 }
 
-CLI::~CLI ()
+CLI::~CLI()
 {
-  vector<Action *>::iterator it4;
+  vector<Action*>::iterator it4;
 
-  Action *Temp;
+  Action* Temp;
 
-  for (it4 = Actions.begin (); it4 != Actions.end (); it4++)
-	{
-	  Temp = *it4;
+  for (it4 = Actions.begin(); it4 != Actions.end(); it4++)
+  {
+    Temp = *it4;
 
-	  if (Temp != 0)
-		{
-		  delete Temp;
-		}
+    if (Temp != 0)
+    {
+      delete Temp;
+    }
 
-	  Temp = 0;
-	}
+    Temp = 0;
+  }
 }
 
 // Allocate and add an Action on Actions container
-void CLI::NewAction (const string _LN, Action *&_PA)
+void CLI::NewAction(const string _LN, Action*& _PA)
 {
   if (_LN == "-run --initialization 0.1")
-	{
-	  CLIRunInitialization01 *P = new CLIRunInitialization01 (_LN, this, PP->PMB);
+  {
+    CLIRunInitialization01* P = new CLIRunInitialization01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-scn --ack 0.1")
-	{
-	  CLISCNAck01 *P = new CLISCNAck01 (_LN, this, PP->PMB);
+  {
+    CLISCNAck01* P = new CLISCNAck01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 }
 
 // Get an Action
-int CLI::GetAction (string _LN, Action *&_PA)
+int CLI::GetAction(string _LN, Action*& _PA)
 {
   int Status = ERROR;
   return Status;
 }
 
 // Delete an Action
-int CLI::DeleteAction (string _LN)
+int CLI::DeleteAction(string _LN)
 {
   int Status = ERROR;
   return Status;
 }
 
 // Command line interface prompt
-void CLI::Prompt ()
+void CLI::Prompt()
 {
   S << "*******************************************************************" << endl;
   S << "*  NovaGenesis(NG) Command Line Interface v0.1                    *" << endl;
@@ -151,9 +151,9 @@ void CLI::Prompt ()
   string CommandAlternative;
   string CommandVersion;
   int NewMessageFromScreen = 0;
-  Message *PM = 0;
+  Message* PM = 0;
   unsigned int NewMessageNumberofLines = 0;
-  CommandLine *PCL = 0;
+  CommandLine* PCL = 0;
   string Temp;
   int Size = 0;
   string HeaderFileName;
@@ -164,532 +164,547 @@ void CLI::Prompt ()
 
   string GWLN = "GW";
 
-  Block *PB = 0;
+  Block* PB = 0;
 
-  PP->GetBlock (GWLN, PB);
+  PP->GetBlock(GWLN, PB);
 
-  GW *PGW = (GW *)PB;
+  GW* PGW = (GW*)PB;
 
   while (1)
-	{
-	  S << "> ";
-
-	  cin.getline (Line, sizeof (Line), '\n');
+  {
+    S << "> ";
+
+    cin.getline(Line, sizeof(Line), '\n');
+
+    if (!strcmp(Line, "quit") || !strcmp(Line, "exit"))
+    {
+      break;
+    }
+    else if (strcmp(Line, ""))
+    {
+      istringstream iss(Line);
+
+      if (NewMessageFromScreen == 1)
+      {
+        // *************************************************************
+        // New message from screen (look bellow first).
+        // *************************************************************
+
+        // Send the typed line directly to a message object
+        if (NewMessageNumberofLines == 0)
+        {
+          // Create the new message
+          PB->PP->NewMessage(GetTime(), 0, false, PM);
+        }
+
+        // Creates an auxiliary istringstream
+        istringstream temp(Line);
 
-	  if (!strcmp (Line, "quit") || !strcmp (Line, "exit"))
-		{
-		  break;
-		}
-	  else if (strcmp (Line, ""))
-		{
-		  istringstream iss (Line);
+        temp >> FirstWord;
 
-		  if (NewMessageFromScreen == 1)
-			{
-			  // *************************************************************
-			  // New message from screen (look bellow first).
-			  // *************************************************************
+        ng = string(FirstWord);
 
-			  // Send the typed line directly to a message object
-			  if (NewMessageNumberofLines == 0)
-				{
-				  // Create the new message
-				  PB->PP->NewMessage (GetTime (), 0, false, PM);
-				}
+        // Tests to see if the user wants to terminate the message that is being typed
+        if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+        {
+          temp >> SecondWord;
 
-			  // Creates an auxiliary istringstream
-			  istringstream temp (Line);
+          CommandName = string(SecondWord);
 
-			  temp >> FirstWord;
+          // cout<<"CommandName = "<<CommandName<<endl;
 
-			  ng = string (FirstWord);
+          // Send
+          if (CommandName == "-send")
+          {
+            temp >> ThirdWord;
 
-			  // Tests to see if the user wants to terminate the message that is being typed
-			  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-				{
-				  temp >> SecondWord;
+            CommandAlternative = string(ThirdWord);
 
-				  CommandName = string (SecondWord);
+            // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
 
-				  //cout<<"CommandName = "<<CommandName<<endl;
+            // Message from screen
+            if (CommandAlternative == "--mfs")
+            {
+              temp >> FourthWord;
 
-				  // Send
-				  if (CommandName == "-send")
-					{
-					  temp >> ThirdWord;
+              CommandVersion = string(FourthWord);
 
-					  CommandAlternative = string (ThirdWord);
+              // cout<<"CommandVersion = "<<CommandVersion<<endl;
 
-					  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+              if (CommandVersion == "0.1")
+              {
+                // This command concludes a new message typed on the screen and sends it to the gateway block.
+                NewMessageFromScreen = 0;
 
-					  // Message from screen
-					  if (CommandAlternative == "--mfs")
-						{
-						  temp >> FourthWord;
+                // The message is send to the gateway
+                // cout << "NewMessageFromScreen = "<<NewMessageFromScreen<<endl;
 
-						  CommandVersion = string (FourthWord);
+                S << "> The typed message was:" << endl
+                  << endl
+                  << *PM << endl
+                  << endl;
 
-						  //cout<<"CommandVersion = "<<CommandVersion<<endl;
+                // Sending the message to the Gateway
+                // MISSING
 
-						  if (CommandVersion == "0.1")
-							{
-							  // This command concludes a new message typed on the screen and sends it to the gateway block.
-							  NewMessageFromScreen = 0;
+                // Reseting the counter
+                NewMessageNumberofLines = 0;
+              }
+            }
+          }
+          else
+          {
+            // Creates the new CommandLine object
+            PM->NewCommandLine(PCL);
 
-							  // The message is send to the gateway
-							  // cout << "NewMessageFromScreen = "<<NewMessageFromScreen<<endl;
+            // iss >> *PM->CommandLines[NewMessageNumberofLines];
 
-							  S << "> The typed message was:" << endl << endl << *PM << endl << endl;
+            // cout<<"The command: "<<*PM->CommandLines[NewMessageNumberofLines]<<" was created on the message."<<endl;
 
-							  // Sending the message to the Gateway
-							  // MISSING
+            NewMessageNumberofLines++;
+          }
+        }
+      }
+      else
+      {
+        // *************************************************************
+        // New message from a file and other commands.
+        // *************************************************************
+        while (!iss.eof())
+        {
+          iss >> FirstWord;
 
-							  // Reseting the counter
-							  NewMessageNumberofLines = 0;
-							}
-						}
-					}
-				  else
-					{
-					  // Creates the new CommandLine object
-					  PM->NewCommandLine (PCL);
+          // Skip comments and new lines
+          if (FirstWord[0] == '#')
+            continue;
+          if (FirstWord[0] == '\0')
+            continue;
 
-					  //iss >> *PM->CommandLines[NewMessageNumberofLines];
+          ng = string(FirstWord);
 
-					  //cout<<"The command: "<<*PM->CommandLines[NewMessageNumberofLines]<<" was created on the message."<<endl;
+          // cout<<"ng = "<<ng<<endl;
 
-					  NewMessageNumberofLines++;
-					}
-				}
-			}
-		  else
-			{
-			  // *************************************************************
-			  // New message from a file and other commands.
-			  // *************************************************************
-			  while (!iss.eof ())
-				{
-				  iss >> FirstWord;
+          // Implements the CLI commands that do not require a message, e.g. -new --m or -list -p
+          if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
+          {
+            iss >> SecondWord;
 
-				  // Skip comments and new lines
-				  if (FirstWord[0] == '#')continue;
-				  if (FirstWord[0] == '\0')continue;
+            CommandName = string(SecondWord);
 
-				  ng = string (FirstWord);
+            // cout<<"CommandName = "<<CommandName<<endl;
 
-				  //cout<<"ng = "<<ng<<endl;
+            // New
+            if (CommandName == "-new")
+            {
+              iss >> ThirdWord;
 
-				  // Implements the CLI commands that do not require a message, e.g. -new --m or -list -p
-				  if (Line[0] == 'n' && Line[1] == 'g' && Line[2] == ' ' && Line[3] == '-')
-					{
-					  iss >> SecondWord;
+              CommandAlternative = string(ThirdWord);
 
-					  CommandName = string (SecondWord);
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
 
-					  //cout<<"CommandName = "<<CommandName<<endl;
+              // Message
+              if (CommandAlternative == "--mfs")
+              {
+                iss >> FourthWord;
 
-					  // New
-					  if (CommandName == "-new")
-						{
-						  iss >> ThirdWord;
+                CommandVersion = string(FourthWord);
 
-						  CommandAlternative = string (ThirdWord);
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
 
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+                if (CommandVersion == "0.1")
+                {
+                  // The next commands until a -send --mfs is received are going to be accommodated in a new MessageFile object
+                  NewMessageFromScreen = 1;
 
-						  // Message
-						  if (CommandAlternative == "--mfs")
-							{
-							  iss >> FourthWord;
+                  S
+                      << "> Please type your message on the following command lines. Finish with a ng -send --mfs version"
+                      << endl
+                      << endl;
 
-							  CommandVersion = string (FourthWord);
+                  break;
+                }
+              }
+            }
 
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
+            // Send
+            if (CommandName == "-send")
+            {
+              iss >> ThirdWord;
 
-							  if (CommandVersion == "0.1")
-								{
-								  // The next commands until a -send --mfs is received are going to be accommodated in a new MessageFile object
-								  NewMessageFromScreen = 1;
+              CommandAlternative = string(ThirdWord);
 
-								  S
-									  << "> Please type your message on the following command lines. Finish with a ng -send --mfs version"
-									  << endl << endl;
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
 
-								  break;
-								}
-							}
-						}
+              // Message from file
+              if (CommandAlternative == "--mff")
+              {
+                iss >> FourthWord;
+
+                CommandVersion = string(FourthWord);
+
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
+                if (CommandVersion == "0.1")
+                {
+                  // Take the [
+                  iss >> Temp;
+
+                  // cout<< Temp << endl;
+
+                  if (Temp == "[" && Temp != "<" && Temp != "<1" && Temp != "<2" && Temp != "]")
+                  {
+                    // Take the <
+                    iss >> Temp;
+
+                    // cout<< Temp << endl;
+
+                    if (Temp == "<" && Temp != "[" && Temp != "<1" && Temp != "<2" && Temp != "]")
+                    {
+                      // Take the size of the argument
+                      iss >> Temp;
+
+                      // cout<< Temp << endl;
 
-					  // Send
-					  if (CommandName == "-send")
-						{
-						  iss >> ThirdWord;
+                      stringstream ssout(Temp.c_str());
+
+                      ssout >> Size;
+
+                      // Message without payload
+                      if (Size == 2)
+                      {
+                        // Take the string type
+                        iss >> Temp;
+
+                        if ((Temp == "s") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
+                        {
+                          iss >> HeaderFileName;
+                          iss >> FilePath;
 
-						  CommandAlternative = string (ThirdWord);
+                          iss >> Temp; // Reads the >
+                          iss >> Temp; // Reads the ]
+
+                          PM = 0;
 
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+                          seconds = time(NULL);
+
+                          S << "Time = " << seconds << endl;
+
+                          // Creating a new message from the header file
+                          PB->PP->NewMessage(seconds, 0, false, HeaderFileName, FilePath, PM);
+                        }
+                        else
+                        {
+                          // ERROR
+                        }
+                      }
+                      else if (Size == 4)
+                      {
+                        // Take the string type
+                        iss >> Temp;
+
+                        if ((Temp == "s") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
+                        {
+                          iss >> HeaderFileName;
+                          iss >> PayloadFileName;
+                          iss >> MessageFileName;
+                          iss >> FilePath;
 
-						  // Message from file
-						  if (CommandAlternative == "--mff")
-							{
-							  iss >> FourthWord;
+                          iss >> Temp; // Reads the >
+                          iss >> Temp; // Reads the ]
 
-							  CommandVersion = string (FourthWord);
+                          PM = 0;
 
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-							  if (CommandVersion == "0.1")
-								{
-								  // Take the [
-								  iss >> Temp;
-
-								  //cout<< Temp << endl;
-
-								  if (Temp == "[" && Temp != "<" && Temp != "<1" && Temp != "<2" && Temp != "]")
-									{
-									  // Take the <
-									  iss >> Temp;
+                          seconds = time(NULL);
 
-									  //cout<< Temp << endl;
+                          // S << "Time = "<<seconds<<endl;
 
-									  if (Temp == "<" && Temp != "[" && Temp != "<1" && Temp != "<2" && Temp != "]")
-										{
-										  // Take the size of the argument
-										  iss >> Temp;
+                          // Creating a new message from the header file
+                          PB->PP
+                              ->NewMessage(seconds, 0, true, HeaderFileName, PayloadFileName, MessageFileName, FilePath, PM);
+                        }
+                        else
+                        {
+                          // ERROR
+                        }
+                      }
+                      else
+                      {
+                        // ERROR;
+                      }
+                    }
+                    else
+                    {
+                      // ERROR
+                    }
+                  }
+                  else
+                  {
+                    // ERROR
+                  }
+                }
+              }
+            }
 
-										  //cout<< Temp << endl;
+            // List
+            if (CommandName == "-list")
+            {
+              iss >> ThirdWord;
 
-										  stringstream ssout (Temp.c_str ());
+              CommandAlternative = string(ThirdWord);
 
-										  ssout >> Size;
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
 
-										  // Message without payload
-										  if (Size == 2)
-											{
-											  // Take the string type
-											  iss >> Temp;
+              // Blocks
+              if (CommandAlternative == "--b")
+              {
+                iss >> FourthWord;
 
-											  if ((Temp == "s") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
-												{
-												  iss >> HeaderFileName;
-												  iss >> FilePath;
+                CommandVersion = string(FourthWord);
 
-												  iss >> Temp; // Reads the >
-												  iss >> Temp; // Reads the ]
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
 
-												  PM = 0;
+                if (CommandVersion == "0.1")
+                {
+                  //
+                }
+              }
 
-												  seconds = time (NULL);
+              // Processes
+              if (CommandAlternative == "--p")
+              {
+                iss >> FourthWord;
 
-												  S << "Time = " << seconds << endl;
+                CommandVersion = string(FourthWord);
 
-												  // Creating a new message from the header file
-												  PB->PP->NewMessage (seconds, 0, false, HeaderFileName, FilePath, PM);
-												}
-											  else
-												{
-												  // ERROR
-												}
-											}
-										  else if (Size == 4)
-											{
-											  // Take the string type
-											  iss >> Temp;
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
 
-											  if ((Temp == "s") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
-												{
-												  iss >> HeaderFileName;
-												  iss >> PayloadFileName;
-												  iss >> MessageFileName;
-												  iss >> FilePath;
+                if (CommandVersion == "0.1")
+                {
+                  //
+                }
+              }
 
-												  iss >> Temp; // Reads the >
-												  iss >> Temp; // Reads the ]
+              // Bindings
+              if (CommandAlternative == "--b")
+              {
+                iss >> FourthWord;
 
-												  PM = 0;
+                CommandVersion = string(FourthWord);
 
-												  seconds = time (NULL);
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
 
-												  //S << "Time = "<<seconds<<endl;
-
-												  // Creating a new message from the header file
-												  PB->PP
-													  ->NewMessage (seconds, 0, true, HeaderFileName, PayloadFileName, MessageFileName, FilePath, PM);
-
-												}
-											  else
-												{
-												  // ERROR
-												}
-											}
-										  else
-											{
-											  //ERROR;
-											}
-										}
-									  else
-										{
-										  // ERROR
-										}
-									}
-								  else
-									{
-									  // ERROR
-									}
-								}
-							}
-						}
-
-					  // List
-					  if (CommandName == "-list")
-						{
-						  iss >> ThirdWord;
-
-						  CommandAlternative = string (ThirdWord);
-
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
-
-						  // Blocks
-						  if (CommandAlternative == "--b")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  //
-								}
-							}
-
-						  // Processes
-						  if (CommandAlternative == "--p")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  //
-								}
-							}
-
-						  // Bindings
-						  if (CommandAlternative == "--b")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-
-								}
-							}
-						}
-
-					  // Version
-					  if (CommandName == "-version")
-						{
-						  iss >> ThirdWord;
-
-						  CommandAlternative = string (ThirdWord);
-
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
-
-						  // Standard
-						  if (CommandAlternative == "--s")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  S << endl << "> The current version is " << Version << endl << endl;
-								}
-							}
-						}
-
-					  // Set
-					  if (CommandName == "-set")
-						{
-						  iss >> ThirdWord;
-
-						  CommandAlternative = string (ThirdWord);
-
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
-
-						  // Path
-						  if (CommandAlternative == "--path")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  // Take the [
-								  iss >> Temp;
-
-								  //cout<< Temp << endl;
-
-								  if (Temp == "[" && Temp != "<" && Temp != "<1" && Temp != "<2" && Temp != "]")
-									{
-									  // Take the <
-									  iss >> Temp;
-
-									  //cout<< Temp << endl;
-
-									  if (Temp == "<" && Temp != "[" && Temp != "<1" && Temp != "<2" && Temp != "]")
-										{
-										  // Take the 1
-										  iss >> Temp;
-
-										  //cout<< Temp << endl;
-
-										  stringstream ssout (Temp.c_str ());
-
-										  ssout >> Size;
-
-										  if (Size == 1)
-											{
-											  // Take the string type
-											  iss >> Temp;
-
-											  if ((Temp == "s") && (Temp != "1s"))
-												{
-												  iss >> FilePath;
-												  iss >> Temp; // Reads the >
-												  iss >> Temp; // Reads the ]
-
-												  if (FilePath != "")
-													{
-													  // Set the process working path
-													  PP->SetPath (FilePath);
-
-													  S << endl << "> Path was set to " << FilePath << endl << endl;
-													}
-												}
-											  else
-												{
-												  // ERROR
-												}
-											}
-										  else
-											{
-											  //ERROR;
-											}
-										}
-									  else
-										{
-										  // ERROR
-										}
-									}
-
-								}
-							}
-						}
-
-					  // Show
-					  if (CommandName == "-show")
-						{
-						  iss >> ThirdWord;
-
-						  CommandAlternative = string (ThirdWord);
-
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
-
-						  // Path
-						  if (CommandAlternative == "--path")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  if (PP->GetPath () != "")
-									{
-									  // Get the process working path
-									  S << endl << "> The current path is " << PP->GetPath () << endl;
-									}
-								  else
-									{
-									  S << endl
-										<< "> The path was not defined yet. Use ng -set --path version [ < 1 string path > ]"
-										<< endl << endl;
-									}
-								}
-							}
-						}
-
-					  // Help
-					  if (CommandName == "-help")
-						{
-						  iss >> ThirdWord;
-
-						  CommandAlternative = string (ThirdWord);
-
-						  //cout<<"CommandAlternative = "<<CommandAlternative<<endl;
-
-						  // Standard
-						  if (CommandAlternative == "--s")
-							{
-							  iss >> FourthWord;
-
-							  CommandVersion = string (FourthWord);
-
-							  //cout<<"CommandVersion = "<<CommandVersion<<endl;
-
-							  if (CommandVersion == "0.1")
-								{
-								  S << endl << " The general format of NovaGenesis messages is:" << endl;
-								  S << endl << " ng -command --alternative version [ vectorial arguments ]" << endl;
-								  S << endl << " Where:" << endl << endl;
-								  S << right << setw (30) << "-command:" << "  It is the action to be done." << endl;
-								  S << right << setw (30) << "--alternative:"
-									<< "  It selects among alternative implementations. An alternative is always required. --s is the standard one."
-									<< endl;
-								  S << right << setw (30) << "version:"
-									<< "  It selects the desired version of implementation." << endl;
-								  S << right << setw (30) << "[ vectorial arguments ]:"
-									<< "  They are the arguments of the command." << endl << endl;
-								}
-							}
-						  else
-							{
-							  S << endl << "> Usage: ng -help --s version. Example: ng -help --s 0.1." << endl << endl;
-							}
-						}
-					}
-				}
-			}
-		}
-
-	  //tthread::this_thread::sleep_for(tthread::chrono::milliseconds(2000));
-	}
-
-  PGW->SetStopGatewayFlag (true);
+                if (CommandVersion == "0.1")
+                {
+                }
+              }
+            }
+
+            // Version
+            if (CommandName == "-version")
+            {
+              iss >> ThirdWord;
+
+              CommandAlternative = string(ThirdWord);
+
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+
+              // Standard
+              if (CommandAlternative == "--s")
+              {
+                iss >> FourthWord;
+
+                CommandVersion = string(FourthWord);
+
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
+
+                if (CommandVersion == "0.1")
+                {
+                  S << endl
+                    << "> The current version is " << Version << endl
+                    << endl;
+                }
+              }
+            }
+
+            // Set
+            if (CommandName == "-set")
+            {
+              iss >> ThirdWord;
+
+              CommandAlternative = string(ThirdWord);
+
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+
+              // Path
+              if (CommandAlternative == "--path")
+              {
+                iss >> FourthWord;
+
+                CommandVersion = string(FourthWord);
+
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
+
+                if (CommandVersion == "0.1")
+                {
+                  // Take the [
+                  iss >> Temp;
+
+                  // cout<< Temp << endl;
+
+                  if (Temp == "[" && Temp != "<" && Temp != "<1" && Temp != "<2" && Temp != "]")
+                  {
+                    // Take the <
+                    iss >> Temp;
+
+                    // cout<< Temp << endl;
+
+                    if (Temp == "<" && Temp != "[" && Temp != "<1" && Temp != "<2" && Temp != "]")
+                    {
+                      // Take the 1
+                      iss >> Temp;
+
+                      // cout<< Temp << endl;
+
+                      stringstream ssout(Temp.c_str());
+
+                      ssout >> Size;
+
+                      if (Size == 1)
+                      {
+                        // Take the string type
+                        iss >> Temp;
+
+                        if ((Temp == "s") && (Temp != "1s"))
+                        {
+                          iss >> FilePath;
+                          iss >> Temp; // Reads the >
+                          iss >> Temp; // Reads the ]
+
+                          if (FilePath != "")
+                          {
+                            // Set the process working path
+                            PP->SetPath(FilePath);
+
+                            S << endl
+                              << "> Path was set to " << FilePath << endl
+                              << endl;
+                          }
+                        }
+                        else
+                        {
+                          // ERROR
+                        }
+                      }
+                      else
+                      {
+                        // ERROR;
+                      }
+                    }
+                    else
+                    {
+                      // ERROR
+                    }
+                  }
+                }
+              }
+            }
+
+            // Show
+            if (CommandName == "-show")
+            {
+              iss >> ThirdWord;
+
+              CommandAlternative = string(ThirdWord);
+
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+
+              // Path
+              if (CommandAlternative == "--path")
+              {
+                iss >> FourthWord;
+
+                CommandVersion = string(FourthWord);
+
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
+
+                if (CommandVersion == "0.1")
+                {
+                  if (PP->GetPath() != "")
+                  {
+                    // Get the process working path
+                    S << endl
+                      << "> The current path is " << PP->GetPath() << endl;
+                  }
+                  else
+                  {
+                    S << endl
+                      << "> The path was not defined yet. Use ng -set --path version [ < 1 string path > ]"
+                      << endl
+                      << endl;
+                  }
+                }
+              }
+            }
+
+            // Help
+            if (CommandName == "-help")
+            {
+              iss >> ThirdWord;
+
+              CommandAlternative = string(ThirdWord);
+
+              // cout<<"CommandAlternative = "<<CommandAlternative<<endl;
+
+              // Standard
+              if (CommandAlternative == "--s")
+              {
+                iss >> FourthWord;
+
+                CommandVersion = string(FourthWord);
+
+                // cout<<"CommandVersion = "<<CommandVersion<<endl;
+
+                if (CommandVersion == "0.1")
+                {
+                  S << endl
+                    << " The general format of NovaGenesis messages is:" << endl;
+                  S << endl
+                    << " ng -command --alternative version [ vectorial arguments ]" << endl;
+                  S << endl
+                    << " Where:" << endl
+                    << endl;
+                  S << right << setw(30) << "-command:" << "  It is the action to be done." << endl;
+                  S << right << setw(30) << "--alternative:"
+                    << "  It selects among alternative implementations. An alternative is always required. --s is the standard one."
+                    << endl;
+                  S << right << setw(30) << "version:"
+                    << "  It selects the desired version of implementation." << endl;
+                  S << right << setw(30) << "[ vectorial arguments ]:"
+                    << "  They are the arguments of the command." << endl
+                    << endl;
+                }
+              }
+              else
+              {
+                S << endl
+                  << "> Usage: ng -help --s version. Example: ng -help --s 0.1." << endl
+                  << endl;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // tthread::this_thread::sleep_for(tthread::chrono::milliseconds(2000));
+  }
+
+  PGW->SetStopGatewayFlag(true);
 
   S << "Closing prompt. ";
 }
 
-void CLI::PromptThreadWrapper (void *aArg)
+void CLI::PromptThreadWrapper(void* aArg)
 {
-  CLI *PCLI = static_cast<CLI *>(aArg);
-  PCLI->Prompt ();
+  CLI* PCLI = static_cast<CLI*>(aArg);
+  PCLI->Prompt();
 }
-

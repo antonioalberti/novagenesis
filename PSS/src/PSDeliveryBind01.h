@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		PS delivery binding
-	Object:		PSDeliveryBind01
-	File:		PSDeliveryBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		PS delivery binding
+        Object:		PSDeliveryBind01
+        File:		PSDeliveryBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,24 +61,18 @@
 
 class Block;
 
-class PSDeliveryBind01 : public Action {
- public:
-
+class PSDeliveryBind01 : public Action
+{
+public:
   // Constructor
-  PSDeliveryBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PSDeliveryBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PSDeliveryBind01 ();
+  virtual ~PSDeliveryBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

@@ -11,7 +11,7 @@ ipcmk -M 1024
 # Diplay a shm report before running. NovaGenesis employs shm for inter container communication
 ipcs -m
 
-echo Starting PGCS and NRNCS	
+echo Starting PGCS and NRNCS\t
 
 # Run the PGCS and NRNCS
 /usr/bin/supervisord -c /home/ng/workspace/novagenesis/supervisord.conf

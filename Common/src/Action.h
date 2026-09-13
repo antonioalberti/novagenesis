@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Action
-	Object:		Action
-	File:		Action.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Action
+        Object:		Action
+        File:		Action.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -55,9 +55,9 @@ using namespace std;
 
 class Block;
 
-class Action {
- public:
-
+class Action
+{
+public:
   // Legible Name
   string LN;
 
@@ -65,41 +65,35 @@ class Action {
   string SCN;
 
   // Pointer to the block where the action is instantiated
-  Block *PB;
+  Block* PB;
 
   // Pointer to the process message builder
-  MessageBuilder *PMB;
+  MessageBuilder* PMB;
 
   // Constructor
-  Action (string _LN, Block *_PB, MessageBuilder *_PMB);
+  Action(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~Action ();
+  virtual ~Action();
 
   // Set block legible name
-  void SetLegibleName (string _LN);
+  void SetLegibleName(string _LN);
 
   // Set block self-certifying name
-  void SetSelfCertifyingName (string _SCN);
+  void SetSelfCertifyingName(string _SCN);
 
   // Get block legible name
-  string GetLegibleName ();
+  string GetLegibleName();
 
   // Get block self-certifying name
-  string GetSelfCertifyingName ();
+  string GetSelfCertifyingName();
 
   // Run the actions behind a received command line
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Return the current time in seconds
-  double GetTime ();
+  double GetTime();
 };
 
 #endif
-
-
-
-
-
-

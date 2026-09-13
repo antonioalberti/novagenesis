@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Message
-	Object:		Message
-	File:		Message.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Message
+        Object:		Message
+        File:		Message.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -80,14 +80,13 @@
 
 using namespace tthread;
 
-class Message {
- private:
-
+class Message
+{
+private:
   // Tag to allow deleting
   bool Delete;
 
- public:
-
+public:
   // ******************************************************
   // Attributes
   // ******************************************************
@@ -99,13 +98,13 @@ class Message {
   short Type;
 
   // CommandLine container
-  CommandLine **CommandLines;
+  CommandLine** CommandLines;
 
   // Number of command lines
   unsigned int NoCL;
 
   // Header file handler. Allows to handle a file with the message command lines
-  //File 					HeaderFile;
+  // File 					HeaderFile;
 
   // Payload file handler. Allows to handle a file with the message payload
   File PayloadFile;
@@ -117,16 +116,16 @@ class Message {
   bool HasPayloadFlag;
 
   // Header char array. Can be used to carry a header to memory instead of using a file
-  //char 					*Header;
+  // char 					*Header;
 
   // Payload char array. Can be used to carry a payload in memory instead of saving it to a file
-  char *Payload;
+  char* Payload;
 
   // Message char array. Can be used to carry the message to memory instead of using a file
-  char *Msg;
+  char* Msg;
 
   // The size of the header in bytes
-  //long					HeaderSize;
+  // long					HeaderSize;
 
   // The size of the payload in bytes
   long long PayloadSize;
@@ -147,7 +146,7 @@ class Message {
   unsigned int Tag;
 
   // Auxiliary flag to enable deletion of *Header array.
-  //bool 					DeleteHeaderArray;
+  // bool 					DeleteHeaderArray;
 
   // Auxiliary flag to enable deletion of *Payload array.
   bool DeletePayloadArray;
@@ -166,306 +165,308 @@ class Message {
   // ******************************************************
 
   // Empty message constructor.
-  Message (double _Time, short _Type, bool _HasPayload);
+  Message(double _Time, short _Type, bool _HasPayload);
 
   // Simple constructor.
-  Message (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _Path);
+  Message(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _Path);
 
   // Complete constructor.
-  Message (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path);
+  Message(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path);
 
   // Copy constructor
-  Message (const Message &M);
+  Message(const Message& M);
 
   // Destructor
-  ~Message ();
+  ~Message();
 
   // ******************************************************
   // Basic set/get functions
   // ******************************************************
 
   void
-  SetMessage (double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path);
+  SetMessage(double _Time, short _Type, bool _HasPayload, string _HeaderFileName, string _PayloadFileName, string _MessageFileName, string _Path);
 
   // Set message's SCN
-  void SetSelfCertifyingName (string _SCN);
+  void SetSelfCertifyingName(string _SCN);
 
   // Set message's type
-  void SetType (short _Type);
+  void SetType(short _Type);
 
   // Set has payload flag
-  void SetHasPayloadFlag (bool _Flag);
+  void SetHasPayloadFlag(bool _Flag);
 
   // Set time
-  void SetTime (double _Time);
+  void SetTime(double _Time);
 
   // Set tag
-  void SetTag (unsigned int _Tag);
+  void SetTag(unsigned int _Tag);
 
   // Set header file name
-  //void SetHeaderFileName(string _Name);
+  // void SetHeaderFileName(string _Name);
 
   // Set payload file name
-  void SetPayloadFileName (string _Name);
+  void SetPayloadFileName(string _Name);
 
   // Set payload file name
-  void SetMessageFileName (string _Name);
+  void SetMessageFileName(string _Name);
 
   // Set header file name
-  //string GetHeaderFileName();
+  // string GetHeaderFileName();
 
   // Set payload file name
-  string GetPayloadFileName ();
+  string GetPayloadFileName();
 
   // Set payload file name
-  string GetMessageFileName ();
+  string GetMessageFileName();
 
   // Set header file path
-  //void SetHeaderFilePath(string _Path);
+  // void SetHeaderFilePath(string _Path);
 
   // Set payload file path
-  void SetPayloadFilePath (string _Path);
+  void SetPayloadFilePath(string _Path);
 
   // Set message file path
-  void SetMessageFilePath (string _Path);
+  void SetMessageFilePath(string _Path);
 
   // Set message to be deleted
-  void MarkToDelete ();
+  void MarkToDelete();
 
   // Set message to be deleted
-  void UnmarkToDelete ();
+  void UnmarkToDelete();
 
   // Set application driven deletion
-  void SetApplicationDeletedFlag (bool _Flag);
+  void SetApplicationDeletedFlag(bool _Flag);
 
   // Set header file path
-  //string GetHeaderFilePath();
+  // string GetHeaderFilePath();
 
   // Set payload file path
-  string GetPayloadFilePath ();
+  string GetPayloadFilePath();
 
   // Set message file path
-  string GetMessageFilePath ();
+  string GetMessageFilePath();
 
   // Set header file option
-  //void SetHeaderFileOption(string _Option);
+  // void SetHeaderFileOption(string _Option);
 
   // Set payload file option
-  void SetPayloadFileOption (string _Option);
+  void SetPayloadFileOption(string _Option);
 
   // Set message file option
-  //void SetMessageFileOption(string _Option);
+  // void SetMessageFileOption(string _Option);
 
   // Set header file option
-  //string GetHeaderFileOption();
+  // string GetHeaderFileOption();
 
   // Set payload file option
-  string GetPayloadFileOption ();
+  string GetPayloadFileOption();
 
   // Set message file option
-  //string GetMessageFileOption();
+  // string GetMessageFileOption();
 
   // Get has payload flag
-  bool GetHasPayloadFlag () const;
+  bool GetHasPayloadFlag() const;
 
   // Get message's SCN
-  string GetSelfCertifyingName () const;
+  string GetSelfCertifyingName() const;
 
   // Get message's type
-  short GetType () const;
+  short GetType() const;
 
   // Get time
-  double GetTime () const;
+  double GetTime() const;
 
   // Get tag
-  unsigned int GetTag () const;
+  unsigned int GetTag() const;
 
   // Get application delete flag status
-  bool GetDeleteFlag ();
+  bool GetDeleteFlag();
 
   // Get application delete flag status
-  bool GetApplicationDeletedFlag ();
+  bool GetApplicationDeletedFlag();
 
   // Allocate an empty command line and add it on CommandLines container
-  int NewCommandLine (CommandLine *&CL);
+  int NewCommandLine(CommandLine*& CL);
 
   // Allocate a copy command line and add it on CommandLines container
-  int NewCommandLine (CommandLine *_PCL, CommandLine *&CL);
+  int NewCommandLine(CommandLine* _PCL, CommandLine*& CL);
 
   // Allocate and add a CommandLine on CommandLines container
-  int NewCommandLine (string _Name, string _Alternative, string _Version, CommandLine *&C);
+  int NewCommandLine(string _Name, string _Alternative, string _Version, CommandLine*& C);
 
   // Get a CommandLine by its index
-  int GetCommandLine (unsigned int _Index, CommandLine *&CL);
+  int GetCommandLine(unsigned int _Index, CommandLine*& CL);
 
   // Get a CommandLine by its name and alternative
-  int GetCommandLine (string _Name, string _Alternative, CommandLine *&CL);
+  int GetCommandLine(string _Name, string _Alternative, CommandLine*& CL);
 
   // Get a CommandLine Index
-  int GetCommandLineIndex (CommandLine *CL, unsigned int &_Index);
+  int GetCommandLineIndex(CommandLine* CL, unsigned int& _Index);
 
   // Get number of command lines
-  int GetNumberofCommandLines (unsigned int &_Number);
+  int GetNumberofCommandLines(unsigned int& _Number);
 
   // Get number of arguments
-  int GetNumberofCommandLineArguments (unsigned int _CommandLine, unsigned int &_Number);
+  int GetNumberofCommandLineArguments(unsigned int _CommandLine, unsigned int& _Number);
 
   // Get number of elements in a certain argument
-  int GetNumberofCommandLineArgumentElements (unsigned int _CommandLine, unsigned int _Argument, unsigned int &_Number);
+  int GetNumberofCommandLineArgumentElements(unsigned int _CommandLine, unsigned int _Argument, unsigned int& _Number);
 
   // Set an element at an Argument
-  int
-  SetCommandLineArgumentElement (unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string _Value);
+  int SetCommandLineArgumentElement(unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string _Value);
 
   // Get an element at an Argument
-  int
-  GetCommandLineArgumentElement (unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string &_Value);
+  int GetCommandLineArgumentElement(unsigned int _CommandLine, unsigned int _Argument, unsigned int _Element, string& _Value);
 
   // Get header file
-  //int GetHeaderFile(File& F);
+  // int GetHeaderFile(File& F);
 
   // Get payload file
-  int GetPayloadFile (File &F);
+  int GetPayloadFile(File& F);
 
   // Get message file
-  int GetMessageFile (File &F);
+  int GetMessageFile(File& F);
 
   // Set *Header from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
-  //int SetHeaderFromCharArray(char* _Value, long _Size);
+  // int SetHeaderFromCharArray(char* _Value, long _Size);
 
   // Set *Payload from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
-  int SetPayloadFromCharArray (char *_Value, long long _Size);
+  int SetPayloadFromCharArray(char* _Value, long long _Size);
+
+  // SPEC-018: Reset payload state so a new payload can be loaded on a reused Message.
+  // Frees the existing Payload array and resets PayloadSize/DeletePayloadArray/HasPayloadFlag.
+  void ResetPayload();
 
   // Set *Msg from char array. A copy of the char array is done. If a previous array was being used, it will be deleted.
-  int SetMessageFromCharArray (char *_Value, long long _Size);
+  int SetMessageFromCharArray(char* _Value, long long _Size);
 
   // Get *Header from char array. Don't delete[] the array pointer
-  //int GetHeaderFromCharArray(char*& _Value);
+  // int GetHeaderFromCharArray(char*& _Value);
 
   // Get *Payload from char array. Don't delete[] the array pointer
-  int GetPayloadFromCharArray (char *&_Value);
+  int GetPayloadFromCharArray(char*& _Value);
 
   // Get *Msg from char array. Don't delete[] the array pointer
-  int GetMessageFromCharArray (char *&_Value);
+  int GetMessageFromCharArray(char*& _Value);
 
   // Get *Msg from char array. Don't delete[] the array pointer
-  int GetMessageFromCharArray (unsigned char *&_Value);
+  int GetMessageFromCharArray(unsigned char*& _Value);
 
   // Return the current system time in seconds
-  double GetSystemTime ();
+  double GetSystemTime();
 
   // Get the object instantiation time in seconds
-  double GetInstantiationTime ();
+  double GetInstantiationTime();
 
   // ******************************************************
   // Header format convertions
   // ******************************************************
 
   // Convert the Header from file to a char array pointed by *Header. The HeaderFile handler needs to be properly configured.
-  //int ConvertHeaderFromFileToCharArray();
+  // int ConvertHeaderFromFileToCharArray();
 
   // Convert the Header from CommandLines to a char array pointed by *Header. The CommandLines need to be properly configured.
-  int ConvertHeaderFromCommandLinesToCharArray ();
+  int ConvertHeaderFromCommandLinesToCharArray();
 
   // Convert the Header from char array to CommandLines. The char array pointed by *Header needs to be properly configured.
-  //int ConvertHeaderFromCharArrayToCommandLines();
+  // int ConvertHeaderFromCharArrayToCommandLines();
 
   // Convert the Header from file to CommandLines. The HeaderFile handler needs to be properly configured.
-  int ConvertHeaderFromFileToCommandLines ();
+  int ConvertHeaderFromFileToCommandLines();
 
   // Convert the Header from char array to file. The char array pointed by *Header needs to be properly configured as well as the HeaderFile handler
-  //int ConvertHeaderFromCharArrayToFile();
+  // int ConvertHeaderFromCharArrayToFile();
 
   // Convert the Header from CommandLines to file. The CommandLines need to be properly configured as well as the HeaderFile handler
-  //int ConvertHeaderFromCommandLinesToFile();
+  // int ConvertHeaderFromCommandLinesToFile();
 
   // ******************************************************
   // Payload format convertions
   // ******************************************************
 
   // Convert the Payload from file to a char array pointed by *Payload. The PayloadFile handler needs to be properly configured.
-  int ConvertPayloadFromFileToCharArray ();
+  int ConvertPayloadFromFileToCharArray();
 
   // Convert the Payload from char array to file. The char array pointed by *Payload needs to be properly configured as well as the PayloadFile handler
-  int ConvertPayloadFromCharArrayToFile ();
+  int ConvertPayloadFromCharArrayToFile();
 
   // Extract Payload char array from message char array. The Msg char array needs to be properly configured.
-  int ExtractPayloadCharArrayFromMessageCharArray ();
+  int ExtractPayloadCharArrayFromMessageCharArray();
 
   // ******************************************************
   // Entire message format convertions
   // ******************************************************
 
   // Convert the Message from file to CommandLines and Payload file. The MessageFile handler needs to be properly configured
-  //int ConvertMessageFromFileToCommandLinesandPayloadFile();
+  // int ConvertMessageFromFileToCommandLinesandPayloadFile();
 
   // Convert the Message from file to a char array pointed by *Msg. The MessageFile handler needs to be properly configured.
-  int ConvertMessageFromFileToCharArray ();
+  int ConvertMessageFromFileToCharArray();
 
   // Convert the Message from char array to a complete Message file. The char array pointed by *Message needs to be properly configured as well as the MessageFile handler
-  //int ConvertMessageFromCharArrayToFile();
+  // int ConvertMessageFromCharArrayToFile();
 
   // Convert the Message from CommandLines and Payload file to a complete Message file. The CommandLines need to be properly configured as well as the MessageFile handler
-  //int ConvertMessageFromCommandLinesandPayloadFileToFile();
+  // int ConvertMessageFromCommandLinesandPayloadFileToFile();
 
   // Convert the Message from CommandLines and Payload file to a char array. The CommandLines need to be properly configured as well as the PayloadFile handler
-  int ConvertMessageFromCommandLinesandPayloadFileToCharArray ();
+  int ConvertMessageFromCommandLinesandPayloadFileToCharArray();
 
   // Convert the Message from CommandLines and Payload char array to a message char array. The CommandLines need to be properly configured as well as the Payload char array
-  int ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray ();
+  int ConvertMessageFromCommandLinesandPayloadCharArrayToCharArray();
 
   // Convert the complete message char array into command lines and payload file (if any was set up in advance)
-  //int ConvertMessageFromCharArrayToCommandLinesandPayloadFile();
+  // int ConvertMessageFromCharArrayToCommandLinesandPayloadFile();
 
   // Convert the complete message char array into command lines and payload char array
-  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray ();
+  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray();
 
   // Convert the complete message char array into command lines and payload char array. Added in May 2015
-  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray (File *_PF);
+  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File* _PF);
 
   // Convert the complete message char array into command lines and payload char array. Rebuild in May 2015
-  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2 ();
+  int ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
 
   // ******************************************************
   // Message size functions
   // ******************************************************
 
   // Get header size in bytes. A previous conversion from file or CommandLines to *Header char array is required
-  //int GetHeaderSize(long& _Size);
+  // int GetHeaderSize(long& _Size);
 
   // Get payload size in bytes. A previous conversion from file to *Payload char array is required
-  int GetPayloadSize (long long &_Size);
+  int GetPayloadSize(long long& _Size);
 
   // Get message size in bytes. A previous conversion from file and/or CommandLines to *Message char array is required
-  int GetMessageSize (long long &_Size);
+  int GetMessageSize(long long& _Size);
 
   // ******************************************************
   // Checking for command lines
   // ******************************************************
-  int DoesThisCommandLineExistsInMessage (string _Name, string _Alternative, bool &_Verdict);
+  int DoesThisCommandLineExistsInMessage(string _Name, string _Alternative, bool& _Verdict);
 
   // ******************************************************
   // Checking for arguments
   // ******************************************************
 
   // Check if the values on the vector exist on some command line. They all need to exist in the same command line
-  int DoAllTheseValuesExistInSomeCommandLine (vector<string> *_Values, bool &_Verdict);
+  int DoAllTheseValuesExistInSomeCommandLine(vector<string>* _Values, bool& _Verdict);
 
   // ******************************************************
   // Operators overloading
   // ******************************************************
 
   // Overloading ostream operator
-  friend ostream &operator<< (ostream &os, Message &M);
+  friend ostream& operator<<(ostream& os, Message& M);
 
   // Overloading fstream operator
-  friend fstream &operator<< (fstream &fs, Message &M);
+  friend fstream& operator<<(fstream& fs, Message& M);
 
   // Overloading stringstream operator
-  friend stringstream &operator>> (stringstream &fs, Message &M);
+  friend stringstream& operator>>(stringstream& fs, Message& M);
 
   // Overloading fstream operator
-  friend fstream &operator>> (fstream &fs, Message &M);
+  friend fstream& operator>>(fstream& fs, Message& M);
 };
 
 #endif

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		NRMessageSeq01
-	Object:		NRMessageSeq01
-	File:		NRMessageSeq01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		NRMessageSeq01
+        Object:		NRMessageSeq01
+        File:		NRMessageSeq01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -33,30 +33,43 @@
 #include "NR.h"
 #endif
 
-NRMessageSeq01::NRMessageSeq01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+// #define DEBUG
+
+NRMessageSeq01::NRMessageSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-NRMessageSeq01::~NRMessageSeq01 ()
+NRMessageSeq01::~NRMessageSeq01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -message --seq _Version [ < 1 string _Seq > ]
-int
-NRMessageSeq01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int NRMessageSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
-  CommandLine *PTemp;
+  CommandLine* PTemp;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
+
+#ifdef DEBUG
+
+  PB->S << Offset << this->GetLegibleName() << endl;
+
+#endif
 
   // Copy the received command line to the InlineResponseMessage
-  InlineResponseMessage->NewCommandLine (_PCL, PTemp);
+  InlineResponseMessage->NewCommandLine(_PCL, PTemp);
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+#ifdef DEBUG
+
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
+
+#endif
 
   return Status;
 }
-

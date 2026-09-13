@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		GWRunInitialization01
-	Object:		GWRunInitialization01
-	File:		GWRunInitialization01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		GWRunInitialization01
+        Object:		GWRunInitialization01
+        File:		GWRunInitialization01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,94 +33,104 @@
 #include "GW.h"
 #endif
 
-GWRunInitialization01::GWRunInitialization01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
+GWRunInitialization01::GWRunInitialization01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-GWRunInitialization01::~GWRunInitialization01 ()
+GWRunInitialization01::~GWRunInitialization01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -run --initialization 0.1
-int
-GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int GWRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
-  Message *StoringInitialBinds = 0;
+  Message* StoringInitialBinds = 0;
   vector<string> Limiters;
   vector<string> Sources;
   vector<string> Destinations;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  GW *PGW = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  GW* PGW = 0;
   int Category;
   string Key;
   vector<string> Values;
   string OperatingSystemLegibleNameSCN;
   string Offset = "                    ";
-  Message *RunPeriodic = 0;
+  Message* RunExposition = 0;
 
-  PGW = (GW *)PB;
+  PGW = (GW*)PB;
 
-  PHTB = (Block *)PGW->PHT;
+  PHTB = (Block*)PGW->PHT;
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
   // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  Sources.push_back(PB->GetSelfCertifyingName());
 
   // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PHTB->GetSelfCertifyingName ());
+  Destinations.push_back(PHTB->GetSelfCertifyingName());
 
   // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, StoringInitialBinds);
+  PB->PP->NewMessage(GetTime(), 0, false, StoringInitialBinds);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, StoringInitialBinds, PCL);
 
   // Block related
 
-  PMB->NewStoreBindingCommandLineFromBLNToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  // ******************************************************
+  // Binding: PeerPID -> LegibleName (Category 20)
+  // ******************************************************
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBLN ("0.1", PB, StoringInitialBinds, PCL);
+  Category = 20;
+  Key = PB->PP->GetSelfCertifyingName();
+  Values.push_back(PB->PP->GetLegibleName());
+  PGW->StoreHTBindingValues(Category, Key, &Values);
+  Values.clear();
 
-  PMB->NewStoreBindingCommandLineFromHashBLNToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBLNToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToHashBLN ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashBLNToBID("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToHashBLN("0.1", PB, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromPIDToBID ("0.1", PB, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromBIDToBlocksIndex("0.1", PB, StoringInitialBinds, PCL);
+
+  PMB->NewStoreBindingCommandLineFromBlocksIndexToBID("0.1", PB, StoringInitialBinds, PCL);
+
+  PMB->NewStoreBindingCommandLineFromPIDToBID("0.1", PB, StoringInitialBinds, PCL);
 
   // Limiters related
 
-  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter ("0.1", "OS", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter("0.1", "OS", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter ("0.1", "OS", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter("0.1", "OS", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN ("0.1", "OS", PB->PP
-	  ->OSSCN, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN("0.1", "OS", PB->PP->OSSCN, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter ("0.1", PB->PP
-	  ->OSSCN, "OS", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter("0.1", PB->PP->OSSCN, "OS", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter ("0.1", "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromLimiterToHashLimiter("0.1", "Domain", StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter ("0.1", "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToLimiter("0.1", "Domain", StoringInitialBinds, PCL);
 
   // **********************************************************************************
   // The next two lines store a temporary domain name, while Domain Service is booting
   // **********************************************************************************
 
-  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN ("0.1", "Domain", PB->PP
-	  ->DSCN, StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromHashLimiterToRepresentativeSCN("0.1", "Domain", PB->PP->DSCN, StoringInitialBinds, PCL);
 
-  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter ("0.1", PB->PP
-	  ->DSCN, "Domain", StoringInitialBinds, PCL);
+  PMB->NewStoreBindingCommandLineFromRepresentativeSCNToHashLimiter("0.1", PB->PP->DSCN, "Domain", StoringInitialBinds, PCL);
 
   // ******************************************************
   // Binding PID to Input IPC Key
@@ -130,95 +140,145 @@ GWRunInitialization01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector
   Category = 13;
 
   // Setting up the key
-  Key = PB->PP->GetSelfCertifyingName ();
+  Key = PB->PP->GetSelfCertifyingName();
 
-  Values.push_back (PB->IntToString (PB->PP->Key));
+  Values.push_back(PB->IntToString(PB->PP->Key));
 
   // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoringInitialBinds, PCL);
+  PMB->NewCommonCommandLine("-sr", "--b", "0.1", Category, Key, &Values, StoringInitialBinds, PCL);
 
-  Values.clear ();
+  Values.clear();
 
   // ***************************************************************************************
   // Create a local process HT binding relating PGCS shared memory IPC key to its shmid
   // ***************************************************************************************
 
-  if (PB->PP->GetLegibleName () != "PGCS")
-	{
-	  key_t IPCKey = 11;
-	  int shmid = 0;
+  if (PB->PP->GetLegibleName() != "PGCS")
+  {
+    key_t IPCKey = 11;
+    int shmid = 0;
 
-	  if (PGW->ReturnIPCSHMID (IPCKey, shmid) == OK)
-		{
-		  // Setting up the category
-		  Category = 17;
+    if (PGW->ReturnIPCSHMID(IPCKey, shmid) == OK)
+    {
+      // Setting up the category
+      Category = 17;
 
-		  // Setting up the key
-		  Key = PB->IntToString (IPCKey);
+      // Setting up the key
+      Key = PB->IntToString(IPCKey);
 
-		  Values.push_back (PB->IntToString (shmid));
+      Values.push_back(PB->IntToString(shmid));
 
-		  // Creating the ng -sr --b 0.1 command line
-		  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoringInitialBinds, PCL);
-		}
-	}
+      // Creating the ng -sr --b 0.1 command line
+      PMB->NewCommonCommandLine("-sr", "--b", "0.1", Category, Key, &Values, StoringInitialBinds, PCL);
+    }
+  }
+
+  // Push the message to the GW input queue
+  PGW->PushToInputQueue(StoringInitialBinds);
 
   // ******************************************************
   // Finish
   // ******************************************************
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (StoringInitialBinds, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(StoringInitialBinds);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, StoringInitialBinds, PCL);
-
-  // Clear the temporary containers
-  Values.clear ();
-  Limiters.clear ();
-  Sources.clear ();
-  Destinations.clear ();
+  PMB->NewSCNCommandLine("0.1", SCN, StoringInitialBinds, PCL);
 
   // ******************************************************
-  // Schedule a message to run periodic first time
+  // Schedule a message to run exposition first time
   // ******************************************************
+  if (PB->PP->GetLegibleName() == "PGCS")
+  {
+    Values.clear();
+    Limiters.clear();
+    Sources.clear();
+    Destinations.clear();
+
+    // Setting up the process SCN as the space limiter
+    Limiters.push_back(PB->PP->Intra_Process);
+
+    // Setting up the block SCN as the source SCN
+    Sources.push_back(PB->GetSelfCertifyingName());
+
+    // Setting up the block SCN as the destination SCN
+    Destinations.push_back(PB->GetSelfCertifyingName());
+
+    // Creating a new message (schedule for next period)
+    PB->PP->NewMessage(GetTime() + 1.0, 1, false, RunExposition);
+
+    // Creating the ng -cl -m command line
+    PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunExposition, PCL);
+
+    // Adding a ng -run --exposition 0.2 command line
+    RunExposition->NewCommandLine("-run", "--exposition", "0.2", PCL);
+
+    // Generate the SCN
+    SCN = NameGenerator::GetInstance().GenerateFromMessage(RunExposition);
+
+    // Creating the ng -scn --s command line
+    PMB->NewSCNCommandLine("0.1", SCN, RunExposition, PCL);
+
+    // Push the message to the GW input queue
+    PGW->PushToInputQueue(RunExposition);
+  }
+
+  // ******************************************************
+  // Schedule the first hello IPC emission
+  // ******************************************************
+
+  // ******************************************************
+  // Schedule the first hello IPC emission
+  // ******************************************************
+
+  Message* RunHelloIPC = NULL;
+  Limiters.clear();
+  Sources.clear();
+  Destinations.clear();
 
   // Setting up the process SCN as the space limiter
-  Limiters.push_back (PB->PP->Intra_Process);
+  Limiters.push_back(PB->PP->Intra_Process);
 
-  // Setting up the CLI block SCN as the source SCN
-  Sources.push_back (PB->GetSelfCertifyingName ());
+  // Setting up the block SCN as the source SCN
+  Sources.push_back(PB->GetSelfCertifyingName());
 
-  // Setting up the HT block SCN as the destination SCN
-  Destinations.push_back (PHTB->GetSelfCertifyingName ());
+  // Setting up the block SCN as the destination SCN
+  Destinations.push_back(PB->GetSelfCertifyingName());
 
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 1, false, RunPeriodic);
+  // Creating a new message (schedule for next period)
+  PB->PP->NewMessage(GetTime() + 1.0, 1, false, RunHelloIPC);
 
   // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &Limiters, &Sources, &Destinations, RunPeriodic, PCL);
+  PMB->NewConnectionLessCommandLine("0.1", &Limiters, &Sources, &Destinations, RunHelloIPC, PCL);
 
-  // Adding a ng -run --periodic command line
-  RunPeriodic->NewCommandLine ("-run", "--periodic", "0.1", PCL);
+  // Adding a ng -run --helloIPC 0.2 command line
+  RunHelloIPC->NewCommandLine("-run", "--helloIPC", "0.2", PCL);
 
   // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (RunPeriodic, SCN);
+  SCN = NameGenerator::GetInstance().GenerateFromMessage(RunHelloIPC);
 
   // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, RunPeriodic, PCL);
+  PMB->NewSCNCommandLine("0.1", SCN, RunHelloIPC, PCL);
+
+  // Push the message to the GW input queue
+  PGW->PushToInputQueue(RunHelloIPC);
+
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
+
+  // ******************************************************
+  // Move to operational state
+  // ******************************************************
+
+  PB->State = "operational";
+
+  PB->S << Offset << "(State: Operational)" << endl
+        << endl
+        << endl;
 
   // ******************************************************
   // Finish
   // ******************************************************
-
-  // Push the message to the GW input queue
-  PGW->PushToInputQueue (StoringInitialBinds);
-
-  // Push the message to the GW input queue
-  PGW->PushToInputQueue (RunPeriodic);
-
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
-

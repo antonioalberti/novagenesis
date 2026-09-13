@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGMsgCl01
-	Object:		PGMsgCl01
-	File:		PGMsgCl01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGMsgCl01
+        Object:		PGMsgCl01
+        File:		PGMsgCl01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -53,9 +53,9 @@
 
 class Block;
 
-class PGMsgCl01 : public Action {
- public:
-
+class PGMsgCl01 : public Action
+{
+public:
   // Auxiliary forwarding case variable
   string ForwardingCase;
 
@@ -67,14 +67,14 @@ class PGMsgCl01 : public Action {
   string HashIPv4_UDP;
 
   // Constructor
-  PGMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  PGMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~PGMsgCl01 ();
+  virtual ~PGMsgCl01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Action
-	Object:		Action
-	File:		Action.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Action
+        Object:		Action
+        File:		Action.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,55 +33,54 @@
 #include "Process.h"
 #endif
 
-Action::Action (string _LN, Block *_PB, MessageBuilder *_PMB)
+Action::Action(string _LN, Block* _PB, MessageBuilder* _PMB)
 {
   LN = _LN;
   PB = _PB;
   PMB = _PMB;
 
-  Process *PR = NULL;
+  Process* PR = NULL;
 }
 
-Action::~Action ()
+Action::~Action()
 {
 }
 
 // Set block legible name
-void Action::SetLegibleName (string _LN)
+void Action::SetLegibleName(string _LN)
 {
   LN = _LN;
 }
 
 // Set block self-certifying name
-void Action::SetSelfCertifyingName (string _SCN)
+void Action::SetSelfCertifyingName(string _SCN)
 {
   SCN = _SCN;
 }
 
 // Get block legible name
-string Action::GetLegibleName ()
+string Action::GetLegibleName()
 {
   return LN;
 }
 
 // Get block self-certifying name
-string Action::GetSelfCertifyingName ()
+string Action::GetSelfCertifyingName()
 {
   return SCN;
 }
 
 // Run the actions behind a received command line
-int
-Action::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int Action::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   return ERROR;
 }
 
-double Action::GetTime ()
+double Action::GetTime()
 {
   struct timespec t;
 
-  clock_gettime (CLOCK_MONOTONIC, &t);
+  clock_gettime(CLOCK_MONOTONIC, &t);
 
   return ((t.tv_sec) + (double)(t.tv_nsec / 1e9));
 }

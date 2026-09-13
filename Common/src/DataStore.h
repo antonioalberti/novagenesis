@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Auxiliary object to store a name binding alternatively
-	Object:		DataStore
-	File:		DataStore.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Auxiliary object to store a name binding alternatively
+        Object:		DataStore
+        File:		DataStore.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -36,16 +36,12 @@ using namespace std;
 
 class DataStore
 {
-	public:
+public:
+  // Tuple values
 
-    	// Tuple values
-
-		unsigned int		Category;
-		string				Key;
-    	string				TextValue;
-    	double				NumericalValue;
+  unsigned int Category;
+  string Key;
+  string TextValue;
+  double NumericalValue;
 };
 #endif
-
-
-

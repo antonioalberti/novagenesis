@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		CoreRunContentPublish01
-	Object:		CoreRunContentPublish01
-	File:		CoreRunContentPublish01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		CoreRunContentPublish01
+        Object:		CoreRunContentPublish01
+        File:		CoreRunContentPublish01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -73,40 +73,34 @@
 
 class Block;
 
-class CoreRunContentPublish01 : public Action {
- public:
-
+class CoreRunContentPublish01 : public Action
+{
+public:
   // Constructor
-  CoreRunContentPublish01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  CoreRunContentPublish01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~CoreRunContentPublish01 ();
+  virtual ~CoreRunContentPublish01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Publish a content to all the peer applications - notifies just one peer
-  int PublishAPhotoToAllPeerApps01 (string _FileName, vector<Message *> &ScheduledMessages);
+  int PublishAPhotoToAllPeerApps01(string _FileName, vector<Message*>& ScheduledMessages);
 
   // Publish a content to all the peer applications - notifies all peers
-  int PublishAPhotoToAllPeerApps02 (string _FileName, vector<Message *> &ScheduledMessages);
+  int PublishAPhotoToAllPeerApps02(string _FileName, vector<Message*>& ScheduledMessages);
 
   // Publish a content to all server applications - notifies all server peers
-  int PublishAPhotoToAllPeerApps03 (string _FileName, vector<Message *> &ScheduledMessages);
+  int PublishAPhotoToAllPeerApps03(string _FileName, vector<Message*>& ScheduledMessages);
 
   // Auxiliary to sort files in the directory
-  std::vector<std::string> read_directory (const string _Path);
+  std::vector<std::string> read_directory(const string _Path);
 
   // TODO: FIXP/Update - This function has been added to simply content publishing
   // Auxiliary function
-  void CreatePublishMessage (double _Time, string _FileName, vector<Tuple *> &_PubNotify, vector<Tuple *> &_SubNotify);
+  void CreatePublishMessage(double _Time, string _FileName, vector<Tuple*>& _PubNotify, vector<Tuple*>& _SubNotify);
 };
 
 #endif
-
-
-
-
-
-

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		Application's core
-	Object:		Core
-	File:		Core.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		Application's core
+        Object:		Core
+        File:		Core.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -49,6 +49,10 @@
 #include "CoreRunSubscribe01.h"
 #endif
 
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
+
 #ifndef _CORERUNPERIODIC01_H
 #include "CoreRunPeriodic01.h"
 #endif
@@ -73,8 +77,8 @@
 #include "CoreDeliveryBind01.h"
 #endif
 
-Core::Core (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path)
-	: Block (_LN, _PP, _Index, _Path)
+Core::Core(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path)
+    : Block(_LN, _PP, _Index, _Path)
 {
   PGW = _PGW;
   PHT = _PHT;
@@ -95,275 +99,275 @@ Core::Core (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, s
   NumberOfMessagesPerBurst = 100;
   NumberOfPubsPerMessage = 100;
 
-  Message *PIM = 0;
-  CommandLine *PCL = 0;
-  Message *InlineResponseMessage = 0;
-  Action *PA = 0;
+  Message* PIM = 0;
+  CommandLine* PCL = 0;
+  Message* InlineResponseMessage = 0;
+  Action* PA = 0;
 
   // More ingenious task actions
-  NewAction ("-run --evaluate 0.1", PA);
+  NewAction("-run --evaluate 0.1", PA);
 
   // Basic task actions
-  NewAction ("-run --initialize 0.1", PA);
-  NewAction ("-run --discover 0.1", PA);
-  NewAction ("-run --subscribe 0.1", PA);
-  NewAction ("-run --periodic 0.1", PA);
+  NewAction("-run --initialize 0.1", PA);
+  NewAction("-run --discover 0.1", PA);
+  NewAction("-run --subscribe 0.1", PA);
+  NewAction("-run --periodic 0.1", PA);
 
   // Basic message related actions
-  NewAction ("-m --cl 0.1", PA);
-  NewAction ("-st --s 0.1", PA);
-  NewAction ("-scn --ack 0.1", PA);
-  NewAction ("-scn --seq 0.1", PA);
-  NewAction ("-d --b 0.1", PA);
+  NewAction("-m --cl 0.1", PA);
+  NewAction("-st --s 0.1", PA);
+  NewAction("-scn --ack 0.1", PA);
+  NewAction("-scn --seq 0.1", PA);
+  NewAction("-d --b 0.1", PA);
 
   // Creating a -run --initialization message
-  PP->NewMessage (GetTime (), 0, false, PIM);
+  PP->NewMessage(GetTime(), 0, false, PIM);
 
   // Adding only the run initialization command line
-  PIM->NewCommandLine ("-run", "--initialize", "0.1", PCL);
+  PIM->NewCommandLine("-run", "--initialize", "0.1", PCL);
 
   // Run
-  Run (PIM, InlineResponseMessage);
+  Run(PIM, InlineResponseMessage);
 
   // Mark to delete
-  PIM->MarkToDelete ();
+  PIM->MarkToDelete();
 }
 
-Core::~Core ()
+Core::~Core()
 {
   delete pubrtt;
   delete subrtt;
-  //delete tsmiup1;
+  // delete tsmiup1;
 
-  Tuple *Temp = 0;
+  Tuple* Temp = 0;
 
-  vector<Tuple *>::iterator it1;
+  vector<Tuple*>::iterator it1;
 
-  for (it1 = PSTuples.begin (); it1 != PSTuples.end (); it1++)
-	{
-	  Temp = *it1;
+  for (it1 = PSTuples.begin(); it1 != PSTuples.end(); it1++)
+  {
+    Temp = *it1;
 
-	  if (Temp != 0)
-		{
-		  delete Temp;
-		}
+    if (Temp != 0)
+    {
+      delete Temp;
+    }
 
-	  Temp = 0;
-	}
+    Temp = 0;
+  }
 
-  vector<Tuple *>::iterator it2;
+  vector<Tuple*>::iterator it2;
 
-  vector<Action *>::iterator it4;
+  vector<Action*>::iterator it4;
 
-  Action *Temp2 = 0;
+  Action* Temp2 = 0;
 
-  for (it4 = Actions.begin (); it4 != Actions.end (); it4++)
-	{
-	  Temp2 = *it4;
+  for (it4 = Actions.begin(); it4 != Actions.end(); it4++)
+  {
+    Temp2 = *it4;
 
-	  if (Temp != 0)
-		{
-		  delete Temp2;
-		}
+    if (Temp != 0)
+    {
+      delete Temp2;
+    }
 
-	  Temp2 = 0;
-	}
+    Temp2 = 0;
+  }
 }
 
 // Allocate and add an Action on Actions container
-void Core::NewAction (const string _LN, Action *&_PA)
+void Core::NewAction(const string _LN, Action*& _PA)
 {
   if (_LN == "-run --evaluate 0.1")
-	{
-	  CoreRunEvaluate01 *P = new CoreRunEvaluate01 (_LN, this, PP->PMB);
+  {
+    CoreRunEvaluate01* P = new CoreRunEvaluate01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --initialize 0.1")
-	{
-	  CoreRunInitialize01 *P = new CoreRunInitialize01 (_LN, this, PP->PMB);
+  {
+    CoreRunInitialize01* P = new CoreRunInitialize01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --discover 0.1")
-	{
-	  CoreRunDiscover01 *P = new CoreRunDiscover01 (_LN, this, PP->PMB);
+  {
+    CoreRunDiscover01* P = new CoreRunDiscover01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --subscribe 0.1")
-	{
-	  CoreRunSubscribe01 *P = new CoreRunSubscribe01 (_LN, this, PP->PMB);
+  {
+    CoreRunSubscribe01* P = new CoreRunSubscribe01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-run --periodic 0.1")
-	{
-	  CoreRunPeriodic01 *P = new CoreRunPeriodic01 (_LN, this, PP->PMB);
+  {
+    CoreRunPeriodic01* P = new CoreRunPeriodic01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-m --cl 0.1")
-	{
-	  CoreMsgCl01 *P = new CoreMsgCl01 (_LN, this, PP->PMB);
+  {
+    CoreMsgCl01* P = new CoreMsgCl01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-st --s 0.1")
-	{
-	  CoreStatusS01 *P = new CoreStatusS01 (_LN, this, PP->PMB);
+  {
+    CoreStatusS01* P = new CoreStatusS01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-scn --ack 0.1")
-	{
-	  CoreSCNAck01 *P = new CoreSCNAck01 (_LN, this, PP->PMB);
+  {
+    CoreSCNAck01* P = new CoreSCNAck01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-d --b 0.1")
-	{
-	  CoreDeliveryBind01 *P = new CoreDeliveryBind01 (_LN, this, PP->PMB);
+  {
+    CoreDeliveryBind01* P = new CoreDeliveryBind01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 
   if (_LN == "-scn --seq 0.1")
-	{
-	  CoreSCNSeq01 *P = new CoreSCNSeq01 (_LN, this, PP->PMB);
+  {
+    CoreSCNSeq01* P = new CoreSCNSeq01(_LN, this, PP->PMB);
 
-	  Actions.push_back ((Action *)P);
-	}
+    Actions.push_back((Action*)P);
+  }
 }
 
 // Get an Action
-int Core::GetAction (string _LN, Action *&_PA)
+int Core::GetAction(string _LN, Action*& _PA)
 {
   int Status = ERROR;
   return Status;
 }
 
 // Delete an Action
-int Core::DeleteAction (string _LN)
+int Core::DeleteAction(string _LN)
 {
   int Status = ERROR;
   return Status;
 }
 
 // Allocate and add a Subscription on Subscriptions container
-void Core::NewSubscription (Subscription *&_PS)
+void Core::NewSubscription(Subscription*& _PS)
 {
-  Subscription *PS = new Subscription;
+  Subscription* PS = new Subscription;
 
-  Subscriptions.push_back (PS);
+  Subscriptions.push_back(PS);
 
   _PS = PS;
 }
 
 // Delete a Subscription
-int Core::DeleteSubscription (Subscription *_PS)
+int Core::DeleteSubscription(Subscription* _PS)
 {
-  Subscription *PS = 0;
-  vector<Subscription *>::iterator it;
+  Subscription* PS = 0;
+  vector<Subscription*>::iterator it;
   int i = 0;
   int Status = ERROR;
 
-  for (it = Subscriptions.begin (); it != Subscriptions.end (); it++)
-	{
-	  PS = Subscriptions[i];
+  for (it = Subscriptions.begin(); it != Subscriptions.end(); it++)
+  {
+    PS = Subscriptions[i];
 
-	  if (PS == _PS)
-		{
-		  Subscriptions.erase (it);
+    if (PS == _PS)
+    {
+      Subscriptions.erase(it);
 
-		  delete PS;
+      delete PS;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
+      break;
+    }
 
-	  i++;
-	}
+    i++;
+  }
 
   return Status;
 }
 
 // Allocate and add a Publication on Publications container
-void Core::NewPublication (Publication *&_PP)
+void Core::NewPublication(Publication*& _PP)
 {
-  Publication *PP = new Publication;
+  Publication* PP = new Publication;
 
-  Publications.push_back (PP);
+  Publications.push_back(PP);
 
   _PP = PP;
 }
 
 // Get a Publication
-int Core::GetPublication (string _Key, Publication *&_PP)
+int Core::GetPublication(string _Key, Publication*& _PP)
 {
-  Publication *PP = 0;
-  vector<Publication *>::iterator it;
+  Publication* PP = 0;
+  vector<Publication*>::iterator it;
   int i = 0;
   int Status = ERROR;
 
-  for (it = Publications.begin (); it != Publications.end (); it++)
-	{
-	  PP = Publications[i];
+  for (it = Publications.begin(); it != Publications.end(); it++)
+  {
+    PP = Publications[i];
 
-	  if (PP->Key == _Key)
-		{
-		  _PP = PP;
+    if (PP->Key == _Key)
+    {
+      _PP = PP;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
+      break;
+    }
 
-	  i++;
-	}
+    i++;
+  }
 
   return Status;
 }
 
 // Delete a Subscription
-int Core::DeletePublication (Publication *_PP)
+int Core::DeletePublication(Publication* _PP)
 {
-  Publication *PP = 0;
-  vector<Publication *>::iterator it;
+  Publication* PP = 0;
+  vector<Publication*>::iterator it;
   int i = 0;
   int Status = ERROR;
 
-  for (it = Publications.begin (); it != Publications.end (); it++)
-	{
-	  PP = Publications[i];
+  for (it = Publications.begin(); it != Publications.end(); it++)
+  {
+    PP = Publications[i];
 
-	  if (PP == _PP)
-		{
-		  Publications.erase (it);
+    if (PP == _PP)
+    {
+      Publications.erase(it);
 
-		  delete PP;
+      delete PP;
 
-		  Status = OK;
+      Status = OK;
 
-		  break;
-		}
+      break;
+    }
 
-	  i++;
-	}
+    i++;
+  }
 
   return Status;
 }
 
-unsigned int Core::GetSequenceNumber ()
+unsigned int Core::GetSequenceNumber()
 {
   Counter++;
 
@@ -371,137 +375,135 @@ unsigned int Core::GetSequenceNumber ()
 }
 
 // Discover a 4-tuple on PGCS: first step
-void
-Core::DiscoveryFirstStep (string _Limiter, vector<string> *_Cat2Keywords, vector<string> *_Cat9Keywords, vector<Message *> ScheduledMessages)
+void Core::DiscoveryFirstStep(string _Limiter, vector<string>* _Cat2Keywords, vector<string>* _Cat9Keywords, vector<Message*> ScheduledMessages)
 {
   string Offset = "                    ";
-  Message *Run = 0;
-  CommandLine *PCL = 0;
+  Message* Run = 0;
+  CommandLine* PCL = 0;
   string Hash;
 
   // **********************************************************************************************************************************************************
   // Creates the ng -run --discovery 0.1 [ < 1 string Limiter > < 2 string Category1 Key1 >  < 2 string Category2 Key2 > ... < 2 string CategoryN KeyN > ]
   // **********************************************************************************************************************************************************
-  if (ScheduledMessages.size () > 0)
-	{
+  if (ScheduledMessages.size() > 0)
+  {
 
 #ifdef DEBUG
-	  S << Offset <<  "(There is a scheduled message)" << endl;
+    S << Offset << "(There is a scheduled message)" << endl;
 #endif
 
-	  Run = ScheduledMessages.at (0);
+    Run = ScheduledMessages.at(0);
 
-	  if (Run != 0)
-		{
-		  // Adding a ng -run --discovery command line
-		  Run->NewCommandLine ("-run", "--discover", "0.1", PCL);
+    if (Run != 0)
+    {
+      // Adding a ng -run --discovery command line
+      Run->NewCommandLine("-run", "--discover", "0.1", PCL);
 
-		  // Set the time to run
-		  Run->SetTime (GetTime () + DelayBeforeDiscovery);
+      // Set the time to run
+      Run->SetTime(GetTime() + DelayBeforeDiscovery);
 
-		  NewLimiterCommandLineArgument (_Limiter, PCL);
+      NewLimiterCommandLineArgument(_Limiter, PCL);
 
-		  if (_Cat2Keywords != 0)
-			{
-			  for (unsigned int i = 0; i < _Cat2Keywords->size (); i++)
-				{
-				  GenerateSCNFromCharArrayBinaryPatterns (_Cat2Keywords->at (i), Hash);
+      if (_Cat2Keywords != 0)
+      {
+        for (unsigned int i = 0; i < _Cat2Keywords->size(); i++)
+        {
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat2Keywords->at(i));
 
-				  NewPairCommandLineArgument (2, Hash, PCL);
+          NewPairCommandLineArgument(2, Hash, PCL);
 
-				  Hash = "";
-				}
-			}
+          Hash = "";
+        }
+      }
 
-		  if (_Cat9Keywords != 0)
-			{
-			  for (unsigned int j = 0; j < _Cat9Keywords->size (); j++)
-				{
-				  GenerateSCNFromCharArrayBinaryPatterns (_Cat9Keywords->at (j), Hash);
+      if (_Cat9Keywords != 0)
+      {
+        for (unsigned int j = 0; j < _Cat9Keywords->size(); j++)
+        {
+          Hash = NameGenerator::GetInstance().GenerateFromString(_Cat9Keywords->at(j));
 
-				  NewPairCommandLineArgument (9, Hash, PCL);
+          NewPairCommandLineArgument(9, Hash, PCL);
 
-				  Hash = "";
-				}
-			}
-		}
-	}
+          Hash = "";
+        }
+      }
+    }
+  }
 }
 
 // Discover a 4-tuple on PGCS: second step
-int
-Core::DiscoverySecondStep (string _Limiter, vector<string> *_Cat2Keywords, vector<string> *_Cat9Keywords, vector<Message *> ScheduledMessages)
+int Core::DiscoverySecondStep(string _Limiter, vector<string>* _Cat2Keywords, vector<string>* _Cat9Keywords, vector<Message*> ScheduledMessages)
 {
   int Status = ERROR;
   string Offset = "                    ";
-  Message *Run = 0;
-  CommandLine *PCL = 0;
-  vector<string> *HIDs = new vector<string>;
-  vector<string> *ADIs = new vector<string>;
+  Message* Run = 0;
+  CommandLine* PCL = 0;
+  vector<string>* HIDs = new vector<string>;
+  vector<string>* ADIs = new vector<string>;
 
   // **********************************************************************************************************************************************************
   // Creates the ng -run --discovery 0.1 [ < 1 string Limiter > < 2 string Category1 Key1 >  < 2 string Category2 Key2 > ... < 2 string CategoryN KeyN > ]
   // **********************************************************************************************************************************************************
-  if (ScheduledMessages.size () > 0)
-	{
+  if (ScheduledMessages.size() > 0)
+  {
 
 #ifdef DEBUG
-	  S << Offset <<  "(There is a scheduled message)" << endl;
+    S << Offset << "(There is a scheduled message)" << endl;
 #endif
 
-	  Run = ScheduledMessages.at (0);
+    Run = ScheduledMessages.at(0);
 
-	  if (Run != 0)
-		{
-		  // Adding a ng -run --discovery command line
-		  Run->NewCommandLine ("-run", "--discover", "0.1", PCL);
+    if (Run != 0)
+    {
+      // Adding a ng -run --discovery command line
+      Run->NewCommandLine("-run", "--discover", "0.1", PCL);
 
-		  // Set the time to run
-		  Run->SetTime (GetTime () + DelayBeforeDiscovery);
+      // Set the time to run
+      Run->SetTime(GetTime() + DelayBeforeDiscovery);
 
-		  NewLimiterCommandLineArgument (_Limiter, PCL);
+      NewLimiterCommandLineArgument(_Limiter, PCL);
 
-		  if (_Cat9Keywords != 0)
-			{
-			  for (unsigned int m = 0; m < _Cat9Keywords->size (); m++)
-				{
-				  if (PP->DiscoverHomonymsEntitiesIDsFromLN (9, _Cat9Keywords->at (m), HIDs, this) == OK)
-					{
-					  for (unsigned int i = 0; i < HIDs->size (); i++)
-						{
-						  NewPairCommandLineArgument (6, HIDs->at (i), PCL);
+      if (_Cat9Keywords != 0)
+      {
+        for (unsigned int m = 0; m < _Cat9Keywords->size(); m++)
+        {
+          if (PP->DiscoverHomonymsEntitiesIDsFromLN(9, _Cat9Keywords->at(m), HIDs, this) == OK)
+          {
+            for (unsigned int i = 0; i < HIDs->size(); i++)
+            {
+              NewPairCommandLineArgument(6, HIDs->at(i), PCL);
 
-						  Status = OK;
-						}
-					}
-				}
-			}
+              Status = OK;
+            }
+          }
+        }
+      }
 
-		  if (_Cat2Keywords != 0)
-			{
-			  for (unsigned int n = 0; n < _Cat2Keywords->size (); n++)
-				{
-				  if (PP->DiscoverHomonymsEntitiesIDsFromLN (2, _Cat2Keywords->at (n), ADIs, this) == OK)
-					{
-					  for (unsigned int i = 0; i < ADIs->size (); i++)
-						{
-						  NewPairCommandLineArgument (5, ADIs->at (i), PCL);
+      if (_Cat2Keywords != 0)
+      {
+        for (unsigned int n = 0; n < _Cat2Keywords->size(); n++)
+        {
+          if (PP->DiscoverHomonymsEntitiesIDsFromLN(2, _Cat2Keywords->at(n), ADIs, this) == OK)
+          {
+            for (unsigned int i = 0; i < ADIs->size(); i++)
+            {
+              NewPairCommandLineArgument(5, ADIs->at(i), PCL);
 
-						  Status = OK;
-						}
-					}
-				}
-			}
-		}
-	  else
-		{
-		  S << Offset << "(ERROR: Unable to obtain the scheduled message at index zero)" << endl;
-		}
-	}
+              Status = OK;
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      S << Offset << "(ERROR: Unable to obtain the scheduled message at index zero)" << endl;
+    }
+  }
   else
-	{
-	  S << Offset << "(ERROR: Unable to obtain the size of the scheduled messages vector)" << endl;
-	}
+  {
+    S << Offset << "(ERROR: Unable to obtain the size of the scheduled messages vector)" << endl;
+  }
 
   delete HIDs;
   delete ADIs;
@@ -510,42 +512,39 @@ Core::DiscoverySecondStep (string _Limiter, vector<string> *_Cat2Keywords, vecto
 }
 
 // Add a limiter on the ng -run --x command line
-void Core::NewLimiterCommandLineArgument (string _Limiter, CommandLine *&_PCL)
+void Core::NewLimiterCommandLineArgument(string _Limiter, CommandLine*& _PCL)
 {
-  _PCL->NewArgument (1);
+  _PCL->NewArgument(1);
 
-  _PCL->SetArgumentElement (0, 0, _Limiter);
+  _PCL->SetArgumentElement(0, 0, _Limiter);
 }
 
 // Add a pair <category, key> on the ng -run --x command line
-void Core::NewPairCommandLineArgument (unsigned int _Category, string _Key, CommandLine *&_PCL)
+void Core::NewPairCommandLineArgument(unsigned int _Category, string _Key, CommandLine*& _PCL)
 {
   unsigned int Number = 0;
 
-  _PCL->NewArgument (2);
+  _PCL->NewArgument(2);
 
-  _PCL->GetNumberofArguments (Number);
+  _PCL->GetNumberofArguments(Number);
 
-  _PCL->SetArgumentElement ((Number - 1), 0, IntToString (_Category));
+  _PCL->SetArgumentElement((Number - 1), 0, IntToString(_Category));
 
-  _PCL->SetArgumentElement ((Number - 1), 1, _Key);
+  _PCL->SetArgumentElement((Number - 1), 1, _Key);
 }
 
 // Add a terna <category, key, value> on the ng -run --x command line
-void Core::NewTernaCommandLineArgument (unsigned int _Category, string _Key, string _Value, CommandLine *&_PCL)
+void Core::NewTernaCommandLineArgument(unsigned int _Category, string _Key, string _Value, CommandLine*& _PCL)
 {
   unsigned int Number = 0;
 
-  _PCL->NewArgument (3);
+  _PCL->NewArgument(3);
 
-  _PCL->GetNumberofArguments (Number);
+  _PCL->GetNumberofArguments(Number);
 
-  _PCL->SetArgumentElement ((Number - 1), 0, IntToString (_Category));
+  _PCL->SetArgumentElement((Number - 1), 0, IntToString(_Category));
 
-  _PCL->SetArgumentElement ((Number - 1), 1, _Key);
+  _PCL->SetArgumentElement((Number - 1), 1, _Key);
 
-  _PCL->SetArgumentElement ((Number - 1), 2, _Value);
+  _PCL->SetArgumentElement((Number - 1), 2, _Value);
 }
-
-
-

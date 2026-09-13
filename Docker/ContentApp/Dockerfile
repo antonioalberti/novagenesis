@@ -6,7 +6,12 @@ MAINTAINER Antonio Marcos Alberti "antonioalberti@gmail.com"
 RUN apt-get update -y && \
     apt-get install gcc g++ -y && \
     apt-get install cmake -y && \
-    apt-get install net-tools -y
+    apt-get install net-tools -y && \
+    apt-get install tcpdump -y && \
+    apt-get install python3 python3-pip -y
+
+# Install Pillow and numpy for image generation (BuildPhotos.py)
+RUN pip3 install Pillow numpy --break-system-packages
 
 # Prepare multiprocess supervisor
 RUN apt-get update && apt-get install -y supervisor

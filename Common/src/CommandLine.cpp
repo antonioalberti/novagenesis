@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		CommandLine
-	Object:		CommandLine
-	File:		CommandLine.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		CommandLine
+        Object:		CommandLine
+        File:		CommandLine.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -31,505 +31,507 @@
 
 CommandLine::CommandLine()
 {
-	Name = "";
-	Alternative="";
-	Version="";
+  Name = "";
+  Alternative = "";
+  Version = "";
 
-	NoA=0;
-	Arguments=0;
-	NoE=0;
+  NoA = 0;
+  Arguments = 0;
+  NoE = 0;
 }
 
 CommandLine::CommandLine(string _Name, string _Alternative, string _Version)
 {
-	Name = _Name;
-	Alternative=_Alternative;
-	Version=_Version;
+  Name = _Name;
+  Alternative = _Alternative;
+  Version = _Version;
 
-	NoA=0;
-	Arguments=0;
-	NoE=0;
+  NoA = 0;
+  Arguments = 0;
+  NoE = 0;
 }
 
-CommandLine::CommandLine(const CommandLine &CL)
+CommandLine::CommandLine(const CommandLine& CL)
 {
-	Name = CL.Name;
-	Alternative=CL.Alternative;
-	Version=CL.Version;
+  Name = CL.Name;
+  Alternative = CL.Alternative;
+  Version = CL.Version;
 
-	NoA = CL.NoA;
+  NoA = CL.NoA;
 
-	// Allocating the arguments
-	Arguments = new string*[NoA];
+  // Allocating the arguments
+  Arguments = new string*[NoA];
 
-	NoE=new unsigned int[NoA];
+  NoE = new unsigned int[NoA];
 
-	// Copy the previous NoE array
-	for (unsigned int m=0; m<NoA; m++)
-		{
-			NoE[m]=CL.NoE[m];
+  // Copy the previous NoE array
+  for (unsigned int m = 0; m < NoA; m++)
+  {
+    NoE[m] = CL.NoE[m];
 
-			Arguments[m]=new string[NoE[m]];
-		}
+    Arguments[m] = new string[NoE[m]];
+  }
 
-	// Copying the elements
-	for (unsigned int n=0; n<CL.NoA; n++)
-		{
-			for (unsigned int o=0; o<CL.NoE[n]; o++)
-				{
-					Arguments[n][o]=CL.Arguments[n][o];
-				}
-		}
+  // Copying the elements
+  for (unsigned int n = 0; n < CL.NoA; n++)
+  {
+    for (unsigned int o = 0; o < CL.NoE[n]; o++)
+    {
+      Arguments[n][o] = CL.Arguments[n][o];
+    }
+  }
 }
 
 CommandLine::~CommandLine()
 {
-	//cout << "It has "<<NoA<<" arguments)"<<endl;
+  // cout << "It has "<<NoA<<" arguments)"<<endl;
 
-	if (NoA > 0)
-		{
-			for (unsigned int i = 0; i<NoA; i++)
-				{
-					//cout << "(Going to delete the argument number "<<i<<")"<<endl;
+  if (NoA > 0)
+  {
+    for (unsigned int i = 0; i < NoA; i++)
+    {
+      // cout << "(Going to delete the argument number "<<i<<")"<<endl;
 
-					delete[] Arguments[i];
-				}
+      delete[] Arguments[i];
+    }
 
-			//cout << "(Going to delete the arguments array)"<<endl;
+    // cout << "(Going to delete the arguments array)"<<endl;
 
-			delete[] Arguments;
+    delete[] Arguments;
 
-			//cout << "(Going to delete the number of elements array)"<<endl;
+    // cout << "(Going to delete the number of elements array)"<<endl;
 
-			delete[] NoE;
-		}
+    delete[] NoE;
+  }
 }
 
 void CommandLine::NewArgument(int _Size)
 {
-	string** A = new string*[NoA+1];
+  string** A = new string*[NoA + 1];
 
-	unsigned int *NE=new unsigned int[NoA+1];
+  unsigned int* NE = new unsigned int[NoA + 1];
 
-	// Copy the previous NoE array
-	for (unsigned int m=0; m<NoA; m++)
-		{
-			NE[m]=NoE[m];
+  // Copy the previous NoE array
+  for (unsigned int m = 0; m < NoA; m++)
+  {
+    NE[m] = NoE[m];
 
-			A[m]=new string[NE[m]];
-		}
+    A[m] = new string[NE[m]];
+  }
 
-	// Copy the previous arguments elements
-	for (unsigned int n=0; n<NoA; n++)
-		{
-			for (unsigned int o=0; o<NE[n]; o++)
-				{
-					A[n][o]=Arguments[n][o];
-				}
-		}
+  // Copy the previous arguments elements
+  for (unsigned int n = 0; n < NoA; n++)
+  {
+    for (unsigned int o = 0; o < NE[n]; o++)
+    {
+      A[n][o] = Arguments[n][o];
+    }
+  }
 
-	// Set the new argument number of elements
-	NE[NoA]=_Size;
+  // Set the new argument number of elements
+  NE[NoA] = _Size;
 
-	// Allocate the new argument
-	A[NoA]=new string[NE[NoA]];
+  // Allocate the new argument
+  A[NoA] = new string[NE[NoA]];
 
-	if (NoA > 0)
-		{
-			// Delete the previous allocation
-			for (unsigned int q = 0; q < NoA; ++q)
-				{
-					delete[] Arguments[q];
-				}
+  if (NoA > 0)
+  {
+    // Delete the previous allocation
+    for (unsigned int q = 0; q < NoA; ++q)
+    {
+      delete[] Arguments[q];
+    }
 
-			delete[] Arguments;
+    delete[] Arguments;
 
-			delete[] NoE;
-		}
+    delete[] NoE;
+  }
 
-	// Set the temporary array as the new arguments
-	Arguments=A;
+  // Set the temporary array as the new arguments
+  Arguments = A;
 
-	// Set the temporary array of number of elements as the new array
-	NoE=NE;
+  // Set the temporary array of number of elements as the new array
+  NoE = NE;
 
-	// Update the NoA
-	NoA++;
+  // Update the NoA
+  NoA++;
 
-	//cout << "NoA = "<<NoA<<endl;
+  // cout << "NoA = "<<NoA<<endl;
 }
 
-int CommandLine::GetArgument(unsigned int _Index, vector<string> & _Argument)
+int CommandLine::GetArgument(unsigned int _Index, vector<string>& _Argument)
 {
-	if (_Index < NoA)
-		{
-			for (unsigned int i=0; i<NoE[_Index]; i++)
-				{
-					_Argument.push_back(Arguments[_Index][i]);
-				}
+  if (_Index < NoA)
+  {
+    for (unsigned int i = 0; i < NoE[_Index]; i++)
+    {
+      _Argument.push_back(Arguments[_Index][i]);
+    }
 
-			return OK;
-		}
+    return OK;
+  }
 
-	return ERROR;
+  return ERROR;
 }
 
-int CommandLine::GetNumberofArguments(unsigned int &_Number)
+int CommandLine::GetNumberofArguments(unsigned int& _Number)
 {
-	_Number=NoA;
+  _Number = NoA;
 
-	return OK;
+  return OK;
 }
 
-int CommandLine::GetNumberofArgumentElements(unsigned int _Index, unsigned int &_Number)
+int CommandLine::GetNumberofArgumentElements(unsigned int _Index, unsigned int& _Number)
 {
-	if (_Index < NoA)
-		{
-			_Number=NoE[_Index];
+  if (_Index < NoA)
+  {
+    _Number = NoE[_Index];
 
-			return OK;
-		}
+    return OK;
+  }
 
-	return ERROR;
+  return ERROR;
 }
 
 int CommandLine::SetArgumentElement(unsigned int _Index, unsigned int _Element, string _Value)
 {
-	if (_Index < NoA)
-		{
-			if (_Element < NoE[_Index])
-				{
-					Arguments[_Index][_Element]=_Value;
+  if (_Index < NoA)
+  {
+    if (_Element < NoE[_Index])
+    {
+      Arguments[_Index][_Element] = _Value;
 
-					return OK;
-				}
-			else
-				{
-					return ERROR;
-				}
-		}
+      return OK;
+    }
+    else
+    {
+      return ERROR;
+    }
+  }
 
-	return ERROR;
+  return ERROR;
 }
 
-int CommandLine::GetArgumentElement(unsigned int _Index, unsigned int _Element, string &_Value) const
+int CommandLine::GetArgumentElement(unsigned int _Index, unsigned int _Element, string& _Value) const
 {
-	if (_Index < NoA)
-		{
-			if (_Element < NoE[_Index])
-				{
-					_Value=Arguments[_Index][_Element];
+  if (_Index < NoA)
+  {
+    if (_Element < NoE[_Index])
+    {
+      _Value = Arguments[_Index][_Element];
 
-					return OK;
-				}
+      return OK;
+    }
 
-			return ERROR;
-		}
+    return ERROR;
+  }
 
-	return ERROR;
+  return ERROR;
 }
 
-ostream&  operator<< (ostream& os, const CommandLine& CL)
+ostream& operator<<(ostream& os, const CommandLine& CL)
 {
-	string 			NG="ng ";
-	string 			SP=" ";
-	string 			NL="\n";
-	string 			OA="[ ";
-	string 			CA="]";
-	string 			OV="< ";
-	string 			CV=">";
-	unsigned int    _Size;
+  string NG = "ng ";
+  string SP = " ";
+  string NL = "\n";
+  string OA = "[ ";
+  string CA = "]";
+  string OV = "< ";
+  string CV = ">";
+  unsigned int _Size;
 
-	os << NG << CL.Name << SP << CL.Alternative << SP << CL.Version;
+  os << NG << CL.Name << SP << CL.Alternative << SP << CL.Version;
 
-	if(CL.NoA > 0)
-		{
-			os << SP << OA;
+  if (CL.NoA > 0)
+  {
+    os << SP << OA;
 
-			// Run over the number of arguments
-			for (unsigned int i=0; i< CL.NoA; i++)
-				{
-					os << OV;
+    // Run over the number of arguments
+    for (unsigned int i = 0; i < CL.NoA; i++)
+    {
+      os << OV;
 
-					stringstream 	out;
+      stringstream out;
 
-					_Size=CL.NoE[i];
+      _Size = CL.NoE[i];
 
-					//cout << endl <<"(The command line has "<<_Size<<" arguments)"<< endl;
+      // cout << endl <<"(The command line has "<<_Size<<" arguments)"<< endl;
 
-					out << _Size;
+      out << _Size;
 
-					os << out.str() << SP << "s ";
+      os << out.str() << SP << "s ";
 
-					//cout << endl <<"(The argument has "<<PV1->size()<<" elements)"<< endl;
+      // cout << endl <<"(The argument has "<<PV1->size()<<" elements)"<< endl;
 
-					for (unsigned int j=0; j<CL.NoE[i]; j++)
-						{
-							string E;
+      for (unsigned int j = 0; j < CL.NoE[i]; j++)
+      {
+        string E;
 
-							E=CL.Arguments[i][j];
+        E = CL.Arguments[i][j];
 
-							os<< E << SP;
-						}
+        os << E << SP;
+      }
 
-					os << CV << SP;
-				}
+      os << CV << SP;
+    }
 
-			os << CA << NL;
-		}
+    os << CA << NL;
+  }
 
-	if(CL.NoA == 0)
-		{
-			os << NL;
-		}
+  if (CL.NoA == 0)
+  {
+    os << NL;
+  }
 
-	return os;
+  return os;
 }
 
-istringstream& operator>> (istringstream& iss, CommandLine& CL)
+istringstream& operator>>(istringstream& iss, CommandLine& CL)
 {
-	string			Temp;
-	int				Size;
-	unsigned int	Argument_Number=0;
+  string Temp;
+  int Size;
+  unsigned int Argument_Number = 0;
 
-	iss >> Temp;
+  iss >> Temp;
 
-	if (Temp == "ng")
-		{
-			iss >> CL.Name;
-			iss >> CL.Alternative;
-			iss >> CL.Version;
-			iss >> Temp;              // Reads the [
+  if (Temp == "ng")
+  {
+    iss >> CL.Name;
+    iss >> CL.Alternative;
+    iss >> CL.Version;
+    iss >> Temp; // Reads the [
 
-			if (Temp == "[" && CL.Name != "" && CL.Alternative != "" && CL.Version != "" && Temp != "[<" )
-				{
-					while(!iss.eof())
-						{
-							iss >> Temp; // Reads the <
+    if (Temp == "[" && CL.Name != "" && CL.Alternative != "" && CL.Version != "" && Temp != "[<")
+    {
+      while (!iss.eof())
+      {
+        iss >> Temp; // Reads the <
 
-							if (Temp == "<" && Temp != "<1" && Temp != "<2" && Temp != "<3" && Temp != "]")
-								{
-									iss >> Temp; // Reads the number
+        if (Temp == "<" && Temp != "<1" && Temp != "<2" && Temp != "<3" && Temp != "]")
+        {
+          iss >> Temp; // Reads the number
 
-									stringstream ssout(Temp.c_str());
+          stringstream ssout(Temp.c_str());
 
-									ssout>>Size;
+          ssout >> Size;
 
-									//cout << endl << "Size = "<<Size<<endl;
+          // cout << endl << "Size = "<<Size<<endl;
 
-									if (Size > 0)
-										{
-											// New argument
-											CL.NewArgument(Size);
+          if (Size > 0)
+          {
+            // New argument
+            CL.NewArgument(Size);
 
-											iss >> Temp; // Reads the type
+            iss >> Temp; // Reads the type
 
-											if ((Temp == "s" || Temp == "h" || Temp == "i") && (Temp != "1s" && Temp != "2s" && Temp != "3s") )
-												{
-													for (int i=0; i < Size; i++)
-														{
-															iss >> Temp; // Reads the value
+            if ((Temp == "s" || Temp == "h" || Temp == "i") && (Temp != "1s" && Temp != "2s" && Temp != "3s"))
+            {
+              for (int i = 0; i < Size; i++)
+              {
+                iss >> Temp; // Reads the value
 
-															//cout << "Value = "<<Temp<<endl;
+                // cout << "Value = "<<Temp<<endl;
 
-															if (Temp != "" && Temp != ">" && Temp != "<" && Temp != "]" && Temp != " ")
-																{
-																	// New element
+                if (Temp != "" && Temp != ">" && Temp != "<" && Temp != "]" && Temp != " ")
+                {
+                  // New element
 
-																	CL.SetArgumentElement(Argument_Number,i,Temp);
-																}
-															else
-																{
-																	break;
-																}
-														}
+                  CL.SetArgumentElement(Argument_Number, i, Temp);
+                }
+                else
+                {
+                  break;
+                }
+              }
 
-													iss >> Temp; // Reads the >
-												}
-											else
-												{
-													break;
-												}
-										}
-								}
-							else
-								{
-									break;
-								}
+              iss >> Temp; // Reads the >
+            }
+            else
+            {
+              break;
+            }
+          }
+        }
+        else
+        {
+          break;
+        }
 
-							Argument_Number++;
-						}
-				}
-		}
+        Argument_Number++;
+      }
+    }
+  }
 
-	iss >> Temp; // Reads the ]
+  iss >> Temp; // Reads the ]
 
-	//cout << "The command line is :" <<endl;
+  // cout << "The command line is :" <<endl;
 
-	//cout << CL << endl;
+  // cout << CL << endl;
 
-	return iss;
+  return iss;
 }
 
 // Example of command line
 // ng -p --notify _Version [ < 1 string _Category > < 1 string _Key > < _ValuesSize string S_1 ... S_ValuesSize > < _PubNotifySize string pub HID OSID PID BID > ... < _SubNotifySize string sub HID OSID PID BID > ]
-int CommandLine::ConvertCommandLineFromCharArray(char *_CL, int _Size)
+int CommandLine::ConvertCommandLineFromCharArray(char* _CL, int _Size)
 {
-	bool 			HasNG=false;
-	bool			HasCommandMarker=false;
-	int				AlternativeMarkerPosition=0;
-	bool			HasBeginArgumentMarker=false;
-	bool			HasEndArgumentMarker=false;
-	int				WhiteSpacePositions[4096]; 			// There is a limit of 4096 white space per command line
-	int				WhiteSpaceCounter=0; 				// Number of white spaces detected
-	int				BeginVectorMarkerCounter=0;      	// Zero means no marker
-	int				EndVectorMarkerCounter=0;      		// Zero means no marker
-	int 			Status=ERROR;
+  bool HasNG = false;
+  bool HasCommandMarker = false;
+  int AlternativeMarkerPosition = 0;
+  bool HasBeginArgumentMarker = false;
+  bool HasEndArgumentMarker = false;
+  int WhiteSpacePositions[4096];    // There is a limit of 4096 white space per command line
+  int WhiteSpaceCounter = 0;        // Number of white spaces detected
+  int BeginVectorMarkerCounter = 0; // Zero means no marker
+  int EndVectorMarkerCounter = 0;   // Zero means no marker
+  int Status = ERROR;
 
-	for (int y=0; y<4096; y++)
-		{
-			WhiteSpacePositions[y]=0;
-		}
+  for (int y = 0; y < 4096; y++)
+  {
+    WhiteSpacePositions[y] = 0;
+  }
 
-	if (_Size > 9)
-		{
-			if (_CL[0] == 'n' && _CL[1] == 'g' && _CL[3] == '-')
-				{
-					HasNG=true;
-					HasCommandMarker=true;
+  if (_Size > 9)
+  {
+    if (_CL[0] == 'n' && _CL[1] == 'g' && _CL[3] == '-')
+    {
+      HasNG = true;
+      HasCommandMarker = true;
 
-					// Loop over all characters
-					for (int i=0; i<(_Size-1); i++)
-						{
-							if (_CL[i] == ' ')
-								{
-									WhiteSpacePositions[WhiteSpaceCounter]=i;
-									WhiteSpaceCounter++;
-								}
+      // Loop over all characters
+      for (int i = 0; i < (_Size - 1); i++)
+      {
+        if (_CL[i] == ' ')
+        {
+          WhiteSpacePositions[WhiteSpaceCounter] = i;
+          WhiteSpaceCounter++;
+        }
 
-							if (_CL[i] == '-' && _CL[i+1] == '-')
-								{
-									AlternativeMarkerPosition=i;
-								}
+        if (_CL[i] == '-' && _CL[i + 1] == '-')
+        {
+          AlternativeMarkerPosition = i;
+        }
 
-							if (_CL[i] == '[')
-								{
-									HasBeginArgumentMarker=true;
-								}
+        if (_CL[i] == '[')
+        {
+          HasBeginArgumentMarker = true;
+        }
 
-							if (_CL[i+1] == ']')
-								{
-									HasEndArgumentMarker=true;
-								}
+        if (_CL[i + 1] == ']')
+        {
+          HasEndArgumentMarker = true;
+        }
 
-							if (_CL[i] == '<')
-								{
-									BeginVectorMarkerCounter++;
-								}
+        if (_CL[i] == '<')
+        {
+          BeginVectorMarkerCounter++;
+        }
 
-							if (_CL[i] == '>')
-								{
-									EndVectorMarkerCounter++;
-								}
+        if (_CL[i] == '>')
+        {
+          EndVectorMarkerCounter++;
+        }
+      }
 
-						}
+      if (HasNG == true &&
+          HasCommandMarker == true &&
+          HasBeginArgumentMarker == true &&
+          HasEndArgumentMarker == true &&
+          AlternativeMarkerPosition > 0 &&
+          WhiteSpaceCounter > 3)
+      {
+        string* Words = new string[WhiteSpaceCounter + 1];
 
-					if (HasNG == true &&
-					    HasCommandMarker == true &&
-					    HasBeginArgumentMarker == true &&
-					    HasEndArgumentMarker == true &&
-					    AlternativeMarkerPosition > 0 &&
-					    WhiteSpaceCounter > 3)
-						{
-							string *Words=new string[WhiteSpaceCounter+1];
+        // Loop over white space positions
+        for (int j = 0; j < (WhiteSpaceCounter - 1); j++)
+        {
+          // cout << "j = "<<j<<endl;
+          // cout <<"White space at = "<<WhiteSpacePositions[j]<<endl;
 
-							// Loop over white space positions
-							for (int j=0; j<(WhiteSpaceCounter-1); j++)
-								{
-									//cout << "j = "<<j<<endl;
-									//cout <<"White space at = "<<WhiteSpacePositions[j]<<endl;
+          int Begin = WhiteSpacePositions[j];
+          int End = WhiteSpacePositions[j + 1];
 
-									int Begin=WhiteSpacePositions[j];
-									int	End=WhiteSpacePositions[j+1];
+          if (End > Begin && Begin > 0)
+          {
+            for (int k = (Begin + 1); k < End; k++)
+            {
+              Words[j] = Words[j] + _CL[k];
 
-									if (End > Begin && Begin > 0)
-										{
-											for (int k=(Begin+1); k<End; k++)
-												{
-													Words[j]=Words[j]+_CL[k];
+              // cout << "Temp["<<k<<"] = "<<_CL[k]<< endl;
+            }
 
-													//cout << "Temp["<<k<<"] = "<<_CL[k]<< endl;
-												}
+            // cout <<"I discovered the word = "<<Words[j]<<endl;
+          }
+        }
 
-											//cout <<"I discovered the word = "<<Words[j]<<endl;
-										}
-								}
+        // cout<<endl<<endl;
 
-							//cout<<endl<<endl;
+        for (int l = 0; l < WhiteSpaceCounter + 1; l++)
+        {
+          // cout <<Words[l]<<endl;
 
-							for (int l=0; l<WhiteSpaceCounter+1; l++)
-								{
-									//cout <<Words[l]<<endl;
+          if (l == 0)
+            Name = Words[0];
+          if (l == 1)
+            Alternative = Words[1];
+          if (l == 2)
+            Version = Words[2];
 
-									if (l == 0) Name=Words[0];
-									if (l == 1) Alternative=Words[1];
-									if (l == 2) Version=Words[2];
+          Status = OK;
 
-									Status=OK;
+          if (Words[l] == "<")
+          {
+            // cout <<endl<< "Vector Size = "<< Words[l+1]<<endl;
+            // cout << "Vector Type = "<< Words[l+2]<<endl;
 
-									if (Words[l] == "<")
-										{
-											//cout <<endl<< "Vector Size = "<< Words[l+1]<<endl;
-											//cout << "Vector Type = "<< Words[l+2]<<endl;
+            stringstream ss(Words[l + 1]);
 
-											stringstream ss(Words[l+1]);
+            int VectorSize = 0;
 
-											int VectorSize=0;
+            ss >> VectorSize;
 
-											ss >> VectorSize;
+            // cout << "Integer Size = "<<VectorSize<<endl;
 
-											//cout << "Integer Size = "<<VectorSize<<endl;
+            if (VectorSize > 0 && VectorSize < 4096) // The maximum number of elements in a vector
+            {
+              // New argument
+              NewArgument(VectorSize);
 
-											if (VectorSize > 0 && VectorSize < 4096)				// The maximum number of elements in a vector
-												{
-													// New argument
-													NewArgument(VectorSize);
+              for (int m = 0; m < VectorSize; m++)
+              {
+                int wi = l + 3 + m;
 
-													for (int m=0; m<VectorSize; m++)
-														{
-															int wi=l+3+m;
+                if (wi <= WhiteSpaceCounter)
+                {
+                  // cout << "Value = "<<Words[wi]<<endl;
 
-															if (wi <= WhiteSpaceCounter)
-																{
-																	//cout << "Value = "<<Words[wi]<<endl;
+                  if (Words[wi] != "" && Words[wi] != ">" && Words[wi] != "<" && Words[wi] != "]" && Words[wi] != " ")
+                  {
+                    // New element
+                    SetArgumentElement((NoA - 1), m, Words[wi]);
+                  }
+                }
+              }
+            }
+          }
+        }
 
-																	if (Words[wi] != "" && Words[wi] != ">" && Words[wi] != "<" && Words[wi] != "]" && Words[wi] != " ")
-																		{
-																			// New element
-																			SetArgumentElement((NoA-1),m,Words[wi]);
-																		}
-																}
-														}
-												}
-										}
-								}
+        delete[] Words;
+      }
+    }
+  }
 
-							delete[] Words;
-						}
-				}
-		}
-
-	return Status;
+  return Status;
 }
 
 // Auxiliary functions
 int CommandLine::StringToInt(string _String)
 {
-	stringstream ss(_String);
+  stringstream ss(_String);
 
-	int Temp=0;
+  int Temp = 0;
 
-	ss >> Temp;
+  ss >> Temp;
 
-	return Temp;
+  return Temp;
 }

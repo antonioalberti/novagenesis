@@ -1,0 +1,27 @@
+{
+  "probe_500msg_s": {
+    "result": "BOTH PGCS PROCESSES DIED ABRUPTLY after ~5 min (logs cut mid-line, ~1GB debug log each, no OOM, no dmesg access).",
+    "interpretation": "500 msg/s (StressInterval=0.002, 2500 msgs per 5s period) crashes the current AIOPT3+e714ab1 code. Consistent with AMEND-3 flagged defects: use-after-free on SAR completion logging, unbounded ReassemblyBuffers growth, no duplicate-SN protection.",
+    "config": "StressInterval=0.002, both PGCS, DEBUG instrumentation on"
+  },
+  "probe_100msg_s": {
+    "src_to_repo": {
+      "offered_120s": 14500,
+      "received": 15000,
+      "rate_msg_s": 121,
+      "loss": "0% (counter skew +4% on receive side \u2014 receive path double-counts, sent-side MN count authoritative)"
+    },
+    "repo_to_src": {
+      "offered_120s": 15000,
+      "received": 15458,
+      "loss": "0%"
+    },
+    "wire_check": {
+      "src_unique_mn_sent": 61563,
+      "repo_unique_mn_received": 60827,
+      "note": "MNs unique, no duplicates on wire"
+    },
+    "conclusion": "At ~120 msg/s sustained, current code delivers ~100% (no loss). At 500 msg/s it CRASHES."
+  },
+  "baseline_verdict": "Baseline performance is NOT the bottleneck at moderate load; stability at high load is the problem. Phase 1 (safety fixes) is directly targeting the observed crash."
+}

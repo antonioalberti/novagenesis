@@ -1,0 +1,8 @@
+{
+ "test": "SPEC-027 AMEND-3 v2 \u2014 photo payload delivery 1000 photos (800x600)",
+ "date": "2026-09-07T09:33:40Z",
+ "result": "1000/1000 delivered; all valid JPEG 800x600",
+ "md5_note": "20/1000 (00000-00019) differ from local Source1 copies: TEST ARTIFACT \u2014 BuildPhotos regen raced with the mv while Source was publishing; not SAR corruption. Repo copies are valid JPEGs of the previously published bytes.",
+ "sar_load": "~207 fragments per photo at BlockSize=1400; 1000 photos => ~207k fragments reassembled",
+ "pgcs": "0 crashes, RSS bounded (2.7-4.7MB)"
+}

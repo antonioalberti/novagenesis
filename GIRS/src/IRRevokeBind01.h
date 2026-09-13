@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Indirection resolution block revoke binding action
-	Object:		IRRevokeBind01
-	File:		IRRevokeBind01.h
-	Author:		Antonio Marcos Alberti
-	Date:		5/2016
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Indirection resolution block revoke binding action
+        Object:		IRRevokeBind01
+        File:		IRRevokeBind01.h
+        Author:		Antonio Marcos Alberti
+        Date:		5/2016
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -61,27 +61,21 @@
 
 class Block;
 
-class IRRevokeBind01 : public Action {
- public:
-
+class IRRevokeBind01 : public Action
+{
+public:
   // Constructor
-  IRRevokeBind01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  IRRevokeBind01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~IRRevokeBind01 ();
+  virtual ~IRRevokeBind01();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Function to select the proper HTS instance for a name binding
-  int SelectHTS (string _Key, int _NumberOfInstances, int &_Index);
+  int SelectHTS(string _Key, int _NumberOfInstances, int& _Index);
 };
 
 #endif
-
-
-
-
-
-

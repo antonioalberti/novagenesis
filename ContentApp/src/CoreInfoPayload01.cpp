@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		CoreInfoPayload01
-	Object:		CoreInfoPayload01
-	File:		CoreInfoPayload01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		CoreInfoPayload01
+        Object:		CoreInfoPayload01
+        File:		CoreInfoPayload01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -37,121 +37,193 @@
 #include "HT.h"
 #endif
 
-////#define DEBUG // To follow message processing
+#ifndef _NAMEGENERATOR_H
+#include "../../Common/src/NameGenerator.h"
+#endif
 
-CoreInfoPayload01::CoreInfoPayload01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+// #define DEBUG // To follow message processing
+
+CoreInfoPayload01::CoreInfoPayload01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-CoreInfoPayload01::~CoreInfoPayload01 ()
+CoreInfoPayload01::~CoreInfoPayload01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -info --payload _Version [ < n string _ValuesSize string S_1 ... S_ValuesSize > ]
-int
-CoreInfoPayload01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int CoreInfoPayload01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
   string Offset = "                    ";
   unsigned int NA = 0;
   vector<string> Values;
-  Core *PCore = 0;
+  Core* PCore = 0;
 
-  PCore = (Core *)PB;
+  PCore = (Core*)PB;
 
 #ifdef DEBUG
 
-  PB->S << Offset <<  this->GetLegibleName() << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
   // Load the number of arguments
-  if (_PCL->GetNumberofArguments (NA) == OK)
-	{
-	  // Check the number of arguments
-	  if (NA == 1)
-		{
-		  // Get received command line argument
-		  _PCL->GetArgument (0, Values);
+  if (_PCL->GetNumberofArguments(NA) == OK)
+  {
+    // Check the number of arguments
+    if (NA == 1)
+    {
+      // Get received command line argument
+      _PCL->GetArgument(0, Values);
 
-		  if (Values.size () > 0)
-			{
-			  // The additional information is related to the message payload
-			  if (_PCL->Alternative == "--payload")
-				{
-				  if (_ReceivedMessage->GetHasPayloadFlag () == true)
-					{
-					  string PayloadPath = PB->GetPath ();
+      if (Values.size() > 0)
+      {
+        // The additional information is related to the message payload
+        if (_PCL->Alternative == "--payload")
+        {
+          if (_ReceivedMessage->GetHasPayloadFlag() == true)
+          {
+            string PayloadPath = PB->GetPath();
 
 #ifdef DEBUG
-					  PB->S << Offset <<  "(The received message has a payload whose file is named "<<Values.at(0)<<")" << endl;
-					  PB->S << Offset <<  "(Saving the payload on the path "<<PayloadPath<<")" << endl;
+            PB->S << Offset << "(The received message has a payload whose file is named " << Values.at(0) << ")" << endl;
+            PB->S << Offset << "(Saving the payload on the path " << PayloadPath << ")" << endl;
 #endif
-					  _ReceivedMessage->SetPayloadFileName (Values.at (0));
-					  _ReceivedMessage->SetPayloadFilePath (PayloadPath);
-					  _ReceivedMessage->SetPayloadFileOption ("BINARY");
-					  _ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray ();
-					  _ReceivedMessage->ConvertPayloadFromCharArrayToFile ();
+            _ReceivedMessage->SetPayloadFileName(Values.at(0));
+            _ReceivedMessage->SetPayloadFilePath(PayloadPath);
+            _ReceivedMessage->SetPayloadFileOption("BINARY");
+            // SPEC-015: Removed ExtractPayloadCharArrayFromMessageCharArray() — redundant call that
+            // re-parses Msg using stringstream::getline(), corrupting binary payloads (e.g. JPG).
+            // The GW already correctly extracted Payload via ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2().
+            //_ReceivedMessage->ExtractPayloadCharArrayFromMessageCharArray();
+            _ReceivedMessage->ConvertPayloadFromCharArrayToFile();
 
-					  // Update related Subscription
-					  for (unsigned int i = 0; i < PCore->Subscriptions.size (); i++)
-						{
-						  Subscription *PS = PCore->Subscriptions[i];
+            // SPEC-019: Log payload hash at ContentApp for traceability
+            {
+              string PayloadHash;
+              // Read the file we just saved to compute hash
+              File F1;
+              F1.OpenInputFile(Values.at(0), PayloadPath, "BINARY");
+              F1.seekg(0, ios::end);
+              long long PayloadSize = F1.tellg();
+              F1.seekg(0);
+              if (PayloadSize > 0) {
+                char* payload_bytes = new char[PayloadSize];
+                F1.read(payload_bytes, PayloadSize);
+                // Use NameGenerator which wraps MurmurHash3_x86_32 with seed 3571
+                PayloadHash = NameGenerator::GetInstance().GenerateFromCharArray(payload_bytes, PayloadSize);
+                delete[] payload_bytes;
+              }
+              F1.CloseFile();
+
+              PB->S << Offset << "(ContentApp received payload: file=" << Values.at(0) << ", size=" << PayloadSize << " bytes, hash=" << PayloadHash << ")" << endl;
+            }
+
+            // Update related Subscription
+            // SPEC-023: Extract key from the -d --b in the received message
+            // and match subscription by key instead of picking first available.
+            string DeliveryKey = "";
+            CommandLine* DCL = NULL;
+            _ReceivedMessage->GetCommandLine("-d", "--b", DCL);
+            if (DCL != NULL)
+            {
+              vector<string> DArgs;
+              DCL->GetArgument(1, DArgs);  // Arg 1 = Key in -d --b [<cat> <key> <file>]
+              if (DArgs.size() > 0)
+              {
+                DeliveryKey = DArgs.at(0);
+              }
+            }
 
 #ifdef DEBUG
-						  PB->S << Offset <<  "(Testing subscription "<<i<<")" << endl;
-
-						  PB->S << Offset <<  "(Subscription status is "<<PS->Status<<")" << endl;
+            if (DeliveryKey != "")
+            {
+              PB->S << Offset << "(Delivery key extracted from -d --b: " << DeliveryKey << ")" << endl;
+            }
+            else
+            {
+              PB->S << Offset << "(WARNING: Could not extract delivery key from -d --b)" << endl;
+            }
 #endif
 
-						  if (PS->Status == "Waiting delivery" && PS->HasContent)
-							{
-#ifdef DEBUG
-							  PB->S << Offset <<  "(Storing the file named "<<Values.at(0)<<" to this subscription)" << endl;
+            for (unsigned int i = 0; i < PCore->Subscriptions.size(); i++)
+            {
+              Subscription* PS = PCore->Subscriptions[i];
 
-							  PB->S << Offset << "(Changing subscription status from \"Waiting delivery\" to \"Processing required\")" << endl;
+#ifdef DEBUG
+              PB->S << Offset << "(Testing subscription " << i << ")" << endl;
+              PB->S << Offset << "(Subscription key is " << PS->Key << ")" << endl;
+              PB->S << Offset << "(Subscription status is " << PS->Status << ")" << endl;
 #endif
 
-							  PS->Status = "Processing required";
-
-							  PS->FileName = Values.at (0);
-
+              // SPEC-023: Match by key from -d --b, not by first available
+              if (DeliveryKey != "" && PS->Key == DeliveryKey && PS->Status == "Waiting delivery")
+              {
 #ifdef DEBUG
-							  PCore->Debug.OpenOutputFile();
+                PB->S << Offset << "(Storing the file named " << Values.at(0) << " to this subscription)" << endl;
 
-							  PCore->Debug << "Received the file " << Values.at(0) << " related to the subscription of index " << i << ". Status of the subscription is " <<PS->Status<< endl;
-
-							  PCore->Debug.CloseFile();
+                PB->S << Offset << "(Changing subscription status from \"Waiting delivery\" to \"Processing required\")" << endl;
 #endif
-							}
-						}
 
-					  // **************************************************
-					  // Type 1 messages statistics
-					  // **************************************************
-					  if (_ReceivedMessage->GetType () == 1)
-						{
-						  double Time = GetTime ();
+                PS->Status = "Processing required";
 
-						  // Sample
-						  PCore->tsmiup1->Sample (Time - _ReceivedMessage->GetInstantiationTime ());
+                PS->FileName = Values.at(0);
 
-						  // Update the mean
-						  PCore->tsmiup1->CalculateArithmetic ();
+                // SPEC-020: Do NOT set Status = "Delivered" here.
+                // CoreRunEvaluate01 needs "Processing required" to trigger
+                // the acceptance flow. It will set Status = "Delete" after
+                // creating the Service_Accepted response.
+                // CoreDeliveryBind01 already set HasContent = true, so
+                // CoreRunPeriodic01 won't re-subscribe (it only re-subscribes
+                // when Status == "Waiting delivery").
 
-						  // Sample to file
-						  PCore->tsmiup1->SampleToFile (Time);
-						}
-					}
-				}
-			}
-		}
-	}
+                // SPEC-017: break after updating the first matching subscription.
+                // Each -info --payload corresponds to exactly one delivery.
+                break;
+
+#ifdef DEBUG
+                PCore->Debug.OpenOutputFile();
+
+                PCore->Debug << "Received the file " << Values.at(0) << " related to the subscription of index " << i << ". Status of the subscription is " << PS->Status << endl;
+
+                PCore->Debug.CloseFile();
+#endif
+              }
+            }
+
+            // **************************************************
+            // Type 1 messages statistics
+            // **************************************************
+            if (_ReceivedMessage->GetType() == 1)
+            {
+              double Time = GetTime();
+
+              // Sample
+              PCore->tsmiup1->Sample(Time - _ReceivedMessage->GetInstantiationTime());
+
+              // Update the mean
+              PCore->tsmiup1->CalculateArithmetic();
+
+              // Sample to file
+              PCore->tsmiup1->SampleToFile(Time);
+            }
+          }
+#ifdef DEBUG
+        PB->S << Offset << "(The message does not have a payload)" << endl;
+#endif
+        }
+      }
+    }
+  }
 
 #ifdef DEBUG
 
-  PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  PB->S << Offset << "(Done)" << endl
+        << endl
+        << endl;
 
 #endif
 

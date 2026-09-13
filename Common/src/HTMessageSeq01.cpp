@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		HTMessageSeq01
-	Object:		HTMessageSeq01
-	File:		HTMessageSeq01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		HTMessageSeq01
+        Object:		HTMessageSeq01
+        File:		HTMessageSeq01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -33,30 +33,29 @@
 #include "HT.h"
 #endif
 
-HTMessageSeq01::HTMessageSeq01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+HTMessageSeq01::HTMessageSeq01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-HTMessageSeq01::~HTMessageSeq01 ()
+HTMessageSeq01::~HTMessageSeq01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -message --seq _Version [ < 1 string _Seq > ]
-int
-HTMessageSeq01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int HTMessageSeq01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = OK;
   string Offset = "                    ";
-  CommandLine *PTemp;
+  CommandLine* PTemp;
 
-  //PB->S << Offset <<  this->GetLegibleName() << endl;
+  // PB->S << Offset <<  this->GetLegibleName() << endl;
 
   // Copy the received command line to the InlineResponseMessage
-  InlineResponseMessage->NewCommandLine (_PCL, PTemp);
+  InlineResponseMessage->NewCommandLine(_PCL, PTemp);
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
-

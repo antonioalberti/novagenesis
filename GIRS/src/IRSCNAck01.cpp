@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		IRSCNAck01
-	Object:		IRSCNAck01
-	File:		IRSCNAck01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		IRSCNAck01
+        Object:		IRSCNAck01
+        File:		IRSCNAck01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -37,18 +37,18 @@
 #include "IR.h"
 #endif
 
-IRSCNAck01::IRSCNAck01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+IRSCNAck01::IRSCNAck01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-IRSCNAck01::~IRSCNAck01 ()
+IRSCNAck01::~IRSCNAck01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -scn --ack 0.1 [ < 2 string SCN AckSCN > ]
-int
-IRSCNAck01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
+int IRSCNAck01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
 {
   int Status = ERROR;
 

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Distributed Hash Table
-	Object:		DHT
-	File:		DHT.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Distributed Hash Table
+        Object:		DHT
+        File:		DHT.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,17 +49,16 @@
 
 using namespace std;
 
-class DHT : public Block {
- private:
-
+class DHT : public Block
+{
+private:
   // Gateway pointer
-  GW *PGW;
+  GW* PGW;
 
   // HT pointer
-  HT *PHT;
+  HT* PHT;
 
- public:
-
+public:
   // Auxiliary flags
   bool GenerateGetBindHeader;
   bool GenerateSCNSeqForStoreBind;
@@ -68,29 +67,29 @@ class DHT : public Block {
   int AuxCounter;
 
   // Auxiliary container
-  vector<Tuple *> PSSTuples;
+  vector<Tuple*> PSSTuples;
 
   // Auxiliary container
-  vector<Tuple *> GIRSTuples;
+  vector<Tuple*> GIRSTuples;
 
   // Constructor
-  DHT (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path);
+  DHT(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path);
 
   // Destructor
-  ~DHT ();
+  ~DHT();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // Delays
   double DelayBeforeRunInitiatilization;
@@ -110,9 +109,3 @@ class DHT : public Block {
 };
 
 #endif
-
-
-
-
-
-

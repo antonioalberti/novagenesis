@@ -1,0 +1,11 @@
+{
+  "probe": "100msg/s-burst",
+  "deltas": {
+    "ss": 3500,
+    "rr": 3000,
+    "rs": 3500,
+    "sr": 3366
+  },
+  "loss_sr_pct": 14.29,
+  "loss_rs_pct": 3.83
+}

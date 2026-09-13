@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Auxiliary TCP IP message receiving class
-	Object:		MessageReceiving
-	File:		MessageReceiving.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Auxiliary TCP IP message receiving class
+        Object:		MessageReceiving
+        File:		MessageReceiving.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -30,43 +30,36 @@
 
 class MessageReceiving
 {
-	public:
+public:
+  // The socket ID
+  int Number;
 
-		// The socket ID
-		int					Number;
+  // The message number
+  unsigned int MessageNumber;
 
-		// The message number
-		unsigned int		MessageNumber;
+  // The number of segments
+  unsigned int NoS;
 
-		// The number of segments
-		unsigned int		NoS;
+  // The char message being received
+  char* MessageBeingReceived;
 
-		// The char message being received
-		char 				*MessageBeingReceived;
+  // The total size of a message being received
+  long long int MessageSize;
 
-		// The total size of a message being received
-		long long int 		MessageSize;
+  // The amount of bytes already received
+  long long int ReceivedSoFar;
 
-		// The amount of bytes already received
-		long long int 		ReceivedSoFar;
+  // The amount of segments already received
+  long long int SegmentsSoFar;
 
-		// The amount of segments already received
-		long long int 		SegmentsSoFar;
+  // The receiving status
+  bool ContinueReceiving;
 
-		// The receiving status
-		bool 				ContinueReceiving;
+  // Problem of extra 14 bytes at the end of the frames
+  bool Problem;
 
-		// Problem of extra 14 bytes at the end of the frames
-		bool 				Problem;
-
-  		// TODO: FIXP/Update - Added to timeout incomplete messages in PGCS PG Dispatcher Buffer
-  		double 				Timestamp;
+  // TODO: FIXP/Update - Added to timeout incomplete messages in PGCS PG Dispatcher Buffer
+  double Timestamp;
 };
 
 #endif
-
-
-
-
-
-

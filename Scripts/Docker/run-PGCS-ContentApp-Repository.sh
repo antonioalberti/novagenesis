@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo docker run -itd --privileged -e CA_PATH="/home/ng/workspace/novagenesis/IO/Repository"$1"/" -e CA_TYPE="Repository" --name Repository$1 ng-contentapp:latest
+docker run -itd --privileged --ipc=container:Core0 -e CA_PATH="/home/ng/workspace/novagenesis/IO/Repository"$1"/" -e CA_TYPE="Repository" --name Repository$1 ng-contentapp:latest
 
 echo "Creating Repository$1 Input/Output folder"
 

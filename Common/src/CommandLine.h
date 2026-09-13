@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		CommandLine
-	Object:		CommandLine
-	File:		CommandLine.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		CommandLine
+        Object:		CommandLine
+        File:		CommandLine.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -57,76 +57,69 @@ using namespace std;
 // ng -sub --bind _Version [ < 1 string _Category > < _SCNsSize string S_1 ... S_SCNsSize > ]
 class CommandLine
 {
-	public:
+public:
+  // Command Name
+  string Name; // ng -msg
 
-		// Command Name
-		string 							Name;  // ng -msg
+  // Command Alternative
+  string Alternative; // --cl
 
-		// Command Alternative
-		string 							Alternative; // --cl
+  // Command Version
+  string Version; // 0.1
 
-		// Command Version
-		string 							Version; // 0.1
+  // Arguments and elements container
+  string** Arguments;
 
-		// Arguments and elements container
-		string							**Arguments;
-		
-		// Number of arguments
-		unsigned int					NoA;
+  // Number of arguments
+  unsigned int NoA;
 
-		// Array of the number of elements per argument
-		unsigned int 					*NoE;
+  // Array of the number of elements per argument
+  unsigned int* NoE;
 
-		// Empty Constructor
-        CommandLine();
+  // Empty Constructor
+  CommandLine();
 
-        // Constructor
-        CommandLine(string _Name, string _Alternative, string _Version);
+  // Constructor
+  CommandLine(string _Name, string _Alternative, string _Version);
 
-        // Copy constructor
-        CommandLine(const CommandLine &CL);
+  // Copy constructor
+  CommandLine(const CommandLine& CL);
 
-		// Destructor
-		~CommandLine();
+  // Destructor
+  ~CommandLine();
 
-		// Allocates and add a string vector on Arguments container
-		void NewArgument(int _Size);
+  // Allocates and add a string vector on Arguments container
+  void NewArgument(int _Size);
 
-		// Get argument
-		int GetArgument(unsigned int _Index, vector<string> & _Argument);
+  // Get argument
+  int GetArgument(unsigned int _Index, vector<string>& _Argument);
 
-		// Get number of arguments
-		int GetNumberofArguments(unsigned int &_Number);
+  // Get number of arguments
+  int GetNumberofArguments(unsigned int& _Number);
 
-		// Get number of elements in a certain argument
-		int GetNumberofArgumentElements(unsigned int _Index, unsigned int &_Number);
+  // Get number of elements in a certain argument
+  int GetNumberofArgumentElements(unsigned int _Index, unsigned int& _Number);
 
-		// Set an element at an Argument
-		int SetArgumentElement(unsigned int _Index, unsigned int _Element, string _Value);
+  // Set an element at an Argument
+  int SetArgumentElement(unsigned int _Index, unsigned int _Element, string _Value);
 
-		// Get an element at an Argument
-		int GetArgumentElement(unsigned int _Index, unsigned int _Element, string &_Value) const;
+  // Get an element at an Argument
+  int GetArgumentElement(unsigned int _Index, unsigned int _Element, string& _Value) const;
 
-		// Overloading ostream operator
-		friend ostream&  operator<< (ostream& os, const CommandLine& CL);
+  // Overloading ostream operator
+  friend ostream& operator<<(ostream& os, const CommandLine& CL);
 
-		// Overloading istringstream operator
-		friend istringstream&  operator>> (istringstream& iss, CommandLine& CL);
+  // Overloading istringstream operator
+  friend istringstream& operator>>(istringstream& iss, CommandLine& CL);
 
-		// New function added to avoid the istringstream operator above
-		int ConvertCommandLineFromCharArray(char *_CL, int _Size);
+  // New function added to avoid the istringstream operator above
+  int ConvertCommandLineFromCharArray(char* _CL, int _Size);
 
-		// ------------------------------------------------------------------------------------------------------------------------------
-		// Auxiliary functions
-		// ------------------------------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------------------------------
+  // Auxiliary functions
+  // ------------------------------------------------------------------------------------------------------------------------------
 
-		int StringToInt(string _String);
+  int StringToInt(string _String);
 };
 
 #endif
-
-
-
-
-
-

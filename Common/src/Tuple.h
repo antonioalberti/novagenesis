@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Tuple
-	Object:		Tuple
-	File:		Tuple.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Tuple
+        Object:		Tuple
+        File:		Tuple.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -34,9 +34,9 @@
 
 using namespace std;
 
-class Tuple {
- public:
-
+class Tuple
+{
+public:
   // A legible name for the peer according to its type, e.g. NRNCS, HTS
   string LN;
 
@@ -48,9 +48,3 @@ class Tuple {
 };
 
 #endif
-
-
-
-
-
-

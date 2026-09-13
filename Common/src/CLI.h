@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Command Line Interface
-	Object:		CLI
-	File:		CLI.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Command Line Interface
+        Object:		CLI
+        File:		CLI.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -77,63 +77,56 @@ using namespace tthread;
 class GW;
 class HT;
 
-class CLI : public Block {
- private:
-
+class CLI : public Block
+{
+private:
   string Version;
 
   // Index at Blocks container
   unsigned int Index;
 
   // Gateway pointer
-  GW *PGW;
+  GW* PGW;
 
   // HT pointer
-  HT *PHT;
+  HT* PHT;
 
- public:
-
+public:
   // Constructor
-  CLI (string _LN, Process *_PP, unsigned int _Index, GW *_PGW, HT *_PHT, string _Path);
+  CLI(string _LN, Process* _PP, unsigned int _Index, GW* _PGW, HT* _PHT, string _Path);
 
   // Destructor
-  ~CLI ();
+  ~CLI();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Action related functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Allocate and add an Action on Actions container
-  void NewAction (const string _LN, Action *&_PA);
+  void NewAction(const string _LN, Action*& _PA);
 
   // Get an Action
-  int GetAction (string _LN, Action *&_PA);
+  int GetAction(string _LN, Action*& _PA);
 
   // Delete an Action
-  int DeleteAction (string _LN);
+  int DeleteAction(string _LN);
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Core functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Command line interface prompt
-  void Prompt ();
+  void Prompt();
 
   // ------------------------------------------------------------------------------------------------------------------------------
   // Auxiliary functions
   // ------------------------------------------------------------------------------------------------------------------------------
 
   // Wrapper function for Prompt() thread
-  static void PromptThreadWrapper (void *aArg);
+  static void PromptThreadWrapper(void* aArg);
 
   // Friend classes
   friend class CLIRunInitialization01;
 };
 
 #endif
-
-
-
-
-
-

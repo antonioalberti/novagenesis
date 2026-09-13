@@ -1,12 +1,12 @@
 /*
-	Name:		Simulator Input Output Stream
-	Object:		Sim_Stream
-	File:		sim_stream.cpp
-	Authors:	Jackson Klein and Antonio Marcos Alberti
-	Date:		02/2007
-	Version:	0.3
+        Name:		Simulator Input Output Stream
+        Object:		Sim_Stream
+        File:		sim_stream.cpp
+        Authors:	Jackson Klein and Antonio Marcos Alberti
+        Date:		02/2007
+        Version:	0.3
 
- 	Copyright (C) 2021  Jackson Klein and Antonio Marcos Alberti
+        Copyright (C) 2021  Jackson Klein and Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -36,36 +36,36 @@ typedef void (*OutFunct)(char);
 
 class ConsoleStreambuf : public ::streambuf
 {
-	private:
+private:
+  OutFunct OutputFunction;
 
-	OutFunct OutputFunction;
+public:
+  ConsoleStreambuf();
 
-	public:
+  ~ConsoleStreambuf();
 
-    ConsoleStreambuf();
+  void SetOutputFunction(OutFunct OutputFunction_);
 
-    ~ConsoleStreambuf();
+  OutFunct GetOutputFunction();
 
-    void SetOutputFunction(OutFunct OutputFunction_);
+  virtual int overflow(int S);
 
-    OutFunct GetOutputFunction();
-
-    virtual int overflow(int S);
-
-    virtual int underflow(void){return 0;}
+  virtual int underflow(void)
+  {
+    return 0;
+  }
 };
 
 class ConsoleOstream : public ::ostream
 {
-	public:
+public:
+  ConsoleStreambuf StreamBuf;
 
-      ConsoleStreambuf StreamBuf;
+  ConsoleOstream(void (*OutputFunction_)(char) = NULL);
 
-      ConsoleOstream(void (*OutputFunction_)(char)=NULL);
+  OutFunct GetOutputFunction();
 
-      OutFunct GetOutputFunction();
-
-      void  SetOutputFunction(OutFunct OutputFunction_);
+  void SetOutputFunction(OutFunct OutputFunction_);
 };
 
 #endif

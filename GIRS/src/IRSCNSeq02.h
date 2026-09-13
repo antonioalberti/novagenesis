@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Indirection Resolution Self-Certifying Name Sequence Version 02
-	Object:		IRSCNSeq02
-	File:		IRSCNSeq02.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.2
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Indirection Resolution Self-Certifying Name Sequence Version 02
+        Object:		IRSCNSeq02
+        File:		IRSCNSeq02.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.2
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -49,24 +49,18 @@
 
 class Block;
 
-class IRSCNSeq02 : public Action {
- public:
-
+class IRSCNSeq02 : public Action
+{
+public:
   // Constructor
-  IRSCNSeq02 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  IRSCNSeq02(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~IRSCNSeq02 ();
+  virtual ~IRSCNSeq02();
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-

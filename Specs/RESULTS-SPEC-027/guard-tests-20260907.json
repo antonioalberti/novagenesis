@@ -1,0 +1,39 @@
+{
+ "test": "SPEC-028-D directed guard tests (Astra closure list)",
+ "date": "2026-09-07T10:15:10Z",
+ "build": "350e604 (AMEND-3 v2 + SPEC-029)",
+ "guards": {
+  "SPEC-029 self-MAC rejected": {
+   "method": "start PGCS with -p <own MAC>, capture stderr",
+   "observed": "ERROR 'peer MAC equals the local interface MAC' + abort before sockets",
+   "result": "PASS"
+  },
+  "SPEC-029 valid peer accepted": {
+   "method": "running PGCS with peer MACs, full session",
+   "observed": "0 'more than one identifier' errors, 1 client socket per VM",
+   "result": "PASS"
+  },
+  "Category-17 single SID after repeated hellos": {
+   "method": "count 'Created the client socket' over multi-hour run with hellos every 2s",
+   "observed": "exactly 1 per VM; no duplicate advertisements effect",
+   "result": "PASS"
+  },
+  "Dispatch: populated tuples route both ways": {
+   "method": "500 msg/s bidirectional run + photo test",
+   "observed": "520k+ msgs/direction delivered, 1000/1000 photos",
+   "result": "PASS"
+  },
+  "Peer restart recovery": {
+   "method": "kill PGCS on repository guest, restart, resume stress",
+   "observed": "1 client socket after restart, 0 errors, bidirectional delivery resumed (loss ~1.5-3.7%)",
+   "result": "PASS"
+  },
+  "Unknown/stale/corrupt frames no crash": {
+   "method": "60 malformed frames injected at raw Ethernet (garbage payload, MN=0, truncated <8B, SN out of range)",
+   "observed": "both PGCS alive, 0 cores, stress continued uninterrupted",
+   "result": "PASS"
+  }
+ },
+ "overall": "ALL DIRECTED GUARDS PASS (6/6)",
+ "note": "Link-interruption sub-test not run (would require bridge manipulation); recommend adding to future soak. Load evidence: see amend3v2-500-run.json and amend3v2-photos-1000.json"
+}

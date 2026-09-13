@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		Auxiliary shared memory access control object
-	Object:		Shm
-	File:		Shm.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-  	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		Auxiliary shared memory access control object
+        Object:		Shm
+        File:		Shm.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -32,9 +32,9 @@
 #include <sys/types.h>
 #endif
 
-class Shm {
- public:
-
+class Shm
+{
+public:
   // The key to get a shmid
   key_t Key;
 
@@ -49,9 +49,3 @@ class Shm {
 };
 
 #endif
-
-
-
-
-
-

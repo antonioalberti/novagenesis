@@ -1,0 +1,20 @@
+{
+ "benchmark": "SPEC-031 AFTER \u2014 recvmmsg batched receive, 500 msg/s bidirectional",
+ "date": "2026-09-07T13:19:13Z",
+ "build": "c638292 (recvmmsg 32-frame pool, 2-call drain, rotation)",
+ "result": "STABLE at ~9min: zero loss maintained (dropped=0, guard=0, rx_truncated=0, rx_too_short=0), outstanding=2",
+ "final": {
+  "source guest": {
+   "stats": "SPEC028_STATS run=00B50E23 pid=12522 elapsed_s=550 offered=270000 sent_ok=270000 received=272308 completed=272363 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=272363 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
+   "alive": "1",
+   "rss": "2872",
+   "cores": "0"
+  },
+  "repository guest": {
+   "stats": "SPEC028_STATS run=00B50E23 pid=10100 elapsed_s=550 offered=272500 sent_ok=272500 received=268575 completed=268630 dropped=0 guard_reject=0 outstanding=2 sar_completed_all=268630 frame_too_short=0 invalid_mn_or_blocksize=0 sn_out_of_range=0 blocksize_mismatch=0 duplicate_sn=0 invalid_payload=0 buffer_limit_reached=0 timeout_abandoned=0 validated_evictions=0 out_of_order=0 invalid_size=0 size_mismatch=0 allocation_failed=0 rx_truncated=0 rx_too_short=0",
+   "alive": "1",
+   "rss": "2924",
+   "cores": "0"
+  }
+ }
+}

@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
+        NovaGenesis
 
-	Name:		PGHelloIHC01
-	Object:		PGHelloIHC01
-	File:		PGHelloIHC01.cpp
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        Name:		PGHelloIHC01
+        Object:		PGHelloIHC01
+        File:		PGHelloIHC01.cpp
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
 
- 	Copyright (C) 2021  Antonio Marcos Alberti
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU General Public License (See COPYING.txt).
 
@@ -37,498 +37,463 @@
 #include "PGCS.h"
 #endif
 
-//#define DEBUG
+#ifndef _NAMEGENERATOR_H
+#include "NameGenerator.h"
+#endif
 
-PGHelloIHC01::PGHelloIHC01 (string _LN, Block *_PB, MessageBuilder *_PMB) : Action (_LN, _PB, _PMB)
+// #define DEBUG
+
+#define LOG(msg) PB->S << endl \
+                       << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
+
+PGHelloIHC01::PGHelloIHC01(string _LN, Block* _PB, MessageBuilder* _PMB)
+    : Action(_LN, _PB, _PMB)
 {
 }
 
-PGHelloIHC01::~PGHelloIHC01 ()
+PGHelloIHC01::~PGHelloIHC01()
 {
 }
 
 // Run the actions behind a received command line
 // ng -hello --ihc _Version [ < HID OSID PGCS_PID PG_BID GW_SCN HT_SCN _Stack _Interface _Identifier > ... < HID OSID PGCS_PID PG_BID GW_SCN HT_SCN _Stack _Interface _Identifier > ]
-int
-PGHelloIHC01::Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage)
-//TODO: FIXP/Update - You should replace all the implementation of this function
+int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage)
+// TODO: FIXP/Update - You should replace all the implementation of this function
 {
   int Status = OK;
-  PG *PPGB = 0;
+  PG* PPGB = 0;
   string HID;
   string PID;
   string BID;
   vector<string> ReceivedElements;
   string Offset = "                    ";
-  string MyStack;            // The local stack
-  string MyInterface;        // The local interface
-  string MyPeerIdentifier;    // The local address
-  string PeerStack;            // The peer stack
-  string PeerInterface;        // The peer interface
-  string PeerIdentifier;    // The peer address
+  string MyStack;          // The local stack
+  string MyInterface;      // The local interface
+  string MyPeerIdentifier; // The local address
+  string PeerStack;        // The peer stack
+  string PeerInterface;    // The peer interface
+  string PeerIdentifier;   // The peer address
   string Peer;
-  PGCS *PPGCS = 0;
+  PGCS* PPGCS = 0;
   bool StoreNewPGCS1 = true;
   bool StoreNewPGCS2 = true;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *PSCNCL = 0;
+  Block* PHTB = 0;
+  CommandLine* PCL = 0;
+  CommandLine* PSCNCL = 0;
   unsigned int NoA = 0;
 
-  PPGCS = (PGCS *)PB->PP;
-  PPGB = (PG *)PB;
-  PHTB = (Block *)PPGB->PHT;
+  PPGCS = (PGCS*)PB->PP;
+  PPGB = (PG*)PB;
+  PHTB = (Block*)PPGB->PHT;
 
 #ifdef DEBUG
 
-  PB->S << Offset << this->GetLegibleName () << endl;
+  PB->S << Offset << this->GetLegibleName() << endl;
 
 #endif
 
-  if (_PCL->GetNumberofArguments (NoA) == OK)
-	{
-	  for (unsigned int k = 0; k < NoA; k++)
-		{
-		  _PCL->GetArgument (k, ReceivedElements);
+  if (_PCL->GetNumberofArguments(NoA) == OK)
+  {
+    for (unsigned int k = 0; k < NoA; k++)
+    {
+      _PCL->GetArgument(k, ReceivedElements);
 
-		  // *****************************************************************************
-		  // Check if there is a compatible local tuple <stack, interface, identifier>
-		  // *****************************************************************************
-		  for (unsigned int i = 0; i < PPGCS->Stacks->size (); i++)
-			{
-			  MyStack = PPGCS->Stacks->at (i);
+      // *****************************************************************************
+      // Check if there is a compatible local tuple <stack, interface, identifier>
+      // *****************************************************************************
+      for (unsigned int i = 0; i < PPGCS->Stacks->size(); i++)
+      {
+        MyStack = PPGCS->Stacks->at(i);
 
-			  MyInterface = PPGCS->Interfaces->at (i);
+        MyInterface = PPGCS->Interfaces->at(i);
 
-			  MyPeerIdentifier = PPGCS->Identifiers->at (i);
+        MyPeerIdentifier = PPGCS->Identifiers->at(i);
 
-			  PeerStack = ReceivedElements.at (6);
+        PeerStack = ReceivedElements.at(6);
 
-			  PeerInterface = ReceivedElements.at (7);
+        PeerInterface = ReceivedElements.at(7);
 
-			  PeerIdentifier = ReceivedElements.at (8);
+        PeerIdentifier = ReceivedElements.at(8);
 
 #ifdef DEBUG
-			  PB->S << endl << Offset << "Index = " << i << endl;
-			  PB->S << Offset << "(Check if this stack " << MyStack << " is equal to the hello stack " << PeerStack
-					<< ")" << endl;
-			  PB->S << Offset << "(Check if this identifier " << MyPeerIdentifier
-					<< " is equal to the hello identifier " << PeerIdentifier << ")" << endl;
-			  PB->S << Offset << "MyInterface = " << MyInterface << endl;
-			  PB->S << Offset << "PeerInterface = " << PeerInterface << endl;
+        PB->S << endl
+              << Offset << "Index = " << i << endl;
+        PB->S << Offset << "(Check if this stack " << MyStack << " is equal to the hello stack " << PeerStack
+              << ")" << endl;
+        PB->S << Offset << "(Check if this identifier " << MyPeerIdentifier
+              << " is equal to the hello identifier " << PeerIdentifier << ")" << endl;
+        PB->S << Offset << "MyInterface = " << MyInterface << endl;
+        PB->S << Offset << "PeerInterface = " << PeerInterface << endl;
 #endif
-			  if (MyStack == PeerStack)
-				{
-				  if (PeerIdentifier == MyPeerIdentifier)
-					{
+        if (MyStack == PeerStack)
+        {
+          if (PeerIdentifier == MyPeerIdentifier)
+          {
 #ifdef DEBUG
-					  PB->S << Offset << "Going to check this previous informed PGCS" << endl;
+            PB->S << Offset << "Going to check this previous informed PGCS" << endl;
 #endif
-					  // ******************************************************
-					  // Check to record the new peer data
-					  // ******************************************************
+            // ******************************************************
+            // Check to record the new peer data
+            // ******************************************************
 
-					  for (unsigned int j = 0; j < PPGB->PGCSTuples.size (); j++)
-						{
-						  if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
-							{
-							  StoreNewPGCS1 = false;
+            for (unsigned int j = 0; j < PPGB->PGCSTuples.size(); j++)
+            {
+              if (ReceivedElements.at(2) == PPGB->PGCSTuples[j]->Values[2])
+              {
+                StoreNewPGCS1 = false;
 
-							  break;
-							}
-						}
+                break;
+              }
+            }
 
-					  if (StoreNewPGCS1 == true
-						  && ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
-						{
-						  PB->S << Offset << "(A new peer PGCS was registered via point to point: "
-								<< ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")"
-								<< endl;
+            if (StoreNewPGCS1 == true && ReceivedElements.at(0) != PB->PP->GetHostSelfCertifyingName()) // Just one PGCS per host
+            {
+              LOG("(A new peer PGCS was registered via point to point: "
+                  << ReceivedElements.at(2) << " at the node identified by " << PeerIdentifier << ")");
 
-						  Tuple *PeerPGCS = new Tuple;
+              Tuple* PeerPGCS = new Tuple;
 
-						  PeerPGCS->Values.push_back (ReceivedElements.at (0));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (1));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (2));
-						  PeerPGCS->Values.push_back (ReceivedElements.at (3));
+              PeerPGCS->Values.push_back(ReceivedElements.at(0));
+              PeerPGCS->Values.push_back(ReceivedElements.at(1));
+              PeerPGCS->Values.push_back(ReceivedElements.at(2));
+              PeerPGCS->Values.push_back(ReceivedElements.at(3));
 
-						  PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
-						  PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
-						  PB->S << Offset << "(PID = " << ReceivedElements.at (2) << ")" << endl;
-						  PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
+              PB->S << Offset << "(HID = " << ReceivedElements.at(0) << ")" << endl;
+              PB->S << Offset << "(OSID = " << ReceivedElements.at(1) << ")" << endl;
+              PB->S << Offset << "(PID = " << ReceivedElements.at(2) << ")" << endl;
+              PB->S << Offset << "(BID = " << ReceivedElements.at(3) << ")" << endl;
 
-						  // Store the peer PGCS tuple for future use
-						  PPGB->PGCSTuples.push_back (PeerPGCS);
+              // Store the peer PGCS tuple for future use
+              PPGB->PGCSTuples.push_back(PeerPGCS);
 
-						  StoreNewPGCS1 = false;
+              StoreNewPGCS1 = false;
 
-						  ScheduleStoreBindings ("-p", ReceivedElements, PeerIdentifier, PeerStack);
-						}
-					}
-				  else
-					{
+              ScheduleStoreBindings("-p", ReceivedElements, PeerIdentifier, PeerStack);
+            }
+          }
+          else
+          {
 
-					  // ****************************************************************************************
-					  // Added in April 22th, 2016; Updated in 26th August 2021
-					  // ****************************************************************************************
-
-#ifdef DEBUG
-					  PB->S << Offset << "This PGCS is unknown" << endl;
-#endif
-
-					  // ******************************************************
-					  // Record the new peer data
-					  // ******************************************************
-
-					  for (unsigned int j = 0; j < PPGB->PGCSTuples.size (); j++)
-						{
-						  if (ReceivedElements.at (2) == PPGB->PGCSTuples[j]->Values[2])
-							{
-							  StoreNewPGCS2 = false;
-
-							  break;
-							}
-						}
+            // ****************************************************************************************
+            // Added in April 22th, 2016; Updated in 26th August 2021
+            // ****************************************************************************************
 
 #ifdef DEBUG
-					  PB->S << Offset << "Trying to store the discovered peer = " <<StoreNewPGCS2<< endl;
+            PB->S << Offset << "This PGCS is unknown" << endl;
 #endif
 
-					  if (StoreNewPGCS2 == true
-						  && ReceivedElements.at (0) != PB->PP->GetHostSelfCertifyingName ()) // Just one PGCS per host
-						{
-						  PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
-								<< ReceivedElements.at (2) << " at the node identified by " << PeerIdentifier << ")"
-								<< endl;
+            // ******************************************************
+            // Record the new peer data
+            // ******************************************************
 
-						  Tuple *PeerPGS = new Tuple;
+            for (unsigned int j = 0; j < PPGB->PGCSTuples.size(); j++)
+            {
+              if (ReceivedElements.at(2) == PPGB->PGCSTuples[j]->Values[2])
+              {
+                StoreNewPGCS2 = false;
 
-						  PeerPGS->Values.push_back (ReceivedElements.at (0));
-						  PeerPGS->Values.push_back (ReceivedElements.at (1));
-						  PeerPGS->Values.push_back (ReceivedElements.at (2));
-						  PeerPGS->Values.push_back (ReceivedElements.at (3));
+                break;
+              }
+            }
 
-						  PB->S << Offset << "(HID = " << ReceivedElements.at (0) << ")" << endl;
-						  PB->S << Offset << "(OSID = " << ReceivedElements.at (1) << ")" << endl;
-						  PB->S << Offset << "(PID = " << ReceivedElements.at (2) << ")" << endl;
-						  PB->S << Offset << "(BID = " << ReceivedElements.at (3) << ")" << endl;
+#ifdef DEBUG
+            PB->S << Offset << "Trying to store the discovered peer = " << StoreNewPGCS2 << endl;
+#endif
 
-						  // Store the peer PGCS tuple for future use
-						  PPGB->PGCSTuples.push_back (PeerPGS);
+            if (StoreNewPGCS2 == true && ReceivedElements.at(0) != PB->PP->GetHostSelfCertifyingName()) // Just one PGCS per host
+            {
+              PB->S << Offset << "(A new peer PGCS was discovered without previous knowledge: "
+                    << ReceivedElements.at(2) << " at the node identified by " << PeerIdentifier << ")"
+                    << endl;
 
-						  ScheduleStoreBindings ("-de", ReceivedElements, PeerIdentifier, PeerStack);
-						}
-					  else
-						{
-						  //PB->S << Offset << "(Warning: Peer already registered or it is this PGCS itself)"<<endl;
+              Tuple* PeerPGS = new Tuple;
 
-						  StoreNewPGCS2 = true;
-						}
-					}
-				}
-			}
+              PeerPGS->Values.push_back(ReceivedElements.at(0));
+              PeerPGS->Values.push_back(ReceivedElements.at(1));
+              PeerPGS->Values.push_back(ReceivedElements.at(2));
+              PeerPGS->Values.push_back(ReceivedElements.at(3));
 
-		  ReceivedElements.clear ();
-		}
-	}
+              PB->S << Offset << "(HID = " << ReceivedElements.at(0) << ")" << endl;
+              PB->S << Offset << "(OSID = " << ReceivedElements.at(1) << ")" << endl;
+              PB->S << Offset << "(PID = " << ReceivedElements.at(2) << ")" << endl;
+              PB->S << Offset << "(BID = " << ReceivedElements.at(3) << ")" << endl;
+
+              // Store the peer PGCS tuple for future use
+              PPGB->PGCSTuples.push_back(PeerPGS);
+
+              ScheduleStoreBindings("-de", ReceivedElements, PeerIdentifier, PeerStack);
+            }
+            else
+            {
+              // PB->S << Offset << "(Warning: Peer already registered or it is this PGCS itself)"<<endl;
+
+              StoreNewPGCS2 = true;
+            }
+          }
+        }
+      }
+
+      ReceivedElements.clear();
+    }
+  }
 
   Status = OK;
 
-  //PB->S << Offset <<  "(Done)" << endl << endl << endl;
+  // PB->S << Offset <<  "(Done)" << endl << endl << endl;
 
   return Status;
 }
 
-int PGHelloIHC01::ScheduleStoreBindings (string _Case, vector<string> &_ReceivedElements, string _PeerIdentifier, string _PeerStack)
+int PGHelloIHC01::ScheduleStoreBindings(string _Case, vector<string>& _ReceivedElements, string _PeerIdentifier, string _PeerStack)
 {
   int Status = OK;
 
-  Message *StoreBind01Msg = 0;
-  CommandLine *StatusS01 = 0;
-  CommandLine *MsgCl01 = 0;
-  CommandLine *StoreBind01 = 0;
-  PG *PPGB = 0;
-  string HID;
-  string PID;
-  string BID;
-  vector<string> StoreBind01MsgLimiters;
-  vector<string> StoreBind01MsgSources;
-  vector<string> StoreBind01MsgDestinations;
-  string Version = "0.1";
+  PG* PPGB = 0;
   unsigned int Category;
   string Key;
   vector<string> Values;
   string Offset = "                    ";
-  string GW_SCN;
-  string HT_SCN;
-  PGCS *PPGCS = 0;
-  Block *PHTB = 0;
-  CommandLine *PCL = 0;
-  CommandLine *PSCNCL = 0;
+  string HashOS;
+  string HashHost;
+  string HashPGCS;
+  string HashPG;
+  string HashGW;
+  string HashHT;
+  PGCS* PPGCS = 0;
 
-  PPGCS = (PGCS *)PB->PP;
-  PPGB = (PG *)PB;
-  PHTB = (Block *)PPGB->PHT;
+  PPGCS = (PGCS*)PB->PP;
+  PPGB = (PG*)PB;
 
-  // Generate the MsgCl header for the store message
-  StoreBind01MsgLimiters.push_back (PB->PP->Intra_Process);
-  StoreBind01MsgSources.push_back (PB->GetSelfCertifyingName ());
-  StoreBind01MsgDestinations.push_back (PPGB->PHT->GetSelfCertifyingName ());
+  // SPEC-008 Rev2: Store bindings directly in the HT to eliminate
+  // race condition between message queue processing and
+  // PGRunExposition01 execution. The message -sr --b was removed
+  // because it was redundant — the only consumer was HTStoreBind01
+  // which stored in the same HT.
 
-  // ******************************************************
-  // Schedule a message to store the learned name bindings
-  // ******************************************************
-
-  // Creating a new message
-  PB->PP->NewMessage (GetTime (), 0, false, StoreBind01Msg);
-
-  // ******************************************************
-  // Setting up the first command line
-  // ******************************************************
-
-  // Creating the ng -cl -m command line
-  PMB->NewConnectionLessCommandLine ("0.1", &StoreBind01MsgLimiters, &StoreBind01MsgSources, &StoreBind01MsgDestinations, StoreBind01Msg, MsgCl01);
+  // Generate hash keys
+  HashHost = NameGenerator::GetInstance().GenerateFromString("Host");
+  HashOS = NameGenerator::GetInstance().GenerateFromString("OS");
+  HashPGCS = NameGenerator::GetInstance().GenerateFromString("PGCS");
+  HashPG = NameGenerator::GetInstance().GenerateFromString("PG");
+  HashGW = NameGenerator::GetInstance().GenerateFromString("GW");
+  HashHT = NameGenerator::GetInstance().GenerateFromString("HT");
 
   // ******************************************************
-  // Binding Received HID to Received OSID
+  // Cat[6] HID -> OSID
   // ******************************************************
-
-  // Setting up the category
   Category = 6;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (0);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (1));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(1));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received OSID to Received HID
+  // Cat[7] OSID -> HID
   // ******************************************************
-
-  // Setting up the category
   Category = 7;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (1);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (0));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received HID to Hash("Host") and vice-versa
+  // Cat[9] Hash("Host") -> HID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 9, "Host", _ReceivedElements
-	  .at (0), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, _ReceivedElements.at (0), "Host", StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Binding Received OSID to Hash("OS") and vice-versa
-  // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "OS", _ReceivedElements
-	  .at (1), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (1), "OS", StoreBind01Msg, StoreBind01);
+  Category = 9;
+  Key = HashHost;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received OSID to Received PGCS PID
+  // Cat[8] HID -> "Host"
   // ******************************************************
+  Category = 8;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back("Host");
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[2] Hash("OS") -> OSID
+  // ******************************************************
+  Category = 2;
+  Key = HashOS;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(1));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // ******************************************************
+  // Cat[3] OSID -> Hash("OS")
+  // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(HashOS);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // ******************************************************
+  // Cat[5] OSID -> PID
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (1);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (2));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(1);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Host HID
+  // Cat[7] PID -> HID
   // ******************************************************
-
-  // Setting up the category
   Category = 7;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (0));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Hash("PGCS") and vice-versa
+  // Cat[2] Hash("PGCS") -> PID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "PGCS", _ReceivedElements
-	  .at (2), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (2), "PGCS", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashPGCS;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(2));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received PG BID
+  // Cat[3] PID -> Hash("PGCS")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(HashPGCS);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> PG_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (3));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(3));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PG BID to Hash("PG") and vice-versa
+  // Cat[2] Hash("PG") -> PG_BID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "PG", _ReceivedElements
-	  .at (3), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (3), "PG", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashPG;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(3));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received GW BID
+  // Cat[3] PG_BID -> Hash("PG")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(3);
+  Values.clear();
+  Values.push_back(HashPG);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> GW_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (4));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(4));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received GW BID to Hash("GW") and vice-versa
+  // Cat[2] Hash("GW") -> GW_BID
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "GW", _ReceivedElements
-	  .at (4), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (4), "GW", StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashGW;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(4));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received PGCS PID to Received HT BID
+  // Cat[3] GW_BID -> Hash("GW")
   // ******************************************************
+  Category = 3;
+  Key = _ReceivedElements.at(4);
+  Values.clear();
+  Values.push_back(HashGW);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Setting up the category
+  // ******************************************************
+  // Cat[5] PID -> HT_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
+  // ******************************************************
   Category = 5;
-
-  // Setting up the binding key
-  Key = _ReceivedElements.at (2);
-
-  // Setting up the values
-  Values.push_back (_ReceivedElements.at (5));
-
-  // Creating the ng -sr --b 0.1 command line
-  PMB->NewCommonCommandLine ("-sr", "--b", "0.1", Category, Key, &Values, StoreBind01Msg, StoreBind01);
-
-  // Clearing the values container
-  Values.clear ();
+  Key = _ReceivedElements.at(2);
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Received HT BID to Hash("HT") and vice-versa
+  // Cat[2] Hash("HT") -> HT_BID (CRITICAL — for DiscoverHomonymsBlocksBIDsFromPID)
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHashLNToSCN ("0.1", 2, "HT", _ReceivedElements
-	  .at (5), StoreBind01Msg, StoreBind01);
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 3, _ReceivedElements.at (5), "HT", StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Binding Peer PGCS HID to informed Peer Identifier.
-  // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromHIDToIdentifier ("0.1", _ReceivedElements
-	  .at (0), _PeerIdentifier, StoreBind01Msg, StoreBind01);
+  Category = 2;
+  Key = HashHT;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(5));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Binding Peer PGCS identifier to HID.
+  // Cat[3] HT_BID -> Hash("HT")
   // ******************************************************
-
-  PMB->NewStoreBindingCommandLineFromIdentifierToHID ("0.1", _PeerIdentifier, _ReceivedElements
-	  .at (0), StoreBind01Msg, StoreBind01);
-
-  // ******************************************************
-  // Binding Peer PGCS HID to Hash(Peer PGCS stack).
-  // ******************************************************
-
-  PMB->NewStoreBindingCommandLineSCNToHashLN ("0.1", 8, _ReceivedElements
-	  .at (0), _PeerStack, StoreBind01Msg, StoreBind01);
-
-  // TODO: FIXP/Update - Added to deal with the PGCS -de initialization in September 2nd, 2021
-
-  if (_Case == "-de" && PPGCS->CSIDs->size () > 0)
-	{
-	  PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at (0)
-			<< " for the peer PGCS with MAC "
-			<< _PeerIdentifier << ")" << endl;
-
-	  // Binding Ethernet address to CSID
-	  PMB->NewStoreBindingCommandLineFromIdentifierToSID ("0.1", _PeerIdentifier, PPGCS->CSIDs
-		  ->at (0), StoreBind01Msg, StoreBind01);
-	}
+  Category = 3;
+  Key = _ReceivedElements.at(5);
+  Values.clear();
+  Values.push_back(HashHT);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Setting up the SCN command line
+  // Peer address bindings (Cat[8] / Cat[15])
   // ******************************************************
 
-  // Generate the SCN
-  PB->GenerateSCNFromMessageBinaryPatterns (StoreBind01Msg, SCN);
+  // Cat[8] HID -> Peer Stack Hash
+  string HashPeerStack;
+  HashPeerStack = NameGenerator::GetInstance().GenerateFromString(_PeerStack);
+  Category = 8;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(HashPeerStack);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
-  // Creating the ng -scn --s command line
-  PMB->NewSCNCommandLine ("0.1", SCN, StoreBind01Msg, StoreBind01);
+  // Cat[15] HID -> Peer Identifier
+  Category = 15;
+  Key = _ReceivedElements.at(0);
+  Values.clear();
+  Values.push_back(_PeerIdentifier);
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+
+  // Cat[15] Peer Identifier -> HID
+  Category = 15;
+  Key = _PeerIdentifier;
+  Values.clear();
+  Values.push_back(_ReceivedElements.at(0));
+  PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
 
   // ******************************************************
-  // Finish
+  // -de mode: associate client socket with CSID
   // ******************************************************
+  if (_Case == "-de" && PPGCS->CSIDs->size() > 0)
+  {
+    PB->S << Offset << "(Associating the client socket with CSID " << PPGCS->CSIDs->at(0)
+          << " for the peer PGCS with MAC "
+          << _PeerIdentifier << ")" << endl;
 
-  // Push the message to the GW input queue
-  PPGB->PGW->PushToInputQueue (StoreBind01Msg);
+    // Cat[15] Peer Identifier -> CSID
+    Category = 15;
+    Key = _PeerIdentifier;
+    Values.clear();
+    Values.push_back(PB->IntToString(PPGCS->CSIDs->at(0)));
+    PPGB->PGW->StoreHTBindingValues(Category, Key, &Values);
+  }
 
   Status = OK;
 
   return Status;
 }
-

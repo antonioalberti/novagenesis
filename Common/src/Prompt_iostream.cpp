@@ -1,12 +1,12 @@
 /*
-	Name:		Simulator Input Output Stream
-	Object:		Sim_Stream
-	File:		sim_stream.cpp
-	Authors:	Jackson Klein and Antonio Marcos Alberti
-	Date:		02/2007
-	Version:	0.3
+        Name:		Simulator Input Output Stream
+        Object:		Sim_Stream
+        File:		sim_stream.cpp
+        Authors:	Jackson Klein and Antonio Marcos Alberti
+        Date:		02/2007
+        Version:	0.3
 
- 	Copyright (C) 2021  Jackson Klein and Antonio Marcos Alberti
+        Copyright (C) 2021  Jackson Klein and Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -28,35 +28,33 @@
 
 //  ConsoleStreambuf Class
 
-ConsoleStreambuf::ConsoleStreambuf() : streambuf()
+ConsoleStreambuf::ConsoleStreambuf()
+    : streambuf()
 {
-	OutputFunction=NULL;
+  OutputFunction = NULL;
 };
 
-ConsoleStreambuf::~ConsoleStreambuf()
-{
-};
+ConsoleStreambuf::~ConsoleStreambuf(){};
 
-void  ConsoleStreambuf::SetOutputFunction(OutFunct OutputFunction_)
+void ConsoleStreambuf::SetOutputFunction(OutFunct OutputFunction_)
 {
-	OutputFunction=OutputFunction_;
+  OutputFunction = OutputFunction_;
 };
 
 OutFunct ConsoleStreambuf::GetOutputFunction()
 {
-	return OutputFunction;
+  return OutputFunction;
 };
-
 
 int ConsoleStreambuf::overflow(int S)
 {
-	cout<<(char)S;
+  cout << (char)S;
 
- 	//if(OutputFunction!=NULL) OutputFunction((char)S);
+  // if(OutputFunction!=NULL) OutputFunction((char)S);
 
-    //else cout<<(char)S;
+  // else cout<<(char)S;
 
-	return 0;
+  return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -65,19 +63,17 @@ int ConsoleStreambuf::overflow(int S)
 
 ConsoleOstream::ConsoleOstream(OutFunct OutputFunction_)
 {
-    init ( &StreamBuf);
+  init(&StreamBuf);
 
-	SetOutputFunction(OutputFunction_);
+  SetOutputFunction(OutputFunction_);
 };
 
-
-void  ConsoleOstream::SetOutputFunction(OutFunct OutputFunction_)
+void ConsoleOstream::SetOutputFunction(OutFunct OutputFunction_)
 {
-	StreamBuf.SetOutputFunction(OutputFunction_);
+  StreamBuf.SetOutputFunction(OutputFunction_);
 };
 
 OutFunct ConsoleOstream::GetOutputFunction()
 {
-	return 	StreamBuf.GetOutputFunction();
+  return StreamBuf.GetOutputFunction();
 };
-

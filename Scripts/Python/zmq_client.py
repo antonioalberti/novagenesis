@@ -1,9 +1,12 @@
+import os
 import zmq
 import sys
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://192.168.1.214:5555")
-#socket.connect("tcp://127.0.0.1:5555")
+endpoint = os.environ.get("ZMQ_ENDPOINT")
+if not endpoint:
+    raise SystemExit("Set ZMQ_ENDPOINT, for example tcp://<host>:5555")
+socket.connect(endpoint)
  
 for i in range(10):
 	#msg = "msg %s" % i

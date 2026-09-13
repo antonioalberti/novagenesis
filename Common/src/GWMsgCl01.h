@@ -1,14 +1,14 @@
 /*
-	NovaGenesis
-	
-	Name:		GWMsgCl01
-	Object:		GWMsgCl01
-	File:		GWMsgCl01.h
-	Author:		Antonio Marcos Alberti
-	Date:		05/2021
-	Version:	0.1
+        NovaGenesis
 
-   	Copyright (C) 2021  Antonio Marcos Alberti
+        Name:		GWMsgCl01
+        Object:		GWMsgCl01
+        File:		GWMsgCl01.h
+        Author:		Antonio Marcos Alberti
+        Date:		05/2021
+        Version:	0.1
+
+        Copyright (C) 2021  Antonio Marcos Alberti
 
     This work is available under the GNU Lesser General Public License (See COPYING.txt).
 
@@ -51,44 +51,34 @@ class Block;
 
 using namespace std;
 
-class GWMsgCl01 : public Action {
- public:
-
+class GWMsgCl01 : public Action
+{
+public:
   string Option1;
   string Option2;
   string Option3;
 
   // Constructor
-  GWMsgCl01 (string _LN, Block *_PB, MessageBuilder *_PMB);
+  GWMsgCl01(string _LN, Block* _PB, MessageBuilder* _PMB);
 
   // Destructor
-  virtual ~GWMsgCl01 ();
+  virtual ~GWMsgCl01();
 
   // The forwarding is limited to a Process
-  int
-  ForwardMessageInsideProcess (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  int ForwardMessageInsideProcess(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // The forwarding is limited to an OS
-  int
-  ForwardMessageInsideOS (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  int ForwardMessageInsideOS(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // The forwarding is limited to a Domain
-  int
-  ForwardMessageInsideDomain (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  int ForwardMessageInsideDomain(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // The forwarding is between two domains
-  int
-  ForwardInterDomainMessage (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  int ForwardInterDomainMessage(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 
   // Run the actions behind a received message
   virtual int
-  Run (Message *_ReceivedMessage, CommandLine *_PCL, vector<Message *> &ScheduledMessages, Message *&InlineResponseMessage);
+  Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Message*>& ScheduledMessages, Message*& InlineResponseMessage);
 };
 
 #endif
-
-
-
-
-
-
