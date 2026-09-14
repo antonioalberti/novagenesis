@@ -7,6 +7,7 @@ guest.  It deliberately does not invoke the older manual run_*.sh launchers.
 from __future__ import annotations
 
 import argparse
+import ctypes
 import datetime as dt
 import hashlib
 import json
@@ -474,16 +475,24 @@ def collect_remote(config: Mapping[str, str], host: str, state_dir: str, local_d
 
 
 def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
-    """Write a manifest, keeping remote v1 and allowing local v2 sealing."""
+    """Write a v1 remote manifest or a fail-closed, sealed local v2 bundle."""
     effective_schema = schema_version if schema_version is not None else (2 if metadata.get("mode") == "local" else 1)
     if effective_schema not in {1, 2}:
         raise ValueError("unsupported evidence schema version")
     if effective_schema == 2:
         metadata_secrets = collect_secret_values(metadata)
         metadata = sanitize_config(metadata, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets)
+        existing_blockers: list[str] = []
+        result_path = evidence_dir / "result.json"
+        try:
+            existing = json.loads(result_path.read_text(encoding="utf-8")) if result_path.is_file() else {}
+            existing_blockers.extend(existing.get("protected_input_blockers", []))
+        except (OSError, json.JSONDecodeError, TypeError):
+            existing = {}
         safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
-        if safety["blockers"]:
-            metadata = {**metadata, "protected_input_blockers": safety["blockers"]}
+        blockers = list(dict.fromkeys(str(item) for item in existing_blockers + safety["blockers"]))
+        if blockers:
+            metadata = {**metadata, "protected_input_blockers": blockers}
     entries = []
     for path in sorted(evidence_dir.rglob("*")):
         if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
@@ -633,13 +642,23 @@ def read_proc_stat(pid: int) -> dict[str, Any]:
         return {"status": "unknown", "error": f"malformed stat: {exc}"}
 
 
+def process_executable_identity(pid: int) -> dict[str, Any]:
+    """Read the executable identity without following a caller-supplied path."""
+    try:
+        return {"status": "ok", "path": os.readlink(f"/proc/{pid}/exe")}
+    except FileNotFoundError:
+        return {"status": "gone"}
+    except OSError as exc:
+        return {"status": "unknown", "error": str(exc)}
+
+
 def process_starttime(pid: int) -> str | None:
-    record = read_proc_stat(pid)
+    record = _safe_read_proc_stat(pid)
     return record.get("starttime") if record.get("status") == "ok" else None
 
 
 def process_state(pid: int) -> str | None:
-    record = read_proc_stat(pid)
+    record = _safe_read_proc_stat(pid)
     return record.get("state") if record.get("status") == "ok" else None
 
 
@@ -653,14 +672,18 @@ def local_group_members_status(pgid: int) -> dict[str, Any]:
     for entry in entries:
         if not entry.name.isdigit():
             continue
-        record = read_proc_stat(int(entry.name))
+        record = _safe_read_proc_stat(int(entry.name))
         if record["status"] == "gone":
             continue
         if record["status"] != "ok":
             complete = False
             continue
         if record["pgid"] == pgid:
-            members.append({"pid": int(entry.name), "pgid": pgid, "comm": record["comm"], "starttime": record["starttime"]})
+            executable = _safe_executable_identity(int(entry.name))
+            if executable["status"] != "ok":
+                complete = False
+                continue
+            members.append({"pid": int(entry.name), "pgid": pgid, "comm": record["comm"], "starttime": record["starttime"], "executable": executable["path"]})
     return {"members": sorted(members, key=lambda item: item["pid"]), "complete": complete}
 
 
@@ -679,11 +702,13 @@ def local_process_descendants(root_pid: int) -> dict[str, Any]:
         if not entry.name.isdigit():
             continue
         pid = int(entry.name)
-        record = read_proc_stat(pid)
+        record = _safe_read_proc_stat(pid)
         if record["status"] == "gone":
             continue
         if record["status"] != "ok":
             complete = False
+            continue
+        if record.get("state") in {"Z", "X"}:
             continue
         records[pid] = {"pid": pid, "ppid": record["ppid"], "pgid": record["pgid"], "starttime": record["starttime"], "comm": record["comm"]}
     children: dict[int, list[int]] = {}
@@ -702,18 +727,39 @@ def local_process_descendants(root_pid: int) -> dict[str, Any]:
             complete = False
             continue
         descendants.append(item)
+        executable = _safe_executable_identity(pid)
+        if executable.get("status") != "ok":
+            complete = False
+        else:
+            item["executable"] = executable["path"]
         pending.extend(children.get(pid, []))
     return {"descendants": sorted(descendants, key=lambda item: item["pid"]), "complete": complete}
+
+
+def _safe_read_proc_stat(pid: int) -> dict[str, Any]:
+    try:
+        return read_proc_stat(pid)
+    except BaseException as exc:
+        return {"status": "unknown", "error": f"identity scan failed: {exc}"}
+
+
+def _safe_executable_identity(pid: int) -> dict[str, Any]:
+    try:
+        return process_executable_identity(pid)
+    except BaseException as exc:
+        return {"status": "unknown", "error": f"executable identity scan failed: {exc}"}
 
 
 def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> tuple[bool, list[dict[str, Any]]]:
     residual: list[dict[str, Any]] = []
     for pid, expected in tracked.items():
-        record = read_proc_stat(pid)
+        record = _safe_read_proc_stat(pid)
         if record["status"] == "gone":
             continue
         if record["status"] != "ok":
             residual.append({"pid": pid, "reason": "identity-unavailable", "error": record.get("error")})
+            continue
+        if record.get("state") in {"Z", "X"}:
             continue
         expected_pgid = expected.get("pgid")
         if expected_pgid is None:
@@ -725,6 +771,15 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
         if record["pgid"] != expected_pgid:
             residual.append({"pid": pid, "reason": "identity-mismatch", "expected_pgid": expected_pgid, "actual_pgid": record["pgid"]})
             continue
+        expected_executable = expected.get("executable")
+        if expected_executable is not None:
+            executable = _safe_executable_identity(pid)
+            if executable.get("status") != "ok":
+                residual.append({"pid": pid, "reason": "executable-identity-unavailable", "error": executable.get("error")})
+                continue
+            if executable.get("path") != expected_executable:
+                residual.append({"pid": pid, "reason": "executable-identity-mismatch", "expected_executable": expected_executable, "actual_executable": executable.get("path")})
+                continue
         try:
             os.kill(pid, signal.SIGTERM)
         except ProcessLookupError:
@@ -735,7 +790,7 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
         deadline = time.monotonic() + 2
         unknown: dict[str, Any] | None = None
         while time.monotonic() < deadline:
-            current = read_proc_stat(pid)
+            current = _safe_read_proc_stat(pid)
             if current["status"] == "gone" or (current["status"] == "ok" and current["state"] in {"Z", "X"}):
                 break
             if current["status"] != "ok":
@@ -745,11 +800,23 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
                 residual.append({"pid": pid, "reason": "identity-mismatch-after-term", "expected_starttime": expected.get("starttime"), "actual_starttime": current["starttime"], "expected_pgid": expected_pgid, "actual_pgid": current["pgid"]})
                 unknown = {"status": "mismatch"}
                 break
+            if expected_executable is not None:
+                executable = _safe_executable_identity(pid)
+                if executable.get("status") == "gone":
+                    confirmed = _safe_read_proc_stat(pid)
+                    if confirmed.get("status") == "gone" or confirmed.get("state") in {"Z", "X"}:
+                        break
+                    time.sleep(0.05)
+                    continue
+                if executable.get("status") != "ok" or executable.get("path") != expected_executable:
+                    residual.append({"pid": pid, "reason": "executable-identity-mismatch-after-term", "expected_executable": expected_executable, "actual_executable": executable.get("path"), "error": executable.get("error")})
+                    unknown = {"status": "mismatch"}
+                    break
             time.sleep(0.05)
         if unknown:
             residual.append({"pid": pid, "reason": "identity-unavailable-after-term", "error": unknown.get("error")})
             continue
-        current = read_proc_stat(pid)
+        current = _safe_read_proc_stat(pid)
         if current["status"] == "gone" or (current["status"] == "ok" and current["state"] in {"Z", "X"}):
             continue
         if current["status"] != "ok":
@@ -758,6 +825,11 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
         if current["starttime"] != expected.get("starttime") or current["pgid"] != expected_pgid:
             residual.append({"pid": pid, "reason": "identity-mismatch-before-kill", "expected_starttime": expected.get("starttime"), "actual_starttime": current.get("starttime"), "expected_pgid": expected_pgid, "actual_pgid": current.get("pgid")})
             continue
+        if expected_executable is not None:
+            executable = _safe_executable_identity(pid)
+            if executable.get("status") != "ok" or executable.get("path") != expected_executable:
+                residual.append({"pid": pid, "reason": "executable-identity-mismatch-before-kill", "expected_executable": expected_executable, "actual_executable": executable.get("path"), "error": executable.get("error")})
+                continue
         try:
             os.kill(pid, signal.SIGKILL)
         except ProcessLookupError:
@@ -767,7 +839,7 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
             continue
         deadline = time.monotonic() + 2
         while time.monotonic() < deadline:
-            current = read_proc_stat(pid)
+            current = _safe_read_proc_stat(pid)
             if current["status"] == "gone" or (current["status"] == "ok" and current["state"] in {"Z", "X"}):
                 break
             if current["status"] != "ok":
@@ -1222,6 +1294,33 @@ def _hash_open_fd(fd: int) -> tuple[int, str]:
     return size, digest.hexdigest()
 
 
+def _create_sealed_memfd(name: str) -> int:
+    """Create a Linux sealing-capable memfd on old Python builds too."""
+    flags = getattr(os, "MFD_CLOEXEC", 0x0001) | getattr(os, "MFD_ALLOW_SEALING", 0x0002)
+    creator = getattr(os, "memfd_create", None)
+    if creator is not None:
+        return creator(name, flags)
+    syscall_numbers = {"x86_64": 319, "amd64": 319, "aarch64": 279, "arm64": 279}
+    number = syscall_numbers.get(os.uname().machine)
+    if number is None:
+        raise OSError(f"memfd_create is unavailable on {os.uname().machine}")
+    fd = ctypes.CDLL(None, use_errno=True).syscall(number, ctypes.c_char_p(name.encode()), ctypes.c_uint(flags))
+    if fd < 0:
+        error = ctypes.get_errno()
+        raise OSError(error, os.strerror(error))
+    return int(fd)
+
+
+def _seal_memfd(fd: int) -> int:
+    add_seals = getattr(fcntl, "F_ADD_SEALS", 1033)
+    get_seals = getattr(fcntl, "F_GET_SEALS", 1034)
+    seals = getattr(fcntl, "F_SEAL_SEAL", 0x0001) | getattr(fcntl, "F_SEAL_SHRINK", 0x0002) | getattr(fcntl, "F_SEAL_GROW", 0x0004) | getattr(fcntl, "F_SEAL_WRITE", 0x0008)
+    fcntl.fcntl(fd, add_seals, seals)
+    if fcntl.fcntl(fd, get_seals) & seals != seals:
+        raise OSError("memfd seals were not applied")
+    return seals
+
+
 def prepare_local_executable(provenance: Mapping[str, Any], role: str, argv0: str) -> dict[str, Any]:
     """Make a sealed executable image and bind the launch to that image.
 
@@ -1258,7 +1357,7 @@ def prepare_local_executable(provenance: Mapping[str, Any], role: str, argv0: st
     expected = provenance.get("binaries", {}).get(role) if isinstance(provenance.get("binaries"), Mapping) else None
     if not isinstance(expected, Mapping) or not expected.get("resolved_path") or not expected.get("sha256"):
         raise ValueError(f"build linkage missing for {role}")
-    if sys.platform != "linux" or fcntl is None or not hasattr(os, "memfd_create") or not hasattr(os, "MFD_ALLOW_SEALING") or not hasattr(os, "O_NOFOLLOW"):
+    if sys.platform != "linux" or fcntl is None or not hasattr(os, "O_NOFOLLOW"):
         raise ValueError(f"immutable executable binding is unavailable on this platform for {role}")
     source_ok, source_error = _source_identity_matches(provenance)
     if not source_ok:
@@ -1277,7 +1376,7 @@ def prepare_local_executable(provenance: Mapping[str, Any], role: str, argv0: st
         source_size, source_hash = _hash_open_fd(source_fd)
         if source_hash != expected["sha256"] or source_size != expected.get("size", source_size):
             raise ValueError(f"launched executable drift for {role}")
-        image_fd = os.memfd_create(f"ng-elc-{role}", os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
+        image_fd = _create_sealed_memfd(f"ng-elc-{role}")
         os.fchmod(image_fd, before.st_mode & 0o7777)
         os.lseek(source_fd, 0, os.SEEK_SET)
         copied = 0
@@ -1299,10 +1398,7 @@ def prepare_local_executable(provenance: Mapping[str, Any], role: str, argv0: st
             raise ValueError(f"executable source raced during immutable staging for {role}")
         if copied != source_size or image_size != source_size or image_hash != expected["sha256"]:
             raise ValueError(f"immutable executable image verification failed for {role}")
-        seals = fcntl.F_SEAL_SEAL | fcntl.F_SEAL_SHRINK | fcntl.F_SEAL_GROW | fcntl.F_SEAL_WRITE
-        fcntl.fcntl(image_fd, fcntl.F_ADD_SEALS, seals)
-        if fcntl.fcntl(image_fd, fcntl.F_GET_SEALS) & seals != seals:
-            raise ValueError(f"immutable executable image is not sealed for {role}")
+        seals = _seal_memfd(image_fd)
         proc_path = f"/proc/self/fd/{image_fd}"
         return {
             "source_path": str(resolved),
@@ -1483,7 +1579,7 @@ def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[
     return ok, new_ids, None
 
 
-def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_starttime: str | None) -> dict[str, Any]:
+def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_starttime: str | None, expected_executable: str | None = None) -> dict[str, Any]:
     if pgid is None:
         return {"ok": False, "result": "identity-unavailable", "pid": proc.pid, "residual": [{"pid": proc.pid, "reason": "process-group-identity-missing"}]}
     if proc.poll() is not None:
@@ -1493,9 +1589,13 @@ def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_st
         if group_scan["members"]:
             return {"ok": False, "result": "group-member-residual", "pid": proc.pid, "pgid": pgid, "returncode": proc.returncode, "residual": group_scan["members"]}
         return {"ok": True, "result": "already-exited", "returncode": proc.returncode}
-    record = read_proc_stat(proc.pid)
+    record = _safe_read_proc_stat(proc.pid)
     if record["status"] != "ok" or record["starttime"] != expected_starttime or record["pgid"] != pgid:
         return {"ok": False, "result": "identity-mismatch", "pid": proc.pid, "pgid": pgid}
+    if expected_executable is not None:
+        executable = _safe_executable_identity(proc.pid)
+        if executable.get("status") != "ok" or executable.get("path") != expected_executable:
+            return {"ok": False, "result": "executable-identity-mismatch", "pid": proc.pid, "pgid": pgid, "residual": [{"pid": proc.pid, "reason": "executable-identity-mismatch"}]}
     try:
         os.killpg(pgid, signal.SIGTERM)
     except (OSError, ProcessLookupError) as exc:
@@ -1509,9 +1609,13 @@ def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_st
             return {"ok": False, "result": "group-member-residual", "pid": proc.pid, "pgid": pgid, "returncode": proc.returncode, "residual": group_scan["members"]}
         return {"ok": True, "result": "SIGTERM", "returncode": proc.returncode}
     except subprocess.TimeoutExpired:
-        record = read_proc_stat(proc.pid)
+        record = _safe_read_proc_stat(proc.pid)
         if record["status"] != "ok" or record["starttime"] != expected_starttime or record["pgid"] != pgid:
             return {"ok": False, "result": "identity-mismatch-before-kill", "pid": proc.pid, "pgid": pgid}
+        if expected_executable is not None:
+            executable = _safe_executable_identity(proc.pid)
+            if executable.get("status") != "ok" or executable.get("path") != expected_executable:
+                return {"ok": False, "result": "executable-identity-mismatch-before-kill", "pid": proc.pid, "pgid": pgid}
         try:
             os.killpg(pgid, signal.SIGKILL)
         except (OSError, ProcessLookupError) as exc:
@@ -1561,33 +1665,62 @@ def register_local_process(
         item["starttime"] = process_starttime(proc.pid)
         if item["starttime"] is None:
             raise RuntimeError("process starttime identity unavailable")
+        executable = _safe_executable_identity(proc.pid)
+        if executable.get("status") != "ok":
+            raise RuntimeError("process executable identity unavailable")
+        item["executable"] = executable["path"]
     except BaseException as exc:
-        # Keep the ledger entry while every rollback check completes.  The
-        # Popen handle is safe for the leader, but it is not proof of group or
-        # descendant ownership; uncertainty must remain visible to teardown.
+        # Keep the ledger entry while rollback checks complete.  Never use a
+        # Popen handle alone as signalling authority when PID/starttime/PGID
+        # or executable identity is unavailable.
         item["identity_failure"] = str(exc)
         item["rollback_uncertain"] = True
         item["rollback_started"] = True
-        scan = local_process_descendants(proc.pid)
+        try:
+            scan = local_process_descendants(proc.pid)
+        except BaseException as scan_exc:
+            scan = {"descendants": [], "complete": False, "error": str(scan_exc)}
         item["descendant_scan_seen"] = True
-        item["descendant_scan_complete"] = scan["complete"]
-        item["tracked_descendants"].update({child["pid"]: child for child in scan["descendants"]})
-        kill_ok = True
-        wait_ok = True
+        item["descendant_scan_complete"] = scan.get("complete", False)
+        item["tracked_descendants"].update({child["pid"]: child for child in scan.get("descendants", [])})
+        rollback_identity = _safe_read_proc_stat(proc.pid)
+        rollback_executable = _safe_executable_identity(proc.pid)
+        identity_ok = (
+            item.get("pgid") is not None
+            and item.get("starttime") is not None
+            and rollback_identity.get("status") == "ok"
+            and rollback_identity.get("starttime") == item.get("starttime")
+            and rollback_identity.get("pgid") == item.get("pgid")
+            and rollback_executable.get("status") == "ok"
+        )
+        kill_ok = False
+        wait_ok = False
+        if identity_ok:
+            try:
+                proc.kill()
+                kill_ok = True
+            except (OSError, ProcessLookupError, subprocess.SubprocessError) as rollback_exc:
+                item["rollback_kill_error"] = str(rollback_exc)
+            try:
+                proc.wait(timeout=5)
+                wait_ok = True
+            except (OSError, subprocess.SubprocessError) as rollback_exc:
+                item["rollback_wait_error"] = str(rollback_exc)
+        else:
+            item["rollback_identity_error"] = "PID/starttime/PGID/executable identity could not be revalidated"
         try:
-            proc.kill()
-        except (OSError, ProcessLookupError) as rollback_exc:
-            kill_ok = False
-            item["rollback_kill_error"] = str(rollback_exc)
+            after_scan = local_process_descendants(proc.pid)
+        except BaseException as scan_exc:
+            after_scan = {"descendants": [], "complete": False, "error": str(scan_exc)}
+        item["descendant_scan_complete"] = item.get("descendant_scan_complete", False) and after_scan.get("complete", False)
+        item["tracked_descendants"].update({child["pid"]: child for child in after_scan.get("descendants", [])})
         try:
-            proc.wait(timeout=5)
-        except (OSError, subprocess.SubprocessError) as rollback_exc:
-            wait_ok = False
-            item["rollback_wait_error"] = str(rollback_exc)
-        descendants_ok, residual = local_stop_tracked_descendants(item["tracked_descendants"])
+            descendants_ok, residual = local_stop_tracked_descendants(item["tracked_descendants"])
+        except BaseException as stop_exc:
+            descendants_ok, residual = False, [{"reason": "rollback-descendant-stop-error", "error": str(stop_exc)}]
         item["rollback_descendants_ok"] = descendants_ok
         item["rollback_descendant_residual"] = residual
-        item["rollback_complete"] = bool(kill_ok and wait_ok and scan["complete"] and descendants_ok)
+        item["rollback_complete"] = bool(kill_ok and wait_ok and item["descendant_scan_complete"] and descendants_ok)
         item["unresolved"] = not item["rollback_complete"]
         try:
             stdout.close()
@@ -1794,17 +1927,33 @@ def run_local_trial(args: argparse.Namespace) -> int:
             if item.get("rollback_uncertain"):
                 teardown_result = "FAIL"
                 local_record(events, "identity-rollback", role=role, rollback_complete=item.get("rollback_complete", False), unresolved=item.get("unresolved", True), residual=item.get("rollback_descendant_residual", []))
-            if proc.poll() is None:
-                final_scan = local_process_descendants(proc.pid)
-                item["descendant_scan_seen"] = True
-                item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and final_scan["complete"]
-                item.setdefault("tracked_descendants", {}).update({descendant["pid"]: descendant for descendant in final_scan["descendants"]})
-            stop_result = local_stop_process_group(proc, pgid, item["starttime"])
+            # Scan before stopping and again after leader termination.  The
+            # second scan is deliberately retained in the ownership ledger:
+            # children can be created during TERM handling or reparented after
+            # a leader exits, and a single pre-stop sample is insufficient.
+            try:
+                initial_scan = local_process_descendants(proc.pid)
+            except BaseException as exc:
+                initial_scan = {"descendants": [], "complete": False, "error": str(exc)}
+            item["descendant_scan_seen"] = True
+            item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and initial_scan.get("complete", False)
+            item.setdefault("tracked_descendants", {}).update({descendant["pid"]: descendant for descendant in initial_scan.get("descendants", [])})
+            if initial_scan.get("error"):
+                item["descendant_scan_error"] = initial_scan["error"]
+            stop_result = local_stop_process_group(proc, pgid, item["starttime"], item.get("executable"))
             if not stop_result["ok"]:
                 teardown_result = "FAIL"
             local_record(events, "stop", role=role, **stop_result)
+            try:
+                final_scan = local_process_descendants(proc.pid)
+            except BaseException as exc:
+                final_scan = {"descendants": [], "complete": False, "error": str(exc)}
+            item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and final_scan.get("complete", False)
+            item.setdefault("tracked_descendants", {}).update({descendant["pid"]: descendant for descendant in final_scan.get("descendants", [])})
+            if final_scan.get("error"):
+                item["descendant_scan_error_after_stop"] = final_scan["error"]
             descendants_ok, descendant_residual = local_stop_tracked_descendants(item.get("tracked_descendants", {}))
-            if not item.get("descendant_scan_seen", False) or not item.get("descendant_scan_complete", True) or not descendants_ok:
+            if not item.get("descendant_scan_complete", True) or not descendants_ok:
                 teardown_result = "FAIL"
                 local_record(events, "descendant-cleanup", role=role, complete=item.get("descendant_scan_complete", True), residual=descendant_residual)
             group_scan = local_group_members_status(pgid)
@@ -1833,6 +1982,17 @@ def run_local_trial(args: argparse.Namespace) -> int:
                     teardown_result = "FAIL"
                     local_record(events, "process-group-residual", role=role, pgid=pgid, members=final_group_scan["members"], reason="surviving-process-group-member")
                 members = final_group_scan["members"]
+            item["unresolved"] = bool(
+                item.get("rollback_uncertain")
+                or not stop_result.get("ok", False)
+                or not item.get("descendant_scan_complete", False)
+                or not descendants_ok
+                or not group_scan.get("complete", False)
+                or bool(members)
+            )
+            if item["unresolved"]:
+                teardown_result = "FAIL"
+                local_record(events, "ownership-unresolved", role=role, reason="descendant-or-process-group-ownership-not-proven")
             item["group_members_after_stop"] = members
             item["process"] = proc
             local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members, "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)), "rollback_uncertain": item.get("rollback_uncertain", False), "unresolved": item.get("unresolved", False)})

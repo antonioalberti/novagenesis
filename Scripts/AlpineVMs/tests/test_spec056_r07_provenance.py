@@ -34,10 +34,10 @@ def _complete_manifest(tmp_path: Path) -> tuple[dict[str, object], dict[str, obj
             "index_sha256": "a" * 64, "index_entries": [{"path": "input.txt", "mode": "100644", "blob_id": "c" * 40, "stage": 0}],
             "content_snapshot": {"captured": True, "files": [], "entries": [], "errors": []},
         },
-        "recipe": {"commands": [["cmake", "--build", "build"]]},
+        "recipe": {"commands": [["cmake", "--build", "build"]], "working_directory": "/src"},
         "toolchain": {"compiler": "g++", "version": "13"},
         "options": {"build_type": "RelWithDebInfo"},
-        "runtime_library_identity": {"binaries": {"Source": {"status": "ok", "ldd_sha256": "c" * 64, "libraries": ["libc.so"]}}},
+        "runtime_library_identity": {"method": "ldd", "binaries": {"Source": {"status": "ok", "ldd_sha256": "c" * 64, "libraries": ["libc.so"]}}},
         "binaries": {"Source": {"path": "/build/bin/Source", "sha256": "d" * 64}},
     }
     evidence.update({"preserved_path": "provenance/build-manifest.json", "preserved_size": evidence["size"], "preserved_sha256": evidence["sha256"]})

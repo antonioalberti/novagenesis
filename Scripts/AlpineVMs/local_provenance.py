@@ -574,77 +574,88 @@ def collect_secret_values(value: Any) -> set[str]:
     return _collect_secret_values(value)
 
 
+_SECRET_FILENAME_RE = re.compile(
+    r"(?:^|[._-])(?:\.env(?:\.|$)|secret|credential|password|passwd|token|api[-_]?key|private[-_]?key|ssh[-_]?key)(?:$|[._-])",
+    re.IGNORECASE,
+)
+
+
+def _remove_protected_path(path: Path, relative: str, blockers: list[str], quarantined: list[str], reason: str) -> None:
+    """Remove an unsafe evidence input when possible, but always retain a blocker."""
+    try:
+        path.unlink()
+        quarantined.append(relative)
+    except (OSError, RuntimeError) as exc:
+        blockers.append(f"protected-input quarantine failed: {relative}: {type(exc).__name__}")
+        return
+    blockers.append(f"protected-input {reason}: {relative}")
+
+
 def sanitize_evidence_tree(
     evidence_dir: os.PathLike[str] | str,
     known_secrets: Iterable[str] = (),
 ) -> dict[str, Any]:
-    """Scrub text evidence and quarantine anything that cannot be scrubbed.
+    """Scan every evidence file/name and fail closed on unsafe publication.
 
-    Evidence is published only after this pass.  Opaque files containing a
-    known secret are removed from the evidence-owned tree and reported as a
-    protected-input blocker; retaining them would publish the secret.
+    Text containing quoted assignments, URL credentials, query credentials, or
+    argv-style secrets is rewritten only when the rewrite succeeds and the
+    result is demonstrably clean.  Binary payloads remain allowed when no known
+    secret is present; opaque/unreadable or secret-bearing paths are rejected
+    and removed when possible.  A blocker is returned even after quarantine so
+    callers cannot publish an apparently complete bundle.
     """
     root = Path(evidence_dir).resolve()
+    if not root.is_dir():
+        return {"ok": False, "scanned": [], "quarantined": [], "blockers": [f"protected-input evidence root is unavailable: {root}"]}
     secrets = {item for item in known_secrets if isinstance(item, str) and item}
     blockers: list[str] = []
     scanned: list[str] = []
     quarantined: list[str] = []
-    excluded = {"manifest.json", "manifest.sha256", "terminal-seal.json"}
     for path in sorted(root.rglob("*")):
-        if path.name in excluded:
-            continue
         relative = path.relative_to(root).as_posix()
         if path.is_symlink():
-            try:
-                path.unlink()
-            except OSError:
-                pass
-            quarantined.append(relative)
-            blockers.append(f"protected-input unsafe evidence link: {relative}")
+            _remove_protected_path(path, relative, blockers, quarantined, "unsafe evidence link")
             continue
-        if not path.exists():
+        try:
+            is_file = path.is_file()
+        except (OSError, RuntimeError) as exc:
+            blockers.append(f"protected-input evidence stat failed: {relative}: {type(exc).__name__}")
             continue
-        if not path.is_file():
+        if not is_file:
+            continue
+        scanned.append(relative)
+        if any(_SECRET_FILENAME_RE.search(part) for part in Path(relative).parts):
+            _remove_protected_path(path, relative, blockers, quarantined, "secret-bearing filename")
             continue
         try:
             data = path.read_bytes()
-        except OSError as exc:
-            blockers.append(f"protected-input evidence unreadable: {relative}: {type(exc).__name__}")
+        except (OSError, RuntimeError) as exc:
+            _remove_protected_path(path, relative, blockers, quarantined, f"evidence unreadable ({type(exc).__name__})")
             continue
-        scanned.append(relative)
+        if b"\0" in data and any(secret.encode("utf-8") in data for secret in secrets):
+            _remove_protected_path(path, relative, blockers, quarantined, "cannot safely preserve opaque evidence")
+            continue
         try:
             text = data.decode("utf-8")
         except UnicodeDecodeError:
             if any(secret.encode("utf-8") in data for secret in secrets):
-                try:
-                    path.unlink()
-                except OSError:
-                    pass
-                quarantined.append(relative)
-                blockers.append(f"protected-input cannot safely preserve opaque evidence: {relative}")
-            continue
-        if b"\0" in data and any(secret.encode("utf-8") in data for secret in secrets):
-            try:
-                path.unlink()
-            except OSError:
-                pass
-            quarantined.append(relative)
-            blockers.append(f"protected-input cannot safely preserve opaque evidence: {relative}")
+                _remove_protected_path(path, relative, blockers, quarantined, "cannot safely preserve opaque evidence")
             continue
         scrubbed = _redact_string(text, secrets)
         if scrubbed != text:
             try:
                 path.write_text(scrubbed, encoding="utf-8")
-            except OSError as exc:
-                blockers.append(f"protected-input cannot safely rewrite evidence: {relative}: {type(exc).__name__}")
+                # Re-open the rewritten path so a partial or intercepted write
+                # cannot be mistaken for successful redaction.
+                rewritten = path.read_text(encoding="utf-8")
+            except (OSError, RuntimeError, UnicodeError) as exc:
+                _remove_protected_path(path, relative, blockers, quarantined, f"cannot safely rewrite evidence ({type(exc).__name__})")
                 continue
-        if any(secret in scrubbed for secret in secrets):
-            try:
-                path.unlink()
-            except OSError:
-                pass
-            quarantined.append(relative)
-            blockers.append(f"protected-input secret remains in evidence: {relative}")
+            if rewritten != scrubbed or any(secret in rewritten for secret in secrets):
+                _remove_protected_path(path, relative, blockers, quarantined, "secret remains in evidence")
+                continue
+        elif any(secret in text for secret in secrets):
+            _remove_protected_path(path, relative, blockers, quarantined, "secret remains in evidence")
     return {"ok": not blockers, "scanned": scanned, "quarantined": quarantined, "blockers": blockers}
 
 
@@ -804,14 +815,15 @@ _PLACEHOLDER_IDENTITY_RE = re.compile(
 
 
 def _require_meaningful_identity(value: Any, field: str) -> None:
-    """Reject empty and placeholder build identity instead of sealing fiction."""
+    """Reject empty, placeholder, and untyped identity structures.
 
-    if value is None:
-        raise ValueError(f"{field} identity is missing")
-    if isinstance(value, bool):
-        # Boolean options such as configure_only are meaningful when nested,
-        # but a boolean can never be an identity structure by itself.
-        raise ValueError(f"{field} identity is missing")
+    JSON numbers and booleans are valid *options* only when their containing
+    record gives them an explicit type/meaning.  They are never meaningful
+    identity values by themselves; accepting them lets ``{"id": false}`` or
+    ``{"version": 1}`` masquerade as provenance.
+    """
+    if value is None or isinstance(value, bool) or isinstance(value, (int, float)):
+        raise ValueError(f"{field} identity is missing or has an invalid type")
     if isinstance(value, str):
         if _PLACEHOLDER_IDENTITY_RE.fullmatch(value.strip()):
             raise ValueError(f"{field} identity is a placeholder or unavailable")
@@ -820,50 +832,93 @@ def _require_meaningful_identity(value: Any, field: str) -> None:
         if not value:
             raise ValueError(f"{field} identity is missing")
         for key, item in value.items():
-            if isinstance(item, Mapping):
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError(f"{field} contains an invalid key")
+            if isinstance(item, (Mapping, list, tuple)):
                 _require_meaningful_identity(item, f"{field}.{key}")
-            elif isinstance(item, (list, tuple)):
-                _require_meaningful_identity(item, f"{field}.{key}")
-            elif item is None or (isinstance(item, str) and _PLACEHOLDER_IDENTITY_RE.fullmatch(item.strip())):
+            elif item is None or isinstance(item, (bool, int, float)):
+                raise ValueError(f"{field}.{key} identity has an invalid type")
+            elif isinstance(item, str) and _PLACEHOLDER_IDENTITY_RE.fullmatch(item.strip()):
                 raise ValueError(f"{field}.{key} identity is a placeholder or unavailable")
+            elif not isinstance(item, str):
+                raise ValueError(f"{field}.{key} identity has an invalid type")
         return
     if isinstance(value, (list, tuple)):
         if not value:
             raise ValueError(f"{field} identity is missing")
         for number, item in enumerate(value):
             _require_meaningful_identity(item, f"{field}[{number}]")
+        return
+    raise ValueError(f"{field} identity has an invalid type")
 
 
-def _source_index_identity(snapshot: Mapping[str, Any], field: str) -> tuple[str, list[Any]]:
-    """Return the explicit source/index identity carried by a manifest."""
+def _require_text(value: Any, field: str, *, absolute: bool = False) -> str:
+    if not isinstance(value, str) or not value.strip() or _PLACEHOLDER_IDENTITY_RE.fullmatch(value.strip()):
+        raise ValueError(f"{field} is missing, placeholder, or invalid")
+    if absolute and not Path(value).is_absolute():
+        raise ValueError(f"{field} must be an absolute path")
+    return value
+
+
+def _require_nonempty_string_list(value: Any, field: str) -> list[str]:
+    if not isinstance(value, (list, tuple)) or not value:
+        raise ValueError(f"{field} must be a non-empty string array")
+    result = []
+    for index, item in enumerate(value):
+        result.append(_require_text(item, f"{field}[{index}]"))
+    return result
+
+
+def _require_index_identity(snapshot: Mapping[str, Any], field: str) -> tuple[str, list[dict[str, Any]]]:
     index = snapshot.get("index")
     if not isinstance(index, Mapping) or index.get("captured") is not True:
         raise ValueError(f"{field} index identity is incomplete")
     entries = index.get("entries")
     if not isinstance(entries, list) or not entries:
         raise ValueError(f"{field} index entries are required")
+    validated: list[dict[str, Any]] = []
+    for number, entry in enumerate(entries):
+        if not isinstance(entry, Mapping):
+            raise ValueError(f"{field} index entry {number} is invalid")
+        path = _require_text(entry.get("path"), f"{field} index entry {number} path")
+        mode = entry.get("mode")
+        blob_id = entry.get("blob_id")
+        stage = entry.get("stage")
+        if not re.fullmatch(r"[0-7]{6}", mode or ""):
+            raise ValueError(f"{field} index entry {number} mode is invalid")
+        if not isinstance(blob_id, str) or not re.fullmatch(r"[0-9a-fA-F]{40,64}", blob_id):
+            raise ValueError(f"{field} index entry {number} blob_id is invalid")
+        if isinstance(stage, bool) or not isinstance(stage, int) or stage not in {0, 1, 2, 3}:
+            raise ValueError(f"{field} index entry {number} stage is invalid")
+        validated.append({"path": path, "mode": mode, "blob_id": blob_id.lower(), "stage": stage})
     index_hash = _normalise_hash(index.get("sha256"), f"{field} index sha256")
     if snapshot.get("index_sha256") != index_hash:
         raise ValueError(f"{field} index identity is inconsistent")
     if snapshot.get("index_entries") != entries:
         raise ValueError(f"{field} index entries are inconsistent")
-    return index_hash, entries
+    return index_hash, validated
+
+
+def _source_index_identity(snapshot: Mapping[str, Any], field: str) -> tuple[str, list[Any]]:
+    """Return a validated, independently comparable source/index identity."""
+    return _require_index_identity(snapshot, field)
 
 
 def _validate_runtime_record(record: Mapping[str, Any], field: str) -> None:
     """Validate the concrete loader identity for one launched role."""
-    status = record.get("status")
-    if status is not None and status != "ok":
+    if not isinstance(record, Mapping) or not record:
+        raise ValueError(f"{field} identity is missing")
+    if record.get("status") != "ok":
         raise ValueError(f"{field} is unavailable or incomplete")
-    for name in ("output_sha256", "ldd_sha256", "sha256"):
-        if name in record:
-            _normalise_hash(record[name], f"{field} {name}")
-    if not any(name in record for name in ("output_sha256", "ldd_sha256", "sha256", "libraries", "identity", "id")):
-        raise ValueError(f"{field} identity is incomplete")
+    hashes = [name for name in ("output_sha256", "ldd_sha256", "sha256") if name in record]
+    if len(hashes) != 1:
+        raise ValueError(f"{field} must carry exactly one runtime output hash")
+    _normalise_hash(record[hashes[0]], f"{field} {hashes[0]}")
     libraries = record.get("libraries")
-    if libraries is not None:
-        if not isinstance(libraries, list) or not libraries or any(not isinstance(item, str) or not item.strip() for item in libraries):
-            raise ValueError(f"{field} library list is empty or invalid")
+    if not isinstance(libraries, list) or not libraries:
+        raise ValueError(f"{field} library list is empty or invalid")
+    for number, library in enumerate(libraries):
+        _require_text(library, f"{field}.libraries[{number}]")
 
 
 def validate_build_linkage(
@@ -882,6 +937,23 @@ def validate_build_linkage(
 
     if not isinstance(manifest, Mapping) or not manifest:
         raise ValueError("manifest is required and must not be empty")
+    preliminary_value = manifest.get("binaries")
+    if preliminary_value:
+        preliminary = _binary_records(preliminary_value, "manifest")
+        seen_basenames: dict[str, tuple[str, str]] = {}
+        for name, record in preliminary.items():
+            try:
+                identity = _binary_identity(name, record, "manifest")
+            except ValueError:
+                continue
+            basename = Path(identity[0]).name
+            prior = seen_basenames.get(basename)
+            if prior is not None and prior != identity:
+                raise ValueError(f"executable basename/path collision for {basename}")
+            seen_basenames[basename] = identity
+    schema_version = manifest.get("schema_version")
+    if schema_version is not None and (isinstance(schema_version, bool) or not isinstance(schema_version, int) or schema_version < 1):
+        raise ValueError("build manifest schema_version is invalid")
 
     recipe = manifest.get("recipe", manifest.get("build_recipe"))
     if not isinstance(recipe, Mapping) or not recipe:
@@ -889,37 +961,43 @@ def validate_build_linkage(
     recipe_commands = recipe.get("commands", recipe.get("command"))
     if not isinstance(recipe_commands, (list, tuple)) or not recipe_commands:
         raise ValueError("complete build recipe commands are required")
-    _require_meaningful_identity(recipe_commands, "build recipe")
+    if all(isinstance(item, str) for item in recipe_commands):
+        _require_nonempty_string_list(recipe_commands, "build recipe command")
+    else:
+        for number, command in enumerate(recipe_commands):
+            _require_nonempty_string_list(command, f"build recipe command {number}")
+    _require_text(recipe.get("working_directory"), "build recipe working_directory", absolute=True)
+
     toolchain = manifest.get("toolchain", manifest.get("toolchain_identity"))
     options = manifest.get("options", manifest.get("build_options"))
-    if not isinstance(toolchain, Mapping) or not toolchain.get("compiler") or not toolchain.get("version"):
-        # Preserve the useful legacy diagnostic for an already-proven
-        # basename collision; semantic identity errors remain fail-closed.
-        try:
-            preliminary = _binary_records(manifest.get("binaries"), "manifest")
-            preliminary_names = [Path(str(record.get("path", record.get("resolved_path", "")))).name for record in preliminary.values()]
-            if len(preliminary_names) != len(set(preliminary_names)):
-                raise ValueError(f"executable basename/path collision for {preliminary_names[0]}")
-        except ValueError as exc:
-            if "collision" in str(exc):
-                raise
+    if not isinstance(toolchain, Mapping) or not toolchain:
         raise ValueError("complete compiler/toolchain identity is required")
     _require_meaningful_identity(toolchain, "toolchain")
-    if not isinstance(toolchain.get("compiler"), str) or not toolchain["compiler"].strip():
-        raise ValueError("complete compiler/toolchain identity is required")
-    if not isinstance(toolchain.get("version"), str) or not toolchain["version"].strip():
-        raise ValueError("complete compiler/toolchain version identity is required")
+    _require_text(toolchain.get("compiler"), "toolchain.compiler")
+    _require_text(toolchain.get("version"), "toolchain.version")
     if toolchain.get("status") not in (None, "ok"):
         raise ValueError("toolchain identity is unavailable or incomplete")
+    if "version_sha256" in toolchain:
+        _normalise_hash(toolchain["version_sha256"], "toolchain.version_sha256")
     if not isinstance(options, Mapping) or not options:
         raise ValueError("complete build options identity is required")
-    _require_meaningful_identity(options, "options")
+    _require_text(options.get("variant", options.get("build_type", "configured")), "build options variant")
+    jobs = options.get("jobs")
+    if jobs is not None and (isinstance(jobs, bool) or not isinstance(jobs, int) or jobs <= 0):
+        raise ValueError("build options jobs must be a positive integer")
+    configure_only = options.get("configure_only")
+    if configure_only is not None and not isinstance(configure_only, bool):
+        raise ValueError("build options configure_only must be boolean")
+    if "cmake_args" in options:
+        _require_nonempty_string_list(options["cmake_args"], "build options cmake_args")
+
     runtime_identity = manifest.get("runtime_library_identity")
     if runtime_identity is None:
         runtime_identity = manifest.get("runtime_libraries") or manifest.get("runtime_library")
     if not isinstance(runtime_identity, Mapping) or not runtime_identity:
         raise ValueError("runtime-library identity is required")
     _require_meaningful_identity(runtime_identity, "runtime-library")
+    _require_text(runtime_identity.get("method"), "runtime-library.method")
     if _identity_unavailable(runtime_identity):
         raise ValueError("runtime-library identity is unavailable or incomplete")
     if manifest_evidence is None and isinstance(manifest.get("manifest_evidence"), Mapping):
@@ -1007,25 +1085,28 @@ def validate_build_linkage(
     if not actual:
         raise ValueError("executables are required")
     snapshot_index_hash, snapshot_index_entries = _source_index_identity(snapshot, "manifest source")
-    if source_state is not None:
-        state_index_hash, state_index_entries = _source_index_identity(source_state, "captured source")
-        if state_index_hash != snapshot_index_hash or state_index_entries != snapshot_index_entries:
-            raise ValueError("manifest source/index identity divergence")
+    if not isinstance(source_state, Mapping):
+        raise ValueError("independent captured source/index identity is required")
+    state_index_hash, state_index_entries = _source_index_identity(source_state, "captured source")
+    if state_index_hash != snapshot_index_hash or state_index_entries != snapshot_index_entries:
+        raise ValueError("manifest source/index identity divergence")
+    if source_state.get("head") != snapshot.get("head"):
+        raise ValueError("manifest source HEAD identity divergence")
+    if source_state.get("tree_sha256") != snapshot.get("tree_sha256"):
+        raise ValueError("manifest source tree identity divergence")
 
     runtime_records = runtime_identity.get("binaries")
     if not isinstance(runtime_records, Mapping) or not runtime_records:
         raise ValueError("runtime-library coverage is incomplete")
-    else:
-        for role, record in actual.items():
-            coverage = runtime_records.get(role)
-            if coverage is None:
-                raise ValueError(f"runtime-library coverage is missing for {role}")
-            _require_meaningful_identity(coverage, f"runtime-library.{role}")
-            if not isinstance(coverage, Mapping):
-                raise ValueError(f"runtime-library coverage is invalid for {role}")
-            _validate_runtime_record(coverage, f"runtime-library.{role}")
-            if _identity_unavailable(coverage):
-                raise ValueError(f"runtime-library coverage is unavailable for {role}")
+    for role, record in actual.items():
+        coverage = runtime_records.get(role)
+        if coverage is None:
+            raise ValueError(f"runtime-library coverage is missing for {role}")
+        if not isinstance(coverage, Mapping):
+            raise ValueError(f"runtime-library coverage is invalid for {role}")
+        _validate_runtime_record(coverage, f"runtime-library.{role}")
+        if _identity_unavailable(coverage):
+            raise ValueError(f"runtime-library coverage is unavailable for {role}")
     expected_identities = {
         name: _binary_identity(name, record, "manifest")
         for name, record in expected.items()

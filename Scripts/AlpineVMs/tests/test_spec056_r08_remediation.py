@@ -127,7 +127,11 @@ def test_process_identity_failure_rolls_back_registered_child(tmp_path: Path):
         with pytest.raises(RuntimeError, match="registration failed"):
             register_local_process(processes, "Role", child, ["child"], stdout, stderr, tmp_path / "stdout", tmp_path / "stderr", {"representation": "sealed-memfd"})
     assert processes["Role"]["rollback_uncertain"] is True
-    assert child.poll() is not None
+    # Unknown PGID ownership is deliberately not signalled; the ledger remains
+    # unresolved and the caller must perform explicit recovery.
+    assert child.poll() is None
+    child.kill()
+    child.wait(timeout=5)
 
 
 def test_remote_schema_v1_manifest_contract_is_preserved(tmp_path: Path):

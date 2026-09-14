@@ -215,6 +215,9 @@ def _check_coverage(actual: set[str], listed: set[str]) -> list[str]:
 
 def _accepted_from_result(result: dict[str, Any]) -> bool:
     """Derive acceptance eligibility from result content, never from integrity."""
+    protected = result.get("protected_input_blockers")
+    if protected not in (None, []):
+        return False
     eligible = result.get("local_acceptance_eligibility", result.get("local_acceptance_eligible"))
     eligibility_record = result.get("acceptance_eligibility")
     if eligible is None and isinstance(eligibility_record, dict):
@@ -325,6 +328,8 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
         if result.get("schema_version") != SCHEMA_VERSION:
             raise _VerificationError("result.json schema_version is not 2")
         accepted = _accepted_from_result(result)
+        if manifest.get("protected_input_blockers"):
+            accepted = False
         return _report(
             CODE_VALID,
             integrity=True,

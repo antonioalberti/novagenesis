@@ -76,10 +76,10 @@ def test_empty_manifest_is_rejected():
 
 def valid_manifest():
     return {
-        "recipe": {"command": ["cmake", "--build", "build"]},
+        "recipe": {"command": ["cmake", "--build", "build"], "working_directory": "/src"},
         "toolchain": {"compiler": "g++", "version": "13"},
         "options": {"build_type": "RelWithDebInfo"},
-        "runtime_library_identity": {"binaries": {"Source": {"status": "ok", "ldd_sha256": "c" * 64, "libraries": ["libc.so"]}}},
+        "runtime_library_identity": {"method": "ldd", "binaries": {"Source": {"status": "ok", "ldd_sha256": "c" * 64, "libraries": ["libc.so"]}}},
         "source_head": "abc123",
         "source_snapshot": {"head": "abc123", "status": [], "tree_sha256": "e" * 64, "submodules": [], "submodules_complete": True,
                              "index": {"captured": True, "sha256": "a" * 64, "entries": [{"path": "tracked.txt", "mode": "100644", "blob_id": "b" * 40, "stage": 0}]},
@@ -97,7 +97,7 @@ def test_valid_build_linkage_is_accepted():
         "Source": {"path": "/build/bin/Source", "sha256": "b" * 64},
     }
 
-    assert validate_build_linkage(manifest, "abc123", executables, manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64}) is True
+    assert validate_build_linkage(manifest, "abc123", executables, source_state=manifest["source_snapshot"], manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64}) is True
 
 
 @pytest.mark.parametrize(
@@ -113,7 +113,7 @@ def test_required_linkage_sections_are_rejected_when_empty(field, replacement, m
     manifest[field] = replacement
 
     with pytest.raises(ValueError, match=message):
-        validate_build_linkage(manifest, "abc123", {"Source": {"path": "/build/bin/Source", "sha256": "b" * 64}}, manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})
+        validate_build_linkage(manifest, "abc123", {"Source": {"path": "/build/bin/Source", "sha256": "b" * 64}}, source_state=manifest["source_snapshot"], manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})
 
 
 def test_hash_divergence_is_rejected():
@@ -121,7 +121,7 @@ def test_hash_divergence_is_rejected():
     executables = {"Source": {"path": "/build/bin/Source", "sha256": "c" * 64}}
 
     with pytest.raises(ValueError, match="hash"):
-        validate_build_linkage(manifest, "abc123", executables, manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})
+        validate_build_linkage(manifest, "abc123", executables, source_state=manifest["source_snapshot"], manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})
 
 
 def test_path_divergence_is_rejected():
@@ -129,4 +129,4 @@ def test_path_divergence_is_rejected():
     executables = {"Source": {"path": "/other/bin/Source", "sha256": "b" * 64}}
 
     with pytest.raises(ValueError, match="path"):
-        validate_build_linkage(manifest, "abc123", executables, manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})
+        validate_build_linkage(manifest, "abc123", executables, source_state=manifest["source_snapshot"], manifest_evidence={"path": "manifest.json", "size": 1, "sha256": "f" * 64, "preserved_path": "provenance/build-manifest.json", "preserved_size": 1, "preserved_sha256": "f" * 64})

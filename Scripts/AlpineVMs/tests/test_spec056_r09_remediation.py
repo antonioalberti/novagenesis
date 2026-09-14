@@ -17,7 +17,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_provenance import capture_git_state, sanitize_config, sanitize_evidence_tree, validate_build_linkage
-from ng_remote_executor import build_parser, register_local_process, run_local_trial, write_evidence_manifest
+from ng_remote_executor import build_parser, register_local_process, run_local_trial, validate_plan, write_evidence_manifest
+from evidence_verifier import verify_bundle
 
 
 def _evidence() -> dict[str, object]:
@@ -99,7 +100,30 @@ def test_manifest_source_index_linkage_is_explicit():
         validate_build_linkage(broken, "a" * 40, broken["binaries"], source_state=broken["source_snapshot"], manifest_evidence=_evidence())
 
 
-def test_quoted_assignment_values_are_redacted():
+def test_manifest_identity_rejects_numeric_boolean_nested_values_and_unlinked_index():
+    manifest = _complete_manifest()
+    for field, replacement in (
+        ("toolchain", {"compiler": "/usr/bin/g++", "version": 13, "status": "ok"}),
+        ("options", {"variant": "normal", "jobs": False, "configure_only": False}),
+        ("runtime_library_identity", {"method": "ldd", "binaries": {role: {"status": "ok", "sha256": "a" * 64, "libraries": [False]} for role in ("PGCS", "NRNCS", "Repository", "Source")}}),
+    ):
+        candidate = json.loads(json.dumps(manifest))
+        candidate[field] = replacement
+        with pytest.raises(ValueError):
+            validate_build_linkage(candidate, "a" * 40, candidate["binaries"], source_state=candidate["source_snapshot"], manifest_evidence=_evidence())
+
+    candidate = json.loads(json.dumps(manifest))
+    candidate["source_snapshot"]["index"]["entries"][0]["stage"] = True
+    with pytest.raises(ValueError, match="index"):
+        validate_build_linkage(candidate, "a" * 40, candidate["binaries"], source_state=candidate["source_snapshot"], manifest_evidence=_evidence())
+
+    candidate = json.loads(json.dumps(manifest))
+    independent = json.loads(json.dumps(candidate["source_snapshot"]))
+    independent["index_sha256"] = "f" * 64
+    with pytest.raises(ValueError, match="index"):
+        validate_build_linkage(candidate, "a" * 40, candidate["binaries"], source_state=independent, manifest_evidence=_evidence())
+
+
     secret = "R09-quoted-secret"
     rendered = sanitize_config({
         "command": f'SOURCE_TOKEN="{secret}" tool --token="{secret}"',
@@ -131,7 +155,24 @@ def test_local_bundle_scan_redacts_logs_and_reports_unpreservable_input(tmp_path
     assert not binary.exists()
 
 
-def test_identity_failure_retains_uncertain_record_and_descendant_failure(tmp_path: Path):
+def test_bundle_scan_rejects_secret_bearing_filename_and_rewrite_failure(tmp_path: Path):
+    secret_path = tmp_path / "roles" / "argv-token.log"
+    secret_path.parent.mkdir()
+    secret_path.write_text("ordinary text", encoding="utf-8")
+    unsafe = sanitize_evidence_tree(tmp_path, set())
+    assert unsafe["ok"] is False
+    assert any("filename" in item for item in unsafe["blockers"])
+    assert not secret_path.exists()
+
+    rewrite = tmp_path / "roles" / "stdout.log"
+    rewrite.write_text('TOKEN="rewrite-secret"\n', encoding="utf-8")
+    with patch("local_provenance.Path.write_text", side_effect=OSError("read-only evidence")):
+        failed = sanitize_evidence_tree(tmp_path, {"rewrite-secret"})
+    assert failed["ok"] is False
+    assert any("rewrite" in item or "quarantine" in item for item in failed["blockers"])
+    assert not rewrite.exists()
+
+
     stdout = (tmp_path / "stdout").open("w")
     stderr = (tmp_path / "stderr").open("w")
     child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"], stdout=stdout, stderr=stderr)
@@ -160,8 +201,17 @@ def test_remote_cli_defaults_and_schema_v1_manifest_remain_unchanged(tmp_path: P
     assert json.loads(manifest.read_text(encoding="utf-8"))["schema_version"] == 1
     assert (tmp_path / "manifest.sha256").is_file()
     assert not (tmp_path / "terminal-seal.json").exists()
-    args = build_parser().parse_args(["run", "--plan", "plan.json", "--scenario", "L0"])
+    args = build_parser().parse_args(["run", "--mode", "remote", "--plan", "plan.json", "--scenario", "L0"])
     assert args.mode == "remote"
+    remote_plan = {
+        "schema_version": 1,
+        "roles": [{"name": "PGCS", "vm": "source", "command": ["/bin/true"], "readiness": [{"id": "ready", "pattern": "READY"}]}],
+        "timeouts": {"readiness": 1, "observation": 0, "total": 1},
+        "runtime_oracle": {"type": "markers", "required": [{"role": "PGCS", "id": "ready", "pattern": "READY"}]},
+    }
+    validate_plan(remote_plan, mode="remote")
+    with pytest.raises(ValueError, match="shell"):
+        validate_plan({**remote_plan, "roles": [{**remote_plan["roles"][0], "shell": "echo READY"}]}, mode="remote")
 
 
 def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
@@ -174,18 +224,24 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
         repo.mkdir()
         build.mkdir()
         io.mkdir()
+        source = root / "fixture.c"
+        executable = root / "fixture-role"
+        source.write_text("#include <stdio.h>\n#include <unistd.h>\nint main(void) { puts(\"READY\"); fflush(stdout); sleep(1); puts(\"OBSERVE\"); fflush(stdout); sleep(5); return 0; }\n", encoding="utf-8")
+        compiler = shutil.which("cc") or shutil.which("gcc")
+        if compiler is None:
+            pytest.fail("positive control cannot run: no C compiler is available to build its real four-role fixture")
+        subprocess.run([compiler, str(source), "-O0", "-o", str(executable)], check=True)
         (repo / "input.txt").write_text("fixture\n", encoding="utf-8")
         subprocess.run(["git", "init", "--quiet", str(repo)], check=True)
         subprocess.run(["git", "-C", str(repo), "add", "input.txt"], check=True)
         subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@e", "commit", "--quiet", "-m", "fixture"], check=True)
         state = capture_git_state(repo, snapshot_dir=root / "source-snapshot")
-        executable = Path(sys.executable).resolve()
         executable_hash = hashlib.sha256(executable.read_bytes()).hexdigest()
         roles = ["PGCS", "NRNCS", "Repository", "Source"]
         plan_roles = [{
             "name": role,
             "vm": "local",
-            "command": [str(executable), "-c", "import time; print('READY', flush=True); time.sleep(1)"],
+            "command": [str(executable)],
             "cwd": str(build),
             "readiness": [{"id": "ready", "pattern": "READY"}],
         } for role in roles]
@@ -194,7 +250,7 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
             "source_head": state["head"],
             "source_snapshot": state,
             "recipe": {"commands": [["cmake", "--build", str(build)]], "working_directory": str(repo)},
-            "toolchain": {"compiler": str(executable), "version": "fixture", "status": "ok"},
+            "toolchain": {"compiler": compiler, "version": "fixture", "status": "ok"},
             "options": {"variant": "normal", "jobs": 1, "configure_only": False},
             "runtime_library_identity": {"method": "fixture", "binaries": {role: {"status": "ok", "sha256": executable_hash, "libraries": ["fixture-runtime"]} for role in roles}},
             "binaries": {role: {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash} for role in roles},
@@ -205,18 +261,38 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
         plan_path.write_text(json.dumps({
             "schema_version": 1,
             "roles": plan_roles,
-            "timeouts": {"readiness": 2, "observation": 0.1, "total": 5},
-            "diagnostic_only": True,
+            "workload": {
+                "schema_version": 1,
+                "generator": {"id": "synthetic-jpeg", "version": "1.0", "seed": 56010, "parameters": {"count": 5, "size_bytes": 32, "prefix": "positive-control"}},
+                "names": [f"positive-control-{index}.jpg" for index in range(1, 6)],
+            },
+            "runtime_oracle": {"type": "markers", "required": [{"role": role, "id": "observed", "pattern": "OBSERVE"} for role in roles]},
+            "timeouts": {"readiness": 2, "observation": 2, "total": 15},
+            "diagnostic_only": False,
         }), encoding="utf-8")
         env = {
             "NG_LOCAL_REPO_PATH": str(repo), "NG_LOCAL_BUILD_PATH": str(build),
             "NG_LOCAL_IO_PATH": str(io), "NG_LOCAL_EVIDENCE_PATH": str(evidence),
             "NG_LOCAL_BUILD_MANIFEST": str(manifest_path),
         }
-        args = Namespace(plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal", trial="r09-four-role", env=env)
-        assert run_local_trial(args) == 11
-        events = [(json.loads(line))["event"] for line in (evidence / "r09-four-role" / "controller-events.jsonl").read_text().splitlines()]
+        args = Namespace(plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal", trial="r10-four-role", env=env)
+        assert run_local_trial(args) == 0
+        bundle = evidence / "r10-four-role"
+        records = [json.loads(line) for line in (bundle / "controller-events.jsonl").read_text().splitlines()]
+        events = [record["event"] for record in records]
         assert events.count("launch") == 4
         assert events.count("readiness") == 4
+        assert events.count("runtime-marker") >= 4
+        assert [record["role"] for record in records if record["event"] == "stop"] == list(reversed(roles))
+        result = json.loads((bundle / "result.json").read_text(encoding="utf-8"))
+        assert result["runtime_result"] == "PASS"
+        assert result["teardown_result"] == "PASS"
+        assert result["evidence_result"] == "COMPLETE"
+        assert result["offline_verification"]["accepted"] is True
+        sealed_report = verify_bundle(bundle)
+        assert sealed_report["code"] == "NGELC-VALID"
+        assert sealed_report["accepted"] is True
+        assert not any("token" in path.name.lower() or "secret" in path.name.lower() for path in bundle.rglob("*") if path.is_file())
+        assert json.loads((bundle / "terminal-seal.json").read_text(encoding="utf-8"))["sealed"] is True
     finally:
         shutil.rmtree(root, ignore_errors=True)
