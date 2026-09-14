@@ -547,9 +547,7 @@ def _collect_secret_values(value: Any, key: str | None = None) -> set[str]:
                 values.add(str(item))
             values.update(_collect_secret_values(item))
             item_text = item if isinstance(item, str) else ""
-            redact_next = bool(_SECRET_KEY_RE.search(item_text.lstrip("-/"))) or bool(
-                re.search(r"(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)=?$", item_text, re.IGNORECASE)
-            )
+            redact_next = _is_secret_argv_flag(item_text)
         return values
     if isinstance(value, str):
         values: set[str] = set()
@@ -602,55 +600,23 @@ def _redact_string(value: str, secrets: set[str]) -> str:
     return result
 
 
-def _redact_argv_forms(value: str) -> str:
-    """Redact secret argv values in shell, JSON, and Python renderings.
+def _is_secret_argv_flag(value: str) -> bool:
+    """Return whether one argv item is an exact protected flag token."""
+    return bool(_SECRET_ARGV_FLAG_RE.fullmatch(value.strip()))
 
-    Evidence logs are often fragments rather than valid source for a parser.
-    This lexical pass therefore recognises a sensitive flag followed by an
-    optional assignment/separator and replaces the complete quoted value,
-    including spaces and escaped delimiters.
+
+def _redact_argv_forms(value: str) -> str:
+    """Fail closed for arbitrary text containing a protected argv flag.
+
+    Captured logs are not guaranteed to be valid shell, JSON, or Python
+    syntax.  A partial lexer cannot prove where an escaped, concatenated, or
+    unterminated value ends, so retaining any part of that record could leak a
+    value or suffix.  Replace the complete record instead.  The evidence-tree
+    caller records this replacement as a protected-input blocker.
     """
-    replacements: list[tuple[int, int]] = []
-    for flag in _SECRET_ARGV_FLAG_RE.finditer(value):
-        cursor = flag.end()
-        preceding = value[flag.start() - 1] if flag.start() else ""
-        if preceding in {"'", '"'} and cursor < len(value) and value[cursor] == preceding:
-            cursor += 1
-        while cursor < len(value) and value[cursor].isspace():
-            cursor += 1
-        if cursor < len(value) and value[cursor] in "=,:":
-            cursor += 1
-            while cursor < len(value) and value[cursor].isspace():
-                cursor += 1
-        if cursor >= len(value):
-            continue
-        if value[cursor] in {"'", '"'}:
-            quote = value[cursor]
-            start = cursor + 1
-            cursor = start
-            backslashes = 0
-            while cursor < len(value):
-                character = value[cursor]
-                if character == quote and backslashes % 2 == 0:
-                    replacements.append((start, cursor))
-                    break
-                if character == "\\":
-                    backslashes += 1
-                else:
-                    backslashes = 0
-                cursor += 1
-            continue
-        start = cursor
-        while cursor < len(value) and value[cursor] not in " \\t\\r\\n,])};&|":
-            cursor += 1
-        if cursor > start:
-            replacements.append((start, cursor))
-    if not replacements:
-        return value
-    result = value
-    for start, end in sorted(set(replacements), reverse=True):
-        result = result[:start] + "<redacted>" + result[end:]
-    return result
+    if _SECRET_ARGV_FLAG_RE.search(value):
+        return "<redacted>"
+    return value
 
 
 def _has_argv_secret_form(value: str) -> bool:
@@ -678,7 +644,7 @@ def sanitize_config(value: Any, key: str | None = None, _known_secrets: set[str]
             for child in item:
                 child_text = child if isinstance(child, str) else ""
                 result.append(sanitize(child, sensitive_next=redact_next))
-                redact_next = bool(_SECRET_KEY_RE.search(child_text.lstrip("-/"))) or bool(re.search(r"(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)=?$", child_text, re.IGNORECASE))
+                redact_next = _is_secret_argv_flag(child_text)
             return result
         return item
 
