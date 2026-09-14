@@ -8,6 +8,7 @@ from local_provenance import (
     capture_git_state,
     file_identity,
     snapshot_selected_files,
+    sanitize_config,
     validate_build_linkage,
 )
 
@@ -57,6 +58,12 @@ def test_capture_code_identity_records_controller_and_helpers(tmp_path):
 
     assert identity["controller"] == file_identity(controller)
     assert identity["helpers"]["helper"] == file_identity(helper)
+
+
+def test_sanitize_config_redacts_secret_values_without_redacting_paths():
+    result = sanitize_config({"NG_LOCAL_IO_PATH": "/var/ng/io", "API_TOKEN": "do-not-publish"})
+
+    assert result == {"API_TOKEN": "<redacted>", "NG_LOCAL_IO_PATH": "/var/ng/io"}
 
 
 def test_empty_manifest_is_rejected():

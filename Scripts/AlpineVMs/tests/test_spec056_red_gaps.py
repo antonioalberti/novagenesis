@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -112,6 +113,97 @@ class Spec056ProvenanceRedTests(unittest.TestCase):
 
         self.assertFalse(eligibility["eligible"])
         self.assertTrue(any("build manifest" in blocker for blocker in eligibility["blockers"]))
+
+    def test_local_lifecycle_persists_canonical_dirty_source_snapshot(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-provenance-wire-", dir=Path.home()) as td:
+            root = Path(td)
+            build = root / "build"
+            io = root / "io"
+            evidence = root / "evidence"
+            build.mkdir()
+            io.mkdir()
+            evidence.mkdir()
+            tracked = root / "tracked-input.txt"
+            tracked.write_text("clean\n", encoding="utf-8")
+            subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+            subprocess.run(["git", "-C", str(root), "add", "tracked-input.txt"], check=True)
+            subprocess.run(
+                ["git", "-C", str(root), "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "initial"],
+                check=True,
+            )
+            tracked.write_text("dirty\n", encoding="utf-8")
+            (root / "untracked-build-input.txt").write_text("build input\n", encoding="utf-8")
+            code = "import time; print('READY', flush=True); time.sleep(0.2)"
+            roles = [
+                {
+                    "name": name,
+                    "vm": "local",
+                    "command": [sys.executable, "-c", code],
+                    "cwd": str(build),
+                    "readiness": [{"id": "ready", "pattern": "READY"}],
+                }
+                for name in ["PGCS", "NRNCS", "Repository", "Source"]
+            ]
+            plan_path = root / "plan.json"
+            plan_path.write_text(json.dumps({
+                "schema_version": 1,
+                "roles": roles,
+                "timeouts": {"readiness": 1, "observation": 0.1, "total": 3},
+                "diagnostic_only": True,
+            }), encoding="utf-8")
+            args = Namespace(
+                plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal",
+                trial="canonical-provenance", env={
+                    "NG_LOCAL_REPO_PATH": str(root),
+                    "NG_LOCAL_BUILD_PATH": str(build),
+                    "NG_LOCAL_IO_PATH": str(io),
+                    "NG_LOCAL_EVIDENCE_PATH": str(evidence),
+                },
+            )
+
+            rc = executor.run_local_trial(args)
+            provenance = json.loads((evidence / "canonical-provenance" / "provenance.json").read_text(encoding="utf-8"))
+            plan_dir = evidence / "canonical-provenance" / "plan"
+            snapshot = provenance["source"]["content_snapshot"]
+            plan_files_exist = (plan_dir / "expanded.json").is_file() and (plan_dir / "effective-config.json").is_file()
+            snapshot_files_exist = all((evidence / "canonical-provenance" / item["snapshot_path"]).is_file() for item in snapshot["files"])
+
+        self.assertNotEqual(rc, 0)
+        self.assertFalse(provenance["git_clean"])
+        self.assertTrue(provenance["plan_snapshot"])
+        self.assertIn("controller_helpers", provenance)
+        self.assertTrue(plan_files_exist)
+        self.assertTrue({"tracked-input.txt", "untracked-build-input.txt"} <= {item["path"] for item in snapshot["files"]})
+        self.assertTrue(all(item.get("snapshot_path") for item in snapshot["files"]))
+        self.assertTrue(snapshot_files_exist)
+
+    def test_build_linkage_rejects_a_launched_role_missing_from_manifest(self):
+        manifest = {
+            "recipe": {"command": ["cmake", "--build", "build"]},
+            "source_head": "abc123",
+            "source_snapshot": [{"path": "src/main.cpp", "size": 1, "sha256": "a" * 64}],
+            "binaries": {"Source": {"path": "/build/bin/Source", "sha256": "b" * 64}},
+        }
+        with self.assertRaises(ValueError, msg="missing launched executable must remain ineligible"):
+            executor.validate_build_linkage(manifest, "abc123", {
+                "Source": {"path": "/build/bin/Source", "sha256": "b" * 64},
+                "Repository": {"path": "/build/bin/Repository", "sha256": "c" * 64},
+            })
+
+    def test_launch_linkage_rehash_detects_replaced_executable(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-executable-drift-", dir=Path.home()) as td:
+            executable = Path(td) / "Source"
+            executable.write_bytes(b"original")
+            expected_hash = hashlib.sha256(executable.read_bytes()).hexdigest()
+            provenance = {
+                "build_linkage": True,
+                "binaries": {"Source": {"resolved_path": str(executable), "sha256": expected_hash}},
+            }
+            executable.write_bytes(b"replaced")
+            linked, reason = executor.local_executable_linkage(provenance, "Source", str(executable))
+
+        self.assertFalse(linked)
+        self.assertIn("drift", reason or "")
 
 
 class Spec056WorkloadRedTests(unittest.TestCase):

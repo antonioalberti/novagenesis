@@ -25,6 +25,12 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from evidence_verifier import CODE_VALID, verify_bundle
+from local_provenance import (
+    capture_local_provenance as local_provenance,
+    capture_plan_snapshot as local_write_v2_plan,
+    file_identity,
+    validate_build_linkage,
+)
 
 
 class ConfigError(ValueError):
@@ -790,6 +796,7 @@ def local_acceptance_eligibility(provenance: Mapping[str, Any]) -> dict[str, Any
     for key, message in (
         ("workload_verified", "fresh workload is not verified"),
         ("evidence_schema_v2", "evidence schema v2 is not verified"),
+        ("source_snapshot_complete", "source content snapshot is incomplete"),
     ):
         if key in provenance and not provenance.get(key, False):
             blockers.append(message)
@@ -797,29 +804,6 @@ def local_acceptance_eligibility(provenance: Mapping[str, Any]) -> dict[str, Any
     if workload_error:
         blockers.append(str(workload_error))
     return {"eligible": not blockers, "blockers": blockers}
-
-
-def validate_local_build_manifest(manifest: Any, source_head: str | None, binaries: Mapping[str, Mapping[str, Any]]) -> tuple[bool, str | None]:
-    """Validate the minimum semantic source/build/executable linkage."""
-    if not isinstance(manifest, Mapping) or not manifest:
-        return False, "build manifest is empty or invalid"
-    if not manifest.get("commands"):
-        return False, "build recipe missing"
-    snapshot = manifest.get("source_snapshot")
-    if not isinstance(snapshot, Mapping) or not snapshot.get("head") or snapshot.get("head") != source_head:
-        return False, "build source identity mismatch"
-    expected = manifest.get("binaries")
-    if not isinstance(expected, Mapping) or not expected:
-        return False, "build binaries missing"
-    for role, binary in binaries.items():
-        if not isinstance(binary, Mapping) or not binary.get("resolved_path") or not binary.get("sha256"):
-            return False, f"build linkage missing for {role}"
-        candidate = expected.get(role)
-        if not isinstance(candidate, Mapping):
-            return False, f"build binary missing for {role}"
-        if candidate.get("path") != binary.get("resolved_path") or candidate.get("sha256") != binary.get("sha256"):
-            return False, f"build binary mismatch for {role}"
-    return True, None
 
 
 def local_observe(processes: Mapping[str, dict[str, Any]], offsets: dict[str, int], carries: dict[str, str], patterns: list[dict[str, Any]], max_bytes: int = 64 * 1024 * 1024) -> dict[str, Any]:
@@ -1036,23 +1020,6 @@ def _local_oracle_directories(plan: Mapping[str, Any], variables: Mapping[str, s
     return Path(expand_argv([source], variables)[0]), Path(expand_argv([repository], variables)[0])
 
 
-def local_write_v2_plan(evidence_dir: Path, plan: Mapping[str, Any], contract: Mapping[str, Any], config: Mapping[str, str], variables: Mapping[str, str]) -> None:
-    """Persist the local plan/configuration inputs before a role is launched."""
-    plan_dir = evidence_dir / "plan"
-    expanded = json.loads(json.dumps(plan))
-    for role in expanded.get("roles", []):
-        role["command"] = expand_argv(role.get("command", []), variables)
-        if role.get("cwd"):
-            role["cwd"] = expand_argv([role["cwd"]], variables)[0]
-        role["env"] = {key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()}
-    local_json_write(plan_dir / "original.json", dict(plan))
-    local_json_write(plan_dir / "expanded.json", expanded)
-    local_json_write(plan_dir / "scenario.json", contract.get("scenario", {}))
-    local_json_write(plan_dir / "observability.json", contract.get("profile", {}))
-    local_json_write(plan_dir / "effective-config.json", {key: str(value) for key, value in sorted(config.items())})
-    local_json_write(evidence_dir / "plan.json", dict(plan))
-
-
 def local_prepare_v2_layout(evidence_dir: Path, plan: Mapping[str, Any], contract: Mapping[str, Any], config: Mapping[str, str], variables: Mapping[str, str]) -> dict[str, Any]:
     """Create durable v2 directories and preserve the pre-launch workload map."""
     for directory in (evidence_dir / "artifacts" / "source", evidence_dir / "artifacts" / "repository", evidence_dir / "inventory"):
@@ -1152,50 +1119,32 @@ def preserve_local_artifacts(oracle: Mapping[str, Any], variables: Mapping[str, 
     return result
 
 
-def local_provenance(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str]) -> dict[str, Any]:
-    repo = Path(config["NG_LOCAL_REPO_PATH"])
-    git = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, check=False)
-    status_run = subprocess.run(["git", "-C", str(repo), "status", "--short"], capture_output=True, text=True, timeout=10, check=False)
-    controller = Path(__file__).resolve()
-    build_manifest_path = Path(config["NG_LOCAL_BUILD_MANIFEST"]).resolve() if config.get("NG_LOCAL_BUILD_MANIFEST") else None
-    build_manifest_data: dict[str, Any] | None = None
-    build_manifest_error: str | None = None
-    if build_manifest_path and build_manifest_path.is_file():
+def local_executable_linkage(provenance: Mapping[str, Any], role: str, argv0: str) -> tuple[bool, str | None]:
+    """Rehash the executable at launch and compare it with captured provenance."""
+
+    if not provenance.get("build_linkage"):
+        return True, None
+    manifest_record = provenance.get("build_manifest")
+    if isinstance(manifest_record, Mapping) and manifest_record.get("path") and manifest_record.get("sha256"):
         try:
-            loaded = json.loads(build_manifest_path.read_text(encoding="utf-8"))
-            build_manifest_data = loaded if isinstance(loaded, dict) else None
-        except (OSError, json.JSONDecodeError) as exc:
-            build_manifest_error = f"build manifest unreadable: {exc}"
-    binaries: dict[str, Any] = {}
-    for role in plan.get("roles", []):
-        argv = expand_argv(role["command"], variables)
-        resolved = Path(argv[0]) if Path(argv[0]).is_absolute() else Path(shutil.which(argv[0]) or argv[0])
-        binaries[role["name"]] = {
-            "argv0": argv[0],
-            "resolved_path": str(resolved),
-            "sha256": hashlib.sha256(resolved.read_bytes()).hexdigest() if resolved.is_file() else None,
-        }
-    build_linkage, linkage_error = validate_local_build_manifest(build_manifest_data, git.stdout.strip() if git.returncode == 0 else None, binaries)
-    return {
-        "schema_version": 2,
-        "mode": "local",
-        "git_head": git.stdout.strip() if git.returncode == 0 else None,
-        "git_status": status_run.stdout.splitlines() if status_run.returncode == 0 else ["git status unavailable"],
-        "git_clean": git.returncode == 0 and status_run.returncode == 0 and not status_run.stdout.strip(),
-        "repo_path": str(repo.resolve()),
-        "build_path": str(Path(config["NG_LOCAL_BUILD_PATH"]).resolve()),
-        "io_path": str(Path(config["NG_LOCAL_IO_PATH"]).resolve()),
-        "controller_identity": controller.is_file(),
-        "controller": {"path": str(controller), "sha256": hashlib.sha256(controller.read_bytes()).hexdigest()},
-        "build_linkage": build_linkage,
-        "build_linkage_reason": build_manifest_error or linkage_error,
-        "build_manifest": {"path": str(build_manifest_path), "sha256": hashlib.sha256(build_manifest_path.read_bytes()).hexdigest(), "valid": build_linkage} if build_manifest_path and build_manifest_path.is_file() else None,
-        "plan_snapshot": False,
-        "binaries": binaries,
-    }
+            current_manifest = file_identity(manifest_record["path"])
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            return False, f"build manifest unavailable: {exc}"
+        if current_manifest["sha256"] != manifest_record["sha256"]:
+            return False, "build manifest drift"
+    expected = provenance.get("binaries", {}).get(role) if isinstance(provenance.get("binaries"), Mapping) else None
+    if not isinstance(expected, Mapping) or not expected.get("resolved_path") or not expected.get("sha256"):
+        return False, f"build linkage missing for {role}"
+    try:
+        current = file_identity(argv0 if Path(argv0).is_absolute() else (shutil.which(argv0) or argv0))
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        return False, f"launched executable unavailable for {role}: {exc}"
+    if current["path"] != expected["resolved_path"] or current["sha256"] != expected["sha256"]:
+        return False, f"launched executable drift for {role}"
+    return True, None
 
 
-def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str], workload: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str], workload: Mapping[str, Any] | None = None, provenance: Mapping[str, Any] | None = None) -> dict[str, Any]:
     errors: list[str] = []
     paths = {key: str(Path(config[key]).resolve()) for key in LOCAL_REQUIRED_ENV}
     for key in ("NG_LOCAL_REPO_PATH", "NG_LOCAL_BUILD_PATH", "NG_LOCAL_IO_PATH"):
@@ -1221,6 +1170,10 @@ def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variable
             errors.append(f"{role['name']} executable not executable")
         if not item["cwd_exists"]:
             errors.append(f"{role['name']} cwd missing")
+        if provenance is not None:
+            linked, linkage_error = local_executable_linkage(provenance, role["name"], str(executable))
+            if not linked:
+                errors.append(linkage_error or f"build linkage missing for {role['name']}")
     return {"ok": not errors, "errors": errors, "paths": paths, "roles": roles}
 
 
@@ -1372,8 +1325,20 @@ def run_local_trial(args: argparse.Namespace) -> int:
     effective_config = dict(config)
     if workload.get("staging_io_path"):
         effective_config["NG_LOCAL_IO_PATH"] = str(workload["staging_io_path"])
-    provenance = local_provenance(effective_config, plan, variables)
-    provenance["plan_snapshot"] = True
+    provenance = local_provenance(
+        repo=effective_config["NG_LOCAL_REPO_PATH"],
+        controller=Path(__file__).resolve(),
+        helpers={
+            "evidence_verifier": Path(__file__).with_name("evidence_verifier.py"),
+            "local_provenance": Path(__file__).with_name("local_provenance.py"),
+            "ng_observability": Path(__file__).with_name("ng_observability.py"),
+        },
+        plan=plan,
+        variables=variables,
+        config=effective_config,
+        evidence_dir=evidence_dir,
+        contract=contract,
+    )
     provenance["workload_verified"] = bool(workload["verified"])
     provenance["workload_error"] = workload.get("reason")
     provenance["evidence_schema_v2"] = True
@@ -1399,7 +1364,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
         effective_oracle["expected_map"] = dict(workload["expected_map"])
     oracle_snapshot: dict[str, Any] = {"schema_version": 2, "type": (effective_oracle or {}).get("type"), "preservation_verified": False}
     try:
-        preflight = local_preflight(effective_config, plan, variables, workload)
+        preflight = local_preflight(effective_config, plan, variables, workload, provenance)
         local_record(events, "preflight", result=preflight)
         if not preflight["ok"]:
             raise ConfigError("local preflight rejected: " + ", ".join(preflight["errors"]))
@@ -1408,6 +1373,9 @@ def run_local_trial(args: argparse.Namespace) -> int:
             cwd = expand_argv([role["cwd"]], variables)[0] if role.get("cwd") else None
             if cwd and not Path(cwd).is_dir():
                 raise ConfigError(f"local cwd does not exist for {role['name']}: {cwd}")
+            linked, linkage_error = local_executable_linkage(provenance, role["name"], argv[0])
+            if not linked:
+                raise ConfigError(linkage_error or f"build linkage missing for {role['name']}")
             role_dir = evidence_dir / "roles" / role["name"]
             role_dir.mkdir(parents=True, exist_ok=True)
             stdout_path = role_dir / "stdout.log"
