@@ -5,7 +5,7 @@
 **Status:** In Progress
 **Branch:** AIOPT3
 **Implementation commit:** —
-**Related:** SPEC-041-gw-deadline-aware-wait.md, SPEC-040-common-performance-build-profiles.md
+**Related:** SPEC-045-core-evaluate-functional-harness.md
 
 ## 1. Problema e evidência
 
@@ -26,7 +26,7 @@ PPGB = (PG*)PB;
 
 A função `CheckSubscriptions()` recebe a acção criada para um objecto `Core`; `PB` é o owner da acção e o diagnóstico confirma que o objecto dinâmico é `Core`, não `PG`. O cast viola o contrato de tipos C++ e torna o acesso subsequente a `PPGB->PGCSTuples` comportamento indefinido.
 
-O relatório foi observado durante o smoke Sanitizer de SPEC-041. O defeito é independente da alteração de espera do Gateway e deve ser tratado separadamente.
+O relatório foi observado durante o smoke Sanitizer anterior do Gateway. O defeito é independente da alteração de espera do Gateway e deve ser tratado separadamente.
 
 ## 2. Objectivo
 
@@ -81,7 +81,7 @@ Explicitamente excluído:
 
 ## 7. Rollback
 
-Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture, o log RED e a evidência de revisão. Não reverter nem misturar as alterações de SPEC-040/041.
+Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture, o log RED e a evidência de revisão. Não reverter nem misturar alterações de performance mantidas fora do candidato.
 
 ## 8. Riscos
 
@@ -103,7 +103,7 @@ Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture,
 - `Specs/RESULTS-SPEC-044/preliminary-red-20260912.md` — baseline RED e análise de ownership.
 - `Specs/RESULTS-SPEC-044/post-fix-20260912.md` — qualificação pós-correção e hashes.
 - `Specs/RESULTS-SPEC-044/vm-101-102-100-photo-20260912.md` — runtime multi-VM normal-path no commit rebuilt; não substitui a matriz de subscriptions.
-- SPEC relacionada: `Specs/SPEC-041-gw-deadline-aware-wait.md`.
+- O diagnóstico foi separado das alterações de performance mantidas fora do candidato de release.
 
 ## 10. Estado
 

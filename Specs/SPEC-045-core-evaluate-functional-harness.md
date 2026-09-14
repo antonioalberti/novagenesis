@@ -5,7 +5,7 @@
 **Status:** In Progress
 **Branch:** AIOPT3
 **Implementation commit:** —
-**Related:** SPEC-044-core-run-evaluate-invalid-pg-downcast.md, SPEC-041-gw-deadline-aware-wait.md
+**Related:** SPEC-044-core-run-evaluate-invalid-pg-downcast.md
 
 ## 1. Problema
 

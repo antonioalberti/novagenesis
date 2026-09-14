@@ -18,7 +18,7 @@
 | Correctness de subscriptions | ⛔ aberto | SPEC-044/045; harness funcional e matriz RED/GREEN ainda não fechados |
 | Runner multi-VM | ⚠️ aberto | SPEC-046; supervisor local funciona, cleanup normal requer aceitação automatizada e readiness completo |
 | Higiene/provenance pública | ⚠️ aberto | SPEC-038 ainda consta como `Proposal` e requer reconciliação formal dos critérios |
-| Performance Common | ⏸ separado | SPEC-039–043 não deve ser misturada silenciosamente no commit de release |
+| Performance Common | ⏸ separado | As propostas de performance permanecem fora do candidato de release e no arquivo de preservação local |
 | Revisão Astra | 🔄 contínua | Necessária antes de cada alteração material e antes da aceitação final |
 | Tag/release pública | ❌ bloqueada | Só depois de todos os gates funcionais, sanitizer, documentação, hygiene e provenance |
 

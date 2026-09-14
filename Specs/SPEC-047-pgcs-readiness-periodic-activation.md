@@ -86,7 +86,7 @@ Este draft não autoriza alterações de produção. Qualquer instrumentação d
 - Branch/remote: `AIOPT3`, ambos em `1af604d` no início da análise.
 - Evidência: `Specs/RESULTS-SPEC-046/pgcs-only-20260912.md` e logs `vm101-long.log`/`vm102-long.log`.
 - Os logs terminam após a criação da SHM de entrada, antes de qualquer marker preservado de periodic/hello.
-- A árvore de trabalho contém alterações não commitadas de performance e artefactos de SPEC-039–043; estes devem ser classificados antes de qualquer freeze de release.
+- A árvore de trabalho continha alterações não commitadas de performance e artefactos fora do escopo; estes foram classificados e preservados fora do candidato antes do freeze.
 
 ## 9. Resultado da execução
 

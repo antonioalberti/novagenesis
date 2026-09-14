@@ -75,7 +75,7 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
-| G0 | Âmbito, baseline e freeze | NG-050, NG-020, NG-036, NG-037 | SPEC-036, SPEC-037, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g1-current-audit-20260913.md` | BLOCKED | Definir candidato limpo e reconciliar registos |
+| G0 | Âmbito, baseline e freeze | NG-050, NG-020, NG-036, NG-037 | SPEC-036, SPEC-037, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-20260914.md` | BLOCKED | Publicar/verificar o commit congelado; depois executar G2 |
 | G1 | Higiene, segurança e provenance pública | NG-038 | SPEC-038 | G0 | `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md` | OPEN | Resolver rotação/handoff histórico, classificação documental e runtime normal pós-cleanup |
 | G2 | Scripts de deployment reproduzíveis | NG-046 | SPEC-009 | G0 | `Specs/RESULTS-SPEC-054/g2-preflight-20260913.md`; `Specs/RESULTS-SPEC-054/g2-final-smoke-20260913.md`; `Specs/RESULTS-SPEC-054/g2-script-hardening-20260913.md` | BLOCKED | Congelar G0 e executar novo build/smoke canónico no commit final; hash mismatch histórico fica no G9 |
 | G3 | Runner, observabilidade, modo local, teardown e canonicalidade do entrypoint | NG-049, NG-055, NG-056, NG-057 | SPEC-046, SPEC-052, SPEC-053, SPEC-055, SPEC-056, SPEC-057 | G2 | `Specs/RESULTS-SPEC-046/`, `Specs/RESULTS-SPEC-055/`, `Specs/RESULTS-SPEC-057/` | OPEN | Concluir hardening da SPEC-056; depois implementar/rever o rename da SPEC-057 e executar novo trial local/preflight SSH |
@@ -114,7 +114,8 @@ Verificação realizada em 2026-09-13:
 - A branch remota/default é `AIOPT3`.
 - `AIOPT1` e `AIOPT2` não existem no remoto consultado; referências a essas branches devem ser tratadas como históricas. O clone local ainda conserva refs stale de `AIOPT1`, que não são base operacional nem devem ser usadas para a release.
 - O commit remoto verificado é `1af604d`.
-- A árvore de trabalho local contém alterações rastreadas e ficheiros não rastreados; ainda não é um candidato congelado.
+- O candidato local foi separado e congelado em `18d9b18`; alterações de performance/históricas foram preservadas fora da árvore do candidato.
+- A publicação remota do candidato congelado e a confirmação de `origin/AIOPT3` ainda estão pendentes.
 - A matriz reconciliada cobre `16` tarefas e `11` gates; G3 inclui o subitem NG-057/SPEC-057 de canonicalidade do entrypoint, dependente da SPEC-056.
 - O downcast alvo de `CoreRunEvaluate01` foi corrigido no commit `21a5512`.
 - Builds CMake Debug e Sanitizer passaram numa árvore temporária fora do repositório.
@@ -131,7 +132,7 @@ Verificação realizada em 2026-09-13:
 - SPEC-038 está `In Progress`; SPEC-044/045/046/047/048/049/050/051/052/053/054/055/056 continuam abertas ou parcialmente aceites.
 - Existem referências ghost a `SPEC-015` e `SPEC-016` em documentos SPEC.
 - Referências de branches anteriores permanecem apenas em documentos históricos/decisões; instruções activas devem continuar em AIOPT3.
-- G2 teve validação operacional diagnóstica em 2026-09-13; depois os seis scripts receberam hardening RED→GREEN local (status do filho, pinning AIOPT3, receipt, SSH estrito, logs duráveis e cancelamento). O smoke remoto anterior preservou uma divergência de hash de payload para G9 e antecede o hardening. O gate formal permanece BLOCKED pelo G0/candidato não congelado; novo build/smoke canónico é obrigatório.
+- G2 teve validação operacional diagnóstica em 2026-09-13; depois os seis scripts receberam hardening RED→GREEN local (status do filho, pinning AIOPT3, receipt, SSH estrito, logs duráveis e cancelamento). O smoke remoto anterior preservou uma divergência de hash de payload para G9 e antecede o hardening. O candidato `18d9b18` passou py_compile, bash -n, 62/62 testes NG-ELC, build CMake Debug e build Sanitizer fora da árvore; publicação remota e novo build/smoke canónico continuam obrigatórios.
 
 ## 7. Regras para novos agentes
 
