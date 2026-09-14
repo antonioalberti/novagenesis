@@ -80,10 +80,10 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 - [x] Active deployment scripts no longer require this laboratory's IPs, MACs, hostnames or absolute paths; they accept local configuration.
 - [x] Active documentation uses roles/placeholders and does not expose private deployment identities.
 - [x] Tracked binaries, temporary artefacts and generated outputs have a documented disposition and are removed or deliberately retained.
-- [ ] Historical files retained in AIOPT3 are labelled and do not override active instructions.
+- [x] Historical files retained in AIOPT3 are labelled and do not override active instructions for the v1.0 supported profile; the bounded classification is recorded in `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md`, while the broader legacy backlog remains v1.1+.
 - [x] Current-tree secret scan finds no credentials or private keys.
 - [x] Public-data scan finds no unintended personal, infrastructure or local-path exposure in the active v1.0 supported profile; the bounded scan and its exclusions are recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`.
-- [ ] Build, normal runtime, legacy build profile and documented test procedures remain reproducible after cleanup.
+- [ ] Normal runtime and documented v1.0 test procedures remain reproducible after cleanup; the legacy build profile is N/A for v1.0 and remains tracked for v1.1+.
 - [x] A final evidence report maps every finding to a disposition.
 - [x] No history rewrite or force-push occurs without separate explicit approval.
 
@@ -98,7 +98,7 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 
 ## 6.1 Current validation
 
-G1 validation is recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md`, the current-profile scan in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`, and the current normal build in `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`. The current-tree and normal CMake build gates passed. On 2026-09-14, the owner classified external rotation as N/A for the v1.0 profile because the referenced guests are dedicated NovaGenesis test fixtures, not production systems and not shared-purpose machines. The historical value remains compromised, must not be published again, and must never be reused outside those disposable test fixtures. The active v1.0 public-data scan now passes; historical classification, runtime and legacy reproducibility remain open.
+G1 validation is recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md`, the current-profile scan in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`, the current normal build in `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`, and historical classification in `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md`. The current-tree and normal CMake build gates passed. On 2026-09-14, the owner classified external rotation as N/A for the v1.0 profile because the referenced guests are dedicated NovaGenesis test fixtures, not production systems and not shared-purpose machines. The historical value remains compromised, must not be published again, and must never be reused outside those disposable test fixtures. The active v1.0 public-data and bounded historical classification scans now pass; legacy build parity is N/A for v1.0 and remains tracked for v1.1+, while normal runtime remains open.
 
 ## 6.2 Release-profile decision — 2026-09-14
 
