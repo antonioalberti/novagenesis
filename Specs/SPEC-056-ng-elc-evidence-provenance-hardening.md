@@ -4,7 +4,7 @@
 **Date:** 2026-09-13  
 **Status:** In Progress  
 **Branch:** AIOPT3  
-**Implementation commit:** —  
+**Implementation commit:** `a571e7e` (bounded offline-verifier wiring increment; acceptance remains open)
 **Related:** SPEC-055-ng-elc-local-mode.md; SPEC-054-release-master-plan-and-audit.md; SPEC-046-multi-vm-runner-safe-teardown.md  
 **Task linkage:** NG-056 (child of NG-050); NG-055 (local NG-ELC)  
 **Canonical tool during SPEC-056:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`; canonical rename is separately specified by SPEC-057 and must not alter this hardening contract.
@@ -308,3 +308,7 @@ G0/G10 remain blocked until their own clean-candidate and release requirements a
 - Never delete uncertain processes, IPC or staging during rollback. Recover only through verified ownership procedures.
 - Reopen NG-055/SPEC-055 local acceptance blockers and record the reverted candidate, failure and outstanding resources.
 - No rollback may change C++, protocol behavior or multi-VM acceptance status.
+
+## 11. Incremento verificado — offline verifier wiring
+
+Commit `a571e7e` wires the local lifecycle to invoke `verify_bundle()` after sealing, persists a stable `offline_verification` summary and reason codes, and fails closed on tampered/missing evidence while preserving remote schema-v1 behaviour. Targeted lifecycle/verifier regressions pass. Deterministic workload generation, complete R06 provenance/build linkage, ownership hardening and local acceptance remain open under this SPEC.
