@@ -98,7 +98,7 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 
 ## 6.1 Current validation
 
-G1 validation is recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md` and the current-profile scan in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`. The current-tree and build gates passed. On 2026-09-14, the owner classified external rotation as N/A for the v1.0 profile because the referenced guests are dedicated NovaGenesis test fixtures, not production systems and not shared-purpose machines. The historical value remains compromised, must not be published again, and must never be reused outside those disposable test fixtures. The active v1.0 public-data scan now passes; historical classification and normal-runtime reproducibility remain open.
+G1 validation is recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md`, the current-profile scan in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`, and the current normal build in `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`. The current-tree and normal CMake build gates passed. On 2026-09-14, the owner classified external rotation as N/A for the v1.0 profile because the referenced guests are dedicated NovaGenesis test fixtures, not production systems and not shared-purpose machines. The historical value remains compromised, must not be published again, and must never be reused outside those disposable test fixtures. The active v1.0 public-data scan now passes; historical classification, runtime and legacy reproducibility remain open.
 
 ## 6.2 Release-profile decision — 2026-09-14
 
