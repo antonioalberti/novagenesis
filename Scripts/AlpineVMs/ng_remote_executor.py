@@ -163,6 +163,8 @@ def validate_plan(plan: dict[str, Any], mode: str = "remote") -> None:
         raise ValueError("log_quota_bytes outside bounded range")
     if not isinstance(plan.get("diagnostic_only", False), bool):
         raise ValueError("diagnostic_only must be boolean")
+    if mode == "local" and "workload" in plan:
+        validate_workload_spec(plan["workload"])
     oracle = plan.get("runtime_oracle")
     if oracle is None and not plan.get("diagnostic_only", False):
         raise ValueError("non-diagnostic plan requires an explicit runtime_oracle")
@@ -791,6 +793,9 @@ def local_acceptance_eligibility(provenance: Mapping[str, Any]) -> dict[str, Any
     ):
         if key in provenance and not provenance.get(key, False):
             blockers.append(message)
+    workload_error = provenance.get("workload_error")
+    if workload_error:
+        blockers.append(str(workload_error))
     return {"eligible": not blockers, "blockers": blockers}
 
 
@@ -879,26 +884,49 @@ def local_file_oracle(oracle: Mapping[str, Any], variables: Mapping[str, str]) -
                 unsafe.append(item.name)
                 continue
             if item.is_file():
-                result[item.name] = {"size": item.stat().st_size, "sha256": hashlib.sha256(item.read_bytes()).hexdigest()}
+                data = item.read_bytes()
+                result[item.name] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
         return result, unsafe
     source, unsafe_source = digest_map(oracle["source"])
     repository, unsafe_repository = digest_map(oracle["repository"])
+    expected = oracle.get("expected_map")
+    if expected is not None and not isinstance(expected, Mapping):
+        raise ValueError("file oracle expected_map must be an object")
+    expected_map = dict(expected or {})
+    source_matches_expected = not expected_map or source == expected_map
+    repository_matches_expected = not expected_map or repository == expected_map
+    source_extra = sorted(set(source) - set(expected_map)) if expected_map else []
+    repository_extra = sorted(set(repository) - set(expected_map)) if expected_map else []
+    changed_source = sorted(name for name in set(source) & set(expected_map) if source[name] != expected_map[name])
+    changed_repository = sorted(name for name in set(repository) & set(expected_map) if repository[name] != expected_map[name])
     result = {
         "source_count": len(source),
         "repository_count": len(repository),
         "expected_count": oracle["expected_count"],
         "source_map": source,
         "repository_map": repository,
+        "expected_map": expected_map,
         "unsafe_source": unsafe_source,
         "unsafe_repository": unsafe_repository,
         "source_equals_repository": source == repository,
+        "source_matches_expected": source_matches_expected,
+        "repository_matches_expected": repository_matches_expected,
         "missing_in_repository": sorted(set(source) - set(repository)),
         "extra_in_repository": sorted(set(repository) - set(source)),
         "hash_mismatches": sorted(name for name in set(source) & set(repository) if source[name] != repository[name]),
+        "source_extra": source_extra,
+        "repository_extra": repository_extra,
+        "changed_source": changed_source,
+        "changed_repository": changed_repository,
     }
     complete = len(source) == oracle["expected_count"] and len(repository) == oracle["expected_count"]
     safe = not unsafe_source and not unsafe_repository
-    result["result"] = "PASS" if complete and safe and result["source_equals_repository"] else ("FAIL" if complete and safe else "INCONCLUSIVE")
+    if expected_map:
+        expected_count_ok = len(expected_map) == oracle["expected_count"] and complete
+        divergence = bool(source_extra or repository_extra or changed_source or changed_repository)
+        result["result"] = "FAIL" if safe and divergence else ("PASS" if safe and expected_count_ok and source_matches_expected and repository_matches_expected else "INCONCLUSIVE")
+    else:
+        result["result"] = "PASS" if complete and safe and result["source_equals_repository"] else ("FAIL" if complete and safe else "INCONCLUSIVE")
     return result
 
 
@@ -920,6 +948,94 @@ def local_json_write(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def validate_workload_spec(workload: Mapping[str, Any]) -> None:
+    """Validate the small, versioned deterministic local-workload contract."""
+    if not isinstance(workload, Mapping) or workload.get("schema_version") != 1:
+        raise ValueError("local workload schema_version must be 1")
+    generator = workload.get("generator")
+    if not isinstance(generator, Mapping):
+        raise ValueError("local workload generator must be an object")
+    if generator.get("id") != "synthetic-jpeg" or not isinstance(generator.get("version"), str) or not generator["version"]:
+        raise ValueError("local workload generator identity is invalid")
+    seed = generator.get("seed")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("local workload seed must be an integer")
+    parameters = generator.get("parameters")
+    if not isinstance(parameters, Mapping):
+        raise ValueError("local workload parameters must be an object")
+    if parameters.get("count") != 5:
+        raise ValueError("local workload count must be five")
+    size_bytes = parameters.get("size_bytes")
+    if isinstance(size_bytes, bool) or not isinstance(size_bytes, int) or not 16 <= size_bytes <= 16 * 1024 * 1024:
+        raise ValueError("local workload size_bytes is outside the bounded range")
+    prefix = parameters.get("prefix")
+    if not isinstance(prefix, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", prefix):
+        raise ValueError("local workload prefix is unsafe")
+    names = workload.get("names")
+    if not isinstance(names, list) or len(names) != 5 or len(set(names)) != 5:
+        raise ValueError("local workload must declare five unique names")
+    for name in names:
+        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+\.jpg", name):
+            raise ValueError("local workload names must be safe JPEG names")
+
+
+def generate_deterministic_workload(workload: Mapping[str, Any], destination: Path) -> dict[str, dict[str, Any]]:
+    """Generate the declared five JPEG-shaped files without overwriting data."""
+    validate_workload_spec(workload)
+    destination = Path(destination)
+    if destination.exists() and any(destination.iterdir()):
+        raise ConfigError(f"workload staging directory is not fresh: {destination}")
+    destination.mkdir(parents=True, exist_ok=True)
+    generator = workload["generator"]
+    parameters = generator["parameters"]
+    size_bytes = parameters["size_bytes"]
+    parameter_bytes = json.dumps(parameters, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    for name in workload["names"]:
+        material = hashlib.sha256(
+            b"SPEC-056/R02/" + str(generator["version"]).encode("utf-8") + b"/" +
+            str(generator["seed"]).encode("ascii") + b"/" + name.encode("utf-8") + b"/" + parameter_bytes
+        ).digest()
+        header = bytes((0xff, 0xd8, 0xff, 0xe0)) + b"SPEC056" + material[:8]
+        footer = bytes((0xff, 0xd9))
+        body_size = size_bytes - len(header) - len(footer)
+        body = (material * ((body_size + len(material) - 1) // len(material)))[:body_size]
+        path = destination / name
+        with path.open("xb") as handle:
+            handle.write(header + body + footer)
+    return local_digest_map(destination, "*.jpg")
+
+
+def _path_aliases(first: Path, second: Path) -> bool:
+    """Detect equal, nested, symlink-resolved, or same-inode IO directories."""
+    first_resolved = first.resolve(strict=False)
+    second_resolved = second.resolve(strict=False)
+    if first_resolved == second_resolved or first_resolved in second_resolved.parents or second_resolved in first_resolved.parents:
+        return True
+    try:
+        return first.exists() and second.exists() and first.samefile(second)
+    except OSError:
+        return True
+
+
+def _directory_has_entries(path: Path) -> bool:
+    if not path.exists():
+        return False
+    if not path.is_dir():
+        return True
+    try:
+        next(path.iterdir())
+    except StopIteration:
+        return False
+    return True
+
+
+def _local_oracle_directories(plan: Mapping[str, Any], variables: Mapping[str, str]) -> tuple[Path, Path]:
+    oracle = plan.get("runtime_oracle") or {}
+    source = oracle.get("source", "${NG_LOCAL_IO_PATH}/Source1")
+    repository = oracle.get("repository", "${NG_LOCAL_IO_PATH}/Repository1")
+    return Path(expand_argv([source], variables)[0]), Path(expand_argv([repository], variables)[0])
+
+
 def local_write_v2_plan(evidence_dir: Path, plan: Mapping[str, Any], contract: Mapping[str, Any], config: Mapping[str, str], variables: Mapping[str, str]) -> None:
     """Persist the local plan/configuration inputs before a role is launched."""
     plan_dir = evidence_dir / "plan"
@@ -939,24 +1055,71 @@ def local_write_v2_plan(evidence_dir: Path, plan: Mapping[str, Any], contract: M
 
 def local_prepare_v2_layout(evidence_dir: Path, plan: Mapping[str, Any], contract: Mapping[str, Any], config: Mapping[str, str], variables: Mapping[str, str]) -> dict[str, Any]:
     """Create durable v2 directories and preserve the pre-launch workload map."""
-    local_write_v2_plan(evidence_dir, plan, contract, config, variables)
     for directory in (evidence_dir / "artifacts" / "source", evidence_dir / "artifacts" / "repository", evidence_dir / "inventory"):
         directory.mkdir(parents=True, exist_ok=True)
-    source = Path(expand_argv(["${NG_LOCAL_IO_PATH}/Source1"], variables)[0])
-    repository = Path(expand_argv(["${NG_LOCAL_IO_PATH}/Repository1"], variables)[0])
-    expected = local_digest_map(source, "*.jpg")
-    repository_initial = local_digest_map(repository, "*.jpg")
-    workload = {
-        "schema_version": 2,
-        "generator": {"id": "external-input", "version": "unverified", "seed": None, "parameters": {}, "verified": False},
-        "source_path": str(source),
-        "repository_path": str(repository),
-        "expected": [{"name": name, **expected[name]} for name in sorted(expected)],
-        "repository_initial": [{"name": name, **repository_initial[name]} for name in sorted(repository_initial)],
-        "repository_empty": not repository_initial,
-        "verified": False,
-        "reason": "fresh deterministic workload generation is not part of this increment",
-    }
+    source, repository = _local_oracle_directories(plan, variables)
+    declared_workload = plan.get("workload")
+    if declared_workload is not None:
+        validate_workload_spec(declared_workload)
+        aliasing = _path_aliases(source, repository)
+        repository_initial_map = local_digest_map(repository, "*.jpg")
+        repository_nonempty = _directory_has_entries(repository)
+        staging_io = evidence_dir / "staging" / "io"
+        staging_source = staging_io / "Source1"
+        staging_repository = staging_io / "Repository1"
+        staging_io.mkdir(parents=True, exist_ok=False)
+        for directory in (staging_source, staging_repository, staging_io / "PGCS", staging_io / "NRNCS"):
+            directory.mkdir(parents=True, exist_ok=False)
+        expected_map = generate_deterministic_workload(declared_workload, staging_source)
+        variables["NG_LOCAL_IO_PATH"] = str(staging_io)
+        effective_config = dict(config)
+        effective_config["NG_LOCAL_IO_PATH"] = str(staging_io)
+        local_write_v2_plan(evidence_dir, plan, contract, effective_config, variables)
+        verified = not repository_nonempty and not aliasing and len(expected_map) == 5
+        reason = None
+        if repository_nonempty:
+            reason = "Repository directory is not empty"
+        elif aliasing:
+            reason = "Source and Repository paths alias or nest"
+        workload = {
+            "schema_version": 2,
+            "generator": dict(declared_workload["generator"]),
+            "parameters": dict(declared_workload["generator"]["parameters"]),
+            "names": list(declared_workload["names"]),
+            "expected_map": expected_map,
+            "expected": [{"name": name, **expected_map[name]} for name in sorted(expected_map)],
+            "repository_initial_map": repository_initial_map,
+            "repository_initial": [{"name": name, **repository_initial_map[name]} for name in sorted(repository_initial_map)],
+            "repository_empty": not repository_nonempty,
+            "aliasing_rejected": aliasing,
+            "source_path": str(staging_source),
+            "repository_path": str(staging_repository),
+            "configured_source_path": str(source),
+            "configured_repository_path": str(repository),
+            "staging_io_path": str(staging_io),
+            "verified": verified,
+            "reason": reason,
+        }
+    else:
+        # Keep older local plans usable as diagnostic fixtures. They remain
+        # ineligible because they do not declare a deterministic workload.
+        local_write_v2_plan(evidence_dir, plan, contract, config, variables)
+        expected = local_digest_map(source, "*.jpg")
+        repository_initial = local_digest_map(repository, "*.jpg")
+        workload = {
+            "schema_version": 2,
+            "generator": {"id": "external-input", "version": "unverified", "seed": None, "parameters": {}, "verified": False},
+            "source_path": str(source),
+            "repository_path": str(repository),
+            "expected": [{"name": name, **expected[name]} for name in sorted(expected)],
+            "repository_initial": [{"name": name, **repository_initial[name]} for name in sorted(repository_initial)],
+            "expected_map": expected,
+            "repository_initial_map": repository_initial,
+            "repository_empty": not _directory_has_entries(repository),
+            "aliasing_rejected": _path_aliases(source, repository),
+            "verified": False,
+            "reason": "plan does not declare a deterministic workload",
+        }
     local_json_write(evidence_dir / "workload.json", workload)
     return workload
 
@@ -1032,12 +1195,19 @@ def local_provenance(config: Mapping[str, str], plan: Mapping[str, Any], variabl
     }
 
 
-def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str]) -> dict[str, Any]:
+def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str], workload: Mapping[str, Any] | None = None) -> dict[str, Any]:
     errors: list[str] = []
     paths = {key: str(Path(config[key]).resolve()) for key in LOCAL_REQUIRED_ENV}
     for key in ("NG_LOCAL_REPO_PATH", "NG_LOCAL_BUILD_PATH", "NG_LOCAL_IO_PATH"):
         if not Path(paths[key]).is_dir():
             errors.append(f"{key} directory missing")
+    if workload is not None and plan.get("workload") is not None:
+        if not workload.get("repository_empty", False):
+            errors.append("Repository directory is not empty")
+        if workload.get("aliasing_rejected", False):
+            errors.append("Source and Repository paths alias or nest")
+        if not workload.get("verified", False) and not errors:
+            errors.append(str(workload.get("reason") or "fresh workload is not verified"))
     roles = []
     for role in plan.get("roles", []):
         argv = expand_argv(role["command"], variables)
@@ -1198,10 +1368,14 @@ def run_local_trial(args: argparse.Namespace) -> int:
     variables["TRIAL_ID"] = trial_id
     overall_deadline = time.monotonic() + float(plan["timeouts"]["total"])
     local_record(events, "prepare", mode="local", evidence_dir=str(evidence_dir))
-    provenance = local_provenance(config, plan, variables)
     workload = local_prepare_v2_layout(evidence_dir, plan, contract, config, variables)
+    effective_config = dict(config)
+    if workload.get("staging_io_path"):
+        effective_config["NG_LOCAL_IO_PATH"] = str(workload["staging_io_path"])
+    provenance = local_provenance(effective_config, plan, variables)
     provenance["plan_snapshot"] = True
     provenance["workload_verified"] = bool(workload["verified"])
+    provenance["workload_error"] = workload.get("reason")
     provenance["evidence_schema_v2"] = True
     eligibility = local_acceptance_eligibility(provenance)
     provenance["acceptance_eligibility"] = eligibility
@@ -1216,9 +1390,16 @@ def run_local_trial(args: argparse.Namespace) -> int:
     interrupted = False
     offsets: dict[str, int] = {}
     carries: dict[str, str] = {}
-    oracle_snapshot: dict[str, Any] = {"schema_version": 2, "type": (plan.get("runtime_oracle") or {}).get("type"), "preservation_verified": False}
+    oracle = plan.get("runtime_oracle")
+    effective_oracle = dict(oracle) if isinstance(oracle, Mapping) else oracle
+    if isinstance(effective_oracle, dict) and effective_oracle.get("type") == "files" and workload.get("expected_map"):
+        if workload.get("staging_io_path"):
+            effective_oracle["source"] = str(Path(workload["staging_io_path"]) / "Source1")
+            effective_oracle["repository"] = str(Path(workload["staging_io_path"]) / "Repository1")
+        effective_oracle["expected_map"] = dict(workload["expected_map"])
+    oracle_snapshot: dict[str, Any] = {"schema_version": 2, "type": (effective_oracle or {}).get("type"), "preservation_verified": False}
     try:
-        preflight = local_preflight(config, plan, variables)
+        preflight = local_preflight(effective_config, plan, variables, workload)
         local_record(events, "preflight", result=preflight)
         if not preflight["ok"]:
             raise ConfigError("local preflight rejected: " + ", ".join(preflight["errors"]))
@@ -1273,7 +1454,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             local_record(events, "no-roles-launched", reason="preflight completed without launchable roles")
 
         if runtime == "PASS":
-            oracle = plan.get("runtime_oracle")
+            oracle = effective_oracle
             deadline = min(time.monotonic() + float(plan["timeouts"]["observation"]), overall_deadline)
             file_result = None
             oracle_verdict = "INCONCLUSIVE"
@@ -1367,7 +1548,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members})
             item["stdout"].close()
             item["stderr"].close()
-        oracle = plan.get("runtime_oracle")
+        oracle = effective_oracle
         if oracle and oracle.get("type") == "files":
             try:
                 oracle_snapshot = preserve_local_artifacts(oracle, variables, evidence_dir)

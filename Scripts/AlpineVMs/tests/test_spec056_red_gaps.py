@@ -114,6 +114,131 @@ class Spec056ProvenanceRedTests(unittest.TestCase):
         self.assertTrue(any("build manifest" in blocker for blocker in eligibility["blockers"]))
 
 
+class Spec056WorkloadRedTests(unittest.TestCase):
+    WORKLOAD = {
+        "schema_version": 1,
+        "generator": {
+            "id": "synthetic-jpeg",
+            "version": "1.0",
+            "seed": 56002,
+            "parameters": {"count": 5, "size_bytes": 128, "prefix": "spec056-photo"},
+        },
+        "names": [f"spec056-photo-{index:02d}.jpg" for index in range(1, 6)],
+    }
+
+    def test_deterministic_workload_generation_repeats_the_same_five_jpegs(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-workload-", dir=Path.home()) as td:
+            root = Path(td)
+            first = executor.generate_deterministic_workload(self.WORKLOAD, root / "first")
+            second = executor.generate_deterministic_workload(self.WORKLOAD, root / "second")
+            self.assertEqual(first, second)
+            self.assertEqual(sorted(first), self.WORKLOAD["names"])
+            self.assertEqual(set(first), set(self.WORKLOAD["names"]))
+            self.assertTrue(all(set(item) == {"size", "sha256"} for item in first.values()))
+            self.assertTrue(all((root / "first" / name).read_bytes().startswith(bytes((0xff, 0xd8))) for name in first))
+
+    def test_local_prepare_preserves_initial_expected_map_before_launch(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-workload-map-", dir=Path.home()) as td:
+            root = Path(td)
+            evidence = root / "evidence"
+            io = root / "io"
+            io.mkdir()
+            (io / "Source1").mkdir()
+            (io / "Repository1").mkdir()
+            plan = {
+                "schema_version": 1,
+                "roles": [],
+                "workload": self.WORKLOAD,
+                "runtime_oracle": {
+                    "type": "files",
+                    "source": "${NG_LOCAL_IO_PATH}/Source1",
+                    "repository": "${NG_LOCAL_IO_PATH}/Repository1",
+                    "pattern": "*.jpg",
+                    "expected_count": 5,
+                    "hash": "sha256",
+                },
+            }
+            config = {
+                "NG_LOCAL_REPO_PATH": str(root),
+                "NG_LOCAL_BUILD_PATH": str(root),
+                "NG_LOCAL_IO_PATH": str(io),
+                "NG_LOCAL_EVIDENCE_PATH": str(evidence),
+            }
+            variables = dict(config)
+            variables["TRIAL_ID"] = "map-before-launch"
+            workload = executor.local_prepare_v2_layout(
+                evidence / "map-before-launch", plan, {"scenario": {}, "profile": {}}, config, variables
+            )
+            persisted = json.loads((evidence / "map-before-launch" / "workload.json").read_text(encoding="utf-8"))
+
+        expected = {name: first for name, first in workload["expected_map"].items()}
+        self.assertEqual(persisted["expected_map"], expected)
+        self.assertEqual(workload["repository_initial_map"], {})
+        self.assertTrue(workload["repository_empty"])
+        self.assertTrue(workload["verified"])
+
+    def test_nonempty_repository_is_rejected_without_launching_roles(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-nonempty-repo-", dir=Path.home()) as td:
+            root = Path(td)
+            build = root / "build"
+            io = root / "io"
+            source = io / "Source1"
+            repository = io / "Repository1"
+            evidence = root / "evidence"
+            for directory in (build, source, repository, evidence):
+                directory.mkdir(parents=True)
+            (repository / "preexisting.jpg").write_bytes(b"must-not-be-used")
+            code = "print('READY', flush=True)"
+            roles = [
+                {
+                    "name": name,
+                    "vm": "local",
+                    "command": [sys.executable, "-c", code],
+                    "cwd": str(build),
+                    "readiness": [{"id": "ready", "pattern": "READY"}],
+                }
+                for name in ["PGCS", "NRNCS", "Repository", "Source"]
+            ]
+            plan_path = root / "plan.json"
+            plan_path.write_text(json.dumps({
+                "schema_version": 1,
+                "roles": roles,
+                "workload": self.WORKLOAD,
+                "timeouts": {"readiness": 0.2, "observation": 0.1, "total": 1},
+                "runtime_oracle": {
+                    "type": "files", "source": str(source), "repository": str(repository),
+                    "pattern": "*.jpg", "expected_count": 5, "hash": "sha256",
+                },
+            }), encoding="utf-8")
+            env = {
+                "NG_LOCAL_REPO_PATH": str(root), "NG_LOCAL_BUILD_PATH": str(build),
+                "NG_LOCAL_IO_PATH": str(io), "NG_LOCAL_EVIDENCE_PATH": str(evidence),
+            }
+            args = Namespace(
+                plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal",
+                trial="nonempty-repository", env=env,
+            )
+            with (
+                patch.object(executor, "local_provenance", return_value={
+                    "git_clean": True, "build_linkage": True, "controller_identity": True,
+                    "plan_snapshot": False,
+                }),
+                patch.object(executor, "local_ipc_snapshot", return_value={"shm": set(), "semaphores": set()}),
+                patch.object(executor.subprocess, "Popen") as popen,
+            ):
+                rc = executor.run_local_trial(args)
+            trial = evidence / "nonempty-repository"
+            result = json.loads((trial / "result.json").read_text(encoding="utf-8"))
+            events = [json.loads(line) for line in (trial / "controller-events.jsonl").read_text(encoding="utf-8").splitlines() if line]
+            workload_map_present = bool(json.loads((trial / "workload.json").read_text(encoding="utf-8"))["expected_map"])
+
+        self.assertNotEqual(rc, 0)
+        popen.assert_not_called()
+        self.assertFalse(any(event["event"] == "launch" for event in events))
+        self.assertIn("Repository directory is not empty", result["acceptance_blockers"])
+        self.assertTrue(workload_map_present)
+
+
 class Spec056EvidenceRedTests(unittest.TestCase):
     def test_evidence_manifest_uses_schema_v2(self):
         with tempfile.TemporaryDirectory(prefix="spec056-manifest-", dir=Path.home()) as td:

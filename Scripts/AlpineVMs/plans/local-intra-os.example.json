@@ -1,5 +1,25 @@
 {
   "schema_version": 1,
+  "workload": {
+    "schema_version": 1,
+    "generator": {
+      "id": "synthetic-jpeg",
+      "version": "1.0",
+      "seed": 56002,
+      "parameters": {
+        "count": 5,
+        "size_bytes": 4096,
+        "prefix": "spec056-photo"
+      }
+    },
+    "names": [
+      "spec056-photo-01.jpg",
+      "spec056-photo-02.jpg",
+      "spec056-photo-03.jpg",
+      "spec056-photo-04.jpg",
+      "spec056-photo-05.jpg"
+    ]
+  },
   "roles": [
     {
       "name": "PGCS",
