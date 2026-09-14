@@ -4,7 +4,7 @@
 **Date:** 2026-09-13  
 **Status:** In Progress  
 **Branch:** AIOPT3  
-**Implementation commit:** `a571e7e` (bounded offline-verifier wiring increment; acceptance remains open)
+**Implementation commits:** `a571e7e`, `dbf1241`, `c1f5ad8` (bounded verifier, deterministic workload and canonical R06 provenance/build-linkage increments; acceptance remains open)
 **Related:** SPEC-055-ng-elc-local-mode.md; SPEC-054-release-master-plan-and-audit.md; SPEC-046-multi-vm-runner-safe-teardown.md  
 **Task linkage:** NG-056 (child of NG-050); NG-055 (local NG-ELC)  
 **Canonical tool during SPEC-056:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`; canonical rename is separately specified by SPEC-057 and must not alter this hardening contract.
@@ -311,4 +311,4 @@ G0/G10 remain blocked until their own clean-candidate and release requirements a
 
 ## 11. Incremento verificado — offline verifier wiring
 
-Commits `a571e7e` and `dbf1241` wire the local lifecycle to invoke `verify_bundle()` after sealing and add the R02 deterministic five-file workload, initial Repository-empty/aliasing checks, expected workload map and oracle comparison fields. Remote schema-v1 behaviour remains preserved. Complete R06 provenance/build linkage, ownership hardening and local acceptance remain open under this SPEC.
+Commits `a571e7e`, `dbf1241` and `c1f5ad8` wire the local lifecycle to invoke `verify_bundle()` after sealing, add the R02 deterministic five-file workload and add canonical R06 provenance/build-linkage capture with fail-closed executable drift/missing-manifest checks. Remote schema-v1 behaviour remains preserved. A clean candidate trial with a production build manifest, complete ownership/cleanup evidence and local acceptance remain open under this SPEC.
