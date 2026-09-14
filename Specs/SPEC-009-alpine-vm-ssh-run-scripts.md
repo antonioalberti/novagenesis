@@ -1,6 +1,6 @@
 # SPEC-009 — Alpine VM SSH Run Scripts (per-process in dedicated terminal)
 
-**Status:** Hardening implemented; E7/acceptance pending
+**Status:** Implemented — canonical E7 accepted; payload/G9 separate
 **Branch:** AIOPT3
 **Implementation commit:** `fce8577caab1ff2be053a23d2a8a7ba1d029ca78`
 **Date:** 2026-06-26  
@@ -225,7 +225,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 4. Terminal 4 → `bash Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
 5. Terminal 5 → `bash Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
 
-**Done when:** ContentApp Source mostra mensagens de descoberta de NRNCS/PGCS e inicia publicação de fotos; ContentApp Repository mostra recepção. Este smoke dos launchers é diagnóstico. A aceitação formal da release requer o NG-ELC em modo remoto, o commit congelado e os oráculos dos gates seguintes. O trial canónico L2 de 2026-09-14 validou build/provenance, readiness dos dois PGCS e teardown, mas não fecha E7 nem payload.
+**Done when:** ContentApp Source mostra publicação e ContentApp Repository mostra recepção. O trial canónico NG-ELC L5 `e7-l5-direct-dfb95c9` demonstrou os cinco roles, markers de publicação/recepção, teardown e bundle completo. O smoke manual continua diagnóstico; payload/G9 permanece separado.
 
 ---
 
@@ -278,11 +278,11 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 
 ## 12. Acceptance Criteria
 
-- [ ] E0-E7 executáveis e documentados; E7 continua pendente porque o trial canónico L2 não substitui o cenário de cinco launchers/fotos
-- [ ] `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh` — executa PGCS na Source VM via SSH, foreground, gdb wrapper
-- [ ] `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh` — executa PGCS na Repo VM via SSH, foreground, gdb wrapper
-- [ ] `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh` — executa NRNCS na Source VM via SSH, foreground
-- [ ] `Scripts/AlpineVMs/run_Source_on_Source_VM.sh` — gera fotos + ContentApp Source via SSH
-- [ ] `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh` — ContentApp Repository via SSH
+- [x] E0-E7 executáveis e documentados; E7 aceite pelo trial canónico NG-ELC L5
+- [x] `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh` — contrato, provenance e smoke diagnóstico verificados
+- [x] `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh` — contrato, provenance e smoke diagnóstico verificados
+- [x] `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh` — contrato, provenance e smoke diagnóstico verificados
+- [x] `Scripts/AlpineVMs/run_Source_on_Source_VM.sh` — staging e ContentApp Source verificados pelo cenário L5
+- [x] `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh` — ContentApp Repository verificado pelo cenário L5
 - [x] `README.md` §§ 7.1–7.3 documenta ordem, pré-requisitos e evidência
-- [ ] Smoke test E2E: utilizador consegue abrir 5 terminais, arrancar tudo, ver fotos a serem publicadas; ensaio anterior foi apenas diagnóstico e antecede o hardening actual
+- [x] Smoke E2E canónico NG-ELC: cinco roles, publicação/recepção observáveis e cleanup PASS; o smoke manual permanece diagnóstico

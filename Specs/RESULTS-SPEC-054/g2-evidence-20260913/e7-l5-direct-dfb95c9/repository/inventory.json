@@ -1,0 +1,136 @@
+{
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+  "processes": [
+    {
+      "kind": "role",
+      "record": {
+        "trial_id": "e7-l5-direct-dfb95c9",
+        "role": "PGCS-Repository",
+        "pid": 2262,
+        "pgid": 2262,
+        "sid": 2262,
+        "starttime": 1487,
+        "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+        "exe": "/usr/bin/python3.12",
+        "argv": [
+          "/usr/bin/python3",
+          "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+          "--",
+          "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+          "/root/workspace/novagenesis/IO/PGCS/",
+          "0",
+          "Intra_Domain",
+          "-p",
+          "Ethernet",
+          "Intra_Domain",
+          "eth0",
+          "08:00:27:79:bb:15",
+          "1200"
+        ],
+        "captured_utc": "2026-09-14T08:49:37.849391Z",
+        "command_argv": [
+          "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+          "/root/workspace/novagenesis/IO/PGCS/",
+          "0",
+          "Intra_Domain",
+          "-p",
+          "Ethernet",
+          "Intra_Domain",
+          "eth0",
+          "08:00:27:79:bb:15",
+          "1200"
+        ],
+        "wrapper": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+        "cwd": "/root/workspace/novagenesis/cmake-build-debug",
+        "launched_utc": "2026-09-14T08:49:37.849404Z",
+        "status": "stopped",
+        "stopped_utc": "2026-09-14T08:52:33.616955Z",
+        "signals": [
+          "SIGTERM"
+        ]
+      },
+      "identity_matches": false,
+      "members": []
+    },
+    {
+      "kind": "role",
+      "record": {
+        "trial_id": "e7-l5-direct-dfb95c9",
+        "role": "Repository",
+        "pid": 2282,
+        "pgid": 2282,
+        "sid": 2282,
+        "starttime": 1765,
+        "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+        "exe": "/usr/bin/python3.12",
+        "argv": [
+          "/usr/bin/python3",
+          "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+          "--",
+          "/root/workspace/novagenesis/cmake-build-debug/ContentApp",
+          "/root/workspace/novagenesis/IO/Repository1/",
+          "Repository"
+        ],
+        "captured_utc": "2026-09-14T08:49:40.625927Z",
+        "command_argv": [
+          "/root/workspace/novagenesis/cmake-build-debug/ContentApp",
+          "/root/workspace/novagenesis/IO/Repository1/",
+          "Repository"
+        ],
+        "wrapper": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+        "cwd": "/root/workspace/novagenesis/cmake-build-debug",
+        "launched_utc": "2026-09-14T08:49:40.625940Z",
+        "status": "stopped",
+        "stopped_utc": "2026-09-14T08:52:32.610012Z",
+        "signals": [
+          "SIGTERM"
+        ]
+      },
+      "identity_matches": false,
+      "members": []
+    },
+    {
+      "kind": "monitor",
+      "record": {
+        "trial_id": "e7-l5-direct-dfb95c9",
+        "role": "monitor",
+        "pid": 2253,
+        "pgid": 2253,
+        "sid": 2253,
+        "starttime": 1387,
+        "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+        "exe": "/usr/bin/python3.12",
+        "argv": [
+          "/usr/bin/python3",
+          "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_trial_helper.py",
+          "monitor"
+        ],
+        "captured_utc": "2026-09-14T08:49:36.853432Z"
+      },
+      "identity_matches": false,
+      "members": []
+    }
+  ],
+  "ipc": {
+    "shm": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Shared Memory Segments --------\nkey        shmid      owner      perms      bytes      nattch     status      \n0x0000000b 0          root       666        33554532   0                       \n0x0000000c 1          root       666        33554532   0                       \n0x0000000d 2          root       666        33554532   0                       \n0x0000000e 3          root       666        33554532   0                       \n0x13d6b3c8 4          root       666        33554532   0                       \n0x13d6b3c9 5          root       666        33554532   0                       \n0x13d6b3ca 6          root       666        33554532   0                       \n0x13d6b3cb 7          root       666        33554532   0                       \n\n",
+      "stderr": ""
+    },
+    "semaphores": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Semaphore Arrays --------\nkey        semid      owner      perms      nsems     \n\n",
+      "stderr": ""
+    }
+  },
+  "ipc_new_ids": {
+    "shm": [],
+    "semaphores": []
+  },
+  "utc": "2026-09-14T08:52:37.398854Z"
+}

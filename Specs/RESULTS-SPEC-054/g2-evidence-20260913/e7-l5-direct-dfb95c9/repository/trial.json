@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+  "prepared_utc": "2026-09-14T08:49:36.652182Z",
+  "sealed": true,
+  "remote_pid": 2246,
+  "lock_path": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-trial.lock",
+  "ipc_before": {
+    "shm": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Shared Memory Segments --------\nkey        shmid      owner      perms      bytes      nattch     status      \n\n",
+      "stderr": ""
+    },
+    "semaphores": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Semaphore Arrays --------\nkey        semid      owner      perms      nsems     \n\n",
+      "stderr": ""
+    }
+  },
+  "log_quota_bytes": 67108864,
+  "metadata": {
+    "scenario": "L5",
+    "debug_profile": "obs-normal",
+    "contract": "L5"
+  },
+  "sealed_utc": "2026-09-14T08:52:36.265883Z"
+}

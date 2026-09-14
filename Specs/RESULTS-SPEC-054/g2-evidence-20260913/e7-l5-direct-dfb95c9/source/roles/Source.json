@@ -1,0 +1,32 @@
+{
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "role": "Source",
+  "pid": 2301,
+  "pgid": 2301,
+  "sid": 2301,
+  "starttime": 1679,
+  "boot_id": "69194be6-1dd3-4c0d-84bc-dc9037f504e2",
+  "exe": "/usr/bin/python3.12",
+  "argv": [
+    "/usr/bin/python3",
+    "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+    "--",
+    "/root/workspace/novagenesis/cmake-build-debug/ContentApp",
+    "/root/workspace/novagenesis/IO/SourceStaging/e7-direct-5d54f32/",
+    "Source"
+  ],
+  "captured_utc": "2026-09-14T08:49:41.683524Z",
+  "command_argv": [
+    "/root/workspace/novagenesis/cmake-build-debug/ContentApp",
+    "/root/workspace/novagenesis/IO/SourceStaging/e7-direct-5d54f32/",
+    "Source"
+  ],
+  "wrapper": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+  "cwd": "/root/workspace/novagenesis/cmake-build-debug",
+  "launched_utc": "2026-09-14T08:49:41.683540Z",
+  "status": "stopped",
+  "stopped_utc": "2026-09-14T08:52:32.596209Z",
+  "signals": [
+    "SIGTERM"
+  ]
+}

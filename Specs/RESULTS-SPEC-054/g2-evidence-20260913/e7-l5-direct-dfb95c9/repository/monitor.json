@@ -1,0 +1,16 @@
+{
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "role": "monitor",
+  "pid": 2253,
+  "pgid": 2253,
+  "sid": 2253,
+  "starttime": 1387,
+  "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4",
+  "exe": "/usr/bin/python3.12",
+  "argv": [
+    "/usr/bin/python3",
+    "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_trial_helper.py",
+    "monitor"
+  ],
+  "captured_utc": "2026-09-14T08:49:36.853432Z"
+}

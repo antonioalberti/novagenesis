@@ -1,0 +1,48 @@
+{"utc": "2026-09-14T08:49:36.653991Z", "kind": "prepared", "trial_id": "e7-l5-direct-dfb95c9", "boot_id": "515ad8f3-fcbc-453f-9206-73c02a4dcaf4"}
+{"utc": "2026-09-14T08:49:36.853608Z", "kind": "monitor_started", "pid": 2253, "pgid": 2253}
+{"utc": "2026-09-14T08:49:36.893810Z", "kind": "monitor_loop", "pid": 2253}
+{"utc": "2026-09-14T08:49:37.455956Z", "kind": "lease_renewed", "sequence": 1, "expires_epoch": 1789375807.4556582}
+{"utc": "2026-09-14T08:49:37.849561Z", "kind": "role_started", "role": "PGCS-Repository", "pid": 2262, "pgid": 2262, "argv": ["/root/workspace/novagenesis/cmake-build-debug/PGCS", "/root/workspace/novagenesis/IO/PGCS/", "0", "Intra_Domain", "-p", "Ethernet", "Intra_Domain", "eth0", "08:00:27:79:bb:15", "1200"]}
+{"utc": "2026-09-14T08:49:38.248253Z", "kind": "lease_renewed", "sequence": 2, "expires_epoch": 1789375808.247937}
+{"utc": "2026-09-14T08:49:39.042306Z", "kind": "lease_renewed", "sequence": 3, "expires_epoch": 1789375809.0419772}
+{"utc": "2026-09-14T08:49:40.626117Z", "kind": "role_started", "role": "Repository", "pid": 2282, "pgid": 2282, "argv": ["/root/workspace/novagenesis/cmake-build-debug/ContentApp", "/root/workspace/novagenesis/IO/Repository1/", "Repository"]}
+{"utc": "2026-09-14T08:49:41.023622Z", "kind": "lease_renewed", "sequence": 4, "expires_epoch": 1789375811.0232677}
+{"utc": "2026-09-14T08:49:41.820952Z", "kind": "lease_renewed", "sequence": 5, "expires_epoch": 1789375811.8206334}
+{"utc": "2026-09-14T08:49:42.419325Z", "kind": "lease_renewed", "sequence": 6, "expires_epoch": 1789375812.419001}
+{"utc": "2026-09-14T08:49:48.197687Z", "kind": "lease_renewed", "sequence": 7, "expires_epoch": 1789375818.197351}
+{"utc": "2026-09-14T08:49:54.054997Z", "kind": "lease_renewed", "sequence": 8, "expires_epoch": 1789375824.0545669}
+{"utc": "2026-09-14T08:49:59.928632Z", "kind": "lease_renewed", "sequence": 9, "expires_epoch": 1789375829.9282932}
+{"utc": "2026-09-14T08:50:05.703076Z", "kind": "lease_renewed", "sequence": 10, "expires_epoch": 1789375835.7027705}
+{"utc": "2026-09-14T08:50:11.489512Z", "kind": "lease_renewed", "sequence": 11, "expires_epoch": 1789375841.489159}
+{"utc": "2026-09-14T08:50:17.350044Z", "kind": "lease_renewed", "sequence": 12, "expires_epoch": 1789375847.3495684}
+{"utc": "2026-09-14T08:50:23.198338Z", "kind": "lease_renewed", "sequence": 13, "expires_epoch": 1789375853.198019}
+{"utc": "2026-09-14T08:50:29.014715Z", "kind": "lease_renewed", "sequence": 14, "expires_epoch": 1789375859.0143578}
+{"utc": "2026-09-14T08:50:34.795121Z", "kind": "lease_renewed", "sequence": 15, "expires_epoch": 1789375864.794796}
+{"utc": "2026-09-14T08:50:40.573995Z", "kind": "lease_renewed", "sequence": 16, "expires_epoch": 1789375870.5736635}
+{"utc": "2026-09-14T08:50:46.510581Z", "kind": "lease_renewed", "sequence": 17, "expires_epoch": 1789375876.5102444}
+{"utc": "2026-09-14T08:50:52.292353Z", "kind": "lease_renewed", "sequence": 18, "expires_epoch": 1789375882.292035}
+{"utc": "2026-09-14T08:50:58.175518Z", "kind": "lease_renewed", "sequence": 19, "expires_epoch": 1789375888.1751747}
+{"utc": "2026-09-14T08:51:03.960049Z", "kind": "lease_renewed", "sequence": 20, "expires_epoch": 1789375893.9597056}
+{"utc": "2026-09-14T08:51:09.741430Z", "kind": "lease_renewed", "sequence": 21, "expires_epoch": 1789375899.7410913}
+{"utc": "2026-09-14T08:51:15.524071Z", "kind": "lease_renewed", "sequence": 22, "expires_epoch": 1789375905.5237393}
+{"utc": "2026-09-14T08:51:21.387521Z", "kind": "lease_renewed", "sequence": 23, "expires_epoch": 1789375911.3871248}
+{"utc": "2026-09-14T08:51:27.231477Z", "kind": "lease_renewed", "sequence": 24, "expires_epoch": 1789375917.2311332}
+{"utc": "2026-09-14T08:51:33.033746Z", "kind": "lease_renewed", "sequence": 25, "expires_epoch": 1789375923.0334253}
+{"utc": "2026-09-14T08:51:38.817188Z", "kind": "lease_renewed", "sequence": 26, "expires_epoch": 1789375928.8168669}
+{"utc": "2026-09-14T08:51:44.602976Z", "kind": "lease_renewed", "sequence": 27, "expires_epoch": 1789375934.6026545}
+{"utc": "2026-09-14T08:51:50.382952Z", "kind": "lease_renewed", "sequence": 28, "expires_epoch": 1789375940.382633}
+{"utc": "2026-09-14T08:51:56.164979Z", "kind": "lease_renewed", "sequence": 29, "expires_epoch": 1789375946.1646707}
+{"utc": "2026-09-14T08:52:01.988712Z", "kind": "lease_renewed", "sequence": 30, "expires_epoch": 1789375951.9883657}
+{"utc": "2026-09-14T08:52:08.036584Z", "kind": "lease_renewed", "sequence": 31, "expires_epoch": 1789375958.0361674}
+{"utc": "2026-09-14T08:52:14.132618Z", "kind": "lease_renewed", "sequence": 32, "expires_epoch": 1789375964.1322722}
+{"utc": "2026-09-14T08:52:19.937449Z", "kind": "lease_renewed", "sequence": 33, "expires_epoch": 1789375969.937101}
+{"utc": "2026-09-14T08:52:25.722923Z", "kind": "lease_renewed", "sequence": 34, "expires_epoch": 1789375975.7226028}
+{"utc": "2026-09-14T08:52:31.578210Z", "kind": "lease_renewed", "sequence": 35, "expires_epoch": 1789375981.577757}
+{"utc": "2026-09-14T08:52:32.610408Z", "kind": "role_stopped", "role": "Repository", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:52:33.617325Z", "kind": "role_stopped", "role": "PGCS-Repository", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:52:36.266236Z", "kind": "sealed"}
+{"utc": "2026-09-14T08:52:36.476508Z", "kind": "inventory", "process_count": 3}
+{"utc": "2026-09-14T08:52:36.941003Z", "kind": "inventory", "process_count": 3}
+{"utc": "2026-09-14T08:52:37.020359Z", "kind": "role_stop_refused", "role": "PGCS-Repository", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:52:37.025554Z", "kind": "role_stop_refused", "role": "Repository", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:52:37.399303Z", "kind": "inventory", "process_count": 3}

@@ -1,0 +1,46 @@
+{
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "role": "PGCS-Source",
+  "pid": 2258,
+  "pgid": 2258,
+  "sid": 2258,
+  "starttime": 1242,
+  "boot_id": "69194be6-1dd3-4c0d-84bc-dc9037f504e2",
+  "exe": "/usr/bin/python3.12",
+  "argv": [
+    "/usr/bin/python3",
+    "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+    "--",
+    "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+    "/root/workspace/novagenesis/IO/PGCS/",
+    "0",
+    "Intra_Domain",
+    "-p",
+    "Ethernet",
+    "Intra_Domain",
+    "eth0",
+    "08:00:27:65:00:08",
+    "1200"
+  ],
+  "captured_utc": "2026-09-14T08:49:37.320468Z",
+  "command_argv": [
+    "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+    "/root/workspace/novagenesis/IO/PGCS/",
+    "0",
+    "Intra_Domain",
+    "-p",
+    "Ethernet",
+    "Intra_Domain",
+    "eth0",
+    "08:00:27:65:00:08",
+    "1200"
+  ],
+  "wrapper": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+  "cwd": "/root/workspace/novagenesis/cmake-build-debug",
+  "launched_utc": "2026-09-14T08:49:37.320480Z",
+  "status": "stopped",
+  "stopped_utc": "2026-09-14T08:52:34.583059Z",
+  "signals": [
+    "SIGTERM"
+  ]
+}

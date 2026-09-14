@@ -1,0 +1,150 @@
+{
+  "trial_id": "e7-l5-direct-dfb95c9",
+  "scenario": "L5",
+  "debug_profile": "obs-normal",
+  "runtime_result": "PASS",
+  "teardown_result": "PASS",
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "controller-events.jsonl",
+      "size": 8358,
+      "sha256": "bcd4c9e765f7fc0b376c5ea414b4e9136309a97f2e51cb683a68139440efb93c"
+    },
+    {
+      "path": "repository/events.jsonl",
+      "size": 5784,
+      "sha256": "572df112ab34e05986688afba7aed60bc0ba8d697c02e205f6f6a1cf603704e9"
+    },
+    {
+      "path": "repository/inventory.json",
+      "size": 4813,
+      "sha256": "195bbdc2b05b646a6c13d6a993daba3349ba82dce847283e01c65a09e11861fe"
+    },
+    {
+      "path": "repository/lease.json",
+      "size": 183,
+      "sha256": "cfc4b3f4ce5e865b1bffa87028d011aece7843b6348294596b1e5041aceda890"
+    },
+    {
+      "path": "repository/logs/PGCS-Repository/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "repository/logs/PGCS-Repository/stdout.log",
+      "size": 3850,
+      "sha256": "8d79066229c08c7cc2dd4915b2098443746cb68c3614b944e40f4731629ea6d9"
+    },
+    {
+      "path": "repository/logs/Repository/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "repository/logs/Repository/stdout.log",
+      "size": 5090,
+      "sha256": "17711f675f6e40fc2a0e24b332dafbfa799a6ced3b9b60da56783eb4a4246117"
+    },
+    {
+      "path": "repository/logs/monitor.log",
+      "size": 42,
+      "sha256": "28a19f938f5de14a83b35a36d4950114509d60fff12773168664bdd26851c536"
+    },
+    {
+      "path": "repository/monitor.json",
+      "size": 405,
+      "sha256": "08f175cae4f57f9a209a2cd13eae069e6107e55f044794a5e26e03a68f062bf0"
+    },
+    {
+      "path": "repository/roles/PGCS-Repository.json",
+      "size": 1192,
+      "sha256": "9ed9a47037329d6508ddb84c5a0244c0d8bb70a6a98971e8f4c35cb8dfe8f715"
+    },
+    {
+      "path": "repository/roles/Repository.json",
+      "size": 1001,
+      "sha256": "623a13a596e3bd97991ac1c3bcef733ed5cbb1ba645a1603d2031881a9c365ee"
+    },
+    {
+      "path": "repository/trial.json",
+      "size": 962,
+      "sha256": "6627a6999468ac85f9f8ca2c9497e4fbe4f06be41608ddf7ec6fb9e446504eb1"
+    },
+    {
+      "path": "source/events.jsonl",
+      "size": 6267,
+      "sha256": "05acd6887d79faef2628409c90fa515341ee2329b234c82cf9952b08bd3ee521"
+    },
+    {
+      "path": "source/inventory.json",
+      "size": 6385,
+      "sha256": "0a915986e74e3151bf6e673492de9b3e1a3e6c96a56f2b32f73c19e54231d9af"
+    },
+    {
+      "path": "source/lease.json",
+      "size": 183,
+      "sha256": "923bb7b1524a009f7a7b385760f9b1478374343f87f58fcbee8a7af0e4a9dc1d"
+    },
+    {
+      "path": "source/logs/NRNCS-Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/logs/NRNCS-Source/stdout.log",
+      "size": 9619,
+      "sha256": "503248643d838e34126c55bf355d5a691f655c0359d418156e75dec2ce5de597"
+    },
+    {
+      "path": "source/logs/PGCS-Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/logs/PGCS-Source/stdout.log",
+      "size": 3854,
+      "sha256": "39219e9297188e90d4d166ce974dd1343b321a7cae5b1b7d47b3e801385ab614"
+    },
+    {
+      "path": "source/logs/Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/logs/Source/stdout.log",
+      "size": 5861,
+      "sha256": "a80e2cabeb25c1297adb351412cbb4cee241123981b42c1842e9f4fa3073bada"
+    },
+    {
+      "path": "source/logs/monitor.log",
+      "size": 42,
+      "sha256": "28a19f938f5de14a83b35a36d4950114509d60fff12773168664bdd26851c536"
+    },
+    {
+      "path": "source/monitor.json",
+      "size": 405,
+      "sha256": "6355aa1284031abc558cea53c1a5f33357124780d4af970c5fbd75bc07eedbe2"
+    },
+    {
+      "path": "source/roles/NRNCS-Source.json",
+      "size": 945,
+      "sha256": "919ded1bad5d5edf2905819726670d61e7331e600954db9a14ee8246500997dc"
+    },
+    {
+      "path": "source/roles/PGCS-Source.json",
+      "size": 1188,
+      "sha256": "aa1388a47541e45b3e3f25b2d1976a7ecf4b78a236d66c82a166444c22503f62"
+    },
+    {
+      "path": "source/roles/Source.json",
+      "size": 1029,
+      "sha256": "8e880f6ab62c1266f4e438fc54076bdfb31315cc1cef54507021fbb10ae4806c"
+    },
+    {
+      "path": "source/trial.json",
+      "size": 962,
+      "sha256": "b4034954f0f6f0b9c4fd0039e29b470ec40c163afd80a576cee5b800652771e2"
+    }
+  ]
+}

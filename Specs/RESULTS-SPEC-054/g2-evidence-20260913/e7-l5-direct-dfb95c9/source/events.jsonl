@@ -1,0 +1,51 @@
+{"utc": "2026-09-14T08:49:35.745104Z", "kind": "prepared", "trial_id": "e7-l5-direct-dfb95c9", "boot_id": "69194be6-1dd3-4c0d-84bc-dc9037f504e2"}
+{"utc": "2026-09-14T08:49:35.942762Z", "kind": "monitor_started", "pid": 2253, "pgid": 2253}
+{"utc": "2026-09-14T08:49:35.981413Z", "kind": "monitor_loop", "pid": 2253}
+{"utc": "2026-09-14T08:49:37.320635Z", "kind": "role_started", "role": "PGCS-Source", "pid": 2258, "pgid": 2258, "argv": ["/root/workspace/novagenesis/cmake-build-debug/PGCS", "/root/workspace/novagenesis/IO/PGCS/", "0", "Intra_Domain", "-p", "Ethernet", "Intra_Domain", "eth0", "08:00:27:65:00:08", "1200"]}
+{"utc": "2026-09-14T08:49:37.516781Z", "kind": "lease_renewed", "sequence": 1, "expires_epoch": 1789375807.516465}
+{"utc": "2026-09-14T08:49:38.315057Z", "kind": "lease_renewed", "sequence": 2, "expires_epoch": 1789375808.3147092}
+{"utc": "2026-09-14T08:49:38.907219Z", "kind": "role_started", "role": "NRNCS-Source", "pid": 2278, "pgid": 2278, "argv": ["/root/workspace/novagenesis/cmake-build-debug/NRNCS", "/root/workspace/novagenesis/IO/NRNCS/"]}
+{"utc": "2026-09-14T08:49:39.104115Z", "kind": "lease_renewed", "sequence": 3, "expires_epoch": 1789375809.1037629}
+{"utc": "2026-09-14T08:49:41.092926Z", "kind": "lease_renewed", "sequence": 4, "expires_epoch": 1789375811.0925894}
+{"utc": "2026-09-14T08:49:41.683705Z", "kind": "role_started", "role": "Source", "pid": 2301, "pgid": 2301, "argv": ["/root/workspace/novagenesis/cmake-build-debug/ContentApp", "/root/workspace/novagenesis/IO/SourceStaging/e7-direct-5d54f32/", "Source"]}
+{"utc": "2026-09-14T08:49:41.888992Z", "kind": "lease_renewed", "sequence": 5, "expires_epoch": 1789375811.8886654}
+{"utc": "2026-09-14T08:49:42.487700Z", "kind": "lease_renewed", "sequence": 6, "expires_epoch": 1789375812.4873805}
+{"utc": "2026-09-14T08:49:48.269661Z", "kind": "lease_renewed", "sequence": 7, "expires_epoch": 1789375818.2693405}
+{"utc": "2026-09-14T08:49:54.103097Z", "kind": "lease_renewed", "sequence": 8, "expires_epoch": 1789375824.1027024}
+{"utc": "2026-09-14T08:49:59.998380Z", "kind": "lease_renewed", "sequence": 9, "expires_epoch": 1789375829.9980116}
+{"utc": "2026-09-14T08:50:05.773447Z", "kind": "lease_renewed", "sequence": 10, "expires_epoch": 1789375835.7731214}
+{"utc": "2026-09-14T08:50:11.550464Z", "kind": "lease_renewed", "sequence": 11, "expires_epoch": 1789375841.5500681}
+{"utc": "2026-09-14T08:50:17.379167Z", "kind": "lease_renewed", "sequence": 12, "expires_epoch": 1789375847.3787787}
+{"utc": "2026-09-14T08:50:23.267533Z", "kind": "lease_renewed", "sequence": 13, "expires_epoch": 1789375853.2672095}
+{"utc": "2026-09-14T08:50:29.082590Z", "kind": "lease_renewed", "sequence": 14, "expires_epoch": 1789375859.082266}
+{"utc": "2026-09-14T08:50:34.865736Z", "kind": "lease_renewed", "sequence": 15, "expires_epoch": 1789375864.8653998}
+{"utc": "2026-09-14T08:50:40.643176Z", "kind": "lease_renewed", "sequence": 16, "expires_epoch": 1789375870.6428537}
+{"utc": "2026-09-14T08:50:46.579848Z", "kind": "lease_renewed", "sequence": 17, "expires_epoch": 1789375876.5795178}
+{"utc": "2026-09-14T08:50:52.362770Z", "kind": "lease_renewed", "sequence": 18, "expires_epoch": 1789375882.3624458}
+{"utc": "2026-09-14T08:50:58.202695Z", "kind": "lease_renewed", "sequence": 19, "expires_epoch": 1789375888.20223}
+{"utc": "2026-09-14T08:51:04.023378Z", "kind": "lease_renewed", "sequence": 20, "expires_epoch": 1789375894.0230572}
+{"utc": "2026-09-14T08:51:09.810091Z", "kind": "lease_renewed", "sequence": 21, "expires_epoch": 1789375899.809734}
+{"utc": "2026-09-14T08:51:15.591689Z", "kind": "lease_renewed", "sequence": 22, "expires_epoch": 1789375905.5913637}
+{"utc": "2026-09-14T08:51:21.420898Z", "kind": "lease_renewed", "sequence": 23, "expires_epoch": 1789375911.4204082}
+{"utc": "2026-09-14T08:51:27.293745Z", "kind": "lease_renewed", "sequence": 24, "expires_epoch": 1789375917.2934089}
+{"utc": "2026-09-14T08:51:33.103030Z", "kind": "lease_renewed", "sequence": 25, "expires_epoch": 1789375923.1026883}
+{"utc": "2026-09-14T08:51:38.886022Z", "kind": "lease_renewed", "sequence": 26, "expires_epoch": 1789375928.8856719}
+{"utc": "2026-09-14T08:51:44.670726Z", "kind": "lease_renewed", "sequence": 27, "expires_epoch": 1789375934.6703966}
+{"utc": "2026-09-14T08:51:50.452273Z", "kind": "lease_renewed", "sequence": 28, "expires_epoch": 1789375940.4519634}
+{"utc": "2026-09-14T08:51:56.236531Z", "kind": "lease_renewed", "sequence": 29, "expires_epoch": 1789375946.2362118}
+{"utc": "2026-09-14T08:52:02.042884Z", "kind": "lease_renewed", "sequence": 30, "expires_epoch": 1789375952.0424614}
+{"utc": "2026-09-14T08:52:07.984904Z", "kind": "lease_renewed", "sequence": 31, "expires_epoch": 1789375957.9844751}
+{"utc": "2026-09-14T08:52:14.195756Z", "kind": "lease_renewed", "sequence": 32, "expires_epoch": 1789375964.195436}
+{"utc": "2026-09-14T08:52:19.984653Z", "kind": "lease_renewed", "sequence": 33, "expires_epoch": 1789375969.9843802}
+{"utc": "2026-09-14T08:52:25.790408Z", "kind": "lease_renewed", "sequence": 34, "expires_epoch": 1789375975.790086}
+{"utc": "2026-09-14T08:52:31.599477Z", "kind": "lease_renewed", "sequence": 35, "expires_epoch": 1789375981.599094}
+{"utc": "2026-09-14T08:52:32.596697Z", "kind": "role_stopped", "role": "Source", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:52:33.572270Z", "kind": "role_stopped", "role": "NRNCS-Source", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:52:34.583556Z", "kind": "role_stopped", "role": "PGCS-Source", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:52:34.796668Z", "kind": "sealed"}
+{"utc": "2026-09-14T08:52:35.013216Z", "kind": "inventory", "process_count": 4}
+{"utc": "2026-09-14T08:52:35.100077Z", "kind": "role_stop_refused", "role": "NRNCS-Source", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:52:35.105703Z", "kind": "role_stop_refused", "role": "PGCS-Source", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:52:35.110526Z", "kind": "role_stop_refused", "role": "Source", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:52:35.489514Z", "kind": "inventory", "process_count": 4}
+{"utc": "2026-09-14T08:52:35.960166Z", "kind": "inventory", "process_count": 4}
