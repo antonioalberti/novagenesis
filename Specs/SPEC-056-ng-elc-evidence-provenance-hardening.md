@@ -311,4 +311,4 @@ G0/G10 remain blocked until their own clean-candidate and release requirements a
 
 ## 11. Incremento verificado — offline verifier wiring
 
-Commit `a571e7e` wires the local lifecycle to invoke `verify_bundle()` after sealing, persists a stable `offline_verification` summary and reason codes, and fails closed on tampered/missing evidence while preserving remote schema-v1 behaviour. Targeted lifecycle/verifier regressions pass. Deterministic workload generation, complete R06 provenance/build linkage, ownership hardening and local acceptance remain open under this SPEC.
+Commits `a571e7e` and `dbf1241` wire the local lifecycle to invoke `verify_bundle()` after sealing and add the R02 deterministic five-file workload, initial Repository-empty/aliasing checks, expected workload map and oracle comparison fields. Remote schema-v1 behaviour remains preserved. Complete R06 provenance/build linkage, ownership hardening and local acceptance remain open under this SPEC.
