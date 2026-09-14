@@ -1,0 +1,11 @@
+role=source
+host=192.168.0.36
+guest_head=1af604dad66148618cc0e578c28adb4a9829e607
+guest_status_before:
+?? IO/NRNCS/Service_Accepted_439026220.txt
+?? IO/NRNCS/Service_Offer_1587924927.txt
+?? IO/NRNCS/manifest.sha256
+?? IO/PGCS/StressTest_Stats.txt
+?? IO/SourceStaging/00f2c4beb0a34c178135608e77553af1/Service_Accepted_439026220.txt
+?? IO/SourceStaging/00f2c4beb0a34c178135608e77553af1/Service_Offer_1587924927.txt
+?? IO/SourceStaging/00f2c4beb0a34c178135608e77553af1/manifest.sha256

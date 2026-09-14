@@ -1,0 +1,105 @@
+{
+  "trial_id": "g2-l2-fce8577",
+  "scenario": "L2",
+  "debug_profile": "obs-normal",
+  "runtime_result": "INCONCLUSIVE",
+  "teardown_result": "PASS",
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "controller-events.jsonl",
+      "size": 3215,
+      "sha256": "f2df56ba9c568adc0063bb10cede8a212e16abc8ef39d7bc2a8d998258ff625b"
+    },
+    {
+      "path": "repository/events.jsonl",
+      "size": 2119,
+      "sha256": "1e1304308db543f7dbfc39a441d000800dec4f662991ab65099cf7dbc4f77e18"
+    },
+    {
+      "path": "repository/inventory.json",
+      "size": 3176,
+      "sha256": "b125d71e7840cba779c1d1ac9a1c937bcf07c4dcfb07afe80749e35304372fd0"
+    },
+    {
+      "path": "repository/lease.json",
+      "size": 179,
+      "sha256": "c2968187e2d59cb27e0974a956d0fe2be98d68aa87f3e12d087ffb70b52c3e86"
+    },
+    {
+      "path": "repository/logs/PGCS-Repository/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "repository/logs/PGCS-Repository/stdout.log",
+      "size": 2825,
+      "sha256": "c310f4fd960bde1eaa52cf6efe0f872cdd3a3899e20ae22ab798ac1aedbb6daf"
+    },
+    {
+      "path": "repository/logs/monitor.log",
+      "size": 42,
+      "sha256": "28a19f938f5de14a83b35a36d4950114509d60fff12773168664bdd26851c536"
+    },
+    {
+      "path": "repository/monitor.json",
+      "size": 398,
+      "sha256": "15cf317701ce70196eb718ba2da417edca22a9f3a44f6467d67176d4edf06c20"
+    },
+    {
+      "path": "repository/roles/PGCS-Repository.json",
+      "size": 1185,
+      "sha256": "7c2c65b72d7772ec64153f46f052fff874a4e9c95ec95efd12f25dbef8591f55"
+    },
+    {
+      "path": "repository/trial.json",
+      "size": 955,
+      "sha256": "47445fca6098d467f1032ad2a7db39044ae88fa26f67f25c702360ba22da896d"
+    },
+    {
+      "path": "source/events.jsonl",
+      "size": 2108,
+      "sha256": "4d03e167c3ecfa8b2f0def2aaf93f72b1758be825ae4be98225a74d6171ef520"
+    },
+    {
+      "path": "source/inventory.json",
+      "size": 3172,
+      "sha256": "a3710cb985de3e708262e84ac8d01dae43c70bce0adab6b128aeab9935021bf4"
+    },
+    {
+      "path": "source/lease.json",
+      "size": 175,
+      "sha256": "42d2966de56c916e99d7a85d359305fcd551a021247e3787786f6d87959fab82"
+    },
+    {
+      "path": "source/logs/PGCS-Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/logs/PGCS-Source/stdout.log",
+      "size": 2829,
+      "sha256": "838151ff2a57fc0a92e990a238d3f169557b12aa7ceaf21ce615c72283445757"
+    },
+    {
+      "path": "source/logs/monitor.log",
+      "size": 42,
+      "sha256": "28a19f938f5de14a83b35a36d4950114509d60fff12773168664bdd26851c536"
+    },
+    {
+      "path": "source/monitor.json",
+      "size": 398,
+      "sha256": "a22ef3072b8409b5c6a6b4dd58fac4292b7bf6ead48eb1646825bc8cfdba1847"
+    },
+    {
+      "path": "source/roles/PGCS-Source.json",
+      "size": 1181,
+      "sha256": "508860f25db005066bd076b162bc1a168abdccaedae64c45de4fe04482a47efe"
+    },
+    {
+      "path": "source/trial.json",
+      "size": 955,
+      "sha256": "5512024678cb61d6ce99b20b1c0396d82a5fa8ec89f79a9fd7b472778c2f0db9"
+    }
+  ]
+}

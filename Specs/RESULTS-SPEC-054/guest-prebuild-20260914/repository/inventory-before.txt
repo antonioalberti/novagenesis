@@ -1,0 +1,8 @@
+role=repository
+host=192.168.0.61
+guest_head=1af604dad66148618cc0e578c28adb4a9829e607
+guest_status_before:
+?? IO/PGCS/StressTest_Stats.txt
+?? IO/Repository1/Service_Accepted_439026220.txt
+?? IO/Repository1/Service_Offer_1587924927.txt
+?? IO/Repository1/manifest.sha256

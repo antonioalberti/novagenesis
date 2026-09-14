@@ -1,0 +1,15 @@
+{
+  "trial_id": "g2-l2-466777b",
+  "scenario": "L2",
+  "debug_profile": "obs-normal",
+  "runtime_result": "INCONCLUSIVE",
+  "teardown_result": "PASS",
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "controller-events.jsonl",
+      "size": 641,
+      "sha256": "2c3b67f073ffabbf0a604ed447863d4d3e5ccc8f779a26e46bd0d603afb54960"
+    }
+  ]
+}

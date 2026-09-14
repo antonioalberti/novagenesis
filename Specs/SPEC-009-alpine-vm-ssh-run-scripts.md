@@ -1,8 +1,8 @@
 # SPEC-009 — Alpine VM SSH Run Scripts (per-process in dedicated terminal)
 
-**Status:** Hardening in progress (E1-E6 implemented; E7/acceptance pending)
+**Status:** Hardening implemented; E7/acceptance pending
 **Branch:** AIOPT3
-**Implementation commit:** pending frozen candidate; current hardening is in the working tree
+**Implementation commit:** `fce8577caab1ff2be053a23d2a8a7ba1d029ca78`
 **Date:** 2026-06-26  
 **Scope:** NovaGenesis ContentApp — 1core-1repo-1source scenario on Alpine VMs  
 **Stack:** Bash, SSH, gdb, PGCS/NRNCS/ContentApp (AIOPT3 branch)
@@ -225,7 +225,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 4. Terminal 4 → `bash Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
 5. Terminal 5 → `bash Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
 
-**Done when:** ContentApp Source mostra mensagens de descoberta de NRNCS/PGCS e inicia publicação de fotos; ContentApp Repository mostra recepção. Este smoke dos launchers é diagnóstico. A aceitação formal da release requer o NG-ELC em modo remoto, o commit congelado e os oráculos dos gates seguintes.
+**Done when:** ContentApp Source mostra mensagens de descoberta de NRNCS/PGCS e inicia publicação de fotos; ContentApp Repository mostra recepção. Este smoke dos launchers é diagnóstico. A aceitação formal da release requer o NG-ELC em modo remoto, o commit congelado e os oráculos dos gates seguintes. O trial canónico L2 de 2026-09-14 validou build/provenance, readiness dos dois PGCS e teardown, mas não fecha E7 nem payload.
 
 ---
 
@@ -278,7 +278,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 
 ## 12. Acceptance Criteria
 
-- [ ] E0-E7 executáveis e documentados; E7 continua pendente até novo ensaio no commit congelado
+- [ ] E0-E7 executáveis e documentados; E7 continua pendente porque o trial canónico L2 não substitui o cenário de cinco launchers/fotos
 - [ ] `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh` — executa PGCS na Source VM via SSH, foreground, gdb wrapper
 - [ ] `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh` — executa PGCS na Repo VM via SSH, foreground, gdb wrapper
 - [ ] `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh` — executa NRNCS na Source VM via SSH, foreground

@@ -1,0 +1,4 @@
+{"utc": "2026-09-14T08:07:38.815490+00:00", "event": "trial-start", "trial_id": "g2-l2-466777b", "scenario": "L2", "debug_profile": "obs-normal", "contract_level": "L2"}
+{"utc": "2026-09-14T08:07:46.255498+00:00", "event": "vms-restarted", "result": {"restarted": ["101", "102"], "statuses": [{"vm_id": "101", "returncode": 0, "stdout": "status: running\n", "stderr": ""}, {"vm_id": "102", "returncode": 0, "stdout": "status: running\n", "stderr": ""}]}}
+{"utc": "2026-09-14T08:07:56.270720+00:00", "event": "runtime-error", "error": "guest preflight failed on 192.168.0.36: ssh: connect to host 192.168.0.36 port 22: Connection timed out"}
+{"utc": "2026-09-14T08:07:56.271280+00:00", "event": "manifest-sealed", "manifest_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-054/g2-evidence-20260913/g2-l2-466777b/manifest.json"}

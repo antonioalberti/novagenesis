@@ -1,0 +1,5 @@
+branch=AIOPT3
+profile=normal
+pinned_commit=fce8577caab1ff2be053a23d2a8a7ba1d029ca78
+repository_guest=root@192.168.0.61
+source_guest=root@192.168.0.36

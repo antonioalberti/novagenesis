@@ -1,0 +1,99 @@
+{
+  "trial_id": "g2-l2-fce8577",
+  "boot_id": "b8c724c0-85f5-4af6-8c96-52395d35881e",
+  "processes": [
+    {
+      "kind": "role",
+      "record": {
+        "trial_id": "g2-l2-fce8577",
+        "role": "PGCS-Source",
+        "pid": 2257,
+        "pgid": 2257,
+        "sid": 2257,
+        "starttime": 1234,
+        "boot_id": "b8c724c0-85f5-4af6-8c96-52395d35881e",
+        "exe": "/usr/bin/python3.12",
+        "argv": [
+          "/usr/bin/python3",
+          "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+          "--",
+          "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+          "/root/workspace/novagenesis/IO/PGCS/",
+          "0",
+          "Intra_Domain",
+          "-p",
+          "Ethernet",
+          "Intra_Domain",
+          "eth0",
+          "08:00:27:65:00:08",
+          "1200"
+        ],
+        "captured_utc": "2026-09-14T08:13:28.449489Z",
+        "command_argv": [
+          "/root/workspace/novagenesis/cmake-build-debug/PGCS",
+          "/root/workspace/novagenesis/IO/PGCS/",
+          "0",
+          "Intra_Domain",
+          "-p",
+          "Ethernet",
+          "Intra_Domain",
+          "eth0",
+          "08:00:27:65:00:08",
+          "1200"
+        ],
+        "wrapper": "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_role_wrapper.py",
+        "cwd": "/root/workspace/novagenesis/cmake-build-debug",
+        "launched_utc": "2026-09-14T08:13:28.449503Z",
+        "status": "stopped",
+        "stopped_utc": "2026-09-14T08:14:00.605307Z",
+        "signals": [
+          "SIGTERM"
+        ]
+      },
+      "identity_matches": false,
+      "members": []
+    },
+    {
+      "kind": "monitor",
+      "record": {
+        "trial_id": "g2-l2-fce8577",
+        "role": "monitor",
+        "pid": 2252,
+        "pgid": 2252,
+        "sid": 2252,
+        "starttime": 1091,
+        "boot_id": "b8c724c0-85f5-4af6-8c96-52395d35881e",
+        "exe": "/usr/bin/python3.12",
+        "argv": [
+          "/usr/bin/python3",
+          "/root/workspace/novagenesis/Specs/RESULTS-SPEC-054/.ng-tools/ng_trial_helper.py",
+          "monitor"
+        ],
+        "captured_utc": "2026-09-14T08:13:27.016368Z"
+      },
+      "identity_matches": false,
+      "members": []
+    }
+  ],
+  "ipc": {
+    "shm": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Shared Memory Segments --------\nkey        shmid      owner      perms      bytes      nattch     status      \n0x0000000b 0          root       666        33554532   0                       \n0x0000000c 1          root       666        33554532   0                       \n0x0000000d 2          root       666        33554532   0                       \n0x0000000e 3          root       666        33554532   0                       \n\n",
+      "stderr": ""
+    },
+    "semaphores": {
+      "available": true,
+      "returncode": 0,
+      "ids": [],
+      "stdout": "\n------ Semaphore Arrays --------\nkey        semid      owner      perms      nsems     \n\n",
+      "stderr": ""
+    }
+  },
+  "ipc_new_ids": {
+    "shm": [],
+    "semaphores": []
+  },
+  "utc": "2026-09-14T08:14:01.919604Z"
+}

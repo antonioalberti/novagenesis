@@ -1,0 +1,18 @@
+{"utc": "2026-09-14T08:13:28.399396Z", "kind": "prepared", "trial_id": "g2-l2-fce8577", "boot_id": "5982052e-eccb-420e-b1c8-614f9f8486af"}
+{"utc": "2026-09-14T08:13:28.617760Z", "kind": "monitor_started", "pid": 2253, "pgid": 2253}
+{"utc": "2026-09-14T08:13:28.659626Z", "kind": "monitor_loop", "pid": 2253}
+{"utc": "2026-09-14T08:13:29.220576Z", "kind": "lease_renewed", "sequence": 1, "expires_epoch": 1789373639.2202241}
+{"utc": "2026-09-14T08:13:29.639308Z", "kind": "role_started", "role": "PGCS-Repository", "pid": 2262, "pgid": 2262, "argv": ["/root/workspace/novagenesis/cmake-build-debug/PGCS", "/root/workspace/novagenesis/IO/PGCS/", "0", "Intra_Domain", "-p", "Ethernet", "Intra_Domain", "eth0", "08:00:27:79:bb:15", "1200"]}
+{"utc": "2026-09-14T08:13:30.068345Z", "kind": "lease_renewed", "sequence": 2, "expires_epoch": 1789373640.0679736}
+{"utc": "2026-09-14T08:13:30.725773Z", "kind": "lease_renewed", "sequence": 3, "expires_epoch": 1789373640.7253773}
+{"utc": "2026-09-14T08:13:36.170090Z", "kind": "lease_renewed", "sequence": 4, "expires_epoch": 1789373646.1697505}
+{"utc": "2026-09-14T08:13:41.568283Z", "kind": "lease_renewed", "sequence": 5, "expires_epoch": 1789373651.567948}
+{"utc": "2026-09-14T08:13:46.994076Z", "kind": "lease_renewed", "sequence": 6, "expires_epoch": 1789373656.9937556}
+{"utc": "2026-09-14T08:13:52.393266Z", "kind": "lease_renewed", "sequence": 7, "expires_epoch": 1789373662.3929503}
+{"utc": "2026-09-14T08:13:57.789400Z", "kind": "lease_renewed", "sequence": 8, "expires_epoch": 1789373667.789081}
+{"utc": "2026-09-14T08:14:00.600588Z", "kind": "role_stopped", "role": "PGCS-Repository", "result": "STOPPED", "signals": ["SIGTERM"], "members": []}
+{"utc": "2026-09-14T08:14:02.850444Z", "kind": "sealed"}
+{"utc": "2026-09-14T08:14:03.058188Z", "kind": "inventory", "process_count": 2}
+{"utc": "2026-09-14T08:14:03.516926Z", "kind": "inventory", "process_count": 2}
+{"utc": "2026-09-14T08:14:03.688091Z", "kind": "role_stop_refused", "role": "PGCS-Repository", "reason": "identity_unknown"}
+{"utc": "2026-09-14T08:14:03.977956Z", "kind": "inventory", "process_count": 2}
