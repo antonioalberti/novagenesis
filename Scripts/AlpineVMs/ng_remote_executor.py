@@ -336,6 +336,26 @@ def guest_preflight(config: Mapping[str, str], host: str, roles: list[dict[str, 
     return result
 
 
+def wait_for_guest_preflight(config: Mapping[str, str], host: str, roles: list[dict[str, Any]], deadline: float) -> dict[str, Any]:
+    """Wait for a rebooted guest's SSH/preflight path without masking real failures."""
+    transient_markers = (
+        "Connection timed out",
+        "Connection refused",
+        "No route to host",
+        "Connection reset",
+    )
+    while True:
+        try:
+            return guest_preflight(config, host, roles)
+        except RuntimeError as exc:
+            if not any(marker in str(exc) for marker in transient_markers):
+                raise
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise RuntimeError(f"guest preflight deadline expired on {host}: {exc}") from exc
+            time.sleep(min(2.0, remaining))
+
+
 def load_plan(path: Path, mode: str = "remote") -> dict[str, Any]:
     plan = json.loads(path.read_text(encoding="utf-8"))
     validate_plan(plan, mode=mode)
@@ -1425,8 +1445,9 @@ def run_trial(args: argparse.Namespace) -> int:
             argv = expand_argv(role["command"], variables)
             cwd = expand_argv([role["cwd"]], variables)[0] if role.get("cwd") else None
             by_host[host].append({"name": role["name"], "argv": argv, "cwd": cwd})
+        preflight_deadline = time.monotonic() + float(plan.get("timeouts", {}).get("readiness", 240))
         for host in hosts:
-            preflight = guest_preflight(config, host, by_host[host])
+            preflight = wait_for_guest_preflight(config, host, by_host[host], preflight_deadline)
             local_record(evidence_dir / "controller-events.jsonl", "guest-preflight", host=host, result=preflight)
             if not preflight.get("ok", False):
                 raise RuntimeError(f"guest preflight rejected {host}")
