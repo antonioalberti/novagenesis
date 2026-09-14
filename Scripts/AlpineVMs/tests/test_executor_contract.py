@@ -12,6 +12,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import ng_remote_executor as executor
 from ng_remote_executor import (
     ConfigError,
     classify_result,
@@ -83,6 +84,24 @@ class ExecutorContractTests(unittest.TestCase):
         }
         result = load_config_from_env(env)
         self.assertEqual(result["NG_BUILD_PATH"], "/opt/ng/build-final")
+
+    def test_guest_preflight_generated_program_is_valid_python(self):
+        config = {
+            "SOURCE_VM_IP": "source",
+            "REPO_VM_IP": "repo",
+            "SOURCE_VM_IFACE": "eth0",
+            "REPO_VM_IFACE": "eth0",
+            "SOURCE_VM_MAC": "08:00:27:65:00:08",
+            "REPO_VM_MAC": "08:00:27:79:bb:15",
+            "NG_REPO_PATH": "/opt/ng",
+            "NG_REMOTE_EVIDENCE_PATH": "/var/ng",
+        }
+        roles = [{"name": "PGCS-Source", "argv": ["/opt/ng/build/PGCS"], "cwd": "/opt/ng/build"}]
+        response = subprocess.CompletedProcess([], 0, '{"ok": true}\n', "")
+        with patch.object(executor, "remote_shell", return_value=response) as remote:
+            executor.guest_preflight(config, "source", roles)
+        generated = remote.call_args.args[2][2]
+        compile(generated, "<guest-preflight>", "exec")
 
     def test_local_mode_has_a_distinct_explicit_configuration(self):
         root = Path(tempfile.mkdtemp(prefix="ng-elc-local-", dir=Path.home()))
