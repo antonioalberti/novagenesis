@@ -20,6 +20,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import ng_remote_executor as executor
+from evidence_verifier import CODE_TAMPERED, CODE_VALID, verify_bundle
 
 
 OWNER = "spec056-test-owner"
@@ -220,6 +221,114 @@ class Spec056FixtureRedTests(unittest.TestCase):
         self.assertFalse(launches)
         self.assertNotEqual(result["runtime_result"], "PASS")
         self.assertNotEqual(rc, 0)
+
+
+class Spec056LocalVerifierLifecycleTests(unittest.TestCase):
+    def _local_trial(self, root: Path, trial: str = "verifier-lifecycle") -> int:
+        build = root / "build"
+        io = root / "io"
+        source = io / "Source1"
+        repository = io / "Repository1"
+        evidence = root / "evidence"
+        for path in (build, source, repository, evidence):
+            path.mkdir(parents=True, exist_ok=True)
+        (source / "a.jpg").write_bytes(b"payload")
+        (repository / "a.jpg").write_bytes(b"payload")
+        code = "import time; print('READY', flush=True); time.sleep(2)"
+        roles = [
+            {
+                "name": name,
+                "vm": "local",
+                "command": [sys.executable, "-c", code],
+                "cwd": str(build),
+                "readiness": [{"id": "ready", "pattern": "READY"}],
+            }
+            for name in ["PGCS", "NRNCS", "Repository", "Source"]
+        ]
+        plan_path = root / "plan.json"
+        plan_path.write_text(json.dumps({
+            "schema_version": 1,
+            "roles": roles,
+            "timeouts": {"readiness": 2, "observation": 1, "total": 5},
+            "runtime_oracle": {
+                "type": "files",
+                "source": str(source),
+                "repository": str(repository),
+                "pattern": "*.jpg",
+                "expected_count": 1,
+                "hash": "sha256",
+            },
+        }), encoding="utf-8")
+        env = {
+            "NG_LOCAL_REPO_PATH": str(root),
+            "NG_LOCAL_BUILD_PATH": str(build),
+            "NG_LOCAL_IO_PATH": str(io),
+            "NG_LOCAL_EVIDENCE_PATH": str(evidence),
+        }
+        args = Namespace(
+            plan=str(plan_path),
+            scenario="local-intra-os",
+            debug_profile="obs-normal",
+            trial=trial,
+            env=env,
+        )
+        return executor.run_local_trial(args)
+
+    def test_local_lifecycle_verifies_the_sealed_schema_v2_bundle(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-local-verifier-", dir=Path.home()) as td:
+            root = Path(td)
+            rc = self._local_trial(root)
+            trial_dir = root / "evidence" / "verifier-lifecycle"
+            result = json.loads((trial_dir / "result.json").read_text(encoding="utf-8"))
+            persisted = json.loads((trial_dir / "offline-verification.json").read_text(encoding="utf-8"))
+            final_report = verify_bundle(trial_dir)
+
+        self.assertNotEqual(rc, 0, "this fixture is not a release-eligible provenance run")
+        self.assertEqual(persisted["code"], CODE_VALID)
+        self.assertEqual(result["offline_verification"]["code"], CODE_VALID)
+        self.assertEqual(final_report["code"], CODE_VALID)
+        self.assertFalse(final_report["accepted"])
+
+    def test_missing_required_evidence_is_persisted_as_failed_offline_verification(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-local-verifier-missing-", dir=Path.home()) as td:
+            root = Path(td)
+            original_seal = executor.write_evidence_manifest
+
+            def seal_without_oracle(evidence_dir, metadata, schema_version=None):
+                manifest = original_seal(evidence_dir, metadata, schema_version)
+                oracle = evidence_dir / "oracle.json"
+                if oracle.exists():
+                    oracle.unlink()
+                return manifest
+
+            with patch.object(executor, "write_evidence_manifest", side_effect=seal_without_oracle):
+                rc = self._local_trial(root, trial="missing-required-evidence")
+            trial_dir = root / "evidence" / "missing-required-evidence"
+            result = json.loads((trial_dir / "result.json").read_text(encoding="utf-8"))
+            report = verify_bundle(trial_dir)
+
+        self.assertNotEqual(rc, 0)
+        self.assertEqual(result["offline_verification"]["code"], CODE_TAMPERED)
+        self.assertEqual(result["evidence_result"], "INCOMPLETE")
+        self.assertFalse(result["local_acceptance_eligible"])
+        self.assertNotEqual(report["code"], CODE_VALID)
+        self.assertFalse(report["accepted"])
+
+    def test_remote_manifest_contract_remains_schema_v1(self):
+        with tempfile.TemporaryDirectory(prefix="spec056-remote-manifest-", dir=Path.home()) as td:
+            evidence_dir = Path(td)
+            (evidence_dir / "result.json").write_text("{}\n", encoding="utf-8")
+            manifest_path = executor.write_evidence_manifest(
+                evidence_dir,
+                {"trial_id": "remote-v1", "mode": "remote"},
+            )
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_sha256_exists = (evidence_dir / "manifest.sha256").is_file()
+            terminal_seal_exists = (evidence_dir / "terminal-seal.json").exists()
+
+        self.assertEqual(manifest["schema_version"], 1)
+        self.assertTrue(manifest_sha256_exists)
+        self.assertFalse(terminal_seal_exists)
 
 
 if __name__ == "__main__":

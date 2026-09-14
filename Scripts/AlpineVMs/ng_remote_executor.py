@@ -24,6 +24,8 @@ import uuid
 from pathlib import Path
 from typing import Any, Mapping
 
+from evidence_verifier import CODE_VALID, verify_bundle
+
 
 class ConfigError(ValueError):
     pass
@@ -457,7 +459,7 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
         raise ValueError("unsupported evidence schema version")
     entries = []
     for path in sorted(evidence_dir.rglob("*")):
-        if not path.is_file() or path.name in {"manifest.json", "manifest.sha256"}:
+        if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": digest})
@@ -473,6 +475,65 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
             encoding="utf-8",
         )
     return manifest_path
+
+
+def local_verification_summary(report: Mapping[str, Any]) -> dict[str, Any]:
+    """Persist the stable offline-verifier verdict without bundle-local paths."""
+    code = report.get("code", "NGELC-VERIFIER-ERROR")
+    accepted = bool(report.get("accepted", False)) if code == CODE_VALID else False
+    reason_codes = [code]
+    if code == CODE_VALID and not accepted:
+        reason_codes.append("NGELC-ACCEPTANCE-INELIGIBLE")
+    summary = {
+        "code": code,
+        "integrity": bool(report.get("integrity", False)),
+        "accepted": accepted,
+        "reason_codes": reason_codes,
+        "errors": list(report.get("errors", [])),
+    }
+    if report.get("schema_version") is not None:
+        summary["schema_version"] = report["schema_version"]
+    return summary
+
+
+def apply_local_verification(
+    result: dict[str, Any],
+    eligibility: dict[str, Any],
+    report: Mapping[str, Any],
+    runtime: str,
+    teardown_result: str,
+    evidence_result: str,
+) -> tuple[dict[str, Any], int, str]:
+    """Make local acceptance depend on the sealed bundle's offline verdict."""
+    summary = local_verification_summary(report)
+    result["offline_verification"] = summary
+    result["reason_codes"] = summary["reason_codes"]
+    if summary["code"] != CODE_VALID:
+        evidence_result = "INCOMPLETE"
+        eligibility["eligible"] = False
+        blocker = f"offline verification failed: {summary['code']}"
+        if blocker not in eligibility["blockers"]:
+            eligibility["blockers"].append(blocker)
+    elif not summary["accepted"]:
+        eligibility["eligible"] = False
+        blocker = "offline verification is not acceptance-eligible"
+        if blocker not in eligibility["blockers"]:
+            eligibility["blockers"].append(blocker)
+    code = classify_result(runtime, teardown_result, evidence_result)
+    # Keep the established local diagnostic/runtime code when runtime already
+    # failed; the verifier still marks evidence incomplete and eligibility false.
+    if summary["code"] != CODE_VALID and runtime in {"INCONCLUSIVE", "NOT_RUN", "ABORTED"} and teardown_result == "PASS":
+        code = 11
+    if not eligibility["eligible"] and code == 0:
+        code = 21
+    result.update({
+        "teardown_result": teardown_result,
+        "evidence_result": evidence_result,
+        "local_acceptance_eligible": eligibility["eligible"],
+        "acceptance_blockers": eligibility["blockers"],
+        "exit_code": code,
+    })
+    return result, code, evidence_result
 
 
 def local_ipc_ids(kind: str) -> set[str] | None:
@@ -1141,7 +1202,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     workload = local_prepare_v2_layout(evidence_dir, plan, contract, config, variables)
     provenance["plan_snapshot"] = True
     provenance["workload_verified"] = bool(workload["verified"])
-    provenance["evidence_schema_v2"] = False
+    provenance["evidence_schema_v2"] = True
     eligibility = local_acceptance_eligibility(provenance)
     provenance["acceptance_eligibility"] = eligibility
     (evidence_dir / "provenance.json").write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -1320,6 +1381,10 @@ def run_local_trial(args: argparse.Namespace) -> int:
         else:
             (evidence_dir / "artifacts" / "source").mkdir(parents=True, exist_ok=True)
             (evidence_dir / "artifacts" / "repository").mkdir(parents=True, exist_ok=True)
+            local_json_write(evidence_dir / "artifacts" / "source" / "_not-captured.json", {"schema_version": 2, "captured": False, "reason": "no file oracle"})
+            local_json_write(evidence_dir / "artifacts" / "repository" / "_not-captured.json", {"schema_version": 2, "captured": False, "reason": "no file oracle"})
+        if not processes:
+            local_json_write(evidence_dir / "roles" / "_not-launched.json", {"schema_version": 2, "launched": False, "reason": "preflight or readiness prevented launch"})
         local_json_write(evidence_dir / "oracle.json", oracle_snapshot)
         local_json_write(evidence_dir / "preservation.json", {"schema_version": 2, "verified": bool(oracle_snapshot.get("preservation_verified")), "before_temporary_cleanup": True, "oracle": "oracle.json"})
         local_json_write(evidence_dir / "inventory" / "pre-cleanup.json", {"schema_version": 2, "processes": local_process_snapshot(processes), "ipc": {"baseline": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}}})
@@ -1341,7 +1406,35 @@ def run_local_trial(args: argparse.Namespace) -> int:
     result_path = evidence_dir / "result.json"
     result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     try:
+        # Seal once before invoking the offline verifier, then reseal after its
+        # stable verdict is recorded. No evidence is mutated after the final seal.
+        local_record(events, "bundle-seal", phase="pre-verification")
         write_evidence_manifest(evidence_dir, {"trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result})
+        try:
+            verification = verify_bundle(evidence_dir)
+        except Exception as exc:
+            verification = {"code": "NGELC-VERIFIER-ERROR", "integrity": False, "accepted": False, "errors": [str(exc)]}
+        result, code, evidence_result = apply_local_verification(result, eligibility, verification, runtime, teardown_result, evidence_result)
+        local_json_write(evidence_dir / "offline-verification.json", result["offline_verification"])
+        result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        for _attempt in range(2):
+            local_record(events, "offline-verification", report=result["offline_verification"])
+            local_record(events, "bundle-seal", phase="final-verification")
+            write_evidence_manifest(evidence_dir, {"trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result})
+            try:
+                final_verification = verify_bundle(evidence_dir)
+            except Exception as exc:
+                final_verification = {"code": "NGELC-VERIFIER-ERROR", "integrity": False, "accepted": False, "errors": [str(exc)]}
+            expected_accepted = result["offline_verification"].get("accepted", False)
+            final_summary = local_verification_summary(final_verification)
+            if final_verification.get("code") == CODE_VALID and final_verification.get("accepted", False) == expected_accepted:
+                break
+            if final_summary == result["offline_verification"]:
+                # The failed verdict is already persisted in this sealed bundle.
+                break
+            result, code, evidence_result = apply_local_verification(result, eligibility, final_verification, runtime, teardown_result, evidence_result)
+            local_json_write(evidence_dir / "offline-verification.json", result["offline_verification"])
+            result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except OSError as exc:
         evidence_result = "INCOMPLETE"
         teardown_result = "UNKNOWN"
@@ -1349,7 +1442,10 @@ def run_local_trial(args: argparse.Namespace) -> int:
         result.update({"teardown_result": teardown_result, "evidence_result": evidence_result, "exit_code": code})
         result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         local_record(events, "manifest-error", error=str(exc))
-        write_evidence_manifest(evidence_dir, {"trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result})
+        try:
+            write_evidence_manifest(evidence_dir, {"trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result})
+        except OSError:
+            pass
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return code
 
