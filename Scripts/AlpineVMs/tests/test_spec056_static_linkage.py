@@ -64,6 +64,64 @@ def test_static_elf_identity_is_truthful_and_accepted(tmp_path: Path):
     )
 
 
+def test_full_static_build_linkage_accepts_typed_numeric_runtime_identity(tmp_path: Path):
+    binary = _compile_fixture(tmp_path, static=True)
+    binary_hash = _sha256(binary)
+    identity = runtime_library_identity({"Static": {"path": str(binary), "sha256": binary_hash}})
+    source = {
+        "head": "a" * 40,
+        "status": [],
+        "tree_sha256": "b" * 64,
+        "submodules": [],
+        "submodules_complete": True,
+        "index": {
+            "captured": True,
+            "sha256": "c" * 64,
+            "entries": [{"path": "input.txt", "mode": "100644", "blob_id": "d" * 40, "stage": 0}],
+        },
+        "index_sha256": "c" * 64,
+        "index_entries": [{"path": "input.txt", "mode": "100644", "blob_id": "d" * 40, "stage": 0}],
+        "content_snapshot": {"captured": True, "files": [], "entries": [], "errors": []},
+    }
+    compiler = str(Path(shutil.which("cc") or shutil.which("gcc")).resolve())
+    version = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0]
+    manifest = {
+        "schema_version": 1,
+        "source_head": source["head"],
+        "source_snapshot": source,
+        "recipe": {
+            "commands": [["cmake", "--build", "build"]],
+            "working_directory": "/src",
+            "executed": True,
+            "returncodes": [0],
+        },
+        "toolchain": {
+            "compiler": compiler,
+            "version": version,
+            "version_sha256": hashlib.sha256(version.encode()).hexdigest(),
+            "status": "ok",
+        },
+        "options": {"variant": "normal", "jobs": 1, "configure_only": False},
+        "runtime_library_identity": identity,
+        "binaries": {"Static": {"path": str(binary), "sha256": binary_hash}},
+    }
+
+    assert local_provenance.validate_build_linkage(
+        manifest,
+        source["head"],
+        manifest["binaries"],
+        source_state=source,
+        manifest_evidence={
+            "path": "/definitely-missing/build-manifest.json",
+            "size": 0,
+            "sha256": "e" * 64,
+            "preserved_path": "provenance/build-manifest.json",
+            "preserved_size": 0,
+            "preserved_sha256": "f" * 64,
+        },
+    ) is True
+
+
 def test_dynamic_ldd_identity_remains_accepted(tmp_path: Path):
     binary = _compile_fixture(tmp_path, static=False)
     identity = runtime_library_identity({"Dynamic": {"path": str(binary), "sha256": _sha256(binary)}})

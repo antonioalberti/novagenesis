@@ -913,15 +913,23 @@ _PLACEHOLDER_IDENTITY_RE = re.compile(
     r"^(?:$|<[^>]+>|unknown|unavailable|not[-_ ]?available|n/?a|none|null|placeholder|todo|tbd|dummy|example)$",
     re.IGNORECASE,
 )
+_RUNTIME_TYPED_NUMERIC_FIELDS = frozenset({"ldd_returncode", "library_count"})
 
 
-def _require_meaningful_identity(value: Any, field: str) -> None:
+def _require_meaningful_identity(
+    value: Any,
+    field: str,
+    *,
+    typed_numeric_fields: frozenset[str] = frozenset(),
+    typed_empty_fields: frozenset[str] = frozenset(),
+) -> None:
     """Reject empty, placeholder, and untyped identity structures.
 
     JSON numbers and booleans are valid *options* only when their containing
     record gives them an explicit type/meaning.  They are never meaningful
     identity values by themselves; accepting them lets ``{"id": false}`` or
-    ``{"version": 1}`` masquerade as provenance.
+    ``{"version": 1}`` masquerade as provenance.  A caller may allow a
+    closed set of known, integer-valued fields for a typed identity schema.
     """
     if value is None or isinstance(value, bool) or isinstance(value, (int, float)):
         raise ValueError(f"{field} identity is missing or has an invalid type")
@@ -936,7 +944,16 @@ def _require_meaningful_identity(value: Any, field: str) -> None:
             if not isinstance(key, str) or not key.strip():
                 raise ValueError(f"{field} contains an invalid key")
             if isinstance(item, (Mapping, list, tuple)):
-                _require_meaningful_identity(item, f"{field}.{key}")
+                if key in typed_empty_fields and isinstance(item, (list, tuple)) and not item:
+                    continue
+                _require_meaningful_identity(
+                    item,
+                    f"{field}.{key}",
+                    typed_numeric_fields=typed_numeric_fields,
+                    typed_empty_fields=typed_empty_fields,
+                )
+            elif key in typed_numeric_fields and isinstance(item, int) and not isinstance(item, bool):
+                continue
             elif item is None or isinstance(item, (bool, int, float)):
                 raise ValueError(f"{field}.{key} identity has an invalid type")
             elif isinstance(item, str) and _PLACEHOLDER_IDENTITY_RE.fullmatch(item.strip()):
@@ -948,7 +965,12 @@ def _require_meaningful_identity(value: Any, field: str) -> None:
         if not value:
             raise ValueError(f"{field} identity is missing")
         for number, item in enumerate(value):
-            _require_meaningful_identity(item, f"{field}[{number}]")
+            _require_meaningful_identity(
+                item,
+                f"{field}[{number}]",
+                typed_numeric_fields=typed_numeric_fields,
+                typed_empty_fields=typed_empty_fields,
+            )
         return
     raise ValueError(f"{field} identity has an invalid type")
 
@@ -1402,7 +1424,12 @@ def validate_build_linkage(
         runtime_identity = manifest.get("runtime_libraries") or manifest.get("runtime_library")
     if not isinstance(runtime_identity, Mapping) or not runtime_identity:
         raise ValueError("runtime-library identity is required")
-    _require_meaningful_identity(runtime_identity, "runtime-library")
+    _require_meaningful_identity(
+        runtime_identity,
+        "runtime-library",
+        typed_numeric_fields=_RUNTIME_TYPED_NUMERIC_FIELDS,
+        typed_empty_fields=frozenset({"libraries"}),
+    )
     method = runtime_identity.get("method")
     _require_text(method, "runtime-library.method")
     if method not in {"ldd", "static"}:
