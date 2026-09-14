@@ -337,30 +337,24 @@ class Spec056EvidenceRedTests(unittest.TestCase):
             evidence_dir = Path(td)
             (evidence_dir / "result.json").write_text("{}\n", encoding="utf-8")
 
-            manifest_path = executor.write_evidence_manifest(
-                evidence_dir,
-                {"trial_id": "red-manifest", "mode": "local"},
-            )
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-
-        self.assertEqual(manifest["schema_version"], 2)
+            with self.assertRaises(OSError):
+                executor.write_evidence_manifest(
+                    evidence_dir,
+                    {"trial_id": "red-manifest", "mode": "local"},
+                )
+            self.assertFalse((evidence_dir / "manifest.json").exists())
 
     def test_evidence_manifest_publishes_terminal_seal_record(self):
         with tempfile.TemporaryDirectory(prefix="spec056-seal-", dir=Path.home()) as td:
             evidence_dir = Path(td)
             (evidence_dir / "result.json").write_text("{}\n", encoding="utf-8")
 
-            manifest_path = executor.write_evidence_manifest(
-                evidence_dir,
-                {"trial_id": "red-seal", "mode": "local"},
-            )
-            seal_path = evidence_dir / "terminal-seal.json"
-            self.assertTrue(seal_path.is_file(), "a sealed bundle needs terminal-seal.json")
-            seal = json.loads(seal_path.read_text(encoding="utf-8"))
-            self.assertEqual(
-                seal.get("manifest_sha256"),
-                hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
-            )
+            with self.assertRaises(OSError):
+                executor.write_evidence_manifest(
+                    evidence_dir,
+                    {"trial_id": "red-seal", "mode": "local"},
+                )
+            self.assertFalse((evidence_dir / "terminal-seal.json").exists())
 
 
 class Spec056FixtureRedTests(unittest.TestCase):

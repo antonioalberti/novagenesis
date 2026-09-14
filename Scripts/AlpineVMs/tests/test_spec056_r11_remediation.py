@@ -89,16 +89,11 @@ def test_publication_boundary_does_not_seal_protected_bundle(tmp_path: Path):
     (tmp_path / "roles").mkdir()
     (tmp_path / "roles" / "stdout.log").write_text('TOKEN="r11-publish-secret"\n', encoding="utf-8")
 
-    manifest = executor.write_evidence_manifest(tmp_path, {"mode": "local", "trial_id": "r11"})
+    with pytest.raises(OSError, match="evidence publication aborted"):
+        executor.write_evidence_manifest(tmp_path, {"mode": "local", "trial_id": "r11"})
 
-    assert manifest.is_file()
+    assert not (tmp_path / "manifest.json").exists()
     assert not (tmp_path / "terminal-seal.json").exists()
-    published_manifest = json.loads(manifest.read_text(encoding="utf-8"))
-    published_result = json.loads(result.read_text(encoding="utf-8"))
-    assert published_manifest["protected_input_blockers"]
-    assert published_result["protected_input_blockers"]
-    assert published_result["evidence_result"] == "INCOMPLETE"
-    assert published_result["local_acceptance_eligible"] is False
 
 
 def test_options_boolean_id_and_synthetic_recipe_runtime_are_rejected():

@@ -334,10 +334,11 @@ class ExecutorContractTests(unittest.TestCase):
         tracked = {1234: {"pid": 1234, "pgid": 77, "starttime": "42"}}
         record = {"status": "ok", "state": "S", "pgid": 77, "starttime": "42"}
         clock = iter([0, 3])
-        with patch("ng_remote_executor.read_proc_stat", side_effect=[record, record, record]), patch("ng_remote_executor.time.monotonic", side_effect=lambda: next(clock)), patch("ng_remote_executor.os.kill", side_effect=[None, PermissionError("denied")]):
+        with patch("ng_remote_executor.read_proc_stat", side_effect=[record, record, record]), patch("ng_remote_executor.time.monotonic", side_effect=lambda: next(clock)), patch("ng_remote_executor.os.kill", side_effect=[None, PermissionError("denied")]) as kill:
             stopped, residual = local_stop_tracked_descendants(tracked)
         self.assertFalse(stopped)
-        self.assertEqual(residual[0]["reason"], "kill-error")
+        self.assertEqual(residual[0]["reason"], "executable-identity-unavailable")
+        self.assertFalse(kill.called)
 
     def test_exited_leader_with_surviving_group_member_is_not_success(self):
         code = "import os, time; child = os.fork(); os._exit(0) if child else time.sleep(10)"
@@ -415,10 +416,11 @@ class ExecutorContractTests(unittest.TestCase):
     def test_descendant_signal_error_is_not_success(self):
         tracked = {1234: {"pid": 1234, "pgid": 77, "starttime": "42"}}
         record = {"status": "ok", "state": "S", "pgid": 77, "starttime": "42"}
-        with patch("ng_remote_executor.read_proc_stat", return_value=record), patch("ng_remote_executor.os.kill", side_effect=PermissionError("denied")):
+        with patch("ng_remote_executor.read_proc_stat", return_value=record), patch("ng_remote_executor.os.kill", side_effect=PermissionError("denied")) as kill:
             stopped, residual = local_stop_tracked_descendants(tracked)
         self.assertFalse(stopped)
-        self.assertEqual(residual[0]["reason"], "term-error")
+        self.assertEqual(residual[0]["reason"], "executable-identity-unavailable")
+        self.assertFalse(kill.called)
 
     def test_descendant_identity_unknown_after_term_is_not_success(self):
         tracked = {1234: {"pid": 1234, "pgid": 77, "starttime": "42"}}
@@ -429,8 +431,8 @@ class ExecutorContractTests(unittest.TestCase):
         with patch("ng_remote_executor.read_proc_stat", side_effect=records), patch("ng_remote_executor.os.kill") as kill:
             stopped, residual = local_stop_tracked_descendants(tracked)
         self.assertFalse(stopped)
-        self.assertEqual(residual[0]["reason"], "identity-unavailable-after-term")
-        kill.assert_called_once_with(1234, 15)
+        self.assertEqual(residual[0]["reason"], "executable-identity-unavailable")
+        kill.assert_not_called()
 
     def test_detached_descendant_is_tracked_and_stopped_by_identity(self):
         code = "import os, time; child = os.fork();\nif child: time.sleep(2)\nelse: os.setsid(); time.sleep(5)"

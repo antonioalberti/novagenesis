@@ -474,6 +474,72 @@ def collect_remote(config: Mapping[str, str], host: str, state_dir: str, local_d
         raise RuntimeError(f"evidence collection failed on {host}: {run.stderr.strip()}")
 
 
+def _durable_atomic_write(path: Path, data: bytes) -> None:
+    """Replace one evidence record atomically and verify the reopened bytes."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("xb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        directory_fd = os.open(path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+        with path.open("rb") as handle:
+            reopened = handle.read()
+        if reopened != data or hashlib.sha256(reopened).digest() != hashlib.sha256(data).digest():
+            raise OSError(f"durable evidence write failed reopen/hash validation: {path.name}")
+    except Exception:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def _local_manifest_entries(evidence_dir: Path) -> tuple[list[dict[str, Any]], list[str]]:
+    """Hash a stable v2 tree and enforce verifier-required coverage."""
+    excluded = {"manifest.json", "manifest.sha256", "terminal-seal.json"}
+    entries: list[dict[str, Any]] = []
+    errors: list[str] = []
+    try:
+        paths = sorted(evidence_dir.rglob("*"))
+    except OSError as exc:
+        return [], [f"final evidence scan failed: {type(exc).__name__}"]
+    for path in paths:
+        relative = path.relative_to(evidence_dir).as_posix()
+        if relative in excluded:
+            continue
+        try:
+            if path.is_symlink() or not path.is_file():
+                if path.is_symlink():
+                    errors.append(f"final evidence scan found unsafe link: {relative}")
+                continue
+            before = path.stat()
+            data = path.read_bytes()
+            after = path.stat()
+        except (OSError, RuntimeError) as exc:
+            errors.append(f"final evidence hash failed: {relative}: {type(exc).__name__}")
+            continue
+        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or len(data) != after.st_size:
+            errors.append(f"final evidence hash race: {relative}")
+            continue
+        digest = hashlib.sha256(data).hexdigest()
+        entries.append({"path": relative, "size": len(data), "sha256": digest})
+    required = {"result.json", "controller-events.jsonl", "provenance.json", "workload.json", "oracle.json", "ownership.json", "cleanup.json", "preservation.json"}
+    listed = {entry["path"] for entry in entries}
+    for name in sorted(required - listed):
+        errors.append(f"required evidence file is not covered: {name}")
+    for prefix in ("plan/", "artifacts/source/", "artifacts/repository/", "roles/", "inventory/"):
+        if not any(name.startswith(prefix) for name in listed):
+            errors.append(f"required evidence area is not covered: {prefix}")
+    return entries, errors
+
+
 def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
     """Publish a manifest, sealing local v2 only after a clean final scan."""
     effective_schema = schema_version if schema_version is not None else (2 if metadata.get("mode") == "local" else 1)
@@ -484,6 +550,18 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
     blockers: list[str] = []
     metadata_secrets: set[str] = set()
     manifest_path = evidence_dir / "manifest.json"
+    if not evidence_dir.is_dir():
+        raise OSError(f"evidence root is unavailable: {evidence_dir}")
+    # Never leave an older inventory/seal available while a new publication is
+    # being evaluated.  Failure to remove either is itself a publication block.
+    stale_publications = (manifest_path, evidence_dir / "manifest.sha256", evidence_dir / "terminal-seal.json")
+    for stale in stale_publications:
+        if not stale.exists():
+            continue
+        try:
+            stale.unlink()
+        except OSError as exc:
+            blockers.append(f"protected-input cannot safely remove prior publication {stale.name}: {type(exc).__name__}")
     if effective_schema == 2:
         metadata_secrets = collect_secret_values(metadata)
         metadata = sanitize_config(metadata, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets)
@@ -499,14 +577,6 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
                 blockers.extend(str(item) for item in prior)
         except (OSError, json.JSONDecodeError, TypeError):
             existing = {}
-        # A previous seal can never survive a new publication attempt.  If it
-        # cannot be removed, publication is itself blocked rather than reused.
-        seal_path = evidence_dir / "terminal-seal.json"
-        if seal_path.exists():
-            try:
-                seal_path.unlink()
-            except OSError as exc:
-                blockers.append(f"protected-input cannot safely remove prior terminal seal: {type(exc).__name__}")
 
     def publish_blockers() -> None:
         if not blockers or effective_schema != 2:
@@ -525,51 +595,74 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
         safe_result["acceptance_blockers"] = acceptance
         if safe_result.get("exit_code") == 0:
             safe_result["exit_code"] = 21
-        (evidence_dir / "result.json").write_text(
-            json.dumps(sanitize_config(safe_result, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
+        _durable_atomic_write(
+            evidence_dir / "result.json",
+            (json.dumps(sanitize_config(safe_result, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets), ensure_ascii=False, indent=2) + "\n").encode("utf-8"),
         )
 
-    for _ in range(2):
+    def abort_publication(reason: str) -> None:
+        if reason and reason not in blockers:
+            blockers.append(reason)
         if effective_schema == 2:
-            safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
-            blockers.extend(str(item) for item in safety["blockers"])
-            blockers = list(dict.fromkeys(blockers))
-            if blockers:
-                metadata = {**metadata, "protected_input_blockers": blockers}
-                publish_blockers()
+            publish_blockers()
+        for published in (manifest_path, evidence_dir / "manifest.sha256", evidence_dir / "terminal-seal.json"):
+            try:
+                published.unlink(missing_ok=True)
+            except OSError:
+                # The original blocker remains authoritative; never replace it
+                # with a falsely clean terminal state.
+                pass
+        raise OSError("evidence publication aborted: " + "; ".join(dict.fromkeys(blockers)))
+
+    if blockers and effective_schema == 2:
+        abort_publication("protected-input blocker was already recorded")
+
+    if effective_schema == 2:
+        safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
+        blockers.extend(str(item) for item in safety.get("blockers", []))
+        blockers = list(dict.fromkeys(blockers))
+        if blockers:
+            metadata = {**metadata, "protected_input_blockers": blockers}
+            abort_publication("sanitization or protected-input scan reported a blocker")
+
+    entries, entry_errors = _local_manifest_entries(evidence_dir) if effective_schema == 2 else ([], [])
+    if entry_errors and effective_schema == 2:
+        blockers.extend(entry_errors)
+        metadata = {**metadata, "protected_input_blockers": blockers}
+        abort_publication("required-artifact or hash validation reported a blocker")
+    if effective_schema == 1:
         entries = []
         for path in sorted(evidence_dir.rglob("*")):
-            if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
-                continue
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
-            entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": digest})
-        manifest = {**metadata, "schema_version": effective_schema, "files": entries}
-        manifest_path = evidence_dir / "manifest.json"
-        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        if effective_schema != 2:
-            (evidence_dir / "manifest.sha256").write_text(
-                f"{hashlib.sha256(manifest_path.read_bytes()).hexdigest()}  manifest.json\n", encoding="utf-8"
-            )
-            return manifest_path
-        final_safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
-        new_blockers = [str(item) for item in final_safety["blockers"] if str(item) not in blockers]
-        if new_blockers:
-            blockers.extend(new_blockers)
-            metadata = {**metadata, "protected_input_blockers": blockers}
-            publish_blockers()
-            continue
-        break
-    if effective_schema == 2:
-        if blockers:
-            # An intact manifest without a terminal seal is intentionally
-            # incomplete; the offline verifier cannot accept this bundle.
-            return manifest_path
-        manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
-        (evidence_dir / "terminal-seal.json").write_text(
-            json.dumps({"schema_version": 2, "kind": "terminal-seal", "manifest_path": "manifest.json", "manifest_sha256": manifest_hash, "sealed": True}, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+            if path.is_file() and path.name not in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
+                entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    manifest = {**metadata, "schema_version": effective_schema, "files": entries}
+    manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    _durable_atomic_write(manifest_path, manifest_bytes)
+    if effective_schema == 1:
+        checksum = f"{hashlib.sha256(manifest_bytes).hexdigest()}  manifest.json\n".encode("utf-8")
+        _durable_atomic_write(evidence_dir / "manifest.sha256", checksum)
+        return manifest_path
+
+    final_safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
+    final_blockers = [str(item) for item in final_safety.get("blockers", [])]
+    final_entries, final_errors = _local_manifest_entries(evidence_dir)
+    if final_blockers or final_errors or final_entries != entries:
+        blockers.extend(final_blockers)
+        blockers.extend(final_errors)
+        if final_entries != entries:
+            blockers.append("final evidence scan changed the inventoried file set")
+        metadata = {**metadata, "protected_input_blockers": list(dict.fromkeys(blockers))}
+        abort_publication("final scan reported a blocker")
+    reopened_manifest = manifest_path.read_bytes()
+    if reopened_manifest != manifest_bytes or hashlib.sha256(reopened_manifest).hexdigest() != hashlib.sha256(manifest_bytes).hexdigest():
+        abort_publication("manifest reopen/hash validation failed")
+    manifest_hash = hashlib.sha256(reopened_manifest).hexdigest()
+    seal = {"schema_version": 2, "kind": "terminal-seal", "manifest_path": "manifest.json", "manifest_sha256": manifest_hash, "sealed": True}
+    seal_bytes = (json.dumps(seal, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    seal_path = evidence_dir / "terminal-seal.json"
+    _durable_atomic_write(seal_path, seal_bytes)
+    if seal_path.read_bytes() != seal_bytes or json.loads(seal_path.read_text(encoding="utf-8")).get("manifest_sha256") != hashlib.sha256(manifest_path.read_bytes()).hexdigest():
+        abort_publication("terminal seal reopen/hash validation failed")
     return manifest_path
 
 
@@ -729,6 +822,44 @@ def process_state(pid: int) -> str | None:
     return record.get("state") if record.get("status") == "ok" else None
 
 
+def local_ownership_anchor(trial_id: str) -> dict[str, Any]:
+    """Make this long-lived controller a verified child-subreaper anchor."""
+    if sys.platform != "linux":
+        return {"method": "linux-prctl-subreaper", "pid": os.getpid(), "trial_id": trial_id, "verified": False, "error": "unsupported platform"}
+    try:
+        libc = ctypes.CDLL(None, use_errno=True)
+        prctl = libc.prctl
+        prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong]
+        prctl.restype = ctypes.c_int
+        if prctl(36, 1, 0, 0, 0) != 0:  # PR_SET_CHILD_SUBREAPER
+            error = ctypes.get_errno()
+            raise OSError(error, os.strerror(error))
+        current = ctypes.c_ulong(0)
+        if prctl(37, ctypes.addressof(current), 0, 0, 0) != 0 or current.value != 1:  # PR_GET_CHILD_SUBREAPER
+            raise OSError("kernel did not confirm child-subreaper state")
+        return {"method": "linux-prctl-subreaper", "pid": os.getpid(), "trial_id": trial_id, "verified": True}
+    except (OSError, AttributeError):
+        return {"method": "linux-prctl-subreaper", "pid": os.getpid(), "trial_id": trial_id, "verified": False, "error": "child-subreaper setup failed"}
+
+
+def _process_environment_markers(pid: int) -> dict[str, str] | None:
+    try:
+        raw = Path(f"/proc/{pid}/environ").read_bytes()
+    except OSError:
+        return None
+    markers: dict[str, str] = {}
+    for item in raw.split(b"\0"):
+        if b"=" not in item:
+            continue
+        key, value = item.split(b"=", 1)
+        if key in {b"NG_ELC_TRIAL_ID", b"NG_ELC_TRIAL_ROLE"}:
+            try:
+                markers[key.decode()] = value.decode()
+            except UnicodeDecodeError:
+                return None
+    return markers
+
+
 def local_group_members_status(pgid: int) -> dict[str, Any]:
     members: list[dict[str, Any]] = []
     complete = True
@@ -799,6 +930,9 @@ def local_process_descendants(root_pid: int) -> dict[str, Any]:
             complete = False
         else:
             item["executable"] = executable["path"]
+        markers = _process_environment_markers(pid)
+        if markers:
+            item.update({"trial_id": markers.get("NG_ELC_TRIAL_ID"), "trial_role": markers.get("NG_ELC_TRIAL_ROLE")})
         pending.extend(children.get(pid, []))
     return {"descendants": sorted(descendants, key=lambda item: item["pid"]), "complete": complete}
 
@@ -839,14 +973,16 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
             expected = dict(expected)
             expected["reparented_pgid"] = record["pgid"]
         expected_executable = expected.get("executable")
-        if expected_executable is not None:
-            executable = _safe_executable_identity(pid)
-            if executable.get("status") != "ok":
-                residual.append({"pid": pid, "reason": "executable-identity-unavailable", "error": executable.get("error")})
-                continue
-            if executable.get("path") != expected_executable:
-                residual.append({"pid": pid, "reason": "executable-identity-mismatch", "expected_executable": expected_executable, "actual_executable": executable.get("path")})
-                continue
+        if not isinstance(expected_executable, str) or not expected_executable:
+            residual.append({"pid": pid, "reason": "executable-identity-unavailable", "error": "tracked executable identity is missing"})
+            continue
+        executable = _safe_executable_identity(pid)
+        if executable.get("status") != "ok":
+            residual.append({"pid": pid, "reason": "executable-identity-unavailable", "error": executable.get("error")})
+            continue
+        if executable.get("path") != expected_executable:
+            residual.append({"pid": pid, "reason": "executable-identity-mismatch", "expected_executable": expected_executable, "actual_executable": executable.get("path")})
+            continue
         try:
             os.kill(pid, signal.SIGTERM)
         except ProcessLookupError:
@@ -927,6 +1063,9 @@ def local_descendant_reconciliation(
     pgid: int | None,
     *,
     scans: int = 4,
+    owner_pid: int | None = None,
+    trial_id: str | None = None,
+    role: str | None = None,
 ) -> dict[str, Any]:
     """Boundedly drain tracked descendants after the leader signal.
 
@@ -949,6 +1088,30 @@ def local_descendant_reconciliation(
         for child in ancestry.get("descendants", []):
             if isinstance(child, Mapping) and isinstance(child.get("pid"), int):
                 tracked[child["pid"]] = dict(child)
+
+        # Once the leader exits, the verified subreaper is the ownership
+        # anchor.  Only marker-matched descendants may enter this role's
+        # ledger; an unmarked process is deliberately left unsignalled and
+        # makes the teardown unresolved.
+        if owner_pid is not None:
+            try:
+                anchored = local_process_descendants(owner_pid)
+            except BaseException as exc:
+                anchored = {"descendants": [], "complete": False, "error": str(exc)}
+            scan_ledger[-1]["anchor_complete"] = bool(anchored.get("complete", False))
+            if not anchored.get("complete", False):
+                unknown.append({"round": number + 1, "kind": "anchor-scan", "error": anchored.get("error", "anchor scan incomplete")})
+            for child in anchored.get("descendants", []):
+                if not isinstance(child, Mapping) or not isinstance(child.get("pid"), int):
+                    continue
+                if child.get("pid") == root_pid:
+                    continue
+                if child.get("trial_id") == trial_id and child.get("trial_role") == role:
+                    tracked[child["pid"]] = dict(child)
+                elif child.get("trial_id") == trial_id:
+                    continue
+                else:
+                    unknown.append({"round": number + 1, "kind": "anchor-unattributed-process", "pid": child.get("pid")})
 
         if pgid is not None:
             try:
@@ -1893,6 +2056,8 @@ def run_local_trial(args: argparse.Namespace) -> int:
     overall_deadline = time.monotonic() + float(plan["timeouts"]["total"])
     local_record(events, "prepare", mode="local", evidence_dir=str(evidence_dir))
     workload = local_prepare_v2_layout(evidence_dir, plan, contract, config, variables)
+    ownership_anchor = local_ownership_anchor(trial_id)
+    local_record(events, "ownership-anchor", anchor=ownership_anchor)
     effective_config = dict(config)
     if workload.get("staging_io_path"):
         effective_config["NG_LOCAL_IO_PATH"] = str(workload["staging_io_path"])
@@ -1913,6 +2078,9 @@ def run_local_trial(args: argparse.Namespace) -> int:
     provenance["workload_verified"] = bool(workload["verified"])
     provenance["workload_error"] = workload.get("reason")
     provenance["evidence_schema_v2"] = True
+    provenance["ownership_anchor"] = ownership_anchor
+    if not ownership_anchor.get("verified"):
+        provenance.setdefault("protected_input_blockers", []).append("ownership anchor could not be verified")
     eligibility = local_acceptance_eligibility(provenance)
     provenance["acceptance_eligibility"] = eligibility
     local_json_write(evidence_dir / "provenance.json", provenance)
@@ -1921,7 +2089,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     before_ipc = local_ipc_snapshot()
     local_json_write(evidence_dir / "inventory" / "baseline.json", {"schema_version": 2, "processes": [], "ipc": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}})
     runtime = "PASS"
-    teardown_result = "PASS"
+    teardown_result = "PASS" if ownership_anchor.get("verified") else "UNKNOWN"
     evidence_result = "COMPLETE"
     interrupted = False
     offsets: dict[str, int] = {}
@@ -1940,6 +2108,8 @@ def run_local_trial(args: argparse.Namespace) -> int:
         local_record(events, "preflight", result=preflight)
         if not preflight["ok"]:
             raise ConfigError("local preflight rejected: " + ", ".join(preflight["errors"]))
+        if not ownership_anchor.get("verified"):
+            raise ConfigError("local ownership anchor is not verified; refusing to launch")
         for role in plan["roles"]:
             argv = expand_argv(role["command"], variables)
             checked_role = next(item for item in preflight["roles"] if item["name"] == role["name"])
@@ -1956,6 +2126,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             stderr = stderr_path.open("w", encoding="utf-8")
             role_env = os.environ.copy()
             role_env.update({key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()})
+            role_env.update({"NG_ELC_TRIAL_ID": trial_id, "NG_ELC_TRIAL_ROLE": role["name"]})
             # The immutable image, not the checked pathname, is the launch
             # target.  Its inherited fd is closed in the parent only after
             # Popen has completed the fork/exec handoff.
@@ -2083,7 +2254,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             if not stop_result["ok"]:
                 teardown_result = "FAIL"
             local_record(events, "stop", role=role, **stop_result)
-            reconciliation = local_descendant_reconciliation(proc.pid, item.get("tracked_descendants", {}), pgid, scans=4)
+            reconciliation = local_descendant_reconciliation(proc.pid, item.get("tracked_descendants", {}), pgid, scans=4, owner_pid=ownership_anchor["pid"], trial_id=trial_id, role=role)
             item["descendant_rollback_ledger"] = reconciliation
             item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and not reconciliation["unknown"]
             item["tracked_descendants"] = {child["pid"]: child for child in reconciliation["tracked"] if isinstance(child.get("pid"), int)}
@@ -2176,7 +2347,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 if blocker not in eligibility["blockers"]:
                     eligibility["blockers"].append(blocker)
             local_record(events, "protected-input-blocker", blockers=safety["blockers"], quarantined=safety["quarantined"])
-        local_json_write(evidence_dir / "ownership.json", {"schema_version": 2, "method": "creator-pid", "trial_pids": sorted(item["process"].pid for item in processes.values()), "ipc_new_ids": new_ipc, "attribution": "fail-closed" if ipc_reason else "creator-pid"})
+        local_json_write(evidence_dir / "ownership.json", {"schema_version": 2, "method": "linux-subreaper-anchor", "anchor": ownership_anchor, "trial_pids": sorted(item["process"].pid for item in processes.values()), "ipc_new_ids": new_ipc, "attribution": "fail-closed" if ipc_reason else "creator-pid", "ownership_proven": all(item.get("unresolved") is False for item in processes.values()) and bool(ownership_anchor.get("verified"))})
         local_json_write(evidence_dir / "cleanup.json", {"schema_version": 2, "ordered_actions": ["stop", "evidence-preserve", "ipc-cleanup", "final-inventory"], "ipc_cleanup": ipc_ok, "ipc_reason": ipc_reason, "result": teardown_result})
         local_json_write(evidence_dir / "inventory" / "final.json", {"schema_version": 2, "processes": local_process_snapshot(processes), "ipc": {"new_ids": new_ipc, "cleanup_ok": ipc_ok, "cleanup_reason": ipc_reason}})
         if teardown_result == "PASS":

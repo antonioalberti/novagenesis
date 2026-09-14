@@ -216,6 +216,7 @@ def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, A
             "output_sha256": hashlib.sha256(stable_output.encode()).hexdigest(),
             "binary_sha256": binary["sha256"],
             "libraries": sorted(line.strip() for line in stable_output.splitlines() if line.strip()),
+            "library_count": len([line for line in stable_output.splitlines() if line.strip()]),
         }
     return {"method": "ldd", "binaries": records}
 
@@ -278,6 +279,41 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
     launch_log = output / "debug-launcher.jsonl"
     if launch_log.is_file():
         effective_debug = [json.loads(line) for line in launch_log.read_text(encoding="utf-8").splitlines() if line.strip()]
+    receipt_commands = []
+    for command, returncode, stdout_name, stderr_name in zip(
+        commands,
+        returncodes,
+        ("configure.stdout.log", "build.stdout.log"),
+        ("configure.stderr.log", "build.stderr.log"),
+    ):
+        stdout_path = output / stdout_name
+        stderr_path = output / stderr_name
+        stdout_bytes = stdout_path.read_bytes() if stdout_path.is_file() else b""
+        stderr_bytes = stderr_path.read_bytes() if stderr_path.is_file() else b""
+        captured = {
+            "argv": command,
+            "cwd": str(source.resolve()),
+            "returncode": returncode,
+            "stdout_sha256": hashlib.sha256(stdout_bytes).hexdigest(),
+            "stderr_sha256": hashlib.sha256(stderr_bytes).hexdigest(),
+        }
+        captured["command_sha256"] = hashlib.sha256(
+            json.dumps(captured, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        receipt_commands.append(captured)
+    receipt = {
+        "schema_version": 1,
+        "working_directory": str(source.resolve()),
+        "output_directory": str(output),
+        "commands": receipt_commands,
+        "outputs": {
+            name: {"path": record["path"], "size": record["size"], "sha256": record["sha256"]}
+            for name, record in binaries.items()
+        },
+    }
+    receipt["receipt_sha256"] = hashlib.sha256(
+        json.dumps({key: value for key, value in receipt.items() if key != "receipt_sha256"}, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
     manifest = {
         "schema_version": 1,
         "variant": variant,
@@ -287,6 +323,7 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         "output": str(output),
         "recipe": {"commands": commands, "working_directory": str(source.resolve()), "executed": True, "returncodes": returncodes},
         "commands": commands,
+        "build_receipt": receipt,
         "toolchain": toolchain_identity(),
         "options": {"variant": variant, "jobs": max(1, jobs), "configure_only": configure_only, "cmake_args": cmake_args},
         "runtime_library_identity": runtime_library_identity(binaries),

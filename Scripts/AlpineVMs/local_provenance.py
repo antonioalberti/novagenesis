@@ -511,6 +511,11 @@ _SECRET_ARGV_TEXT_RE = re.compile(
     r"(?:=|[\s,]+)(?P<quote>['\"]?)(?P<value>[^'\"\s,\])]+)(?P=quote)",
     re.IGNORECASE,
 )
+_SERIALIZED_ARGV_TEXT_RE = re.compile(
+    r"(?P<flag_quote>['\"])(?P<flag>--?(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key))"
+    r"(?P=flag_quote)\s*,\s*(?P<value_quote>['\"])(?P<serialized_value>.*?)(?P=value_quote)",
+    re.IGNORECASE,
+)
 _SECRET_TEXT_PATTERNS = (
     _SECRET_QUERY_RE,
     _AUTH_RE,
@@ -518,6 +523,7 @@ _SECRET_TEXT_PATTERNS = (
     _SECRET_SOURCE_ASSIGN_TEXT_RE,
     _SECRET_ASSIGN_RE,
     _SECRET_ARGV_TEXT_RE,
+    _SERIALIZED_ARGV_TEXT_RE,
 )
 
 
@@ -553,6 +559,7 @@ def _collect_secret_values(value: Any, key: str | None = None) -> set[str]:
                     or groups.get("query_value")
                     or groups.get("auth_value")
                     or groups.get("url_password")
+                    or groups.get("serialized_value")
                 )
                 if not candidate:
                     candidate = next((item for item in reversed(match.groups()) if item), None)
@@ -579,6 +586,13 @@ def _redact_string(value: str, secrets: set[str]) -> str:
     result = _SECRET_SOURCE_ASSIGN_TEXT_RE.sub(redact_assignment, result)
     result = _SECRET_ARGV_TEXT_RE.sub(
         lambda match: match.group(0)[:match.start("value") - match.start()] + "<redacted>" + (match.group("quote") or ""),
+        result,
+    )
+    result = _SERIALIZED_ARGV_TEXT_RE.sub(
+        lambda match: (
+            f"{match.group('flag_quote')}{match.group('flag')}{match.group('flag_quote')}, "
+            f"{match.group('value_quote')}<redacted>{match.group('value_quote')}"
+        ),
         result,
     )
     return result
@@ -626,7 +640,14 @@ _SECRET_FILENAME_RE = re.compile(
 
 def _is_secret_filename(part: str) -> bool:
     """Recognise dotenv names and secret-labelled path components exactly."""
-    return bool(_SECRET_FILENAME_RE.search(part))
+    lowered = part.lower()
+    return bool(
+        _SECRET_FILENAME_RE.search(part)
+        or lowered == ".envrc"
+        or lowered.endswith(".env")
+        or lowered.startswith(".env.")
+        or lowered.startswith(".env-")
+    )
 
 
 def _remove_protected_path(path: Path, relative: str, blockers: list[str], quarantined: list[str], reason: str) -> None:
@@ -1051,8 +1072,121 @@ def _validate_runtime_record(
         if record[hashes[0]] != observed_hash:
             raise ValueError(f"{field} ldd output hash diverges")
         observed_libraries = sorted(line.strip() for line in stable_output.splitlines() if line.strip())
-        if not set(libraries) <= set(observed_libraries):
+        if "library_count" in record:
+            if record.get("library_count") != len(observed_libraries) or libraries != observed_libraries:
+                raise ValueError(f"{field} library evidence is incomplete or diverges")
+        elif not set(libraries) <= set(observed_libraries):
             raise ValueError(f"{field} library evidence diverges")
+
+
+def _receipt_records(value: Any, field: str) -> dict[str, Mapping[str, Any]]:
+    if isinstance(value, Mapping):
+        result: dict[str, Mapping[str, Any]] = {}
+        for name, record in value.items():
+            if not isinstance(record, Mapping):
+                raise ValueError(f"{field} entries must be mappings")
+            result[str(name)] = record
+        return result
+    if isinstance(value, list):
+        result = {}
+        for number, record in enumerate(value):
+            if not isinstance(record, Mapping) or not isinstance(record.get("name"), str):
+                raise ValueError(f"{field}[{number}] requires a name")
+            result[record["name"]] = record
+        return result
+    raise ValueError(f"{field} must be a mapping or array")
+
+
+def _receipt_command_digest(command: Mapping[str, Any]) -> str:
+    payload = {
+        "argv": command.get("argv"),
+        "cwd": command.get("cwd"),
+        "returncode": command.get("returncode"),
+        "stdout_sha256": command.get("stdout_sha256"),
+        "stderr_sha256": command.get("stderr_sha256"),
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def validate_build_receipt(manifest: Mapping[str, Any], executables: Mapping[str, Any] | Sequence[Mapping[str, Any]]) -> bool:
+    """Require a receipt that binds commands, output paths, and output hashes.
+
+    A recipe's ``executed`` flag is only a claim.  The receipt is the captured
+    command/output ledger produced by ``ng_observability.build_variant``; every
+    launched executable must be one of its captured outputs and every command
+    must carry a successful, self-consistent execution record.
+    """
+    recipe = manifest.get("recipe", manifest.get("build_recipe"))
+    receipt = manifest.get("build_receipt")
+    if not isinstance(recipe, Mapping) or not isinstance(receipt, Mapping):
+        raise ValueError("build recipe receipt is required")
+    commands = recipe.get("commands", recipe.get("command"))
+    returncodes = recipe.get("returncodes")
+    receipt_commands = receipt.get("commands")
+    if not isinstance(commands, list) or not commands or not isinstance(returncodes, list) or len(returncodes) != len(commands):
+        raise ValueError("build recipe commands/returncodes are incomplete")
+    if not isinstance(receipt_commands, list) or len(receipt_commands) != len(commands):
+        raise ValueError("build receipt command coverage is incomplete")
+    working_directory = _require_text(recipe.get("working_directory"), "build recipe working_directory", absolute=True)
+    if receipt.get("schema_version") != 1 or receipt.get("working_directory") != working_directory:
+        raise ValueError("build receipt identity is incomplete")
+    output_directory = _require_text(receipt.get("output_directory"), "build receipt output_directory", absolute=True)
+    if manifest.get("output") is not None and str(Path(manifest["output"]).resolve()) != str(Path(output_directory).resolve()):
+        raise ValueError("build receipt output directory diverges")
+    source_directory = manifest.get("source")
+    if source_directory is not None:
+        source_directory = _require_text(source_directory, "build source", absolute=True)
+        if str(Path(source_directory).resolve()) != str(Path(working_directory).resolve()):
+            raise ValueError("build recipe working directory is unrelated to source")
+        command_argv = [item.get("argv") for item in receipt_commands if isinstance(item, Mapping)]
+        configured = any(
+            isinstance(argv, list) and "cmake" in {str(argv[0])} and "-S" in argv and source_directory in argv and "-B" in argv and output_directory in argv
+            for argv in command_argv
+        )
+        building = any(
+            isinstance(argv, list) and "cmake" in {str(argv[0])} and "--build" in argv and output_directory in argv
+            for argv in command_argv
+        )
+        if not configured or (manifest.get("options", {}).get("configure_only") is not True and not building):
+            raise ValueError("build recipe commands are not linked to the captured source/output")
+    for number, (recipe_command, returncode, captured) in enumerate(zip(commands, returncodes, receipt_commands)):
+        if not isinstance(captured, Mapping) or captured.get("argv") != recipe_command or captured.get("cwd") != working_directory:
+            raise ValueError(f"build receipt command {number} diverges from recipe")
+        if captured.get("returncode") != returncode or returncode != 0:
+            raise ValueError(f"build receipt command {number} did not complete successfully")
+        _normalise_hash(captured.get("stdout_sha256"), f"build receipt command {number} stdout_sha256")
+        _normalise_hash(captured.get("stderr_sha256"), f"build receipt command {number} stderr_sha256")
+        command_hash = _normalise_hash(captured.get("command_sha256"), f"build receipt command {number} command_sha256")
+        if command_hash != _receipt_command_digest(captured):
+            raise ValueError(f"build receipt command {number} hash diverges")
+    receipt_hash = receipt.get("receipt_sha256")
+    if receipt_hash is not None:
+        canonical = dict(receipt)
+        canonical.pop("receipt_sha256", None)
+        expected = hashlib.sha256(json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        if _normalise_hash(receipt_hash, "build receipt receipt_sha256") != expected:
+            raise ValueError("build receipt hash diverges")
+
+    actual = _binary_records(executables, "executables") if executables else {}
+    outputs = _receipt_records(receipt.get("outputs"), "build receipt outputs")
+    if not outputs:
+        raise ValueError("build receipt output coverage is empty")
+    for role, record in actual.items():
+        output = outputs.get(role)
+        if output is None:
+            raise ValueError(f"build receipt output coverage is missing for {role}")
+        expected_path, expected_hash = _binary_identity(role, record, "executables")
+        if str(Path(output.get("path", "")).resolve(strict=False)) != expected_path:
+            raise ValueError(f"build receipt output path diverges for {role}")
+        if _normalise_hash(output.get("sha256"), f"build receipt output {role} sha256") != expected_hash:
+            raise ValueError(f"build receipt output hash diverges for {role}")
+        if isinstance(record.get("size"), int) and output.get("size") != record["size"]:
+            raise ValueError(f"build receipt output size diverges for {role}")
+        if not Path(expected_path).is_file() or _sha256(Path(expected_path)) != expected_hash:
+            raise ValueError(f"build receipt output is not the captured file for {role}")
+        if Path(expected_path).resolve() not in Path(output_directory).resolve().parents and Path(expected_path).resolve() != Path(output_directory).resolve():
+            raise ValueError(f"build receipt output escapes output directory for {role}")
+    return True
 
 
 def validate_build_linkage(
@@ -1136,6 +1270,18 @@ def validate_build_linkage(
     if not isinstance(options, Mapping) or not options:
         raise ValueError("complete build options identity is required")
     _validate_build_options(options)
+
+    if "build_receipt" in manifest or "source" in manifest or "output" in manifest:
+        validate_build_receipt(manifest, executables)
+    else:
+        # Keep old schema-1 callers readable, but do not let an arbitrary
+        # fixture command masquerade as a NovaGenesis build recipe.
+        recipe_commands = manifest.get("recipe", {}).get("commands", manifest.get("recipe", {}).get("command", []))
+        command_tokens = [str(item) for item in recipe_commands] if isinstance(recipe_commands, list) else []
+        if "cmake" not in command_tokens or "--build" not in command_tokens:
+            nested = [token for command in recipe_commands if isinstance(command, (list, tuple)) for token in command] if isinstance(recipe_commands, list) else []
+            if "cmake" not in nested or "--build" not in nested:
+                raise ValueError("build recipe commands are not linked to a captured build")
 
     runtime_identity = manifest.get("runtime_library_identity")
     if runtime_identity is None:
@@ -1504,4 +1650,5 @@ __all__ = [
     "snapshot_files",
     "snapshot_selected_files",
     "validate_build_linkage",
+    "validate_build_receipt",
 ]
