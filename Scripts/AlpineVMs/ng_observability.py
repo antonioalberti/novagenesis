@@ -140,11 +140,35 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def git_index_snapshot(root: Path) -> dict[str, Any]:
+    """Capture the staged index identity used by the build manifest."""
+    try:
+        run = subprocess.run(["git", "ls-files", "--stage", "-z"], cwd=root, capture_output=True, check=False)
+        if run.returncode != 0:
+            return {"captured": False, "entries": [], "errors": ["git index unavailable"]}
+        entries: list[dict[str, Any]] = []
+        canonical: list[str] = []
+        for raw in run.stdout.split(b"\0"):
+            if not raw:
+                continue
+            header, relative_bytes = raw.split(b"\t", 1)
+            mode, blob_id, stage = header.decode("ascii").split()
+            relative = relative_bytes.decode("utf-8")
+            entry = {"path": relative, "mode": mode, "blob_id": blob_id.lower(), "stage": int(stage)}
+            entries.append(entry)
+            canonical.append(f"{mode} {blob_id.lower()} {stage}\t{relative}\n")
+        digest = hashlib.sha256("".join(sorted(canonical)).encode("utf-8")).hexdigest()
+        return {"captured": True, "entries": sorted(entries, key=lambda item: (item["path"], item["stage"])), "sha256": digest, "errors": []}
+    except (OSError, UnicodeDecodeError, ValueError):
+        return {"captured": False, "entries": [], "errors": ["git index unavailable"]}
+
+
 def git_snapshot(root: Path) -> dict[str, Any]:
     try:
         head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
         status = subprocess.run(["git", "status", "--short"], cwd=root, capture_output=True, text=True, check=True).stdout.splitlines()
         submodule = subprocess.run(["git", "submodule", "status", "--recursive"], cwd=root, capture_output=True, text=True, check=False)
+        index = git_index_snapshot(root)
         return {
             "head": head,
             "dirty": bool(status),
@@ -152,10 +176,13 @@ def git_snapshot(root: Path) -> dict[str, Any]:
             "tree_sha256": tree_sha256(root),
             "submodules": submodule.stdout.splitlines() if submodule.returncode == 0 else ["git submodule status unavailable"],
             "submodules_complete": submodule.returncode == 0,
+            "index": index,
+            "index_sha256": index.get("sha256"),
+            "index_entries": index.get("entries", []),
             "content_snapshot": {"captured": not status, "files": [], "entries": [], "errors": [] if not status else ["dirty source archive not captured"]},
         }
     except (OSError, subprocess.CalledProcessError):
-        return {"head": "unknown", "dirty": True, "status": ["not-a-git-tree"], "tree_sha256": tree_sha256(root), "submodules": ["git snapshot unavailable"], "submodules_complete": False, "content_snapshot": {"captured": False, "files": [], "entries": [], "errors": ["git snapshot unavailable"]}}
+        return {"head": "unknown", "dirty": True, "status": ["not-a-git-tree"], "tree_sha256": tree_sha256(root), "submodules": ["git snapshot unavailable"], "submodules_complete": False, "index": {"captured": False, "entries": [], "errors": ["git index unavailable"]}, "index_sha256": None, "index_entries": [], "content_snapshot": {"captured": False, "files": [], "entries": [], "errors": ["git snapshot unavailable"]}}
 
 
 def tree_sha256(root: Path) -> str:

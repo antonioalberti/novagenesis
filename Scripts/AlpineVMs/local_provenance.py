@@ -491,12 +491,17 @@ capture_controller_helpers = capture_code_identity
 
 _SECRET_KEY_RE = re.compile(r"(?:password|passwd|secret|token|credential|private[_-]?key|api[_-]?key|ssh[_-]?key|key$)", re.IGNORECASE)
 _VARIABLE_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
-_SECRET_ASSIGN_RE = re.compile(r"((?:--?|/)?(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)(?:=|\s+))([^\s'\"&]+)", re.IGNORECASE)
+_SECRET_ASSIGN_RE = re.compile(
+    r"((?:--?|/)?(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)(?:=|\s+))"
+    r"(?:(['\"])(.*?)\2|([^\s'\"&;]+))",
+    re.IGNORECASE,
+)
 _SECRET_QUERY_RE = re.compile(r"([?&](?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)=)[^&#\s]+", re.IGNORECASE)
 _AUTH_RE = re.compile(r"(\b(?:authorization\s*:\s*bearer|bearer)\s+)[^\s'\"]+", re.IGNORECASE)
 _URL_USERINFO_TEXT_RE = re.compile(r"(\b[A-Za-z][A-Za-z0-9+.-]*://)([^/@\s:]+):([^/@\s]+)@", re.IGNORECASE)
 _SECRET_SOURCE_ASSIGN_TEXT_RE = re.compile(
-    r"(\b(?:export\s+)?[A-Za-z_][A-Za-z0-9.-]*(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)\s*[:=]\s*)([^\s'\";&]+)",
+    r"(\b(?:export\s+)?[A-Za-z_][A-Za-z0-9.-]*(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)\s*[:=]\s*)"
+    r"(?:(['\"])(.*?)\2|([^\s'\";&]+))",
     re.IGNORECASE,
 )
 
@@ -518,14 +523,20 @@ def _collect_secret_values(value: Any, key: str | None = None) -> set[str]:
 
 
 def _redact_string(value: str, secrets: set[str]) -> str:
+    def redact_assignment(match: re.Match[str]) -> str:
+        prefix, quote, quoted_value, bare_value = match.groups()
+        if quote:
+            return f"{prefix}{quote}<redacted>{quote}"
+        return f"{prefix}<redacted>"
+
     result = value
     for secret in sorted((item for item in secrets if item), key=len, reverse=True):
         result = result.replace(secret, "<redacted>")
     result = _SECRET_QUERY_RE.sub(r"\1<redacted>", result)
-    result = _SECRET_ASSIGN_RE.sub(r"\1<redacted>", result)
+    result = _SECRET_ASSIGN_RE.sub(redact_assignment, result)
     result = _AUTH_RE.sub(r"\1<redacted>", result)
     result = _URL_USERINFO_TEXT_RE.sub(r"\1<redacted>@", result)
-    result = _SECRET_SOURCE_ASSIGN_TEXT_RE.sub(r"\1<redacted>", result)
+    result = _SECRET_SOURCE_ASSIGN_TEXT_RE.sub(redact_assignment, result)
     return result
 
 
@@ -556,6 +567,85 @@ def sanitize_config(value: Any, key: str | None = None, _known_secrets: set[str]
     if key and _SECRET_KEY_RE.search(key):
         return "<redacted>"
     return sanitize(value, key)
+
+
+def collect_secret_values(value: Any) -> set[str]:
+    """Collect secret values for the controller's in-memory scrub boundary."""
+    return _collect_secret_values(value)
+
+
+def sanitize_evidence_tree(
+    evidence_dir: os.PathLike[str] | str,
+    known_secrets: Iterable[str] = (),
+) -> dict[str, Any]:
+    """Scrub text evidence and quarantine anything that cannot be scrubbed.
+
+    Evidence is published only after this pass.  Opaque files containing a
+    known secret are removed from the evidence-owned tree and reported as a
+    protected-input blocker; retaining them would publish the secret.
+    """
+    root = Path(evidence_dir).resolve()
+    secrets = {item for item in known_secrets if isinstance(item, str) and item}
+    blockers: list[str] = []
+    scanned: list[str] = []
+    quarantined: list[str] = []
+    excluded = {"manifest.json", "manifest.sha256", "terminal-seal.json"}
+    for path in sorted(root.rglob("*")):
+        if path.name in excluded:
+            continue
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            try:
+                path.unlink()
+            except OSError:
+                pass
+            quarantined.append(relative)
+            blockers.append(f"protected-input unsafe evidence link: {relative}")
+            continue
+        if not path.exists():
+            continue
+        if not path.is_file():
+            continue
+        try:
+            data = path.read_bytes()
+        except OSError as exc:
+            blockers.append(f"protected-input evidence unreadable: {relative}: {type(exc).__name__}")
+            continue
+        scanned.append(relative)
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            if any(secret.encode("utf-8") in data for secret in secrets):
+                try:
+                    path.unlink()
+                except OSError:
+                    pass
+                quarantined.append(relative)
+                blockers.append(f"protected-input cannot safely preserve opaque evidence: {relative}")
+            continue
+        if b"\0" in data and any(secret.encode("utf-8") in data for secret in secrets):
+            try:
+                path.unlink()
+            except OSError:
+                pass
+            quarantined.append(relative)
+            blockers.append(f"protected-input cannot safely preserve opaque evidence: {relative}")
+            continue
+        scrubbed = _redact_string(text, secrets)
+        if scrubbed != text:
+            try:
+                path.write_text(scrubbed, encoding="utf-8")
+            except OSError as exc:
+                blockers.append(f"protected-input cannot safely rewrite evidence: {relative}: {type(exc).__name__}")
+                continue
+        if any(secret in scrubbed for secret in secrets):
+            try:
+                path.unlink()
+            except OSError:
+                pass
+            quarantined.append(relative)
+            blockers.append(f"protected-input secret remains in evidence: {relative}")
+    return {"ok": not blockers, "scanned": scanned, "quarantined": quarantined, "blockers": blockers}
 
 
 def _expand_value(value: Any, variables: Mapping[str, str]) -> Any:
@@ -591,6 +681,7 @@ def _preserve_manifest(path: Path, evidence_root: Path, manifest: Mapping[str, A
         "preserved_path": preserved["path"],
         "preserved_size": preserved["size"],
         "preserved_sha256": preserved["sha256"],
+        "evidence_dir": str(evidence_root.resolve()),
     }
 
 
@@ -715,7 +806,11 @@ _PLACEHOLDER_IDENTITY_RE = re.compile(
 def _require_meaningful_identity(value: Any, field: str) -> None:
     """Reject empty and placeholder build identity instead of sealing fiction."""
 
-    if value is None or isinstance(value, bool):
+    if value is None:
+        raise ValueError(f"{field} identity is missing")
+    if isinstance(value, bool):
+        # Boolean options such as configure_only are meaningful when nested,
+        # but a boolean can never be an identity structure by itself.
         raise ValueError(f"{field} identity is missing")
     if isinstance(value, str):
         if _PLACEHOLDER_IDENTITY_RE.fullmatch(value.strip()):
@@ -728,8 +823,7 @@ def _require_meaningful_identity(value: Any, field: str) -> None:
             if isinstance(item, Mapping):
                 _require_meaningful_identity(item, f"{field}.{key}")
             elif isinstance(item, (list, tuple)):
-                if item:
-                    _require_meaningful_identity(item, f"{field}.{key}")
+                _require_meaningful_identity(item, f"{field}.{key}")
             elif item is None or (isinstance(item, str) and _PLACEHOLDER_IDENTITY_RE.fullmatch(item.strip())):
                 raise ValueError(f"{field}.{key} identity is a placeholder or unavailable")
         return
@@ -738,6 +832,38 @@ def _require_meaningful_identity(value: Any, field: str) -> None:
             raise ValueError(f"{field} identity is missing")
         for number, item in enumerate(value):
             _require_meaningful_identity(item, f"{field}[{number}]")
+
+
+def _source_index_identity(snapshot: Mapping[str, Any], field: str) -> tuple[str, list[Any]]:
+    """Return the explicit source/index identity carried by a manifest."""
+    index = snapshot.get("index")
+    if not isinstance(index, Mapping) or index.get("captured") is not True:
+        raise ValueError(f"{field} index identity is incomplete")
+    entries = index.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError(f"{field} index entries are required")
+    index_hash = _normalise_hash(index.get("sha256"), f"{field} index sha256")
+    if snapshot.get("index_sha256") != index_hash:
+        raise ValueError(f"{field} index identity is inconsistent")
+    if snapshot.get("index_entries") != entries:
+        raise ValueError(f"{field} index entries are inconsistent")
+    return index_hash, entries
+
+
+def _validate_runtime_record(record: Mapping[str, Any], field: str) -> None:
+    """Validate the concrete loader identity for one launched role."""
+    status = record.get("status")
+    if status is not None and status != "ok":
+        raise ValueError(f"{field} is unavailable or incomplete")
+    for name in ("output_sha256", "ldd_sha256", "sha256"):
+        if name in record:
+            _normalise_hash(record[name], f"{field} {name}")
+    if not any(name in record for name in ("output_sha256", "ldd_sha256", "sha256", "libraries", "identity", "id")):
+        raise ValueError(f"{field} identity is incomplete")
+    libraries = record.get("libraries")
+    if libraries is not None:
+        if not isinstance(libraries, list) or not libraries or any(not isinstance(item, str) or not item.strip() for item in libraries):
+            raise ValueError(f"{field} library list is empty or invalid")
 
 
 def validate_build_linkage(
@@ -779,13 +905,19 @@ def validate_build_linkage(
                 raise
         raise ValueError("complete compiler/toolchain identity is required")
     _require_meaningful_identity(toolchain, "toolchain")
+    if not isinstance(toolchain.get("compiler"), str) or not toolchain["compiler"].strip():
+        raise ValueError("complete compiler/toolchain identity is required")
+    if not isinstance(toolchain.get("version"), str) or not toolchain["version"].strip():
+        raise ValueError("complete compiler/toolchain version identity is required")
+    if toolchain.get("status") not in (None, "ok"):
+        raise ValueError("toolchain identity is unavailable or incomplete")
     if not isinstance(options, Mapping) or not options:
         raise ValueError("complete build options identity is required")
     _require_meaningful_identity(options, "options")
     runtime_identity = manifest.get("runtime_library_identity")
     if runtime_identity is None:
         runtime_identity = manifest.get("runtime_libraries") or manifest.get("runtime_library")
-    if not runtime_identity:
+    if not isinstance(runtime_identity, Mapping) or not runtime_identity:
         raise ValueError("runtime-library identity is required")
     _require_meaningful_identity(runtime_identity, "runtime-library")
     if _identity_unavailable(runtime_identity):
@@ -802,6 +934,21 @@ def validate_build_linkage(
     preserved_path = manifest_evidence.get("preserved_path")
     if not isinstance(evidence_path, str) or not evidence_path or not isinstance(evidence_size, int) or evidence_size < 0 or not isinstance(preserved_path, str) or not preserved_path or not isinstance(preserved_size, int) or preserved_size < 0:
         raise ValueError("preserved manifest evidence is incomplete")
+    source_manifest_path = Path(evidence_path)
+    if source_manifest_path.is_symlink() or (source_manifest_path.exists() and not source_manifest_path.is_file()):
+        raise ValueError("build manifest evidence is not a regular file")
+    if source_manifest_path.is_file():
+        current_manifest = file_identity(source_manifest_path)
+        if current_manifest["size"] != evidence_size or current_manifest["sha256"] != manifest_evidence["sha256"]:
+            raise ValueError("build manifest identity drift")
+    evidence_root = manifest_evidence.get("evidence_dir")
+    if isinstance(evidence_root, str) and evidence_root:
+        preserved_candidate = Path(preserved_path) if Path(preserved_path).is_absolute() else Path(evidence_root) / preserved_path
+        if not preserved_candidate.is_file() or preserved_candidate.is_symlink():
+            raise ValueError("preserved manifest evidence is unavailable")
+        current_preserved = file_identity(preserved_candidate)
+        if current_preserved["size"] != preserved_size or current_preserved["sha256"] != manifest_evidence["preserved_sha256"]:
+            raise ValueError("preserved manifest evidence drift")
 
     snapshot = manifest.get("source_snapshot")
     if snapshot is None and isinstance(manifest.get("source"), Mapping):
@@ -827,13 +974,6 @@ def validate_build_linkage(
         raise ValueError("source content snapshot contains unreconstructable entries")
     if status and (content_snapshot.get("captured") is not True or not content_snapshot.get("entries")):
         raise ValueError("dirty source status has an empty or partial content snapshot")
-    if source_state is not None:
-        if "index" in source_state:
-            captured_index = source_state.get("index")
-            if not isinstance(captured_index, Mapping) or captured_index.get("captured") is not True or not isinstance(captured_index.get("entries"), list):
-                raise ValueError("source index identity is incomplete")
-            if source_state.get("index_sha256") != captured_index.get("sha256"):
-                raise ValueError("source index identity is inconsistent")
     _snapshot_records(content_snapshot.get("files", [])) if content_snapshot.get("files") else []
 
     if not isinstance(source_head, str) or not source_head:
@@ -866,23 +1006,24 @@ def validate_build_linkage(
     actual = _binary_records(executables, "executables") if executables else {}
     if not actual:
         raise ValueError("executables are required")
+    snapshot_index_hash, snapshot_index_entries = _source_index_identity(snapshot, "manifest source")
+    if source_state is not None:
+        state_index_hash, state_index_entries = _source_index_identity(source_state, "captured source")
+        if state_index_hash != snapshot_index_hash or state_index_entries != snapshot_index_entries:
+            raise ValueError("manifest source/index identity divergence")
 
-    runtime_records = runtime_identity.get("binaries") if isinstance(runtime_identity, Mapping) else None
-    if runtime_records is None:
-        # Preserve the small legacy single-binary manifest shape, but never
-        # treat one aggregate identity as coverage for multiple launched roles.
-        if len(actual) != 1:
-            raise ValueError("runtime-library coverage is missing for launched executables")
-        _require_meaningful_identity(runtime_identity, "runtime-library")
-    elif not isinstance(runtime_records, Mapping) or not runtime_records:
+    runtime_records = runtime_identity.get("binaries")
+    if not isinstance(runtime_records, Mapping) or not runtime_records:
         raise ValueError("runtime-library coverage is incomplete")
     else:
         for role, record in actual.items():
-            manifest_name = str(record.get("manifest_name") or Path(str(record.get("path", ""))).name) if isinstance(record, Mapping) else Path(str(record)).name
-            coverage = runtime_records.get(role, runtime_records.get(manifest_name))
+            coverage = runtime_records.get(role)
             if coverage is None:
                 raise ValueError(f"runtime-library coverage is missing for {role}")
             _require_meaningful_identity(coverage, f"runtime-library.{role}")
+            if not isinstance(coverage, Mapping):
+                raise ValueError(f"runtime-library coverage is invalid for {role}")
+            _validate_runtime_record(coverage, f"runtime-library.{role}")
             if _identity_unavailable(coverage):
                 raise ValueError(f"runtime-library coverage is unavailable for {role}")
     expected_identities = {
@@ -1108,8 +1249,10 @@ __all__ = [
     "capture_git_state",
     "capture_local_provenance",
     "capture_plan_snapshot",
+    "collect_secret_values",
     "file_identity",
     "sanitize_config",
+    "sanitize_evidence_tree",
     "snapshot_files",
     "snapshot_selected_files",
     "validate_build_linkage",

@@ -36,8 +36,11 @@ from local_provenance import (
     capture_git_state,
     capture_plan_snapshot as local_write_v2_plan,
     _current_index_blob as local_provenance_module_current_index_blob,
+    _expand_value as _expand_value_for_secrets,
+    collect_secret_values,
     file_identity,
     sanitize_config,
+    sanitize_evidence_tree,
     validate_build_linkage,
 )
 
@@ -62,6 +65,7 @@ OPTIONAL_ENV = ("NG_VM_HOST", "NG_VM_USER", "NG_VM_SSH_KEY", "NG_VM_KNOWN_HOSTS"
 SCENARIO_FILE = {"L0": "L0", "L1": "L1", "L2": "L2", "L3": "L3", "L4": "L4", "L5": "L5", "pgcs-only": "L2", "nrncs-only": "L3", "repository-control": "L4", "photos-100": "L5", "local-intra-os": "LOCAL"}
 LOCAL_REQUIRED_ENV = ("NG_LOCAL_REPO_PATH", "NG_LOCAL_BUILD_PATH", "NG_LOCAL_IO_PATH", "NG_LOCAL_EVIDENCE_PATH")
 LOCAL_OPTIONAL_ENV = ("NG_LOCAL_BUILD_MANIFEST",)
+_LOCAL_SECRET_VALUES: set[str] = set()
 
 
 def utc_id() -> str:
@@ -422,7 +426,7 @@ def host_for(config: Mapping[str, str], role: Mapping[str, Any]) -> tuple[str, s
 
 def local_record(path: Path, event: str, **fields: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    record = {"utc": dt.datetime.now(dt.timezone.utc).isoformat(), "event": event, **sanitize_config(fields)}
+    record = {"utc": dt.datetime.now(dt.timezone.utc).isoformat(), "event": event, **sanitize_config(fields, _known_secrets=_LOCAL_SECRET_VALUES)}
     with path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(record, ensure_ascii=False) + "\n")
 
@@ -474,6 +478,12 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
     effective_schema = schema_version if schema_version is not None else (2 if metadata.get("mode") == "local" else 1)
     if effective_schema not in {1, 2}:
         raise ValueError("unsupported evidence schema version")
+    if effective_schema == 2:
+        metadata_secrets = collect_secret_values(metadata)
+        metadata = sanitize_config(metadata, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets)
+        safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
+        if safety["blockers"]:
+            metadata = {**metadata, "protected_input_blockers": safety["blockers"]}
     entries = []
     for path in sorted(evidence_dir.rglob("*")):
         if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
@@ -785,6 +795,11 @@ def local_process_snapshot(processes: Mapping[str, dict[str, Any]]) -> list[dict
             "running": proc.poll() is None,
             "executable": item["argv"][0],
             "launched_identity": item.get("launched_identity"),
+            "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)),
+            "descendant_scan_seen": item.get("descendant_scan_seen", False),
+            "descendant_scan_complete": item.get("descendant_scan_complete", True),
+            "rollback_uncertain": item.get("rollback_uncertain", False),
+            "unresolved": item.get("unresolved", False),
         })
     return result
 
@@ -941,7 +956,7 @@ def local_digest_map(directory: Path, pattern: str = "*") -> dict[str, dict[str,
 
 def local_json_write(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(sanitize_config(value, _known_secrets=_LOCAL_SECRET_VALUES), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def validate_workload_spec(workload: Mapping[str, Any]) -> None:
@@ -1469,6 +1484,8 @@ def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[
 
 
 def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_starttime: str | None) -> dict[str, Any]:
+    if pgid is None:
+        return {"ok": False, "result": "identity-unavailable", "pid": proc.pid, "residual": [{"pid": proc.pid, "reason": "process-group-identity-missing"}]}
     if proc.poll() is not None:
         group_scan = local_group_members_status(pgid)
         if not group_scan["complete"]:
@@ -1545,14 +1562,33 @@ def register_local_process(
         if item["starttime"] is None:
             raise RuntimeError("process starttime identity unavailable")
     except BaseException as exc:
-        # The Popen object is the only safe identity available when metadata
-        # lookup fails.  Roll back immediately and leave no untracked child.
-        processes.pop(role, None)
+        # Keep the ledger entry while every rollback check completes.  The
+        # Popen handle is safe for the leader, but it is not proof of group or
+        # descendant ownership; uncertainty must remain visible to teardown.
+        item["identity_failure"] = str(exc)
+        item["rollback_uncertain"] = True
+        item["rollback_started"] = True
+        scan = local_process_descendants(proc.pid)
+        item["descendant_scan_seen"] = True
+        item["descendant_scan_complete"] = scan["complete"]
+        item["tracked_descendants"].update({child["pid"]: child for child in scan["descendants"]})
+        kill_ok = True
+        wait_ok = True
         try:
             proc.kill()
+        except (OSError, ProcessLookupError) as rollback_exc:
+            kill_ok = False
+            item["rollback_kill_error"] = str(rollback_exc)
+        try:
             proc.wait(timeout=5)
-        except (OSError, subprocess.SubprocessError):
-            pass
+        except (OSError, subprocess.SubprocessError) as rollback_exc:
+            wait_ok = False
+            item["rollback_wait_error"] = str(rollback_exc)
+        descendants_ok, residual = local_stop_tracked_descendants(item["tracked_descendants"])
+        item["rollback_descendants_ok"] = descendants_ok
+        item["rollback_descendant_residual"] = residual
+        item["rollback_complete"] = bool(kill_ok and wait_ok and scan["complete"] and descendants_ok)
+        item["unresolved"] = not item["rollback_complete"]
         try:
             stdout.close()
             stderr.close()
@@ -1563,6 +1599,7 @@ def register_local_process(
 
 
 def run_local_trial(args: argparse.Namespace) -> int:
+    global _LOCAL_SECRET_VALUES
     config = load_local_config(getattr(args, "env", None))
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="local")
     trial_id = validate_trial_id(args.trial or utc_id())
@@ -1575,6 +1612,11 @@ def run_local_trial(args: argparse.Namespace) -> int:
     local_record(events, "trial-start", trial_id=trial_id, scenario=args.scenario, debug_profile=args.debug_profile, contract_level=contract["level"], mode="local")
     variables = dict(config)
     variables["TRIAL_ID"] = trial_id
+    _LOCAL_SECRET_VALUES = collect_secret_values({"plan": _expand_value_for_secrets(plan, variables), "config": variables})
+    _LOCAL_SECRET_VALUES.update(collect_secret_values(os.environ))
+    for declared_role in plan.get("roles", []):
+        if isinstance(declared_role, Mapping):
+            _LOCAL_SECRET_VALUES.update(collect_secret_values(_expand_value_for_secrets(declared_role.get("env", {}), variables)))
     overall_deadline = time.monotonic() + float(plan["timeouts"]["total"])
     local_record(events, "prepare", mode="local", evidence_dir=str(evidence_dir))
     workload = local_prepare_v2_layout(evidence_dir, plan, contract, config, variables)
@@ -1600,7 +1642,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     provenance["evidence_schema_v2"] = True
     eligibility = local_acceptance_eligibility(provenance)
     provenance["acceptance_eligibility"] = eligibility
-    (evidence_dir / "provenance.json").write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    local_json_write(evidence_dir / "provenance.json", provenance)
     local_record(events, "provenance-written", provenance_path=str(evidence_dir / "provenance.json"), acceptance_eligibility=eligibility)
     processes: dict[str, dict[str, Any]] = {}
     before_ipc = local_ipc_snapshot()
@@ -1619,6 +1661,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             effective_oracle["repository"] = str(Path(workload["staging_io_path"]) / "Repository1")
         effective_oracle["expected_map"] = dict(workload["expected_map"])
     oracle_snapshot: dict[str, Any] = {"schema_version": 2, "type": (effective_oracle or {}).get("type"), "preservation_verified": False}
+    protected_input_blockers: list[str] = []
     try:
         preflight = local_preflight(effective_config, plan, variables, workload, provenance)
         local_record(events, "preflight", result=preflight)
@@ -1748,6 +1791,9 @@ def run_local_trial(args: argparse.Namespace) -> int:
             item = processes[role]
             proc = item["process"]
             pgid = item["pgid"]
+            if item.get("rollback_uncertain"):
+                teardown_result = "FAIL"
+                local_record(events, "identity-rollback", role=role, rollback_complete=item.get("rollback_complete", False), unresolved=item.get("unresolved", True), residual=item.get("rollback_descendant_residual", []))
             if proc.poll() is None:
                 final_scan = local_process_descendants(proc.pid)
                 item["descendant_scan_seen"] = True
@@ -1789,14 +1835,14 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 members = final_group_scan["members"]
             item["group_members_after_stop"] = members
             item["process"] = proc
-            local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members})
+            local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members, "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)), "rollback_uncertain": item.get("rollback_uncertain", False), "unresolved": item.get("unresolved", False)})
             item["stdout"].close()
             item["stderr"].close()
         oracle = effective_oracle
         if oracle and oracle.get("type") == "files":
             try:
                 oracle_snapshot = preserve_local_artifacts(oracle, variables, evidence_dir)
-                (evidence_dir / "oracle.json").write_text(json.dumps(oracle_snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                local_json_write(evidence_dir / "oracle.json", oracle_snapshot)
                 local_record(events, "evidence-preserved", oracle_path=str(evidence_dir / "oracle.json"), preservation_verified=oracle_snapshot["preservation_verified"])
                 if not oracle_snapshot["preservation_verified"]:
                     evidence_result = "INCOMPLETE"
@@ -1817,6 +1863,15 @@ def run_local_trial(args: argparse.Namespace) -> int:
         local_record(events, "inventory", processes=local_process_snapshot(processes), ipc_new_ids=new_ipc, ipc_cleanup=ipc_ok, ipc_cleanup_reason=ipc_reason)
         if not ipc_ok:
             teardown_result = "FAIL"
+        safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES)
+        if safety["blockers"]:
+            protected_input_blockers.extend(safety["blockers"])
+            evidence_result = "INCOMPLETE"
+            eligibility["eligible"] = False
+            for blocker in safety["blockers"]:
+                if blocker not in eligibility["blockers"]:
+                    eligibility["blockers"].append(blocker)
+            local_record(events, "protected-input-blocker", blockers=safety["blockers"], quarantined=safety["quarantined"])
         local_json_write(evidence_dir / "ownership.json", {"schema_version": 2, "method": "creator-pid", "trial_pids": sorted(item["process"].pid for item in processes.values()), "ipc_new_ids": new_ipc, "attribution": "fail-closed" if ipc_reason else "creator-pid"})
         local_json_write(evidence_dir / "cleanup.json", {"schema_version": 2, "ordered_actions": ["stop", "evidence-preserve", "ipc-cleanup", "final-inventory"], "ipc_cleanup": ipc_ok, "ipc_reason": ipc_reason, "result": teardown_result})
         local_json_write(evidence_dir / "inventory" / "final.json", {"schema_version": 2, "processes": local_process_snapshot(processes), "ipc": {"new_ids": new_ipc, "cleanup_ok": ipc_ok, "cleanup_reason": ipc_reason}})
@@ -1827,9 +1882,9 @@ def run_local_trial(args: argparse.Namespace) -> int:
     code = 130 if interrupted and teardown_result == "PASS" and evidence_result == "COMPLETE" else classify_result(runtime, teardown_result, evidence_result)
     if not eligibility["eligible"] and code == 0:
         code = 21
-    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "exit_code": code}
+    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "protected_input_blockers": protected_input_blockers, "exit_code": code}
     result_path = evidence_dir / "result.json"
-    result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    local_json_write(result_path, result)
     try:
         # Seal once before invoking the offline verifier, then reseal after its
         # stable verdict is recorded. No evidence is mutated after the final seal.
@@ -1841,7 +1896,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             verification = {"code": "NGELC-VERIFIER-ERROR", "integrity": False, "accepted": False, "errors": [str(exc)]}
         result, code, evidence_result = apply_local_verification(result, eligibility, verification, runtime, teardown_result, evidence_result)
         local_json_write(evidence_dir / "offline-verification.json", result["offline_verification"])
-        result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        local_json_write(result_path, result)
         for _attempt in range(2):
             local_record(events, "offline-verification", report=result["offline_verification"])
             local_record(events, "bundle-seal", phase="final-verification")
@@ -1859,13 +1914,13 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 break
             result, code, evidence_result = apply_local_verification(result, eligibility, final_verification, runtime, teardown_result, evidence_result)
             local_json_write(evidence_dir / "offline-verification.json", result["offline_verification"])
-            result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            local_json_write(result_path, result)
     except OSError as exc:
         evidence_result = "INCOMPLETE"
         teardown_result = "UNKNOWN"
         code = classify_result(runtime, teardown_result, evidence_result)
         result.update({"teardown_result": teardown_result, "evidence_result": evidence_result, "exit_code": code})
-        result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        local_json_write(result_path, result)
         local_record(events, "manifest-error", error=str(exc))
         try:
             write_evidence_manifest(evidence_dir, {"trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result})

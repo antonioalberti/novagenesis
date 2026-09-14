@@ -126,7 +126,7 @@ def test_process_identity_failure_rolls_back_registered_child(tmp_path: Path):
     with patch("ng_remote_executor.os.getpgid", side_effect=PermissionError("identity denied")):
         with pytest.raises(RuntimeError, match="registration failed"):
             register_local_process(processes, "Role", child, ["child"], stdout, stderr, tmp_path / "stdout", tmp_path / "stderr", {"representation": "sealed-memfd"})
-    assert processes == {}
+    assert processes["Role"]["rollback_uncertain"] is True
     assert child.poll() is not None
 
 
