@@ -516,6 +516,10 @@ _SERIALIZED_ARGV_TEXT_RE = re.compile(
     r"(?P=flag_quote)\s*,\s*(?P<value_quote>['\"])(?P<serialized_value>.*?)(?P=value_quote)",
     re.IGNORECASE,
 )
+_SECRET_ARGV_FLAG_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:--?|/)(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)(?![A-Za-z0-9_-])",
+    re.IGNORECASE,
+)
 _SECRET_TEXT_PATTERNS = (
     _SECRET_QUERY_RE,
     _AUTH_RE,
@@ -576,7 +580,7 @@ def _redact_string(value: str, secrets: set[str]) -> str:
             return f"{prefix}{quote}<redacted>{quote}"
         return f"{prefix}<redacted>"
 
-    result = value
+    result = _redact_argv_forms(value)
     for secret in sorted((item for item in secrets if item), key=len, reverse=True):
         result = result.replace(secret, "<redacted>")
     result = _SECRET_QUERY_RE.sub(r"\1<redacted>", result)
@@ -596,6 +600,62 @@ def _redact_string(value: str, secrets: set[str]) -> str:
         result,
     )
     return result
+
+
+def _redact_argv_forms(value: str) -> str:
+    """Redact secret argv values in shell, JSON, and Python renderings.
+
+    Evidence logs are often fragments rather than valid source for a parser.
+    This lexical pass therefore recognises a sensitive flag followed by an
+    optional assignment/separator and replaces the complete quoted value,
+    including spaces and escaped delimiters.
+    """
+    replacements: list[tuple[int, int]] = []
+    for flag in _SECRET_ARGV_FLAG_RE.finditer(value):
+        cursor = flag.end()
+        preceding = value[flag.start() - 1] if flag.start() else ""
+        if preceding in {"'", '"'} and cursor < len(value) and value[cursor] == preceding:
+            cursor += 1
+        while cursor < len(value) and value[cursor].isspace():
+            cursor += 1
+        if cursor < len(value) and value[cursor] in "=,:":
+            cursor += 1
+            while cursor < len(value) and value[cursor].isspace():
+                cursor += 1
+        if cursor >= len(value):
+            continue
+        if value[cursor] in {"'", '"'}:
+            quote = value[cursor]
+            start = cursor + 1
+            cursor = start
+            backslashes = 0
+            while cursor < len(value):
+                character = value[cursor]
+                if character == quote and backslashes % 2 == 0:
+                    replacements.append((start, cursor))
+                    break
+                if character == "\\":
+                    backslashes += 1
+                else:
+                    backslashes = 0
+                cursor += 1
+            continue
+        start = cursor
+        while cursor < len(value) and value[cursor] not in " \\t\\r\\n,])};&|":
+            cursor += 1
+        if cursor > start:
+            replacements.append((start, cursor))
+    if not replacements:
+        return value
+    result = value
+    for start, end in sorted(set(replacements), reverse=True):
+        result = result[:start] + "<redacted>" + result[end:]
+    return result
+
+
+def _has_argv_secret_form(value: str) -> bool:
+    """Return whether a sensitive argv flag has a value to protect."""
+    return _redact_argv_forms(value) != value
 
 
 def sanitize_config(value: Any, key: str | None = None, _known_secrets: set[str] | None = None) -> Any:
@@ -1005,7 +1065,7 @@ def _execution_input_blockers(value: Any, location: str = "input") -> list[str]:
     if isinstance(value, str):
         if any(_is_secret_filename(part) for part in Path(value).parts):
             blockers.append(f"protected-input secret-bearing filename: {location}")
-        if any(pattern.search(value) for pattern in _SECRET_TEXT_PATTERNS):
+        if any(pattern.search(value) for pattern in _SECRET_TEXT_PATTERNS) or _has_argv_secret_form(value):
             blockers.append(f"protected-input secret-bearing execution text: {location}")
     return blockers
 
@@ -1131,7 +1191,10 @@ def validate_build_receipt(manifest: Mapping[str, Any], executables: Mapping[str
     if receipt.get("schema_version") != 1 or receipt.get("working_directory") != working_directory:
         raise ValueError("build receipt identity is incomplete")
     output_directory = _require_text(receipt.get("output_directory"), "build receipt output_directory", absolute=True)
-    if manifest.get("output") is not None and str(Path(manifest["output"]).resolve()) != str(Path(output_directory).resolve()):
+    output_root = Path(output_directory).resolve()
+    if not output_root.is_dir():
+        raise ValueError("build receipt output_directory is not a directory")
+    if manifest.get("output") is not None and str(Path(manifest["output"]).resolve()) != str(output_root):
         raise ValueError("build receipt output directory diverges")
     source_directory = manifest.get("source")
     if source_directory is not None:
@@ -1184,8 +1247,11 @@ def validate_build_receipt(manifest: Mapping[str, Any], executables: Mapping[str
             raise ValueError(f"build receipt output size diverges for {role}")
         if not Path(expected_path).is_file() or _sha256(Path(expected_path)) != expected_hash:
             raise ValueError(f"build receipt output is not the captured file for {role}")
-        if Path(expected_path).resolve() not in Path(output_directory).resolve().parents and Path(expected_path).resolve() != Path(output_directory).resolve():
-            raise ValueError(f"build receipt output escapes output directory for {role}")
+        resolved_output = Path(expected_path).resolve()
+        try:
+            resolved_output.relative_to(output_root)
+        except ValueError as exc:
+            raise ValueError(f"build receipt output escapes output directory for {role}") from exc
     return True
 
 
@@ -1195,6 +1261,7 @@ def validate_build_linkage(
     executables: Mapping[str, Any] | Sequence[Mapping[str, Any]],
     source_state: Mapping[str, Any] | None = None,
     manifest_evidence: Mapping[str, Any] | None = None,
+    require_receipt: bool | None = None,
 ) -> bool:
     """Validate that a build manifest links the supplied source and binaries.
 
@@ -1205,6 +1272,10 @@ def validate_build_linkage(
 
     if not isinstance(manifest, Mapping) or not manifest:
         raise ValueError("manifest is required and must not be empty")
+    if require_receipt is None:
+        require_receipt = manifest.get("mode") == "local"
+    if not isinstance(require_receipt, bool):
+        raise ValueError("require_receipt must be boolean")
     preliminary_value = manifest.get("binaries")
     if preliminary_value:
         preliminary = _binary_records(preliminary_value, "manifest")
@@ -1271,7 +1342,7 @@ def validate_build_linkage(
         raise ValueError("complete build options identity is required")
     _validate_build_options(options)
 
-    if "build_receipt" in manifest or "source" in manifest or "output" in manifest:
+    if require_receipt or "build_receipt" in manifest or "source" in manifest or "output" in manifest:
         validate_build_receipt(manifest, executables)
     else:
         # Keep old schema-1 callers readable, but do not let an arbitrary
@@ -1321,6 +1392,16 @@ def validate_build_linkage(
         current_preserved = file_identity(preserved_candidate)
         if current_preserved["size"] != preserved_size or current_preserved["sha256"] != manifest_evidence["preserved_sha256"]:
             raise ValueError("preserved manifest evidence drift")
+        if require_receipt:
+            try:
+                preserved_manifest = json.loads(preserved_candidate.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise ValueError("preserved build receipt is unavailable") from exc
+            if not isinstance(preserved_manifest, Mapping) or not isinstance(preserved_manifest.get("build_receipt"), Mapping):
+                raise ValueError("preserved build receipt is required")
+            validate_build_receipt(preserved_manifest, executables)
+    elif require_receipt:
+        raise ValueError("preserved build receipt evidence is required")
 
     snapshot = manifest.get("source_snapshot")
     if snapshot is None and isinstance(manifest.get("source"), Mapping):
@@ -1558,6 +1639,7 @@ def capture_local_provenance(
                 manifest_executables,
                 source_state=git_state,
                 manifest_evidence=manifest_record,
+                require_receipt=True,
             )
             linkage_error = None
         except (TypeError, ValueError) as exc:

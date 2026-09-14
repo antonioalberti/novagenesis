@@ -474,11 +474,42 @@ def collect_remote(config: Mapping[str, str], host: str, state_dir: str, local_d
         raise RuntimeError(f"evidence collection failed on {host}: {run.stderr.strip()}")
 
 
-def _durable_atomic_write(path: Path, data: bytes) -> None:
+def _cleanup_publication_artifacts(evidence_dir: Path) -> list[str]:
+    """Remove or quarantine every partially published manifest artifact."""
+    root = Path(evidence_dir)
+    candidates = [root / "manifest.json", root / "manifest.sha256", root / "terminal-seal.json"]
+    candidates.extend(root / f".{name}.{os.getpid()}.tmp" for name in ("manifest.json", "manifest.sha256", "terminal-seal.json"))
+    errors: list[str] = []
+    try:
+        candidates.extend(root.glob(".manifest.json.*.tmp"))
+        candidates.extend(root.glob(".manifest.sha256.*.tmp"))
+        candidates.extend(root.glob(".terminal-seal.json.*.tmp"))
+    except BaseException as exc:
+        # The fixed publication names are still cleaned even when directory
+        # enumeration itself is fault-injected or unavailable.
+        errors.append(f"publication artifact enumeration failed: {type(exc).__name__}")
+    for candidate in dict.fromkeys(candidates):
+        try:
+            candidate.unlink(missing_ok=True)
+        except FileNotFoundError:
+            continue
+        except BaseException as exc:
+            quarantine = root.parent / f".{root.name}.publication-quarantine"
+            try:
+                quarantine.mkdir(parents=True, exist_ok=True)
+                os.replace(candidate, quarantine / f"{candidate.name}.{os.getpid()}")
+            except BaseException as quarantine_exc:
+                errors.append(f"publication artifact cleanup failed: {candidate.name}: {type(quarantine_exc).__name__}")
+            else:
+                errors.append(f"publication artifact quarantined: {candidate.name}: {type(exc).__name__}")
+    return errors
+
+
+def _durable_atomic_write(path: Path, data: bytes, *, publication_artifact: bool = False) -> None:
     """Replace one evidence record atomically and verify the reopened bytes."""
-    path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
+        path.parent.mkdir(parents=True, exist_ok=True)
         with temporary.open("xb") as handle:
             handle.write(data)
             handle.flush()
@@ -493,11 +524,13 @@ def _durable_atomic_write(path: Path, data: bytes) -> None:
             reopened = handle.read()
         if reopened != data or hashlib.sha256(reopened).digest() != hashlib.sha256(data).digest():
             raise OSError(f"durable evidence write failed reopen/hash validation: {path.name}")
-    except Exception:
+    except BaseException:
         try:
             temporary.unlink()
-        except FileNotFoundError:
+        except BaseException:
             pass
+        if publication_artifact:
+            _cleanup_publication_artifacts(path.parent)
         raise
 
 
@@ -540,7 +573,7 @@ def _local_manifest_entries(evidence_dir: Path) -> tuple[list[dict[str, Any]], l
     return entries, errors
 
 
-def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
+def _write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
     """Publish a manifest, sealing local v2 only after a clean final scan."""
     effective_schema = schema_version if schema_version is not None else (2 if metadata.get("mode") == "local" else 1)
     if effective_schema not in {1, 2}:
@@ -603,16 +636,14 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
     def abort_publication(reason: str) -> None:
         if reason and reason not in blockers:
             blockers.append(reason)
+        # Publication artifacts must be gone (or quarantined) before the
+        # failure record is written.  This prevents a stale seal from being
+        # mistaken for the result of the failed attempt.
+        blockers.extend(_cleanup_publication_artifacts(evidence_dir))
+        blockers[:] = list(dict.fromkeys(blockers))
         if effective_schema == 2:
             publish_blockers()
-        for published in (manifest_path, evidence_dir / "manifest.sha256", evidence_dir / "terminal-seal.json"):
-            try:
-                published.unlink(missing_ok=True)
-            except OSError:
-                # The original blocker remains authoritative; never replace it
-                # with a falsely clean terminal state.
-                pass
-        raise OSError("evidence publication aborted: " + "; ".join(dict.fromkeys(blockers)))
+        raise OSError("evidence publication aborted: " + "; ".join(blockers))
 
     if blockers and effective_schema == 2:
         abort_publication("protected-input blocker was already recorded")
@@ -637,10 +668,10 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
                 entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
     manifest = {**metadata, "schema_version": effective_schema, "files": entries}
     manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    _durable_atomic_write(manifest_path, manifest_bytes)
+    _durable_atomic_write(manifest_path, manifest_bytes, publication_artifact=True)
     if effective_schema == 1:
         checksum = f"{hashlib.sha256(manifest_bytes).hexdigest()}  manifest.json\n".encode("utf-8")
-        _durable_atomic_write(evidence_dir / "manifest.sha256", checksum)
+        _durable_atomic_write(evidence_dir / "manifest.sha256", checksum, publication_artifact=True)
         return manifest_path
 
     final_safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
@@ -660,10 +691,20 @@ def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema
     seal = {"schema_version": 2, "kind": "terminal-seal", "manifest_path": "manifest.json", "manifest_sha256": manifest_hash, "sealed": True}
     seal_bytes = (json.dumps(seal, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     seal_path = evidence_dir / "terminal-seal.json"
-    _durable_atomic_write(seal_path, seal_bytes)
+    _durable_atomic_write(seal_path, seal_bytes, publication_artifact=True)
     if seal_path.read_bytes() != seal_bytes or json.loads(seal_path.read_text(encoding="utf-8")).get("manifest_sha256") != hashlib.sha256(manifest_path.read_bytes()).hexdigest():
         abort_publication("terminal seal reopen/hash validation failed")
     return manifest_path
+
+
+def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
+    """Publish evidence or clean publication artifacts before failure escapes."""
+    root = Path(evidence_dir)
+    try:
+        return _write_evidence_manifest(root, metadata, schema_version)
+    except BaseException:
+        _cleanup_publication_artifacts(root)
+        raise
 
 
 def local_verification_summary(report: Mapping[str, Any]) -> dict[str, Any]:

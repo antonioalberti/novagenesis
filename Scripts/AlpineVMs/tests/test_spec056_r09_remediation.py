@@ -236,7 +236,7 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
         build.mkdir()
         io.mkdir()
         source = root / "fixture.c"
-        executable = root / "fixture-role"
+        executable = build / "fixture-role"
         source.write_text("#include <stdio.h>\n#include <unistd.h>\nint main(void) { puts(\"READY\"); fflush(stdout); sleep(1); puts(\"OBSERVE\"); fflush(stdout); sleep(5); return 0; }\n", encoding="utf-8")
         compiler = shutil.which("cc") or shutil.which("gcc")
         if compiler is None:
@@ -262,11 +262,22 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
             "cwd": str(build),
             "readiness": [{"id": "ready", "pattern": "READY"}],
         } for role in roles]
+        receipt_commands = []
+        build_commands = [["cmake", "-S", str(repo), "-B", str(build)], ["cmake", "--build", str(build)]]
+        for command in build_commands:
+            captured = {"argv": command, "cwd": str(repo), "returncode": 0, "stdout_sha256": hashlib.sha256(b"").hexdigest(), "stderr_sha256": hashlib.sha256(b"").hexdigest()}
+            captured["command_sha256"] = local_provenance._receipt_command_digest(captured)
+            receipt_commands.append(captured)
+        receipt = {"schema_version": 1, "working_directory": str(repo), "output_directory": str(build), "commands": receipt_commands, "outputs": {"PGCS": {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash}, "NRNCS": {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash}, "Repository": {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash}, "Source": {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash}}}
+        receipt["receipt_sha256"] = hashlib.sha256(json.dumps({key: value for key, value in receipt.items() if key != "receipt_sha256"}, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         manifest = {
             "schema_version": 1,
+            "source": str(repo),
+            "output": str(build),
             "source_head": state["head"],
             "source_snapshot": state,
-            "recipe": {"commands": [["cmake", "--build", str(build)]], "working_directory": str(repo), "executed": True, "returncodes": [0]},
+            "recipe": {"commands": build_commands, "working_directory": str(repo), "executed": True, "returncodes": [0, 0]},
+            "build_receipt": receipt,
             "toolchain": {"compiler": compiler, "version": compiler_version, "version_sha256": hashlib.sha256(compiler_version.encode()).hexdigest(), "status": "ok"},
             "options": {"variant": "normal", "jobs": 1, "configure_only": False},
             "runtime_library_identity": {"method": "ldd", "binaries": {role: {"status": "ok", "output_sha256": ldd_hash, "binary_sha256": executable_hash, "libraries": [line.strip() for line in stable_ldd.splitlines() if line.strip()]} for role in roles}},
