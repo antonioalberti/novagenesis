@@ -50,7 +50,7 @@
       ]
     }
   ],
-  "timeouts": {"readiness": 300, "observation": 120, "total": 600},
+  "timeouts": {"readiness": 300, "observation": 300, "total": 900},
   "require_fresh_boot": true,
   "diagnostic_only": false,
   "debug_profile": "obs-normal",
