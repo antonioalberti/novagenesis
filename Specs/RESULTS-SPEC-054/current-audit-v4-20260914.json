@@ -1,7 +1,6 @@
 {
-  "audit_tree_sha": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
-  "audit_command": "python3 Scripts/ProjectAudit/ng_release_audit.py --repo . --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md --vault /home/gandalf/ObsidianVault --json",
-  "exit_code": 2,
+  "audit_tree_sha": "bf55f0f97b630db50efd7533882e8887d281f23f",
+  "audit_command": "python3 Scripts/ProjectAudit/ng_release_audit.py --repo . --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md --vault <obsidian-vault> --json",
   "result": {
     "branch": "AIOPT3",
     "gates": [
@@ -76,7 +75,7 @@
         ]
       }
     ],
-    "head": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
+    "head": "bf55f0f97b630db50efd7533882e8887d281f23f",
     "issues": [
       {
         "code": "SPEC_OPEN",
@@ -181,7 +180,7 @@
     "worktree": {
       "branch": "AIOPT3",
       "dirty": false,
-      "head": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
+      "head": "bf55f0f97b630db50efd7533882e8887d281f23f",
       "paths": []
     }
   }
