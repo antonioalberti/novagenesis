@@ -211,7 +211,7 @@ Execução com vault:
 python3 Scripts/ProjectAudit/ng_release_audit.py \
   --repo . \
   --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md \
-  --vault /home/gandalf/ObsidianVault
+  --vault <obsidian-vault>
 ```
 
 JSON para automação:
@@ -220,7 +220,7 @@ JSON para automação:
 python3 Scripts/ProjectAudit/ng_release_audit.py \
   --repo . \
   --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md \
-  --vault /home/gandalf/ObsidianVault \
+  --vault <obsidian-vault> \
   --json
 ```
 

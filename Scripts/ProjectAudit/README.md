@@ -10,7 +10,7 @@ A partir da raiz do repositório:
 python3 Scripts/ProjectAudit/ng_release_audit.py \
   --repo . \
   --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md \
-  --vault /home/gandalf/ObsidianVault
+  --vault <obsidian-vault>
 ```
 
 Para automação:
@@ -19,7 +19,7 @@ Para automação:
 python3 Scripts/ProjectAudit/ng_release_audit.py \
   --repo . \
   --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md \
-  --vault /home/gandalf/ObsidianVault \
+  --vault <obsidian-vault> \
   --json
 ```
 

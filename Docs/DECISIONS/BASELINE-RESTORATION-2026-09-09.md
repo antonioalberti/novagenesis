@@ -1,5 +1,7 @@
 # Baseline restoration and controlled SPEC-033 restart
 
+> **HISTORICAL RECORD:** This document describes a 2026-09-09 recovery event. Its guest paths, hashes and runtime observations are retained for provenance only and are not active deployment instructions.
+
 Date: 2026-09-09. User-approved rollback; no new refactor implementation approved.
 
 ## Source and recovery identity
