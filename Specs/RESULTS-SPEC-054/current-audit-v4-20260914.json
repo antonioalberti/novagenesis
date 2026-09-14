@@ -1,11 +1,11 @@
 {
-  "audit_tree_sha": "bf55f0f97b630db50efd7533882e8887d281f23f",
+  "audit_tree_sha": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
   "audit_command": "python3 Scripts/ProjectAudit/ng_release_audit.py --repo . --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md --vault <obsidian-vault> --json",
   "result": {
     "branch": "AIOPT3",
     "gates": [
       {
-        "evidence": "`Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`",
+        "evidence": "`Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`",
         "gate": "M0",
         "objective": "Contrato suportado, higiene, baseline e freeze",
         "prerequisite": "—",
@@ -75,12 +75,12 @@
         ]
       }
     ],
-    "head": "bf55f0f97b630db50efd7533882e8887d281f23f",
+    "head": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
     "issues": [
       {
         "code": "SPEC_OPEN",
         "message": "SPEC-038-public-repository-hygiene.md está In Progress",
-        "open_criteria": 3,
+        "open_criteria": 2,
         "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-038-public-repository-hygiene.md",
         "spec": "SPEC-038",
         "status": "In Progress"
@@ -180,7 +180,7 @@
     "worktree": {
       "branch": "AIOPT3",
       "dirty": false,
-      "head": "bf55f0f97b630db50efd7533882e8887d281f23f",
+      "head": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
       "paths": []
     }
   }
