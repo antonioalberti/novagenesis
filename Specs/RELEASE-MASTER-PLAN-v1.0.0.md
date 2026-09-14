@@ -127,7 +127,7 @@ Verificação realizada em 2026-09-13:
 
 - A branch remota/default é `AIOPT3`.
 - `AIOPT1` e `AIOPT2` não existem no remoto consultado; referências a essas branches devem ser tratadas como históricas. O clone local ainda conserva refs stale de `AIOPT1`, que não são base operacional nem devem ser usadas para a release.
-- O candidato actual publicado/verificado é `203927e`; commits anteriores (`1af604d`, `18d9b18`, `fce8577`, `4a8916e`) permanecem apenas como evidência histórica.
+- O candidato actual publicado/verificado é `c7deb7d`; commits anteriores (`1af604d`, `18d9b18`, `fce8577`, `4a8916e`, `203927e`, `eeb02bb`) permanecem apenas como evidência histórica.
 - A matriz v4 cobre quatro macro-gates operacionais (`M0–M3`) para o perfil mínimo; o mapa G0–G10 completo foi preservado no Apêndice A para v1.1+.
 - R12–R14 de SPEC-056 estão publicados como incrementos técnicos não-aceites; Astra mantém HOLD para aceitação formal.
 - O downcast alvo de `CoreRunEvaluate01` foi corrigido no commit `21a5512`.
