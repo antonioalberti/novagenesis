@@ -43,13 +43,7 @@
     {
       "name": "Source",
       "vm": "source",
-      "command": [
-        "/usr/bin/python3",
-        "-c",
-        "import os,subprocess,sys; base=sys.argv[1]; build=sys.argv[2]; io=os.path.join(base,'IO','SourceStaging','ng-elc-${TRIAL_ID}'); os.makedirs(io,exist_ok=True); subprocess.run(['python3',os.path.join(base,'Scripts/Python/BuildPhotos.py'),'--staging',io,'different','5','100','100'],check=True); os.execv(os.path.join(build,'ContentApp'),[os.path.join(build,'ContentApp'),io,'Source'])",
-        "${NG_REPO_PATH}",
-        "${NG_BUILD_PATH}"
-      ],
+      "command": ["${NG_BUILD_PATH}/ContentApp", "${NG_REPO_PATH}/IO/SourceStaging/e7-direct-5d54f32/", "Source"],
       "cwd": "${NG_BUILD_PATH}",
       "readiness": [
         {"id": "source-operational", "pattern": "State: Operational"}
