@@ -312,3 +312,18 @@ G0/G10 remain blocked until their own clean-candidate and release requirements a
 ## 11. Incremento verificado — offline verifier wiring
 
 Commits `a571e7e`, `dbf1241` and `c1f5ad8` wire the local lifecycle to invoke `verify_bundle()` after sealing, add the R02 deterministic five-file workload and add canonical R06 provenance/build-linkage capture with fail-closed executable drift/missing-manifest checks. Remote schema-v1 behaviour remains preserved. Astra reviews through `Specs/RESULTS-SPEC-056/astra-r14-review-20260914.md` returned `HOLD` for formal publication approval while preserving R12–R14 as bounded work. R12–R14 fix receipt containment and the tested quoted-argv disclosure, and improve publication/ownership controls, but complete durable sealing, receipt-to-build/runtime proof, C01 ownership and full remote compatibility/retained evidence remain open. A clean candidate trial with a production build manifest, complete ownership/cleanup evidence and local acceptance remain open under this SPEC.
+
+## 12. Bounded amendment — static executable build linkage (2026-09-14)
+
+The v1.0 normal build currently produces statically linked ELF executables. `ldd` therefore returns `not a dynamic executable`; treating that observation as a dynamic-library failure prevents the canonical local trial from reaching runtime and does not prove a NovaGenesis runtime defect.
+
+This amendment is limited to provenance validation and does not change C++, protocol, launch or remote schema-v1 behaviour:
+
+- retain the existing `ldd` path unchanged for dynamically linked executables;
+- add an explicit `static` linkage mode selected only after independent ELF/file inspection proves the executable is static;
+- record the observed `file`/ELF identity, executable SHA-256 and the exact `ldd` static result without inventing library dependencies;
+- validate static identity against the launched path and binary hash, and fail closed on ambiguous or contradictory loader evidence;
+- add RED→GREEN tests for static acceptance, dynamic regression and static/dynamic identity drift;
+- repeat one fresh local five-photo trial after the amendment, with the same provenance, workload, verifier and teardown requirements.
+
+The failed preflight is retained at `Specs/RESULTS-SPEC-056/local-static-build-linkage-20260914.md`. This amendment is a single M1 compatibility fix; it does not reopen the R15+ hardening backlog or permit SPEC-056 acceptance without the retained trial and review required by §8.2.
