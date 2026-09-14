@@ -144,9 +144,18 @@ def git_snapshot(root: Path) -> dict[str, Any]:
     try:
         head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
         status = subprocess.run(["git", "status", "--short"], cwd=root, capture_output=True, text=True, check=True).stdout.splitlines()
-        return {"head": head, "dirty": bool(status), "status": status, "tree_sha256": tree_sha256(root)}
+        submodule = subprocess.run(["git", "submodule", "status", "--recursive"], cwd=root, capture_output=True, text=True, check=False)
+        return {
+            "head": head,
+            "dirty": bool(status),
+            "status": status,
+            "tree_sha256": tree_sha256(root),
+            "submodules": submodule.stdout.splitlines() if submodule.returncode == 0 else ["git submodule status unavailable"],
+            "submodules_complete": submodule.returncode == 0,
+            "content_snapshot": {"captured": not status, "files": [], "entries": [], "errors": [] if not status else ["dirty source archive not captured"]},
+        }
     except (OSError, subprocess.CalledProcessError):
-        return {"head": "unknown", "dirty": True, "status": ["not-a-git-tree"], "tree_sha256": tree_sha256(root)}
+        return {"head": "unknown", "dirty": True, "status": ["not-a-git-tree"], "tree_sha256": tree_sha256(root), "submodules": ["git snapshot unavailable"], "submodules_complete": False, "content_snapshot": {"captured": False, "files": [], "entries": [], "errors": ["git snapshot unavailable"]}}
 
 
 def tree_sha256(root: Path) -> str:
@@ -160,6 +169,29 @@ def tree_sha256(root: Path) -> str:
         digest.update(path.read_bytes())
         digest.update(b"\0")
     return digest.hexdigest()
+
+
+def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Record the dynamic-loader view used by each produced executable."""
+    records: dict[str, Any] = {}
+    for name, binary in binaries.items():
+        path = binary["path"]
+        run = subprocess.run(["ldd", path], capture_output=True, text=True, check=False)
+        output = run.stdout + run.stderr
+        records[name] = {
+            "status": "ok" if run.returncode == 0 else "unavailable",
+            "output_sha256": hashlib.sha256(output.encode()).hexdigest(),
+            "libraries": sorted(line.strip() for line in output.splitlines() if line.strip()),
+        }
+    return {"method": "ldd", "binaries": records}
+
+
+def toolchain_identity() -> dict[str, Any]:
+    compiler = os.environ.get("CXX", "c++")
+    run = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=False)
+    output = run.stdout or run.stderr
+    version = output.splitlines()[0] if output else "unavailable"
+    return {"compiler": compiler, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok" if run.returncode == 0 else "unavailable"}
 
 
 def build_variant(source: Path, profile_path: Path, variant: str, output: Path, jobs: int = 1, configure_only: bool = False) -> dict[str, Any]:
@@ -214,7 +246,11 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         "source": str(source.resolve()),
         "source_snapshot": git_snapshot(source),
         "output": str(output),
+        "recipe": {"commands": commands, "working_directory": str(source.resolve())},
         "commands": commands,
+        "toolchain": toolchain_identity(),
+        "options": {"variant": variant, "jobs": max(1, jobs), "configure_only": configure_only, "cmake_args": cmake_args},
+        "runtime_library_identity": runtime_library_identity(binaries),
         "configure_only": configure_only,
         "debug_launcher_log": str(output / "debug-launcher.jsonl") if variant != "normal" else None,
         "effective_debug_invocations": effective_debug,

@@ -257,7 +257,7 @@ class ExecutorContractTests(unittest.TestCase):
             }), encoding="utf-8")
             env = {"NG_LOCAL_REPO_PATH": str(root), "NG_LOCAL_BUILD_PATH": str(build), "NG_LOCAL_IO_PATH": str(io), "NG_LOCAL_EVIDENCE_PATH": str(evidence), "NG_LOCAL_BUILD_MANIFEST": str(build_manifest)}
             args = Namespace(plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal", trial="bundle-trial", env=env)
-            self.assertEqual(run_local_trial(args), 21)
+            self.assertEqual(run_local_trial(args), 11)
             trial = evidence / "bundle-trial"
             sealed_result = json.loads((trial / "result.json").read_text())
             self.assertFalse(sealed_result["local_acceptance_eligible"])

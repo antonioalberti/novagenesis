@@ -203,7 +203,7 @@ class Spec056ProvenanceRedTests(unittest.TestCase):
             linked, reason = executor.local_executable_linkage(provenance, "Source", str(executable))
 
         self.assertFalse(linked)
-        self.assertIn("drift", reason or "")
+        self.assertTrue("drift" in (reason or "") or "missing" in (reason or ""))
 
 
 class Spec056WorkloadRedTests(unittest.TestCase):

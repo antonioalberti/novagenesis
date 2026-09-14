@@ -27,8 +27,10 @@ from typing import Any, Mapping
 from evidence_verifier import CODE_VALID, verify_bundle
 from local_provenance import (
     capture_local_provenance as local_provenance,
+    capture_git_state,
     capture_plan_snapshot as local_write_v2_plan,
     file_identity,
+    sanitize_config,
     validate_build_linkage,
 )
 
@@ -803,6 +805,8 @@ def local_acceptance_eligibility(provenance: Mapping[str, Any]) -> dict[str, Any
     workload_error = provenance.get("workload_error")
     if workload_error:
         blockers.append(str(workload_error))
+    if provenance.get("protected_inputs"):
+        blockers.append("protected-input provenance blocker")
     return {"eligible": not blockers, "blockers": blockers}
 
 
@@ -1119,28 +1123,98 @@ def preserve_local_artifacts(oracle: Mapping[str, Any], variables: Mapping[str, 
     return result
 
 
-def local_executable_linkage(provenance: Mapping[str, Any], role: str, argv0: str) -> tuple[bool, str | None]:
-    """Rehash the executable at launch and compare it with captured provenance."""
+def _source_identity_matches(provenance: Mapping[str, Any]) -> tuple[bool, str | None]:
+    source = provenance.get("source")
+    repo = provenance.get("repo_path")
+    if not isinstance(source, Mapping) or not isinstance(repo, str) or not repo:
+        return False, "source identity is missing"
+    try:
+        current = capture_git_state(repo, include_tree=True)
+    except (OSError, RuntimeError, subprocess.SubprocessError, ValueError) as exc:
+        return False, f"source identity unavailable: {exc}"
+    for field in ("head", "status", "tree_sha256"):
+        if source.get(field) != current.get(field):
+            return False, f"source {field} drift"
+    content = source.get("content_snapshot")
+    if not isinstance(content, Mapping) or content.get("captured") is not True or content.get("errors"):
+        return False, "source content snapshot is incomplete"
+    for record in content.get("files", []):
+        relative = record.get("path")
+        if not isinstance(relative, str):
+            return False, "source snapshot path is invalid"
+        try:
+            identity = file_identity(Path(repo) / relative)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            return False, f"source snapshot input unavailable: {exc}"
+        if identity["sha256"] != record.get("sha256"):
+            return False, f"source snapshot drift: {relative}"
+        evidence_dir = provenance.get("evidence_dir")
+        snapshot_path = record.get("snapshot_path")
+        if not isinstance(evidence_dir, str) or not isinstance(snapshot_path, str):
+            return False, f"source preserved snapshot is missing: {relative}"
+        try:
+            preserved_path = (Path(evidence_dir) / snapshot_path).resolve(strict=False)
+            preserved_path.relative_to(Path(evidence_dir).resolve())
+            preserved = file_identity(preserved_path)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            return False, f"source preserved snapshot unavailable: {exc}"
+        if preserved["sha256"] != record.get("snapshot_sha256", record.get("sha256")) or preserved["size"] != record.get("size"):
+            return False, f"source preserved snapshot drift: {relative}"
+        staged_path = record.get("staged_snapshot_path")
+        if staged_path:
+            try:
+                staged_candidate = (Path(evidence_dir) / staged_path).resolve(strict=False)
+                staged_candidate.relative_to(Path(evidence_dir).resolve())
+                staged = file_identity(staged_candidate)
+            except (FileNotFoundError, OSError, ValueError) as exc:
+                return False, f"staged source snapshot unavailable: {exc}"
+            if staged["sha256"] != record.get("staged_sha256") or staged["size"] != record.get("staged_size"):
+                return False, f"staged source snapshot drift: {relative}"
+    return True, None
+
+
+def local_executable_linkage(provenance: Mapping[str, Any], role: str, argv0: str, checked_path: str | None = None) -> tuple[bool, str | None]:
+    """Rehash the exact checked executable and source/build identity at spawn."""
 
     if not provenance.get("build_linkage"):
-        return True, None
+        return False, f"build linkage missing for {role}"
     manifest_record = provenance.get("build_manifest")
     if isinstance(manifest_record, Mapping) and manifest_record.get("path") and manifest_record.get("sha256"):
         try:
             current_manifest = file_identity(manifest_record["path"])
         except (FileNotFoundError, OSError, ValueError) as exc:
             return False, f"build manifest unavailable: {exc}"
-        if current_manifest["sha256"] != manifest_record["sha256"]:
+        if current_manifest["sha256"] != manifest_record["sha256"] or current_manifest["size"] != manifest_record.get("size"):
             return False, "build manifest drift"
+        preserved_path = manifest_record.get("preserved_path")
+        evidence_dir = provenance.get("evidence_dir")
+        if not isinstance(preserved_path, str) or not isinstance(evidence_dir, str):
+            return False, "preserved manifest evidence is missing"
+        try:
+            preserved_candidate = (Path(evidence_dir) / preserved_path).resolve(strict=False)
+            preserved_candidate.relative_to(Path(evidence_dir).resolve())
+            preserved = file_identity(preserved_candidate)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            return False, f"preserved manifest evidence unavailable: {exc}"
+        if preserved["sha256"] != manifest_record.get("preserved_sha256") or preserved["size"] != manifest_record.get("preserved_size"):
+            return False, "preserved manifest evidence drift"
+    else:
+        return False, "preserved build manifest is missing"
     expected = provenance.get("binaries", {}).get(role) if isinstance(provenance.get("binaries"), Mapping) else None
     if not isinstance(expected, Mapping) or not expected.get("resolved_path") or not expected.get("sha256"):
         return False, f"build linkage missing for {role}"
     try:
-        current = file_identity(argv0 if Path(argv0).is_absolute() else (shutil.which(argv0) or argv0))
+        resolved = Path(checked_path or (argv0 if Path(argv0).is_absolute() else (shutil.which(argv0) or argv0))).resolve(strict=False)
+        if checked_path is not None and resolved != Path(checked_path).resolve(strict=False):
+            return False, f"checked executable path changed for {role}"
+        current = file_identity(resolved)
     except (FileNotFoundError, OSError, ValueError) as exc:
         return False, f"launched executable unavailable for {role}: {exc}"
     if current["path"] != expected["resolved_path"] or current["sha256"] != expected["sha256"]:
         return False, f"launched executable drift for {role}"
+    source_ok, source_error = _source_identity_matches(provenance)
+    if not source_ok:
+        return False, source_error
     return True, None
 
 
@@ -1158,11 +1232,24 @@ def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variable
         if not workload.get("verified", False) and not errors:
             errors.append(str(workload.get("reason") or "fresh workload is not verified"))
     roles = []
+    executable_names: dict[str, tuple[str, str]] = {}
     for role in plan.get("roles", []):
         argv = expand_argv(role["command"], variables)
         executable = Path(argv[0]) if Path(argv[0]).is_absolute() else Path(shutil.which(argv[0]) or argv[0])
+        resolved_executable = executable.resolve(strict=False)
         cwd = Path(expand_argv([role["cwd"]], variables)[0]) if role.get("cwd") else None
-        item = {"name": role["name"], "executable": str(executable), "executable_exists": executable.is_file(), "executable_mode": bool(executable.is_file() and os.access(executable, os.X_OK)), "cwd": str(cwd) if cwd else None, "cwd_exists": bool(cwd is None or cwd.is_dir())}
+        item = {"name": role["name"], "executable": str(resolved_executable), "resolved_path": str(resolved_executable), "executable_exists": resolved_executable.is_file(), "executable_mode": bool(resolved_executable.is_file() and os.access(resolved_executable, os.X_OK)), "cwd": str(cwd) if cwd else None, "cwd_exists": bool(cwd is None or cwd.is_dir())}
+        if item["executable_exists"] and item["executable_mode"]:
+            try:
+                item["executable_identity"] = file_identity(resolved_executable)
+                identity = (item["executable_identity"]["path"], item["executable_identity"]["sha256"])
+                basename = resolved_executable.name
+                if basename in executable_names and executable_names[basename] != identity:
+                    errors.append(f"executable basename/path collision for {basename}")
+                executable_names[basename] = identity
+            except (FileNotFoundError, OSError, ValueError) as exc:
+                item["executable_identity_error"] = str(exc)
+                errors.append(f"{role['name']} executable identity unavailable")
         roles.append(item)
         if not item["executable_exists"]:
             errors.append(f"{role['name']} executable missing")
@@ -1171,7 +1258,7 @@ def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variable
         if not item["cwd_exists"]:
             errors.append(f"{role['name']} cwd missing")
         if provenance is not None:
-            linked, linkage_error = local_executable_linkage(provenance, role["name"], str(executable))
+            linked, linkage_error = local_executable_linkage(provenance, role["name"], str(resolved_executable), checked_path=str(resolved_executable))
             if not linked:
                 errors.append(linkage_error or f"build linkage missing for {role['name']}")
     return {"ok": not errors, "errors": errors, "paths": paths, "roles": roles}
@@ -1370,12 +1457,12 @@ def run_local_trial(args: argparse.Namespace) -> int:
             raise ConfigError("local preflight rejected: " + ", ".join(preflight["errors"]))
         for role in plan["roles"]:
             argv = expand_argv(role["command"], variables)
+            checked_role = next(item for item in preflight["roles"] if item["name"] == role["name"])
+            checked_executable = checked_role["resolved_path"]
+            argv[0] = checked_executable
             cwd = expand_argv([role["cwd"]], variables)[0] if role.get("cwd") else None
             if cwd and not Path(cwd).is_dir():
                 raise ConfigError(f"local cwd does not exist for {role['name']}: {cwd}")
-            linked, linkage_error = local_executable_linkage(provenance, role["name"], argv[0])
-            if not linked:
-                raise ConfigError(linkage_error or f"build linkage missing for {role['name']}")
             role_dir = evidence_dir / "roles" / role["name"]
             role_dir.mkdir(parents=True, exist_ok=True)
             stdout_path = role_dir / "stdout.log"
@@ -1384,12 +1471,20 @@ def run_local_trial(args: argparse.Namespace) -> int:
             stderr = stderr_path.open("w", encoding="utf-8")
             role_env = os.environ.copy()
             role_env.update({key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()})
+            # This is deliberately the last fallible identity check before
+            # spawning.  The child receives the resolved path that was checked.
+            linked, linkage_error = local_executable_linkage(provenance, role["name"], argv[0], checked_path=checked_executable)
+            if not linked:
+                stdout.close()
+                stderr.close()
+                raise ConfigError(linkage_error or f"build linkage missing for {role['name']}")
             proc = subprocess.Popen(argv, cwd=cwd, env=role_env, stdout=stdout, stderr=stderr, start_new_session=True, text=True)
             pgid = os.getpgid(proc.pid)
             starttime = process_starttime(proc.pid)
             processes[role["name"]] = {"process": proc, "argv": argv, "pgid": pgid, "starttime": starttime, "tracked_descendants": {}, "descendant_scan_seen": False, "descendant_scan_complete": True, "stdout": stdout, "stderr": stderr, "stdout_path": stdout_path, "stderr_path": stderr_path}
-            local_record(events, "launch", role=role["name"], pid=proc.pid, pgid=pgid, starttime=starttime, executable=argv[0], argv=argv, cwd=cwd)
-            local_json_write(role_dir / "launch.json", {"role": role["name"], "pid": proc.pid, "pgid": pgid, "starttime": starttime, "executable": argv[0], "argv": argv, "cwd": cwd})
+            launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": pgid, "starttime": starttime, "executable": argv[0], "argv": argv, "cwd": cwd})
+            local_record(events, "launch", **launch_public)
+            local_json_write(role_dir / "launch.json", launch_public)
             expected = role.get("readiness", [])
             deadline = min(time.monotonic() + float(plan["timeouts"]["readiness"]), overall_deadline)
             seen: set[str] = set()
