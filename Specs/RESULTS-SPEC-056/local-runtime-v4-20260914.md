@@ -32,6 +32,16 @@ PGCS stdout ended immediately after the Core block was created. No stderr was em
 cmake-build-debug/.ng-evidence/local-intra-os-v4-d303b05/m0-runtime-v4/
 ```
 
-## Interpretation
+## Status — invalid execution environment
 
-This is a runtime correctness/lifecycle blocker for M0/M1. It is not evidence of a payload hash failure, subscription failure or remote transport failure, because the trial stopped before those stages. No release acceptance is claimed.
+This trial was launched by the local controller without the mandatory privileged execution path. Historical NovaGenesis runbooks require `sudo` for `clean.sh` and for PGCS/NRNCS/ContentApp because raw sockets, SysV SHM and POSIX semaphore ownership are privilege-sensitive.
+
+The trial therefore cannot establish a NovaGenesis runtime crash or a readiness race. Its provenance/build-linkage result remains useful as a controller check, but its runtime result is invalid for M0/M1 acceptance and must not be compared with the historical root-run trials.
+
+The next valid run must use:
+
+```bash
+sudo bash Scripts/Simple/clean.sh
+```
+
+followed by zero-process/zero-IPC verification and a same-privilege launch of the complete local lifecycle.
