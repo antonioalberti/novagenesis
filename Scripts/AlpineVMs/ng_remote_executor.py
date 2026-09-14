@@ -475,37 +475,97 @@ def collect_remote(config: Mapping[str, str], host: str, state_dir: str, local_d
 
 
 def write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schema_version: int | None = None) -> Path:
-    """Write a v1 remote manifest or a fail-closed, sealed local v2 bundle."""
+    """Publish a manifest, sealing local v2 only after a clean final scan."""
     effective_schema = schema_version if schema_version is not None else (2 if metadata.get("mode") == "local" else 1)
     if effective_schema not in {1, 2}:
         raise ValueError("unsupported evidence schema version")
+    evidence_dir = Path(evidence_dir)
+    existing: dict[str, Any] = {}
+    blockers: list[str] = []
+    metadata_secrets: set[str] = set()
+    manifest_path = evidence_dir / "manifest.json"
     if effective_schema == 2:
         metadata_secrets = collect_secret_values(metadata)
         metadata = sanitize_config(metadata, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets)
-        existing_blockers: list[str] = []
+        supplied = metadata.get("protected_input_blockers", [])
+        if isinstance(supplied, list):
+            blockers.extend(str(item) for item in supplied)
         result_path = evidence_dir / "result.json"
         try:
-            existing = json.loads(result_path.read_text(encoding="utf-8")) if result_path.is_file() else {}
-            existing_blockers.extend(existing.get("protected_input_blockers", []))
+            loaded = json.loads(result_path.read_text(encoding="utf-8")) if result_path.is_file() else {}
+            existing = loaded if isinstance(loaded, dict) else {}
+            prior = existing.get("protected_input_blockers", [])
+            if isinstance(prior, list):
+                blockers.extend(str(item) for item in prior)
         except (OSError, json.JSONDecodeError, TypeError):
             existing = {}
-        safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
-        blockers = list(dict.fromkeys(str(item) for item in existing_blockers + safety["blockers"]))
-        if blockers:
+        # A previous seal can never survive a new publication attempt.  If it
+        # cannot be removed, publication is itself blocked rather than reused.
+        seal_path = evidence_dir / "terminal-seal.json"
+        if seal_path.exists():
+            try:
+                seal_path.unlink()
+            except OSError as exc:
+                blockers.append(f"protected-input cannot safely remove prior terminal seal: {type(exc).__name__}")
+
+    def publish_blockers() -> None:
+        if not blockers or effective_schema != 2:
+            return
+        safe_result = dict(existing)
+        safe_result["protected_input_blockers"] = list(dict.fromkeys(blockers))
+        safe_result["evidence_result"] = "INCOMPLETE"
+        safe_result["local_acceptance_eligible"] = False
+        acceptance = safe_result.get("acceptance_blockers", [])
+        if not isinstance(acceptance, list):
+            acceptance = []
+        acceptance = list(acceptance)
+        for blocker in blockers:
+            if blocker not in acceptance:
+                acceptance.append(blocker)
+        safe_result["acceptance_blockers"] = acceptance
+        if safe_result.get("exit_code") == 0:
+            safe_result["exit_code"] = 21
+        (evidence_dir / "result.json").write_text(
+            json.dumps(sanitize_config(safe_result, _known_secrets=_LOCAL_SECRET_VALUES | metadata_secrets), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+    for _ in range(2):
+        if effective_schema == 2:
+            safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
+            blockers.extend(str(item) for item in safety["blockers"])
+            blockers = list(dict.fromkeys(blockers))
+            if blockers:
+                metadata = {**metadata, "protected_input_blockers": blockers}
+                publish_blockers()
+        entries = []
+        for path in sorted(evidence_dir.rglob("*")):
+            if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
+                continue
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": digest})
+        manifest = {**metadata, "schema_version": effective_schema, "files": entries}
+        manifest_path = evidence_dir / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        if effective_schema != 2:
+            (evidence_dir / "manifest.sha256").write_text(
+                f"{hashlib.sha256(manifest_path.read_bytes()).hexdigest()}  manifest.json\n", encoding="utf-8"
+            )
+            return manifest_path
+        final_safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
+        new_blockers = [str(item) for item in final_safety["blockers"] if str(item) not in blockers]
+        if new_blockers:
+            blockers.extend(new_blockers)
             metadata = {**metadata, "protected_input_blockers": blockers}
-    entries = []
-    for path in sorted(evidence_dir.rglob("*")):
-        if not path.is_file() or path.name in {"manifest.json", "manifest.sha256", "terminal-seal.json"}:
+            publish_blockers()
             continue
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        entries.append({"path": str(path.relative_to(evidence_dir)), "size": path.stat().st_size, "sha256": digest})
-    manifest = {**metadata, "schema_version": effective_schema, "files": entries}
-    manifest_path = evidence_dir / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
-    if effective_schema == 1:
-        (evidence_dir / "manifest.sha256").write_text(f"{manifest_hash}  manifest.json\n", encoding="utf-8")
+        break
     if effective_schema == 2:
+        if blockers:
+            # An intact manifest without a terminal seal is intentionally
+            # incomplete; the offline verifier cannot accept this bundle.
+            return manifest_path
+        manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
         (evidence_dir / "terminal-seal.json").write_text(
             json.dumps({"schema_version": 2, "kind": "terminal-seal", "manifest_path": "manifest.json", "manifest_sha256": manifest_hash, "sealed": True}, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
@@ -544,6 +604,13 @@ def apply_local_verification(
     summary = local_verification_summary(report)
     result["offline_verification"] = summary
     result["reason_codes"] = summary["reason_codes"]
+    protected = result.get("protected_input_blockers", [])
+    if isinstance(protected, list) and protected:
+        evidence_result = "INCOMPLETE"
+        eligibility["eligible"] = False
+        for blocker in protected:
+            if blocker not in eligibility["blockers"]:
+                eligibility["blockers"].append(blocker)
     if summary["code"] != CODE_VALID:
         evidence_result = "INCOMPLETE"
         eligibility["eligible"] = False
@@ -769,8 +836,8 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
             residual.append({"pid": pid, "reason": "identity-mismatch", "expected_starttime": expected.get("starttime"), "actual_starttime": record["starttime"]})
             continue
         if record["pgid"] != expected_pgid:
-            residual.append({"pid": pid, "reason": "identity-mismatch", "expected_pgid": expected_pgid, "actual_pgid": record["pgid"]})
-            continue
+            expected = dict(expected)
+            expected["reparented_pgid"] = record["pgid"]
         expected_executable = expected.get("executable")
         if expected_executable is not None:
             executable = _safe_executable_identity(pid)
@@ -796,8 +863,8 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
             if current["status"] != "ok":
                 unknown = current
                 break
-            if current["starttime"] != expected.get("starttime") or current["pgid"] != expected_pgid:
-                residual.append({"pid": pid, "reason": "identity-mismatch-after-term", "expected_starttime": expected.get("starttime"), "actual_starttime": current["starttime"], "expected_pgid": expected_pgid, "actual_pgid": current["pgid"]})
+            if current["starttime"] != expected.get("starttime"):
+                residual.append({"pid": pid, "reason": "identity-mismatch-after-term", "expected_starttime": expected.get("starttime"), "actual_starttime": current["starttime"]})
                 unknown = {"status": "mismatch"}
                 break
             if expected_executable is not None:
@@ -822,8 +889,8 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
         if current["status"] != "ok":
             residual.append({"pid": pid, "reason": "identity-unavailable-before-kill", "error": current.get("error")})
             continue
-        if current["starttime"] != expected.get("starttime") or current["pgid"] != expected_pgid:
-            residual.append({"pid": pid, "reason": "identity-mismatch-before-kill", "expected_starttime": expected.get("starttime"), "actual_starttime": current.get("starttime"), "expected_pgid": expected_pgid, "actual_pgid": current.get("pgid")})
+        if current["starttime"] != expected.get("starttime"):
+            residual.append({"pid": pid, "reason": "identity-mismatch-before-kill", "expected_starttime": expected.get("starttime"), "actual_starttime": current.get("starttime")})
             continue
         if expected_executable is not None:
             executable = _safe_executable_identity(pid)
@@ -845,13 +912,85 @@ def local_stop_tracked_descendants(tracked: Mapping[int, Mapping[str, Any]]) -> 
             if current["status"] != "ok":
                 residual.append({"pid": pid, "reason": "identity-unavailable-after-kill", "error": current.get("error")})
                 break
-            if current.get("starttime") != expected.get("starttime") or current.get("pgid") != expected_pgid:
-                residual.append({"pid": pid, "reason": "identity-mismatch-after-kill", "expected_starttime": expected.get("starttime"), "actual_starttime": current.get("starttime"), "expected_pgid": expected_pgid, "actual_pgid": current.get("pgid")})
+            if current.get("starttime") != expected.get("starttime"):
+                residual.append({"pid": pid, "reason": "identity-mismatch-after-kill", "expected_starttime": expected.get("starttime"), "actual_starttime": current.get("starttime")})
                 break
             time.sleep(0.05)
         else:
             residual.append({"pid": pid, "reason": "survived-descendant-stop", "starttime": expected.get("starttime")})
     return not residual, residual
+
+
+def local_descendant_reconciliation(
+    root_pid: int,
+    tracked: dict[int, dict[str, Any]],
+    pgid: int | None,
+    *,
+    scans: int = 4,
+) -> dict[str, Any]:
+    """Boundedly drain tracked descendants after the leader signal.
+
+    Descendant discovery is never treated as complete after one sample.  Each
+    post-signal round records scan uncertainty, merges both ancestry and group
+    observations, and revalidates tracked PID identities before signalling.
+    """
+    rounds = max(1, min(int(scans), 8))
+    residual: list[dict[str, Any]] = []
+    unknown: list[dict[str, Any]] = []
+    scan_ledger: list[dict[str, Any]] = []
+    for number in range(rounds):
+        try:
+            ancestry = local_process_descendants(root_pid)
+        except BaseException as exc:
+            ancestry = {"descendants": [], "complete": False, "error": str(exc)}
+        scan_ledger.append({"round": number + 1, "ancestry_complete": bool(ancestry.get("complete", False))})
+        if not ancestry.get("complete", False):
+            unknown.append({"round": number + 1, "kind": "ancestry-scan", "error": ancestry.get("error", "scan incomplete")})
+        for child in ancestry.get("descendants", []):
+            if isinstance(child, Mapping) and isinstance(child.get("pid"), int):
+                tracked[child["pid"]] = dict(child)
+
+        if pgid is not None:
+            try:
+                group = local_group_members_status(pgid)
+            except BaseException as exc:
+                group = {"members": [], "complete": False, "error": str(exc)}
+            scan_ledger[-1]["group_complete"] = bool(group.get("complete", False))
+            if not group.get("complete", False):
+                unknown.append({"round": number + 1, "kind": "group-scan", "error": group.get("error", "scan incomplete")})
+            for member in group.get("members", []):
+                if isinstance(member, Mapping) and isinstance(member.get("pid"), int) and member["pid"] != root_pid:
+                    tracked[member["pid"]] = dict(member)
+
+        try:
+            stopped, round_residual = local_stop_tracked_descendants(tracked)
+        except BaseException as exc:
+            stopped, round_residual = False, [{"reason": "descendant-stop-unknown", "error": str(exc)}]
+        del stopped
+        residual.extend(round_residual)
+        if number + 1 < rounds:
+            time.sleep(0.05)
+
+    def unique(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        result: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for item in items:
+            key = json.dumps(item, sort_keys=True, default=str)
+            if key not in seen:
+                seen.add(key)
+                result.append(item)
+        return result
+
+    residual = unique(residual)
+    unknown = unique(unknown)
+    return {
+        "ok": not residual and not unknown,
+        "scan_count": rounds,
+        "scans": scan_ledger,
+        "tracked": sorted(tracked.values(), key=lambda item: item.get("pid", 0)),
+        "residual": residual,
+        "unknown": unknown,
+    }
 
 
 def local_process_snapshot(processes: Mapping[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -872,6 +1011,7 @@ def local_process_snapshot(processes: Mapping[str, dict[str, Any]]) -> list[dict
             "descendant_scan_complete": item.get("descendant_scan_complete", True),
             "rollback_uncertain": item.get("rollback_uncertain", False),
             "unresolved": item.get("unresolved", False),
+            "descendant_rollback_ledger": item.get("descendant_rollback_ledger", {}),
         })
     return result
 
@@ -900,7 +1040,7 @@ def local_acceptance_eligibility(provenance: Mapping[str, Any]) -> dict[str, Any
     workload_error = provenance.get("workload_error")
     if workload_error:
         blockers.append(str(workload_error))
-    if provenance.get("protected_inputs"):
+    if provenance.get("protected_inputs") or provenance.get("protected_input_blockers"):
         blockers.append("protected-input provenance blocker")
     return {"eligible": not blockers, "blockers": blockers}
 
@@ -1794,7 +1934,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             effective_oracle["repository"] = str(Path(workload["staging_io_path"]) / "Repository1")
         effective_oracle["expected_map"] = dict(workload["expected_map"])
     oracle_snapshot: dict[str, Any] = {"schema_version": 2, "type": (effective_oracle or {}).get("type"), "preservation_verified": False}
-    protected_input_blockers: list[str] = []
+    protected_input_blockers: list[str] = list(provenance.get("protected_input_blockers", []))
     try:
         preflight = local_preflight(effective_config, plan, variables, workload, provenance)
         local_record(events, "preflight", result=preflight)
@@ -1927,10 +2067,9 @@ def run_local_trial(args: argparse.Namespace) -> int:
             if item.get("rollback_uncertain"):
                 teardown_result = "FAIL"
                 local_record(events, "identity-rollback", role=role, rollback_complete=item.get("rollback_complete", False), unresolved=item.get("unresolved", True), residual=item.get("rollback_descendant_residual", []))
-            # Scan before stopping and again after leader termination.  The
-            # second scan is deliberately retained in the ownership ledger:
-            # children can be created during TERM handling or reparented after
-            # a leader exits, and a single pre-stop sample is insufficient.
+            # Capture ownership while the leader is present, then drain with
+            # several bounded post-signal scans.  The ledger is explicit so a
+            # late/reparented child or any uncertain scan prevents teardown PASS.
             try:
                 initial_scan = local_process_descendants(proc.pid)
             except BaseException as exc:
@@ -1944,18 +2083,23 @@ def run_local_trial(args: argparse.Namespace) -> int:
             if not stop_result["ok"]:
                 teardown_result = "FAIL"
             local_record(events, "stop", role=role, **stop_result)
-            try:
-                final_scan = local_process_descendants(proc.pid)
-            except BaseException as exc:
-                final_scan = {"descendants": [], "complete": False, "error": str(exc)}
-            item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and final_scan.get("complete", False)
-            item.setdefault("tracked_descendants", {}).update({descendant["pid"]: descendant for descendant in final_scan.get("descendants", [])})
-            if final_scan.get("error"):
-                item["descendant_scan_error_after_stop"] = final_scan["error"]
-            descendants_ok, descendant_residual = local_stop_tracked_descendants(item.get("tracked_descendants", {}))
+            reconciliation = local_descendant_reconciliation(proc.pid, item.get("tracked_descendants", {}), pgid, scans=4)
+            item["descendant_rollback_ledger"] = reconciliation
+            item["descendant_scan_complete"] = item.get("descendant_scan_complete", True) and not reconciliation["unknown"]
+            item["tracked_descendants"] = {child["pid"]: child for child in reconciliation["tracked"] if isinstance(child.get("pid"), int)}
+            descendants_ok = reconciliation["ok"]
+            descendant_residual = reconciliation["residual"]
             if not item.get("descendant_scan_complete", True) or not descendants_ok:
                 teardown_result = "FAIL"
-                local_record(events, "descendant-cleanup", role=role, complete=item.get("descendant_scan_complete", True), residual=descendant_residual)
+                local_record(
+                    events,
+                    "descendant-cleanup",
+                    role=role,
+                    complete=item.get("descendant_scan_complete", True),
+                    residual=descendant_residual,
+                    unknown=reconciliation["unknown"],
+                    scan_count=reconciliation["scan_count"],
+                )
             group_scan = local_group_members_status(pgid)
             members = group_scan["members"]
             if not group_scan["complete"]:
@@ -1995,7 +2139,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 local_record(events, "ownership-unresolved", role=role, reason="descendant-or-process-group-ownership-not-proven")
             item["group_members_after_stop"] = members
             item["process"] = proc
-            local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members, "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)), "rollback_uncertain": item.get("rollback_uncertain", False), "unresolved": item.get("unresolved", False)})
+            local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members, "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)), "descendant_rollback_ledger": item.get("descendant_rollback_ledger", {}), "rollback_uncertain": item.get("rollback_uncertain", False), "unresolved": item.get("unresolved", False)})
             item["stdout"].close()
             item["stderr"].close()
         oracle = effective_oracle

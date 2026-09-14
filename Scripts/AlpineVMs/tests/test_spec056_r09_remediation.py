@@ -16,6 +16,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import local_provenance
 from local_provenance import capture_git_state, sanitize_config, sanitize_evidence_tree, validate_build_linkage
 from ng_remote_executor import build_parser, register_local_process, run_local_trial, validate_plan, write_evidence_manifest
 from evidence_verifier import verify_bundle
@@ -33,6 +34,15 @@ def _evidence() -> dict[str, object]:
 
 
 def _complete_manifest() -> dict[str, object]:
+    compiler = str(Path(shutil.which("g++") or shutil.which("c++")).resolve())
+    version = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0]
+    binary = Path("/bin/true")
+    binary_hash = hashlib.sha256(binary.read_bytes()).hexdigest()
+    ldd_run = subprocess.run(["ldd", str(binary)], capture_output=True, text=True, check=True)
+    ldd_output = ldd_run.stdout + ldd_run.stderr
+    stable_output = local_provenance._normalise_loader_output(ldd_output)
+    ldd_hash = hashlib.sha256(stable_output.encode()).hexdigest()
+    libraries = sorted(line.strip() for line in stable_output.splitlines() if line.strip())
     index = {
         "captured": True,
         "sha256": "d" * 64,
@@ -50,15 +60,15 @@ def _complete_manifest() -> dict[str, object]:
         "index_entries": index["entries"],
         "content_snapshot": {"captured": True, "files": [], "entries": [], "errors": []},
     }
-    roles = {name: {"path": f"/build/{name}", "sha256": ("abcdef0123456789"[index] * 64)} for index, name in enumerate(("PGCS", "NRNCS", "Repository", "Source"))}
+    roles = {name: {"path": "/bin/true", "sha256": binary_hash} for name in ("PGCS", "NRNCS", "Repository", "Source")}
     return {
         "schema_version": 1,
         "source_head": source["head"],
         "source_snapshot": source,
-        "recipe": {"commands": [["cmake", "--build", "build"]], "working_directory": "/src"},
-        "toolchain": {"compiler": "/usr/bin/g++", "version": "13.2.0", "status": "ok"},
+        "recipe": {"commands": [["cmake", "--build", "build"]], "working_directory": "/src", "executed": True, "returncodes": [0]},
+        "toolchain": {"compiler": compiler, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok"},
         "options": {"variant": "normal", "jobs": 1, "configure_only": False},
-        "runtime_library_identity": {"method": "ldd", "binaries": {role: {"status": "ok", "output_sha256": "a" * 64, "libraries": ["libc.so"]} for role in roles}},
+        "runtime_library_identity": {"method": "ldd", "binaries": {role: {"status": "ok", "output_sha256": ldd_hash, "binary_sha256": binary_hash, "libraries": libraries} for role in roles}},
         "binaries": roles,
     }
 
@@ -142,7 +152,8 @@ def test_local_bundle_scan_redacts_logs_and_reports_unpreservable_input(tmp_path
     (tmp_path / "roles" / "launch.json").write_text(json.dumps({"argv": [f'SOURCE_TOKEN="{secret}"']}), encoding="utf-8")
     (tmp_path / "controller-events.jsonl").write_text(json.dumps({"event": "error", "error": f"SOURCE_TOKEN=\"{secret}\""}) + "\n", encoding="utf-8")
     safe = sanitize_evidence_tree(tmp_path, {secret})
-    assert safe["ok"] is True
+    assert safe["ok"] is False
+    assert any("rewritten" in item for item in safe["blockers"])
     for path in tmp_path.rglob("*"):
         if path.is_file():
             assert secret not in path.read_text(encoding="utf-8")
@@ -237,6 +248,12 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
         subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@e", "commit", "--quiet", "-m", "fixture"], check=True)
         state = capture_git_state(repo, snapshot_dir=root / "source-snapshot")
         executable_hash = hashlib.sha256(executable.read_bytes()).hexdigest()
+        compiler = str(Path(compiler).resolve())
+        compiler_version = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0]
+        ldd_output = subprocess.run(["ldd", str(executable)], capture_output=True, text=True, check=True)
+        ldd_text = ldd_output.stdout + ldd_output.stderr
+        stable_ldd = local_provenance._normalise_loader_output(ldd_text)
+        ldd_hash = hashlib.sha256(stable_ldd.encode()).hexdigest()
         roles = ["PGCS", "NRNCS", "Repository", "Source"]
         plan_roles = [{
             "name": role,
@@ -249,10 +266,10 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
             "schema_version": 1,
             "source_head": state["head"],
             "source_snapshot": state,
-            "recipe": {"commands": [["cmake", "--build", str(build)]], "working_directory": str(repo)},
-            "toolchain": {"compiler": compiler, "version": "fixture", "status": "ok"},
+            "recipe": {"commands": [["cmake", "--build", str(build)]], "working_directory": str(repo), "executed": True, "returncodes": [0]},
+            "toolchain": {"compiler": compiler, "version": compiler_version, "version_sha256": hashlib.sha256(compiler_version.encode()).hexdigest(), "status": "ok"},
             "options": {"variant": "normal", "jobs": 1, "configure_only": False},
-            "runtime_library_identity": {"method": "fixture", "binaries": {role: {"status": "ok", "sha256": executable_hash, "libraries": ["fixture-runtime"]} for role in roles}},
+            "runtime_library_identity": {"method": "ldd", "binaries": {role: {"status": "ok", "output_sha256": ldd_hash, "binary_sha256": executable_hash, "libraries": [line.strip() for line in stable_ldd.splitlines() if line.strip()]} for role in roles}},
             "binaries": {role: {"path": str(executable), "size": executable.stat().st_size, "sha256": executable_hash} for role in roles},
         }
         manifest_path = root / "build-manifest.json"
@@ -276,7 +293,8 @@ def test_four_role_lifecycle_fixture_reaches_each_readiness_gate():
             "NG_LOCAL_BUILD_MANIFEST": str(manifest_path),
         }
         args = Namespace(plan=str(plan_path), scenario="local-intra-os", debug_profile="obs-normal", trial="r10-four-role", env=env)
-        assert run_local_trial(args) == 0
+        rc = run_local_trial(args)
+        assert rc == 0
         bundle = evidence / "r10-four-role"
         records = [json.loads(line) for line in (bundle / "controller-events.jsonl").read_text().splitlines()]
         events = [record["event"] for record in records]

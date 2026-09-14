@@ -496,13 +496,28 @@ _SECRET_ASSIGN_RE = re.compile(
     r"(?:(['\"])(.*?)\2|([^\s'\"&;]+))",
     re.IGNORECASE,
 )
-_SECRET_QUERY_RE = re.compile(r"([?&](?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)=)[^&#\s]+", re.IGNORECASE)
-_AUTH_RE = re.compile(r"(\b(?:authorization\s*:\s*bearer|bearer)\s+)[^\s'\"]+", re.IGNORECASE)
-_URL_USERINFO_TEXT_RE = re.compile(r"(\b[A-Za-z][A-Za-z0-9+.-]*://)([^/@\s:]+):([^/@\s]+)@", re.IGNORECASE)
+_SECRET_QUERY_RE = re.compile(r"([?&](?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)=)(?P<query_value>[^&#\s]+)", re.IGNORECASE)
+_AUTH_RE = re.compile(r"(\b(?:authorization\s*:\s*bearer|bearer)\s+)(?P<auth_value>[^\s'\"]+)", re.IGNORECASE)
+_URL_USERINFO_TEXT_RE = re.compile(r"(\b[A-Za-z][A-Za-z0-9+.-]*://)([^/@\s:]+):(?P<url_password>[^/@\s]+)@", re.IGNORECASE)
 _SECRET_SOURCE_ASSIGN_TEXT_RE = re.compile(
     r"(\b(?:export\s+)?[A-Za-z_][A-Za-z0-9.-]*(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)\s*[:=]\s*)"
     r"(?:(['\"])(.*?)\2|([^\s'\";&]+))",
     re.IGNORECASE,
+)
+# Transport syntax can carry secrets without a structured secret key.  Keep
+# these patterns shared by collection and evidence-tree sanitisation.
+_SECRET_ARGV_TEXT_RE = re.compile(
+    r"(?:^|[\s\[,(])(?P<flag>--?|/)(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)"
+    r"(?:=|[\s,]+)(?P<quote>['\"]?)(?P<value>[^'\"\s,\])]+)(?P=quote)",
+    re.IGNORECASE,
+)
+_SECRET_TEXT_PATTERNS = (
+    _SECRET_QUERY_RE,
+    _AUTH_RE,
+    _URL_USERINFO_TEXT_RE,
+    _SECRET_SOURCE_ASSIGN_TEXT_RE,
+    _SECRET_ASSIGN_RE,
+    _SECRET_ARGV_TEXT_RE,
 )
 
 
@@ -516,8 +531,33 @@ def _collect_secret_values(value: Any, key: str | None = None) -> set[str]:
         return values
     if isinstance(value, (list, tuple)):
         values: set[str] = set()
+        redact_next = False
         for item in value:
+            if redact_next and isinstance(item, (str, int, float)):
+                values.add(str(item))
             values.update(_collect_secret_values(item))
+            item_text = item if isinstance(item, str) else ""
+            redact_next = bool(_SECRET_KEY_RE.search(item_text.lstrip("-/"))) or bool(
+                re.search(r"(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)=?$", item_text, re.IGNORECASE)
+            )
+        return values
+    if isinstance(value, str):
+        values: set[str] = set()
+        for pattern in _SECRET_TEXT_PATTERNS:
+            for match in pattern.finditer(value):
+                groups = match.groupdict()
+                candidate = (
+                    groups.get("value")
+                    or groups.get("quoted_value")
+                    or groups.get("bare_value")
+                    or groups.get("query_value")
+                    or groups.get("auth_value")
+                    or groups.get("url_password")
+                )
+                if not candidate:
+                    candidate = next((item for item in reversed(match.groups()) if item), None)
+                if candidate and candidate != "<redacted>":
+                    values.add(candidate)
         return values
     return set()
 
@@ -537,6 +577,10 @@ def _redact_string(value: str, secrets: set[str]) -> str:
     result = _AUTH_RE.sub(r"\1<redacted>", result)
     result = _URL_USERINFO_TEXT_RE.sub(r"\1<redacted>@", result)
     result = _SECRET_SOURCE_ASSIGN_TEXT_RE.sub(redact_assignment, result)
+    result = _SECRET_ARGV_TEXT_RE.sub(
+        lambda match: match.group(0)[:match.start("value") - match.start()] + "<redacted>" + (match.group("quote") or ""),
+        result,
+    )
     return result
 
 
@@ -575,9 +619,14 @@ def collect_secret_values(value: Any) -> set[str]:
 
 
 _SECRET_FILENAME_RE = re.compile(
-    r"(?:^|[._-])(?:\.env(?:\.|$)|secret|credential|password|passwd|token|api[-_]?key|private[-_]?key|ssh[-_]?key)(?:$|[._-])",
+    r"(?:^\.env(?:\..*)?$|(?:^|[._-])(?:secret|credential|password|passwd|token|api[-_]?key|private[-_]?key|ssh[-_]?key)(?:$|[._-]))",
     re.IGNORECASE,
 )
+
+
+def _is_secret_filename(part: str) -> bool:
+    """Recognise dotenv names and secret-labelled path components exactly."""
+    return bool(_SECRET_FILENAME_RE.search(part))
 
 
 def _remove_protected_path(path: Path, relative: str, blockers: list[str], quarantined: list[str], reason: str) -> None:
@@ -611,6 +660,7 @@ def sanitize_evidence_tree(
     blockers: list[str] = []
     scanned: list[str] = []
     quarantined: list[str] = []
+    rewritten_paths: list[str] = []
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root).as_posix()
         if path.is_symlink():
@@ -624,7 +674,7 @@ def sanitize_evidence_tree(
         if not is_file:
             continue
         scanned.append(relative)
-        if any(_SECRET_FILENAME_RE.search(part) for part in Path(relative).parts):
+        if any(_is_secret_filename(part) for part in Path(relative).parts):
             _remove_protected_path(path, relative, blockers, quarantined, "secret-bearing filename")
             continue
         try:
@@ -643,20 +693,24 @@ def sanitize_evidence_tree(
             continue
         scrubbed = _redact_string(text, secrets)
         if scrubbed != text:
+            rewritten_paths.append(relative)
             try:
                 path.write_text(scrubbed, encoding="utf-8")
                 # Re-open the rewritten path so a partial or intercepted write
                 # cannot be mistaken for successful redaction.
-                rewritten = path.read_text(encoding="utf-8")
+                rewritten_text = path.read_text(encoding="utf-8")
             except (OSError, RuntimeError, UnicodeError) as exc:
                 _remove_protected_path(path, relative, blockers, quarantined, f"cannot safely rewrite evidence ({type(exc).__name__})")
                 continue
-            if rewritten != scrubbed or any(secret in rewritten for secret in secrets):
+            if rewritten_text != scrubbed or any(secret in rewritten_text for secret in secrets):
                 _remove_protected_path(path, relative, blockers, quarantined, "secret remains in evidence")
                 continue
+            # Rewriting proves only that the published copy is scrubbed.  It
+            # does not prove that the original execution input was safe.
+            blockers.append(f"protected-input rewritten: {relative}")
         elif any(secret in text for secret in secrets):
             _remove_protected_path(path, relative, blockers, quarantined, "secret remains in evidence")
-    return {"ok": not blockers, "scanned": scanned, "quarantined": quarantined, "blockers": blockers}
+    return {"ok": not blockers, "scanned": scanned, "rewritten": rewritten_paths, "quarantined": quarantined, "blockers": blockers}
 
 
 def _expand_value(value: Any, variables: Mapping[str, str]) -> Any:
@@ -904,7 +958,64 @@ def _source_index_identity(snapshot: Mapping[str, Any], field: str) -> tuple[str
     return _require_index_identity(snapshot, field)
 
 
-def _validate_runtime_record(record: Mapping[str, Any], field: str) -> None:
+def _execution_input_blockers(value: Any, location: str = "input") -> list[str]:
+    """Return stable locations of secrets before they enter evidence output."""
+    blockers: list[str] = []
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            key_text = str(key)
+            child_location = f"{location}.{key_text}"
+            if _SECRET_KEY_RE.search(key_text) and isinstance(item, (str, int, float)) and str(item):
+                blockers.append(f"protected-input execution secret: {child_location}")
+            blockers.extend(_execution_input_blockers(item, child_location))
+        return blockers
+    if isinstance(value, (list, tuple)):
+        secret_flag = False
+        for index, item in enumerate(value):
+            item_location = f"{location}[{index}]"
+            if secret_flag and isinstance(item, (str, int, float)) and str(item):
+                blockers.append(f"protected-input argv secret: {item_location}")
+            blockers.extend(_execution_input_blockers(item, item_location))
+            item_text = item if isinstance(item, str) else ""
+            secret_flag = bool(_SECRET_KEY_RE.search(item_text.lstrip("-/"))) or bool(
+                re.search(r"(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)=?$", item_text, re.IGNORECASE)
+            )
+        return blockers
+    if isinstance(value, str):
+        if any(_is_secret_filename(part) for part in Path(value).parts):
+            blockers.append(f"protected-input secret-bearing filename: {location}")
+        if any(pattern.search(value) for pattern in _SECRET_TEXT_PATTERNS):
+            blockers.append(f"protected-input secret-bearing execution text: {location}")
+    return blockers
+
+
+def _validate_build_options(options: Mapping[str, Any]) -> None:
+    """Validate typed build options; falsey IDs are not identities."""
+    if not isinstance(options, Mapping) or not options:
+        raise ValueError("complete build options identity is required")
+    if "id" in options:
+        _require_meaningful_identity(options["id"], "build options.id")
+    variant = options.get("variant", options.get("build_type"))
+    _require_text(variant, "build options variant")
+    if "jobs" in options and (isinstance(options["jobs"], bool) or not isinstance(options["jobs"], int) or options["jobs"] <= 0):
+        raise ValueError("build options jobs must be a positive integer")
+    if "configure_only" in options and not isinstance(options["configure_only"], bool):
+        raise ValueError("build options configure_only must be boolean")
+    if "cmake_args" in options:
+        _require_nonempty_string_list(options["cmake_args"], "build options cmake_args")
+
+
+def _normalise_loader_output(output: str) -> str:
+    """Remove ASLR addresses while retaining the loader's concrete mapping."""
+    return re.sub(r"0x[0-9a-fA-F]+", "0xADDR", output)
+
+
+def _validate_runtime_record(
+    record: Mapping[str, Any],
+    field: str,
+    expected_binary_hash: str | None = None,
+    expected_binary_path: str | None = None,
+) -> None:
     """Validate the concrete loader identity for one launched role."""
     if not isinstance(record, Mapping) or not record:
         raise ValueError(f"{field} identity is missing")
@@ -914,11 +1025,34 @@ def _validate_runtime_record(record: Mapping[str, Any], field: str) -> None:
     if len(hashes) != 1:
         raise ValueError(f"{field} must carry exactly one runtime output hash")
     _normalise_hash(record[hashes[0]], f"{field} {hashes[0]}")
+    binary_hash = record.get("binary_sha256")
+    if expected_binary_hash is not None:
+        if not isinstance(binary_hash, str):
+            raise ValueError(f"{field} must carry the launched binary hash")
+        if _normalise_hash(binary_hash, f"{field} binary_sha256") != expected_binary_hash:
+            raise ValueError(f"{field} binary hash diverges from launched executable")
     libraries = record.get("libraries")
     if not isinstance(libraries, list) or not libraries:
         raise ValueError(f"{field} library list is empty or invalid")
     for number, library in enumerate(libraries):
         _require_text(library, f"{field}.libraries[{number}]")
+        if _PLACEHOLDER_IDENTITY_RE.fullmatch(library.strip()):
+            raise ValueError(f"{field}.libraries[{number}] is synthetic or unavailable")
+    if expected_binary_path is not None:
+        try:
+            observed_run = subprocess.run(["ldd", expected_binary_path], capture_output=True, text=True, timeout=10, check=False)
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise ValueError(f"{field} ldd evidence unavailable: {exc}") from exc
+        observed_output = observed_run.stdout + observed_run.stderr
+        if observed_run.returncode != 0 or not observed_output.strip():
+            raise ValueError(f"{field} ldd evidence is unavailable")
+        stable_output = _normalise_loader_output(observed_output)
+        observed_hash = hashlib.sha256(stable_output.encode()).hexdigest()
+        if record[hashes[0]] != observed_hash:
+            raise ValueError(f"{field} ldd output hash diverges")
+        observed_libraries = sorted(line.strip() for line in stable_output.splitlines() if line.strip())
+        if not set(libraries) <= set(observed_libraries):
+            raise ValueError(f"{field} library evidence diverges")
 
 
 def validate_build_linkage(
@@ -966,6 +1100,15 @@ def validate_build_linkage(
     else:
         for number, command in enumerate(recipe_commands):
             _require_nonempty_string_list(command, f"build recipe command {number}")
+    if recipe.get("executed") is not True:
+        raise ValueError("build recipe execution evidence is required")
+    if "commands" in manifest and manifest["commands"] != recipe_commands:
+        raise ValueError("manifest recipe commands diverge")
+    returncodes = recipe.get("returncodes")
+    if not isinstance(returncodes, list) or len(returncodes) != len(recipe_commands) or any(
+        isinstance(code, bool) or not isinstance(code, int) or code != 0 for code in returncodes
+    ):
+        raise ValueError("build recipe returncode evidence is incomplete")
     _require_text(recipe.get("working_directory"), "build recipe working_directory", absolute=True)
 
     toolchain = manifest.get("toolchain", manifest.get("toolchain_identity"))
@@ -973,23 +1116,26 @@ def validate_build_linkage(
     if not isinstance(toolchain, Mapping) or not toolchain:
         raise ValueError("complete compiler/toolchain identity is required")
     _require_meaningful_identity(toolchain, "toolchain")
-    _require_text(toolchain.get("compiler"), "toolchain.compiler")
-    _require_text(toolchain.get("version"), "toolchain.version")
-    if toolchain.get("status") not in (None, "ok"):
+    if toolchain.get("status") != "ok":
         raise ValueError("toolchain identity is unavailable or incomplete")
-    if "version_sha256" in toolchain:
-        _normalise_hash(toolchain["version_sha256"], "toolchain.version_sha256")
+    compiler = _require_text(toolchain.get("compiler"), "toolchain.compiler", absolute=True)
+    compiler_path = Path(compiler)
+    if not compiler_path.is_file() or not os.access(compiler_path, os.X_OK):
+        raise ValueError("toolchain compiler is not an executable file")
+    version = _require_text(toolchain.get("version"), "toolchain.version")
+    version_hash = _normalise_hash(toolchain.get("version_sha256"), "toolchain.version_sha256")
+    if version_hash != hashlib.sha256(version.encode()).hexdigest():
+        raise ValueError("toolchain version evidence hash diverges")
+    try:
+        version_run = subprocess.run([str(compiler_path), "--version"], capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ValueError(f"toolchain version evidence unavailable: {exc}") from exc
+    observed_version = (version_run.stdout or version_run.stderr).splitlines()
+    if version_run.returncode != 0 or not observed_version or observed_version[0] != version:
+        raise ValueError("toolchain version evidence does not match compiler")
     if not isinstance(options, Mapping) or not options:
         raise ValueError("complete build options identity is required")
-    _require_text(options.get("variant", options.get("build_type", "configured")), "build options variant")
-    jobs = options.get("jobs")
-    if jobs is not None and (isinstance(jobs, bool) or not isinstance(jobs, int) or jobs <= 0):
-        raise ValueError("build options jobs must be a positive integer")
-    configure_only = options.get("configure_only")
-    if configure_only is not None and not isinstance(configure_only, bool):
-        raise ValueError("build options configure_only must be boolean")
-    if "cmake_args" in options:
-        _require_nonempty_string_list(options["cmake_args"], "build options cmake_args")
+    _validate_build_options(options)
 
     runtime_identity = manifest.get("runtime_library_identity")
     if runtime_identity is None:
@@ -998,6 +1144,8 @@ def validate_build_linkage(
         raise ValueError("runtime-library identity is required")
     _require_meaningful_identity(runtime_identity, "runtime-library")
     _require_text(runtime_identity.get("method"), "runtime-library.method")
+    if runtime_identity.get("method") != "ldd":
+        raise ValueError("runtime-library method must be actual ldd evidence")
     if _identity_unavailable(runtime_identity):
         raise ValueError("runtime-library identity is unavailable or incomplete")
     if manifest_evidence is None and isinstance(manifest.get("manifest_evidence"), Mapping):
@@ -1095,6 +1243,10 @@ def validate_build_linkage(
     if source_state.get("tree_sha256") != snapshot.get("tree_sha256"):
         raise ValueError("manifest source tree identity divergence")
 
+    expected_identities = {
+        name: _binary_identity(name, record, "manifest")
+        for name, record in expected.items()
+    }
     runtime_records = runtime_identity.get("binaries")
     if not isinstance(runtime_records, Mapping) or not runtime_records:
         raise ValueError("runtime-library coverage is incomplete")
@@ -1104,13 +1256,12 @@ def validate_build_linkage(
             raise ValueError(f"runtime-library coverage is missing for {role}")
         if not isinstance(coverage, Mapping):
             raise ValueError(f"runtime-library coverage is invalid for {role}")
-        _validate_runtime_record(coverage, f"runtime-library.{role}")
+        expected_record = expected_identities.get(role)
+        expected_hash = expected_record[1] if expected_record else None
+        expected_path = expected_record[0] if expected_record else None
+        _validate_runtime_record(coverage, f"runtime-library.{role}", expected_hash, expected_path)
         if _identity_unavailable(coverage):
             raise ValueError(f"runtime-library coverage is unavailable for {role}")
-    expected_identities = {
-        name: _binary_identity(name, record, "manifest")
-        for name, record in expected.items()
-    }
     actual_names: dict[str, tuple[str, str]] = {}
     for role, record in actual.items():
         identity = _binary_identity(role, record, "executables")
@@ -1163,6 +1314,10 @@ def capture_local_provenance(
     config = dict(config or {})
     plan = plan or {}
     contract = contract or {}
+    execution_blockers = _execution_input_blockers(
+        {"plan": _expand_value(plan, variables), "config": config},
+        "execution",
+    )
     root = Path(evidence_dir).resolve() if evidence_dir is not None else None
     source_snapshot_dir = root / "provenance" / "source-snapshot" if root else None
     try:
@@ -1271,11 +1426,22 @@ def capture_local_provenance(
         **git_state,
         "content_snapshot": git_state.get("content_snapshot", {"captured": False, "files": [], "errors": ["not requested"]}),
     }
-    protected_inputs = list(source["content_snapshot"].get("errors", [])) if source["content_snapshot"].get("errors") else []
+    protected_inputs = execution_blockers + (list(source["content_snapshot"].get("errors", [])) if source["content_snapshot"].get("errors") else [])
+    protected_input_blockers = list(execution_blockers)
+    protected_input_blockers.extend(
+        item for item in protected_inputs
+        if str(item).startswith("protected-input") and item not in protected_input_blockers
+    )
     if plan_record.get("error"):
         protected_inputs.append(f"protected-input plan snapshot unavailable: {plan_record['error']}")
     if manifest_error:
         protected_inputs.append(f"protected-input build manifest unavailable: {manifest_error}")
+    for item in protected_inputs:
+        if item not in protected_input_blockers and str(item).startswith("protected-input") and "unavailable" not in str(item):
+            # Publication blockers represent secret-bearing inputs, not every
+            # ordinary provenance incompleteness (which remains an eligibility blocker).
+            if "execution" in str(item) or "dirty source content" in str(item) or "staged source content" in str(item):
+                protected_input_blockers.append(item)
     controller_record = code_identity.get("controller") if isinstance(code_identity, Mapping) else None
     helper_records = code_identity.get("helpers", {}) if isinstance(code_identity, Mapping) else {}
     return {
@@ -1287,6 +1453,7 @@ def capture_local_provenance(
         "source_content_snapshot": source["content_snapshot"],
         "source_snapshot_complete": bool(source["content_snapshot"].get("captured", False)),
         "protected_inputs": protected_inputs,
+        "protected_input_blockers": protected_input_blockers,
         "git_head": git_state.get("head"),
         "git_status": git_state.get("status", []),
         "git_clean": bool(git_state.get("clean", False)),

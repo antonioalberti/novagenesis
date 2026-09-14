@@ -21,6 +21,15 @@ from ng_remote_executor import local_executable_linkage, write_evidence_manifest
 
 
 def _complete_manifest(tmp_path: Path) -> tuple[dict[str, object], dict[str, object]]:
+    compiler = str(Path(subprocess.run(["which", "g++"], capture_output=True, text=True, check=True).stdout.strip()).resolve())
+    version = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0]
+    binary = Path("/bin/true")
+    binary_hash = hashlib.sha256(binary.read_bytes()).hexdigest()
+    ldd_run = subprocess.run(["ldd", str(binary)], capture_output=True, text=True, check=True)
+    ldd_output = ldd_run.stdout + ldd_run.stderr
+    stable_output = local_provenance._normalise_loader_output(ldd_output)
+    ldd_hash = hashlib.sha256(stable_output.encode()).hexdigest()
+    libraries = sorted(line.strip() for line in stable_output.splitlines() if line.strip())
     manifest_path = tmp_path / "build-manifest.json"
     manifest_path.write_text("manifest bytes\n", encoding="utf-8")
     evidence = {"path": str(manifest_path), "size": manifest_path.stat().st_size,
@@ -34,11 +43,11 @@ def _complete_manifest(tmp_path: Path) -> tuple[dict[str, object], dict[str, obj
             "index_sha256": "a" * 64, "index_entries": [{"path": "input.txt", "mode": "100644", "blob_id": "c" * 40, "stage": 0}],
             "content_snapshot": {"captured": True, "files": [], "entries": [], "errors": []},
         },
-        "recipe": {"commands": [["cmake", "--build", "build"]], "working_directory": "/src"},
-        "toolchain": {"compiler": "g++", "version": "13"},
+        "recipe": {"commands": [["cmake", "--build", "build"]], "working_directory": "/src", "executed": True, "returncodes": [0]},
+        "toolchain": {"compiler": compiler, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok"},
         "options": {"build_type": "RelWithDebInfo"},
-        "runtime_library_identity": {"method": "ldd", "binaries": {"Source": {"status": "ok", "ldd_sha256": "c" * 64, "libraries": ["libc.so"]}}},
-        "binaries": {"Source": {"path": "/build/bin/Source", "sha256": "d" * 64}},
+        "runtime_library_identity": {"method": "ldd", "binaries": {"Source": {"status": "ok", "ldd_sha256": ldd_hash, "binary_sha256": binary_hash, "libraries": libraries}}},
+        "binaries": {"Source": {"path": "/bin/true", "sha256": binary_hash}},
     }
     evidence.update({"preserved_path": "provenance/build-manifest.json", "preserved_size": evidence["size"], "preserved_sha256": evidence["sha256"]})
     return manifest, {"manifest": evidence}
@@ -47,7 +56,7 @@ def _complete_manifest(tmp_path: Path) -> tuple[dict[str, object], dict[str, obj
 def test_complete_manifest_control_is_accepted(tmp_path: Path):
     manifest, preserved = _complete_manifest(tmp_path)
     assert validate_build_linkage(
-        manifest, "abc123", {"Source": {"path": "/build/bin/Source", "sha256": "d" * 64}},
+        manifest, "abc123", {"Source": {"path": "/bin/true", "sha256": manifest["binaries"]["Source"]["sha256"]}},
         source_state=manifest["source_snapshot"], manifest_evidence=preserved["manifest"],
     ) is True
 
@@ -58,7 +67,7 @@ def test_linkage_rejects_missing_required_identity(field: str, tmp_path: Path):
     manifest.pop(field)
     with pytest.raises(ValueError, match="identity|snapshot|toolchain|options"):
         validate_build_linkage(
-            manifest, "abc123", {"Source": {"path": "/build/bin/Source", "sha256": "d" * 64}},
+            manifest, "abc123", {"Source": {"path": "/bin/true", "sha256": manifest["binaries"]["Source"]["sha256"]}},
             source_state=manifest.get("source_snapshot"), manifest_evidence=preserved["manifest"],
         )
 
@@ -66,7 +75,7 @@ def test_linkage_rejects_missing_required_identity(field: str, tmp_path: Path):
 def test_linkage_rejects_missing_preserved_manifest_evidence(tmp_path: Path):
     manifest, _ = _complete_manifest(tmp_path)
     with pytest.raises(ValueError, match="manifest evidence"):
-        validate_build_linkage(manifest, "abc123", {"Source": {"path": "/build/bin/Source", "sha256": "d" * 64}}, source_state=manifest["source_snapshot"])
+        validate_build_linkage(manifest, "abc123", {"Source": {"path": "/bin/true", "sha256": manifest["binaries"]["Source"]["sha256"]}}, source_state=manifest["source_snapshot"])
 
 
 def test_linkage_rejects_distinct_same_basename_executables():

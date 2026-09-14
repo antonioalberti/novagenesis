@@ -8,6 +8,7 @@ import json
 import os
 import re
 import subprocess
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -198,6 +199,10 @@ def tree_sha256(root: Path) -> str:
     return digest.hexdigest()
 
 
+def _normalise_loader_output(output: str) -> str:
+    return re.sub(r"0x[0-9a-fA-F]+", "0xADDR", output)
+
+
 def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, Any]:
     """Record the dynamic-loader view used by each produced executable."""
     records: dict[str, Any] = {}
@@ -205,20 +210,24 @@ def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, A
         path = binary["path"]
         run = subprocess.run(["ldd", path], capture_output=True, text=True, check=False)
         output = run.stdout + run.stderr
+        stable_output = _normalise_loader_output(output)
         records[name] = {
             "status": "ok" if run.returncode == 0 else "unavailable",
-            "output_sha256": hashlib.sha256(output.encode()).hexdigest(),
-            "libraries": sorted(line.strip() for line in output.splitlines() if line.strip()),
+            "output_sha256": hashlib.sha256(stable_output.encode()).hexdigest(),
+            "binary_sha256": binary["sha256"],
+            "libraries": sorted(line.strip() for line in stable_output.splitlines() if line.strip()),
         }
     return {"method": "ldd", "binaries": records}
 
 
 def toolchain_identity() -> dict[str, Any]:
     compiler = os.environ.get("CXX", "c++")
-    run = subprocess.run([compiler, "--version"], capture_output=True, text=True, check=False)
+    compiler_path = shutil.which(compiler) if not Path(compiler).is_absolute() else compiler
+    resolved = str(Path(compiler_path).resolve()) if compiler_path else compiler
+    run = subprocess.run([resolved, "--version"], capture_output=True, text=True, check=False)
     output = run.stdout or run.stderr
     version = output.splitlines()[0] if output else "unavailable"
-    return {"compiler": compiler, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok" if run.returncode == 0 else "unavailable"}
+    return {"compiler": resolved, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok" if run.returncode == 0 else "unavailable"}
 
 
 def build_variant(source: Path, profile_path: Path, variant: str, output: Path, jobs: int = 1, configure_only: bool = False) -> dict[str, Any]:
@@ -244,7 +253,9 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         env["NG_DEBUG_LAUNCH_LOG"] = str(output / "debug-launcher.jsonl")
         cmake_args.append(f"-DCMAKE_CXX_COMPILER_LAUNCHER={launcher}")
     commands = [cmake_args]
+    returncodes = []
     configure = subprocess.run(cmake_args, cwd=source, env=env, capture_output=True, text=True, check=False)
+    returncodes.append(configure.returncode)
     (output / "configure.stdout.log").write_text(configure.stdout, encoding="utf-8")
     (output / "configure.stderr.log").write_text(configure.stderr, encoding="utf-8")
     if configure.returncode != 0:
@@ -253,6 +264,7 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         build_cmd = ["cmake", "--build", str(output), "--parallel", str(max(1, jobs))]
         commands.append(build_cmd)
         build = subprocess.run(build_cmd, cwd=source, env=env, capture_output=True, text=True, check=False)
+        returncodes.append(build.returncode)
         (output / "build.stdout.log").write_text(build.stdout, encoding="utf-8")
         (output / "build.stderr.log").write_text(build.stderr, encoding="utf-8")
         if build.returncode != 0:
@@ -273,7 +285,7 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         "source": str(source.resolve()),
         "source_snapshot": git_snapshot(source),
         "output": str(output),
-        "recipe": {"commands": commands, "working_directory": str(source.resolve())},
+        "recipe": {"commands": commands, "working_directory": str(source.resolve()), "executed": True, "returncodes": returncodes},
         "commands": commands,
         "toolchain": toolchain_identity(),
         "options": {"variant": variant, "jobs": max(1, jobs), "configure_only": configure_only, "cmake_args": cmake_args},
