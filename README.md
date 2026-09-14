@@ -179,7 +179,7 @@ Each PGCS must receive the other guest's actual Ethernet MAC as its peer argumen
 
 ## 7.1 Build and deploy
 
-From the control host, prepare a local ignored configuration from `Scripts/AlpineVMs/ng-vm.env.example`, fill in the two guest addresses/MACs and local repository path, then source it:
+From the control host, prepare a local ignored configuration from `Scripts/AlpineVMs/ng-vm.env.example`, fill in the two guest addresses/MACs, guest repository/build paths, SSH key/user/known-hosts and a durable local evidence path, then source it:
 
 ```bash
 cp Scripts/AlpineVMs/ng-vm.env.example Scripts/AlpineVMs/ng-vm.env
@@ -208,7 +208,7 @@ The guests must independently verify:
 Before every run:
 
 1. Stop and start both VMs cleanly.
-2. Run `Scripts/Simple/clean.sh` on both guests.
+2. Verify that the previous trial has no identity-attributed processes or IPC resources; the five launchers do not invoke `Scripts/Simple/clean.sh`.
 3. Verify exactly one intended process per role.
 4. Start PGCS on both VMs with the peer MACs above.
 5. Wait for bidirectional PGCS peer registration.
@@ -249,6 +249,51 @@ tcpdump -eni <bridge-interface> ether proto 0x1234
 First verify that each transmitted Ethernet destination matches the peer VM MAC. A wrong destination is a test/deployment configuration error, not evidence of a NovaGenesis runtime defect.
 
 After evidence collection, stop all NG processes and leave both test guests stopped unless another test is actively running.
+
+## 7.4 Supervised executor and observability
+
+The manual `run_*.sh` helpers above remain available for interactive diagnosis only. They verify build provenance and propagate child exit status, but do not provide the supervised teardown contract of SPEC-046/G3. For reproducible acceptance trials use the additive tooling under `Scripts/AlpineVMs/`:
+
+```bash
+cp Scripts/AlpineVMs/ng-vm.env.example Scripts/AlpineVMs/ng-vm.env
+$EDITOR Scripts/AlpineVMs/ng-vm.env   # local values only; never commit this file
+. Scripts/AlpineVMs/ng-vm.env
+
+# Inventory the actual source tree and create inventory.json, inventory.md and coverage.json.
+python3 Scripts/AlpineVMs/ng_observability.py \\
+  inventory --source . --output "$NG_EVIDENCE_PATH/observability-inventory"
+
+# Validate a profile against that inventory.
+python3 Scripts/AlpineVMs/ng_observability.py \\
+  validate --inventory "$NG_EVIDENCE_PATH/observability-inventory/inventory.json" \\
+  --profile Scripts/AlpineVMs/observability/profiles/obs-hello.json
+
+# Configure an isolated normal or targeted-debug build.
+python3 Scripts/AlpineVMs/ng_observability.py build \\
+  --source . --profile Scripts/AlpineVMs/observability/profiles/obs-normal.json \\
+  --variant normal --output "$NG_EVIDENCE_PATH/build-normal" --jobs 4
+
+# Validate the plan locally; this command does not open SSH.
+python3 Scripts/AlpineVMs/ng_remote_executor.py dry-run \\
+  --plan Scripts/AlpineVMs/plans/L2-pgcs-only.example.json \\
+  --scenario L2 --debug-profile obs-normal
+
+# Run read-only guest preflight, then use the same plan only after reviewing it.
+python3 Scripts/AlpineVMs/ng_remote_executor.py preflight \\
+  --plan Scripts/AlpineVMs/plans/L2-pgcs-only.example.json \\
+  --scenario L2 --debug-profile obs-normal
+python3 Scripts/AlpineVMs/ng_remote_executor.py run \\
+  --plan Scripts/AlpineVMs/plans/L2-pgcs-only.example.json \\
+  --scenario L2 --debug-profile obs-normal
+```
+
+The staged scenarios are `L0` (preflight), `L1` (local PGCS/SHM), `L2` (two-VM PGCS and receiver), `L3` (NRNCS readiness/binding), `L4` (Repository control plane) and `L5` (100-photo path). Each level has its own gates and does not promote a lower-level result into a higher-level claim.
+
+`obs-normal` is the acceptance baseline. Targeted profiles such as `obs-hello`, `obs-raw-sar`, `obs-nrncs-binding`, `obs-core-control` and `obs-payload-cache` are diagnostic variants and produce separate manifests. Broad `PGCS/src/PG.cpp` debug, `Common/src/GW.cpp:DEBUG`, `DEBUG2`, `DEBUG3`, `DEBUG5`, `DEBUG6` and `DEBUG_NETWORK_QUEUE` are prohibited by default because they can alter timing or flood Alpine `/tmp`.
+
+The executor uses short non-PTY SSH calls and a per-trial remote helper. It records remote PID/PGID/start time, executable, command, commit, configuration and hashes; it distinguishes runtime, teardown and evidence results. Use `status`, `collect` and `cleanup` for recovery. Do not run manual `run_*.sh` helpers concurrently with a supervised trial, do not use global `killall`/`ipcrm -a`, and do not stop a VM before evidence and process/IPC verification.
+
+The helper requires Python 3 and persistent guest evidence storage. Logs from the guest are kept outside `/tmp`; raw logs, captures and manifests may contain private deployment or payload data and must remain outside Git. A missing or buffered marker is reported as `INCONCLUSIVE`, not silently promoted to `FAIL` or `PASS`.
 
 # 8. Documentation and reproducibility
 

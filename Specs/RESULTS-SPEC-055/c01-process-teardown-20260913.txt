@@ -1,0 +1,8 @@
+test_exited_leader_with_surviving_group_member_is_not_success (test_executor_contract.ExecutorContractTests.test_exited_leader_with_surviving_group_member_is_not_success) ... ok
+test_detached_tracked_descendant_retains_pgid_identity_after_leader_exit (test_executor_contract.ExecutorContractTests.test_detached_tracked_descendant_retains_pgid_identity_after_leader_exit) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.358s
+
+OK
+focused_test_rc=0

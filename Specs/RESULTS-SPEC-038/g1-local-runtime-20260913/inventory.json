@@ -1,0 +1,10 @@
+{
+  "delivered_count_observed": 5,
+  "extra_in_repository": [],
+  "hash_mismatches": [],
+  "missing_in_repository": [],
+  "repository_count": 5,
+  "source_count": 5,
+  "source_equals_repository": true,
+  "source_manifest": "/tmp/ng-g1-io/Source1/manifest.sha256"
+}

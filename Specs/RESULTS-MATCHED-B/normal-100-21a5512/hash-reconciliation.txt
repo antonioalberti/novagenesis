@@ -1,0 +1,4 @@
+Source=100 NRNCS=100 Repository=100
+Source==NRNCS=True
+Source==Repository=True
+NRNCS==Repository=True

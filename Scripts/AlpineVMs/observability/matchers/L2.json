@@ -1,0 +1,5 @@
+[
+  {"id": "socket", "pattern": "socket"},
+  {"id": "receiver-entry", "pattern": "RECEIVER_HANDLER_ENTRY"},
+  {"id": "receiver-ok", "pattern": "RECEIVER_HANDLER_STATUS_OK"}
+]

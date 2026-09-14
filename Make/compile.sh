@@ -8,9 +8,35 @@
 
 cd "$(dirname "$0")/.." || exit 1
 
-BUILD_DIR="cmake-build-debug"
+NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
+case "$NG_BUILD_PROFILE" in
+  debug|performance|sanitizer) ;;
+  *)
+    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
+    exit 2
+    ;;
+esac
+
+BUILD_DIR="cmake-build-$NG_BUILD_PROFILE"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
+
+case "$NG_BUILD_PROFILE" in
+  debug)
+    CXX_FLAGS="-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
+    ;;
+  performance)
+    CXX_FLAGS="-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
+    ;;
+  sanitizer)
+    CXX_FLAGS="-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fsanitize=address,undefined -fno-omit-frame-pointer"
+    ;;
+  *)
+    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
+    exit 2
+    ;;
+esac
+echo "Build profile: $NG_BUILD_PROFILE"
 
 # If arguments provided, compile only those services
 if [ $# -gt 0 ]; then
@@ -21,7 +47,7 @@ fi
 
 for i in $SERVICES; do
   echo "Compiling $i..."
-  if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
+  if g++ -std=c++20 $CXX_FLAGS \
     -o "$BUILD_DIR/$i" "$i/src/"*.cpp Common/src/*.cpp \
     -I Common/src/ -lpthread -lrt; then
     echo "✓ $i compiled successfully"

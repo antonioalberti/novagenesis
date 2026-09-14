@@ -1,0 +1,28 @@
+=== Killing NovaGenesis processes ===
+
+=== Cleaning IO directories ===
+  PGCS (3 files)
+  Repository1 (105 files)
+
+=== Cleaning IPC resources ===
+  Removed shmid 0
+  Removed shmid 1
+  Removed shmid 2
+  Removed shmid 3
+  Removed shmid 4
+  Removed shmid 5
+  Removed shmid 6
+  Removed shmid 7
+
+=== Done ===
+FINAL_PROCESSES
+FINAL_SHM
+
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status      
+
+FINAL_SEM
+
+------ Semaphore Arrays --------
+key        semid      owner      perms      nsems     
+

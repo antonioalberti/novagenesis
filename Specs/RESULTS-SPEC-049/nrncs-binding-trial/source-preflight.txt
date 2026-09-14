@@ -1,0 +1,8 @@
+=== Killing NovaGenesis processes ===
+
+=== Cleaning IO directories ===
+  PGCS (3 files)
+
+=== Cleaning IPC resources ===
+
+=== Done ===

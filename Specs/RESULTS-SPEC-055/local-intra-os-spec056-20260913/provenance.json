@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "mode": "local",
+  "git_head": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "repo_path": "/home/gandalf/workspace/novagenesis",
+  "build_path": "/tmp/ng-spec056-build",
+  "io_path": "/tmp/ng-spec056-io",
+  "binaries": {
+    "PGCS": {
+      "argv0": "/tmp/ng-spec056-build/PGCS",
+      "resolved_path": "/tmp/ng-spec056-build/PGCS",
+      "sha256": "edbd33eea3c95a4d8db8c5cb8af2703d3a0cae4f35902bf38818f7fb92642e22"
+    },
+    "NRNCS": {
+      "argv0": "/tmp/ng-spec056-build/NRNCS",
+      "resolved_path": "/tmp/ng-spec056-build/NRNCS",
+      "sha256": "a9c0e753b2b16be88a83105b02e9d8e746683eb148b630105ff60de5df968de6"
+    },
+    "Repository": {
+      "argv0": "/tmp/ng-spec056-build/ContentApp",
+      "resolved_path": "/tmp/ng-spec056-build/ContentApp",
+      "sha256": "ec6001110e1ae75d4ceb6ebe632d2c876eed4dd1e8f8c2f3ac52007b704ffcbe"
+    },
+    "Source": {
+      "argv0": "/tmp/ng-spec056-build/ContentApp",
+      "resolved_path": "/tmp/ng-spec056-build/ContentApp",
+      "sha256": "ec6001110e1ae75d4ceb6ebe632d2c876eed4dd1e8f8c2f3ac52007b704ffcbe"
+    }
+  }
+}

@@ -1,11 +1,13 @@
 # SPEC-009 — Alpine VM SSH Run Scripts (per-process in dedicated terminal)
 
-**Status:** Implemented (E1-E6 scripts created)  
+**Status:** Hardening in progress (E1-E6 implemented; E7/acceptance pending)
+**Branch:** AIOPT3
+**Implementation commit:** pending frozen candidate; current hardening is in the working tree
 **Date:** 2026-06-26  
 **Scope:** NovaGenesis ContentApp — 1core-1repo-1source scenario on Alpine VMs  
 **Stack:** Bash, SSH, gdb, PGCS/NRNCS/ContentApp (AIOPT3 branch)
 **Autor:** Hermes Agent
-**Revisão:** v1.1
+**Revisão:** v1.2
 
 ---
 
@@ -62,9 +64,10 @@ Novos scripts em `Scripts/AlpineVMs/`:
 | **PGCS Source → Repo** | `-p Ethernet Intra_Domain eth0 <source-peer-mac> 1200` |
 | **PGCS Repo → Source** | `-p Ethernet Intra_Domain eth0 <repository-peer-mac> 1200` |
 | **gdb disponível** | `/usr/bin/gdb` em ambas as VMs — verificado 2026-06-26 |
-|| **Branch AIOPT3** | Commit `cd804a7` em ambas as VMs — verificado 2026-07-16 |
-| **NRNCS presente na source guest** | `cmake-build-debug/NRNCS` (5.5 MB) — verificado 2026-06-26. Apenas Source VM precisa de NRNCS. |
-| **SSH key** | `<operator-ssh-key>` em `~/.ssh/`, deployada em ambas as VMs — verificado |
+| **Branch AIOPT3** | O builder fixa um SHA comum de `origin/AIOPT3`; o SHA observado deve ser registado no receipt `.ng-build-receipt` de cada guest. |
+| **Build path** | `NG_BUILD_PATH` é absoluto, explícito e não é removido implicitamente; o receipt liga branch, commit, profile e paths ao binário. |
+| **NRNCS presente na source guest** | `$NG_BUILD_PATH/NRNCS`, verificado pelo builder antes do uso. Apenas Source VM precisa de NRNCS. |
+| **SSH key/host keys** | `NG_SSH_KEY`, `NG_SSH_USER` e `NG_SSH_KNOWN_HOSTS` são obrigatórios; o known-hosts é usado com `StrictHostKeyChecking=yes`. |
 | **PGCS precisa de sudo** | PGCS usa SHM + raw sockets — necessita de root em ambas as VMs Alpine |
 | **NRNCS/ContentApp sem sudo** | Correm como root via SSH por simplicidade (já são SSH como root) |
 
@@ -110,10 +113,16 @@ Terminal 4         Terminal 5
 
 Cada script usa gdb em batch mode, herdado dos scripts `run_*.sh` existentes:
 ```
-gdb -batch -ex "run" -ex "bt" -ex "quit" --args ./<binary> <args>
+gdb -batch -return-child-result -ex "run" -ex "bt" -ex "quit" --args ./<binary> <args>
 ```
 
-Isto captura backtrace automático em caso de crash sem bloquear — o processo corre normalmente e o gdb só intervém no segfault.
+Isto captura backtrace automático em caso de crash sem bloquear e propaga o status de saída do processo filho ao launcher. O processo corre normalmente e o gdb só intervém no segfault.
+
+### Proveniência e falha do build
+
+Antes de iniciar um processo, cada launcher verifica no guest a branch `AIOPT3`, o `git rev-parse HEAD` e o receipt `$NG_BUILD_PATH/.ng-build-receipt`. O receipt só é escrito depois de o build e a verificação dos binários terminarem com sucesso. A ausência, divergência ou ilegibilidade do receipt bloqueia o arranque.
+
+O `pull-and-build-vms.sh` resolve um único SHA de `origin/AIOPT3`, move ambos os guests apenas por fast-forward para esse SHA, grava logs em `NG_EVIDENCE_PATH` e cancela o outro build se um guest falhar. Não usa `git stash`, `rm -rf` nem `Scripts/Simple/clean.sh` implicitamente.
 
 ---
 
@@ -121,28 +130,11 @@ Isto captura backtrace automático em caso de crash sem bloquear — o processo 
 
 ### 5.1 `run_PGCS_on_Source_VM.sh`
 
+Implementação canónica: `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`. A configuração deve ser carregada de `Scripts/AlpineVMs/ng-vm.env`; não copiar credenciais ou paths literais para o script.
+
 ```bash
-#!/bin/bash
-# run_PGCS_on_Source_VM.sh — Start PGCS on Source VM (<source-guest-ip>)
-# Opens a dedicated SSH terminal. PGCS uses deterministic mode (-p)
-# targeting the Repo VM's MAC address for inter-VM raw socket discovery.
-#
-# Usage: bash run_PGCS_on_Source_VM.sh
-# Requires: ssh key ~/.ssh/<operator-ssh-key>
-
-SSH_KEY=~/.ssh/<operator-ssh-key>
-VM_IP=<source-guest-ip>
-PEER_MAC=<source-peer-mac>  # Repo VM MAC
-BASE=<guest-repository-path>
-
-echo "=== PGCS on Source VM (${VM_IP}) ==="
-echo "Peer MAC: ${PEER_MAC}"
-echo "Opening SSH terminal... (Ctrl+C to stop)"
-
-ssh -t -i ${SSH_KEY} root@${VM_IP} \
-  "cd ${BASE}/cmake-build-debug && \
-   sudo gdb -batch -ex \"run\" -ex \"bt\" -ex \"quit\" --args \
-   ./PGCS ${BASE}/IO/PGCS/ 0 Intra_Domain -p Ethernet Intra_Domain eth0 ${PEER_MAC} 1200"
+. Scripts/AlpineVMs/ng-vm.env
+bash Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh
 ```
 
 ### 5.2 `run_PGCS_on_Repo_VM.sh`
@@ -156,50 +148,20 @@ PEER_MAC=<repository-peer-mac>  # Source VM MAC
 
 ### 5.3 `run_NRNCS_on_Source_VM.sh`
 
+Implementação canónica: `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`.
+
 ```bash
-#!/bin/bash
-# run_NRNCS_on_Source_VM.sh — Start NRNCS on Source VM (<source-guest-ip>)
-# Opens a dedicated SSH terminal. Must start after PGCS.
-#
-# Usage: bash run_NRNCS_on_Source_VM.sh
-
-SSH_KEY=~/.ssh/<operator-ssh-key>
-VM_IP=<source-guest-ip>
-BASE=<guest-repository-path>
-
-ssh -t -i ${SSH_KEY} root@${VM_IP} \
-  "cd ${BASE}/cmake-build-debug && \
-   gdb -batch -ex \"run\" -ex \"bt\" -ex \"quit\" --args \
-   ./NRNCS ${BASE}/IO/NRNCS/"
+. Scripts/AlpineVMs/ng-vm.env
+bash Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh
 ```
 
 ### 5.4 `run_Source_on_Source_VM.sh`
 
+Implementação canónica: `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`. O argumento de fotos é validado pelo launcher e o staging é único por execução.
+
 ```bash
-#!/bin/bash
-# run_Source_on_Source_VM.sh — Start ContentApp Source on Source VM (<source-guest-ip>)
-# Opens a dedicated SSH terminal. Requires PGCS already running.
-# Generates photos, then starts ContentApp.
-#
-# Usage: bash run_Source_on_Source_VM.sh [num_photos] [width] [height]
-
-SSH_KEY=~/.ssh/<operator-ssh-key>
-VM_IP=<source-guest-ip>
-PHOTOS=${1:-100}
-WIDTH=${2:-800}
-HEIGHT=${3:-600}
-BASE=<guest-repository-path>
-IO_DIR=${BASE}/IO/Source1
-
-ssh -t -i ${SSH_KEY} root@${VM_IP} \
-  "cd ${BASE} && \
-   python3 Scripts/Python/BuildPhotos.py different ${PHOTOS} ${WIDTH} ${HEIGHT} && \
-   mkdir -p ${IO_DIR} && \
-   mv *.jpg ${IO_DIR}/ 2>/dev/null; \
-   echo 'Photos generated. Starting ContentApp...' && \
-   cd ${BASE}/cmake-build-debug && \
-   gdb -batch -ex \"run\" -ex \"bt full\" -ex \"info registers\" -ex \"thread apply all bt full\" -ex \"quit\" --args \
-   ./ContentApp ${IO_DIR}/ Source"
+. Scripts/AlpineVMs/ng-vm.env
+bash Scripts/AlpineVMs/run_Source_on_Source_VM.sh 100 800 600
 ```
 
 ### 5.5 `run_Repository_on_Repo_VM.sh`
@@ -212,7 +174,7 @@ Documentation covering:
 - Pré-requisitos (VMs ligadas, SSH key)
 - Ordem de arranque
 - Uso de cada script (número de terminais)
-- Como parar (Ctrl+C em cada terminal)
+- Como parar (Ctrl+C em cada terminal; teardown supervisionado pertence ao NG-ELC/SPEC-046)
 - Verificação de que os PGCS se descobriram (log `PGCS has N peer(s)`)
 
 ---
@@ -223,14 +185,11 @@ Documentation covering:
 
 **Comando:**
 ```bash
-# Verificar VMs ligadas
-ssh root@<control-host> "qm status 101 && qm status 102"
-# Verificar branch
-ssh -i ~/.ssh/<operator-ssh-key> root@<source-guest-ip> "cd <guest-repository-path> && git log --oneline -1"
-ssh -i ~/.ssh/<operator-ssh-key> root@<repository-guest-ip> "cd <guest-repository-path> && git log --oneline -1"
+. Scripts/AlpineVMs/ng-vm.env
+NG_BUILD_PROFILE=normal bash Scripts/AlpineVMs/pull-and-build-vms.sh
 ```
 
-**Done when:** Both VMs report AIOPT3 branch at commit `cd804a7`.
+**Done when:** o builder fixa um SHA de `origin/AIOPT3`, verifica o mesmo SHA nos dois guests e grava receipts `.ng-build-receipt` que os cinco launchers conseguem validar. O estado das VMs e o teardown pertencem ao NG-ELC/SPEC-046.
 
 ### Etapa E1: Criar `run_PGCS_on_Source_VM.sh`
 
@@ -266,7 +225,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 4. Terminal 4 → `bash Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
 5. Terminal 5 → `bash Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
 
-**Done when:** ContentApp Source mostra mensagens de descoberta de NRNCS/PGCS e inicia publicação de fotos. ContentApp Repository mostra recepção.
+**Done when:** ContentApp Source mostra mensagens de descoberta de NRNCS/PGCS e inicia publicação de fotos; ContentApp Repository mostra recepção. Este smoke dos launchers é diagnóstico. A aceitação formal da release requer o NG-ELC em modo remoto, o commit congelado e os oráculos dos gates seguintes.
 
 ---
 
@@ -275,9 +234,9 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 | Teste | Descrição | Critério |
 |-------|-----------|----------|
 | T1 | Syntax check | `bash -n script.sh` retorna 0 |
-| T2 | SSH connectivity | `ssh -i key -o ConnectTimeout=5 root@VM_IP "echo OK"` retorna "OK" |
-| T3 | Binary exists on VM | SSH check de `ls` no cmake-build-debug/ |
-| T4 | E2E smoke | Utilizador abre 5 terminais, corre script por script, verifica logs |
+| T2 | SSH connectivity | `ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=...` retorna sucesso |
+| T3 | Binary/provenance exists on VM | `NG_BUILD_PATH/<binary>` é executável e `.ng-build-receipt` coincide com branch `AIOPT3` e `git rev-parse HEAD` |
+| T4 | E2E smoke diagnóstico | Utilizador abre 5 terminais, corre script por script, verifica logs e preserva evidência; não fecha SPEC-046/G3 |
 
 ---
 
@@ -310,7 +269,7 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 ## 11. Pitfalls Discovered During Design
 
 - **SSH `-t` vs `-tt`**: `-t` força pseudo-TTY allocation. Para comandos que correm muito tempo (PGCS), `-t` é suficiente. `-tt` pode forçar duas alocações que quebram o redireccionamento de saída.
-- **GDB com sudo via SSH**: `sudo gdb -batch -ex "run" ...` funciona porque o utilizador na VM Alpine (root) tem NOPASSWD para os binários PGCS. Confirmado nos scripts existentes.
+- **GDB com status do filho**: usar `gdb -batch -return-child-result ...`; sem essa opção, `set -e` pode aceitar `rc=0` mesmo quando o processo remoto falha.
 - **Photos no Source VM via SSH**: O `mv *.jpg` pode falhar se Python não gerar fotos (Pillow não instalado). Incluir fallback: `mv *.jpg ... 2>/dev/null || true`.
 - **Ordem de arranque é crítica**: PGCS em ambas as VMs tem de arrancar PRIMEIRO (raw socket discovery). NRNCS depois. ContentApp por último. Documentar explicitamente.
 - **Ctrl+C num terminal SSH** fecha a sessão SSH e o processo remoto recebe SIGHUP → morre. Isto é o comportamento desejado para "parar o processo".
@@ -319,11 +278,11 @@ O utilizador abre 5 terminais na VM 100 e executa os scripts na ordem correcta:
 
 ## 12. Acceptance Criteria
 
-- [ ] E0-E7 executáveis e documentados
+- [ ] E0-E7 executáveis e documentados; E7 continua pendente até novo ensaio no commit congelado
 - [ ] `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh` — executa PGCS na Source VM via SSH, foreground, gdb wrapper
 - [ ] `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh` — executa PGCS na Repo VM via SSH, foreground, gdb wrapper
 - [ ] `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh` — executa NRNCS na Source VM via SSH, foreground
 - [ ] `Scripts/AlpineVMs/run_Source_on_Source_VM.sh` — gera fotos + ContentApp Source via SSH
 - [ ] `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh` — ContentApp Repository via SSH
 - [x] `README.md` §§ 7.1–7.3 documenta ordem, pré-requisitos e evidência
-- [ ] Smoke test E2E: utilizador consegue abrir 5 terminais, arrancar tudo, ver fotos a serem publicadas
+- [ ] Smoke test E2E: utilizador consegue abrir 5 terminais, arrancar tudo, ver fotos a serem publicadas; ensaio anterior foi apenas diagnóstico e antecede o hardening actual

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "roles": [
+    {
+      "name": "PGCS",
+      "vm": "local",
+      "command": ["${NG_LOCAL_BUILD_PATH}/PGCS", "${NG_LOCAL_IO_PATH}/PGCS/", "0", "Intra_Domain", "-lc"],
+      "cwd": "${NG_LOCAL_BUILD_PATH}",
+      "readiness": [{"id": "gw-operational", "pattern": "State: Operational"}]
+    },
+    {
+      "name": "NRNCS",
+      "vm": "local",
+      "command": ["${NG_LOCAL_BUILD_PATH}/NRNCS", "${NG_LOCAL_IO_PATH}/NRNCS/"],
+      "cwd": "${NG_LOCAL_BUILD_PATH}",
+      "readiness": [{"id": "nrncs-operational", "pattern": "OPERATIONAL: Everything ok!"}]
+    },
+    {
+      "name": "Repository",
+      "vm": "local",
+      "command": ["${NG_LOCAL_BUILD_PATH}/ContentApp", "${NG_LOCAL_IO_PATH}/Repository1/", "Repository"],
+      "cwd": "${NG_LOCAL_BUILD_PATH}",
+      "readiness": [{"id": "repository-operational", "pattern": "State: Operational"}]
+    },
+    {
+      "name": "Source",
+      "vm": "local",
+      "command": ["${NG_LOCAL_BUILD_PATH}/ContentApp", "${NG_LOCAL_IO_PATH}/Source1/", "Source"],
+      "cwd": "${NG_LOCAL_BUILD_PATH}",
+      "readiness": [{"id": "source-operational", "pattern": "State: Operational"}]
+    }
+  ],
+  "timeouts": {"readiness": 240, "observation": 120, "total": 600},
+  "require_fresh_boot": false,
+  "diagnostic_only": false,
+  "runtime_oracle": {
+    "type": "files",
+    "source": "${NG_LOCAL_IO_PATH}/Source1",
+    "repository": "${NG_LOCAL_IO_PATH}/Repository1",
+    "pattern": "*.jpg",
+    "expected_count": 5,
+    "hash": "sha256"
+  }
+}

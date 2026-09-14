@@ -1,0 +1,5 @@
+[
+  {"id": "nrncs-operational", "pattern": "OPERATIONAL: Everything ok!"},
+  {"id": "publication", "pattern": "NRPUB_INGRESS"},
+  {"id": "storage", "pattern": "HT_STORE_CALL"}
+]

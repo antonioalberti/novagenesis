@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "obs-payload-cache",
+  "variant": "targeted-debug",
+  "defines": [
+    {"file": "ContentApp/src/CoreRunContentPublish01.cpp", "macro": "DEBUG"},
+    {"file": "ContentApp/src/CoreInfoPayload01.cpp", "macro": "DEBUG"}
+  ],
+  "notes": "Diagnóstico de publicação/cache; integridade exige SHA-256 externo."
+}

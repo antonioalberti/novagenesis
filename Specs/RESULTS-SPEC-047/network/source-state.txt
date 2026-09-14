@@ -1,0 +1,20 @@
+status
+## AIOPT3...origin/AIOPT3
+?? IO/SourceStaging/
+origin
+357596a494891242a8390e95f414ef40c5e9a6e0
+untracked
+IO/SourceStaging/20260910T160901Z-b1/Service_Accepted_140960354.txt
+IO/SourceStaging/20260910T160901Z-b1/Service_Offer_1556019852.txt
+IO/SourceStaging/20260910T160901Z-b1/manifest.sha256
+IO/SourceStaging/dd14bb9ef5a340acad3f9d4b50119df9/Service_Accepted_1595762265.txt
+IO/SourceStaging/dd14bb9ef5a340acad3f9d4b50119df9/Service_Offer_1677496306.txt
+IO/SourceStaging/dd14bb9ef5a340acad3f9d4b50119df9/manifest.sha256
+IO/SourceStaging/ng037_100_1789124455/Service_Accepted_880658941.txt
+IO/SourceStaging/ng037_100_1789124455/Service_Offer_411215039.txt
+IO/SourceStaging/ng037_100_1789124455/manifest.sha256
+IO/SourceStaging/ng037_1789119612/manifest.sha256
+IO/SourceStaging/ng037_correct_1789122369/Service_Accepted_1455563062.txt
+IO/SourceStaging/ng037_correct_1789122369/Service_Offer_1776470055.txt
+IO/SourceStaging/ng037_correct_1789122369/manifest.sha256
+io-files

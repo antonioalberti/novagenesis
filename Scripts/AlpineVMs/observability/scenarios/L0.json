@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "scenario": "L0",
+  "roles": [],
+  "required_gates": ["config", "provenance", "tools", "disk", "baseline-processes-ipc"],
+  "forbidden_roles": ["PGCS", "NRNCS", "Repository", "Source"]
+}

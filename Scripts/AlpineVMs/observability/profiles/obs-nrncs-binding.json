@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "obs-nrncs-binding",
+  "variant": "targeted-debug",
+  "defines": [
+    {"file": "NRNCS/src/NRRunInitialization01.cpp", "macro": "DEBUG"},
+    {"file": "NRNCS/src/NRRunPeriodic01.cpp", "macro": "DEBUG"},
+    {"file": "NRNCS/src/NRPubBind01.cpp", "macro": "DEBUG"}
+  ],
+  "notes": "Binding/storage; invocação não equivale a readback."
+}

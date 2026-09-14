@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "trial_id": "local-intra-os-20260913-real",
+  "scenario": "local-intra-os",
+  "debug_profile": "obs-normal",
+  "mode": "local",
+  "runtime_result": "PASS",
+  "teardown_result": "PASS",
+  "files": [
+    {
+      "path": "controller-events.jsonl",
+      "size": 187548,
+      "sha256": "d6b93d20718fe8d746ce6dd7c2f941885d5314e192ad6b798b6592e10d955c17"
+    },
+    {
+      "path": "provenance.json",
+      "size": 1152,
+      "sha256": "a133194b3efbce7e03221c515313451833d2d449deaaa0d7754e2eec5697b800"
+    },
+    {
+      "path": "roles/NRNCS/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/NRNCS/stdout.log",
+      "size": 6706,
+      "sha256": "f965a125346eac3793784f1254c81780a10e08c3f1ebe9f592a46e5ea2f1042d"
+    },
+    {
+      "path": "roles/PGCS/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/PGCS/stdout.log",
+      "size": 1974,
+      "sha256": "3ee7ee68ac352904146169635f12fe475f083dd11d0005d766be3143c7d73f84"
+    },
+    {
+      "path": "roles/Repository/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/Repository/stdout.log",
+      "size": 1443,
+      "sha256": "e1919af1ddaad74e6ca9634d3730d0f7b0fd10826ac076f212683b92aff1932f"
+    },
+    {
+      "path": "roles/Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/Source/stdout.log",
+      "size": 1435,
+      "sha256": "48568f628773b549f27ce682759e466547628659391a453dad0ec1d1c81c0fa3"
+    }
+  ]
+}

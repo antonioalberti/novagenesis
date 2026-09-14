@@ -1,0 +1,10 @@
+=== Killing NovaGenesis processes ===
+
+=== Cleaning IO directories ===
+  PGCS (3 files)
+
+=== Cleaning IPC resources ===
+
+=== Done ===
+761ca777d9129797beddefe28dcf776833eb284aa26d3d51473bad1f4ca8e902  IO/Repository1/App.ini
+0e0318c8a38c355cfabc6c39ef33ac40fb15f487958d6dcdc28f4884014aafac  IO/NRNCS/NRNCS.ini

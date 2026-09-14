@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "obs-raw-sar",
+  "variant": "targeted-debug",
+  "defines": [
+    {"file": "PGCS/src/NGAL_Transport_RAW.cpp", "macro": "DEBUG"},
+    {"file": "Common/src/NGAL_SAR.cpp", "macro": "DEBUG"}
+  ],
+  "notes": "Somente diagnóstico curto, sem stress/fotos."
+}

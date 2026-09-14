@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "trial_id": "local-intra-os-spec056-guard-20260913",
+  "scenario": "local-intra-os",
+  "debug_profile": "obs-normal",
+  "mode": "local",
+  "runtime_result": "PASS",
+  "teardown_result": "PASS",
+  "evidence_result": "COMPLETE",
+  "local_acceptance_eligible": false,
+  "acceptance_blockers": [
+    "dirty source tree",
+    "build linkage missing"
+  ],
+  "exit_code": 21
+}

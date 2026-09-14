@@ -3,6 +3,24 @@ project(novagenesis)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Keep Debug as the default while exposing an explicit optimised profile for
+# measurements.  Do not use architecture-specific tuning, fast-math or LTO.
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+endif()
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -fmessage-length=0 -pthread -Wno-deprecated")
+option(NG_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+if(NG_ENABLE_SANITIZERS)
+    # Sanitizer builds use O1 explicitly, independent of the selected CMake configuration.
+    set(CMAKE_CXX_FLAGS_DEBUG "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+endif()
+
 option(NG_ENABLE_LEGACY_STANDALONE
        "Build deprecated standalone PSS, GIRS and HTS services"
        OFF)
@@ -141,8 +159,12 @@ add_library(Common
         Common/src/tinythread.h
         Common/src/Tuple.h)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -lrt")
+if(NG_ENABLE_SANITIZERS)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+else()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
+endif()
 
 add_executable(ContentApp
         ContentApp/src/ContentApp.cpp

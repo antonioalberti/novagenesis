@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "trial_id": "local-intra-os-spec056-final-20260913",
+  "scenario": "local-intra-os",
+  "debug_profile": "obs-normal",
+  "mode": "local",
+  "runtime_result": "PASS",
+  "teardown_result": "PASS",
+  "files": [
+    {
+      "path": "artifacts/repository/00000-1stagent.jpg",
+      "size": 969,
+      "sha256": "6626c6ade760bd2856374c75445094d9cef8a36bf39d83dcbfabc7009a840a5a"
+    },
+    {
+      "path": "artifacts/repository/00001-1stagent.jpg",
+      "size": 985,
+      "sha256": "2b02292cd529f72f92dacb7c62c1aa40c0fa8da8f95761333eae5d56bb6e6910"
+    },
+    {
+      "path": "artifacts/repository/00002-1stagent.jpg",
+      "size": 979,
+      "sha256": "065c0248d87e273f2a097c484b218cbb3aea4c0969c0a9f859fc59d7fdeff14b"
+    },
+    {
+      "path": "artifacts/repository/00003-1stagent.jpg",
+      "size": 969,
+      "sha256": "ff192f83500a57b449ca0723e6566db85d5f28422cbeb0a4dcb6fe24edc562d3"
+    },
+    {
+      "path": "artifacts/repository/00004-1stagent.jpg",
+      "size": 982,
+      "sha256": "951465ac37f6d937a84969aa21bfb52d6538b7f4930ac9b35ccca9d9dd2af38e"
+    },
+    {
+      "path": "artifacts/source/00000-1stagent.jpg",
+      "size": 969,
+      "sha256": "6626c6ade760bd2856374c75445094d9cef8a36bf39d83dcbfabc7009a840a5a"
+    },
+    {
+      "path": "artifacts/source/00001-1stagent.jpg",
+      "size": 985,
+      "sha256": "2b02292cd529f72f92dacb7c62c1aa40c0fa8da8f95761333eae5d56bb6e6910"
+    },
+    {
+      "path": "artifacts/source/00002-1stagent.jpg",
+      "size": 979,
+      "sha256": "065c0248d87e273f2a097c484b218cbb3aea4c0969c0a9f859fc59d7fdeff14b"
+    },
+    {
+      "path": "artifacts/source/00003-1stagent.jpg",
+      "size": 969,
+      "sha256": "ff192f83500a57b449ca0723e6566db85d5f28422cbeb0a4dcb6fe24edc562d3"
+    },
+    {
+      "path": "artifacts/source/00004-1stagent.jpg",
+      "size": 982,
+      "sha256": "951465ac37f6d937a84969aa21bfb52d6538b7f4930ac9b35ccca9d9dd2af38e"
+    },
+    {
+      "path": "controller-events.jsonl",
+      "size": 499476,
+      "sha256": "77a7e9eca9b8e63430bed3244d9ff7e54a0d5c6dc8a239178833213d34ce1046"
+    },
+    {
+      "path": "oracle.json",
+      "size": 3152,
+      "sha256": "7247829fefcda6e36af793872a69b9003e194ff9b80551a7cb3164d72e334133"
+    },
+    {
+      "path": "plan.json",
+      "size": 1843,
+      "sha256": "ed51ec48ab327b491ce2de260b4745f5a762bd946e613d843907805d1c8590ca"
+    },
+    {
+      "path": "provenance.json",
+      "size": 4182,
+      "sha256": "4c0f0615d7b6c70de289b2e26e9b4eefff90afd6df45f95338e974933e9eec6a"
+    },
+    {
+      "path": "result.json",
+      "size": 397,
+      "sha256": "5a470d6a8292baff6edddcbfa390b397c4071f07875a01e961c6c572831232bf"
+    },
+    {
+      "path": "roles/NRNCS/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/NRNCS/stdout.log",
+      "size": 6724,
+      "sha256": "cb08b4579f99f356cdbc4036ae5281312b870e26bd0890634089545798856224"
+    },
+    {
+      "path": "roles/PGCS/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/PGCS/stdout.log",
+      "size": 1970,
+      "sha256": "f6d238eef629ff809e7a0498cfc74635d85318aa0945f3457be7cc0eb86579ed"
+    },
+    {
+      "path": "roles/Repository/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/Repository/stdout.log",
+      "size": 1442,
+      "sha256": "316048773ea696f9a34853ee5abd80675562ff6eeadd9eead5fd217289185b5c"
+    },
+    {
+      "path": "roles/Source/stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "roles/Source/stdout.log",
+      "size": 1434,
+      "sha256": "682ccf43888538d621059072c2d7d76ca1d90826b9c849b8400788bc462133ae"
+    }
+  ]
+}

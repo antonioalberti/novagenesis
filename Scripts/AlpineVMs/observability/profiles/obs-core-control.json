@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "obs-core-control",
+  "variant": "targeted-debug",
+  "defines": [
+    {"file": "ContentApp/src/CoreRunPeriodic01.cpp", "macro": "DEBUG"},
+    {"file": "ContentApp/src/CoreRunDiscover01.cpp", "macro": "DEBUG"},
+    {"file": "ContentApp/src/CoreRunSubscribe01.cpp", "macro": "DEBUG"}
+  ],
+  "notes": "Descoberta/subscrição; exige correlação por identidade."
+}

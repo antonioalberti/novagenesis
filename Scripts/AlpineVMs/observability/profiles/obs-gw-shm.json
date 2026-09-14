@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "id": "obs-gw-shm",
+  "variant": "targeted-debug",
+  "defines": [],
+  "external_observation": ["/proc", "ipcs", "logs incondicionais do GW"],
+  "notes": "Não activa Common/src/GW.cpp:DEBUG; usa probes externos e logs existentes."
+}

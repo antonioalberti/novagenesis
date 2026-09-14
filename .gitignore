@@ -32,3 +32,5 @@ Temp/
 Make/out.txt
 **/*.bak
 IO/NG-*/
+__pycache__/
+*.py[cod]

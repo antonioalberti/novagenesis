@@ -5,6 +5,7 @@
 **Author:** Antonio Alberti, with GPT-6 Astra review
 **Status:** Implemented
 **Branch:** AIOPT3
+**Implementation commit:** `3f95ba7`
 **Baseline:** `4ff9ec9`
 **Task:** `NG-036-deprecacao-standalone-v2-20260911.md`
 **Related:** `SPEC-008-ht-bid-raw-socket-discovery.md`, `SPEC-018-payload-sticks-on-reused-inline-response.md`, `SPEC-021-one-message-per-file.md`, `SPEC-022-nrinfopayload01-separate-messages.md`

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "trial_id": "local-intra-os-spec056-20260913",
+  "scenario": "local-intra-os",
+  "debug_profile": "obs-normal",
+  "mode": "local",
+  "runtime_result": "PASS",
+  "teardown_result": "PASS",
+  "evidence_result": "COMPLETE",
+  "exit_code": 0
+}

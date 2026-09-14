@@ -1,0 +1,28 @@
+=== NovaGenesis SPEC Validation ===
+Directory: Specs
+
+1. Checking for stale AIOPT2 references...
+Specs/RESULTS-SPEC-054/rerun-audit-20260913.json:149:      "code": "ACTIVE_AIOPT2_REF",
+Specs/RESULTS-SPEC-054/rerun-audit-20260913.json:150:      "message": "Referências AIOPT2 permanecem em documentos não históricos",
+Specs/RESULTS-SPEC-054/task-mapped-audit-20260913.json:157:      "code": "ACTIVE_AIOPT2_REF",
+Specs/RESULTS-SPEC-054/task-mapped-audit-20260913.json:158:      "message": "Referências AIOPT2 permanecem em documentos não históricos",
+Specs/RESULTS-SPEC-054/initial-audit-20260913.json:147:      "code": "ACTIVE_AIOPT2_REF",
+Specs/RESULTS-SPEC-054/initial-audit-20260913.json:148:      "message": "Referências AIOPT2 permanecem em documentos não históricos",
+Specs/RESULTS-SPEC-054/final-audit-20260913.json:157:      "code": "ACTIVE_AIOPT2_REF",
+Specs/RESULTS-SPEC-054/final-audit-20260913.json:158:      "message": "Referências AIOPT2 permanecem em documentos não históricos",
+Specs/RESULTS-SPEC-054/initial-audit-20260913.md:25:- `ACTIVE_AIOPT2_REF`: 1
+Specs/SPEC-054-release-master-plan-and-audit.md:139:- [x] A auditoria detecta referências ghost e referências AIOPT2 que não estejam explicitamente históricas.
+Specs/SPEC-054-release-master-plan-and-audit.md:157:- detecção dos drift conhecidos: árvore dirty, SPECs abertas, SPEC-036 sem commit registado, NG-049 com metadata legacy, referências ghost `SPEC-015`/`SPEC-016` e referência AIOPT2 fora de documento histórico.
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:27:### 2.1 Referências AIOPT2 desactualizadas (CRÍTICO)
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:31:| SPEC-001-NRNCS-debug-logging.md | L7 | `Branch: AIOPT2` → `Branch: AIOPT3` |
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:32:| SPEC-009-alpine-vm-ssh-run-scripts.md | L6, L65, L233 | `AIOPT2` → `AIOPT3` (3 ocorrências) |
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:33:| SPEC-011-periodic-exposition-contentapp.md | L127 | `git push origin AIOPT2` → `git push origin AIOPT3` |
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:81:#### 1.1 Actualizar referências AIOPT2 → AIOPT3
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:196:- [ ] **Branch**: `AIOPT3` (actual) — não mais `AIOPT2`
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:230:1. **Fase 1.1-1.5** (editar 8 ficheiros SPEC — referências AIOPT2, status, superseded, dangling refs)
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:245:# Grepar referências AIOPT2
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:246:grep -rn "AIOPT2" Specs/
+Specs/PLAN-CONSOLIDATION-2026-07-16.md:265:- [ ] **0 referências a AIOPT2** em Specs/
+   ✅ PASS: No AIOPT2 references
+
+2. Checking for dangling SPEC cross-references...

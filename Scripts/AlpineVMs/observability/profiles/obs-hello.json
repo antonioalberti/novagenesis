@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "obs-hello",
+  "variant": "targeted-debug",
+  "defines": [
+    {"file": "PGCS/src/PGHelloIHC01.cpp", "macro": "DEBUG"},
+    {"file": "PGCS/src/PGRunPeriodic01.cpp", "macro": "DEBUG"}
+  ],
+  "notes": "Diagnóstico curto de hello/periodicidade; não prova binding."
+}

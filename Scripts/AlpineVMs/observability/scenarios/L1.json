@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "scenario": "L1",
+  "roles": ["PGCS-Source"],
+  "required_gates": ["process", "gw", "shm", "cleanup"],
+  "forbidden_roles": ["PGCS-Repository", "NRNCS", "Repository", "Source"]
+}

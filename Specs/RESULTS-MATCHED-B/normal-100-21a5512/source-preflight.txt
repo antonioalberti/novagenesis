@@ -1,0 +1,12 @@
+=== Killing NovaGenesis processes ===
+
+=== Cleaning IO directories ===
+  NRNCS (103 files)
+  PGCS (3 files)
+
+=== Cleaning IPC resources ===
+
+=== Done ===
+53c08f4aa6236dacea0ae3bc8807c11372386621a6e9a302db6998a6e9acd950  cmake-build-debug/PGCS
+dc7850feb133a1264231e38167aa2a6aa9e7f9fcdf7f48eb7e9c271432aef19c  cmake-build-debug/NRNCS
+4773615b02cd6746c16546ab522a91bafd1ae6af1b627c813ce3a45ce9b6cbfb  cmake-build-debug/ContentApp

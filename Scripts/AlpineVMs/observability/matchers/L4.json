@@ -1,0 +1,4 @@
+[
+  {"id": "repository-ready", "pattern": "Repository"},
+  {"id": "nrncs-discovered", "pattern": "Discovered a NRNCS! HID="}
+]

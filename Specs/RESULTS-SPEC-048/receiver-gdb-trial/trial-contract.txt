@@ -1,0 +1,15 @@
+start_utc=2026-09-12T11:27:56.137908+00:00
+commit=1af604dad66148618cc0e578c28adb4a9829e607
+window=180s
+repo_preflight_rc=0
+source_preflight_rc=0
+repo_rc=124
+source_rc=124
+tcpdump_rc=124
+repo_fetch_rc=0
+source_fetch_rc=0
+tcpdump_fetch_rc=0
+repo_cleanup_rc=0
+source_cleanup_rc=0
+vm_stop_rc=0
+end_utc=2026-09-12T11:31:10.668561+00:00

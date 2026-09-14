@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "scenario": "L2",
+  "roles": ["PGCS-Source", "PGCS-Repository"],
+  "required_gates": ["socket", "peer-mac", "on-wire", "receiver-handler", "cleanup"],
+  "forbidden_roles": ["NRNCS", "Repository", "Source"]
+}

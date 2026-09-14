@@ -1,0 +1,101 @@
+{
+  "source_count": 5,
+  "repository_count": 5,
+  "expected_count": 5,
+  "source_map": {
+    "00000-1stagent.jpg": {
+      "size": 974,
+      "sha256": "8f88cfd08d4770517dcca89f710cf3e8c323cadd70ee9f7768c7228500a5ffd6"
+    },
+    "00001-1stagent.jpg": {
+      "size": 984,
+      "sha256": "d49727793b5d57d5172e7070b21fff132ad7128bf84629e63d5ed631024f7574"
+    },
+    "00002-1stagent.jpg": {
+      "size": 982,
+      "sha256": "84060611b547c716a13d395a3cdd4f07ed820005e4b357026f14030f4be00cde"
+    },
+    "00003-1stagent.jpg": {
+      "size": 976,
+      "sha256": "76e7b293e84340f9442708439ebc98a7f9bb110a29ab22270254a25c14f1a31c"
+    },
+    "00004-1stagent.jpg": {
+      "size": 976,
+      "sha256": "df8f486cf6f81c832ca8658a9a9f5ffdedda277f599c03cc72ed92608096c5d2"
+    }
+  },
+  "repository_map": {
+    "00000-1stagent.jpg": {
+      "size": 974,
+      "sha256": "8f88cfd08d4770517dcca89f710cf3e8c323cadd70ee9f7768c7228500a5ffd6"
+    },
+    "00001-1stagent.jpg": {
+      "size": 984,
+      "sha256": "d49727793b5d57d5172e7070b21fff132ad7128bf84629e63d5ed631024f7574"
+    },
+    "00002-1stagent.jpg": {
+      "size": 982,
+      "sha256": "84060611b547c716a13d395a3cdd4f07ed820005e4b357026f14030f4be00cde"
+    },
+    "00003-1stagent.jpg": {
+      "size": 976,
+      "sha256": "76e7b293e84340f9442708439ebc98a7f9bb110a29ab22270254a25c14f1a31c"
+    },
+    "00004-1stagent.jpg": {
+      "size": 976,
+      "sha256": "df8f486cf6f81c832ca8658a9a9f5ffdedda277f599c03cc72ed92608096c5d2"
+    }
+  },
+  "unsafe_source": [],
+  "unsafe_repository": [],
+  "source_equals_repository": true,
+  "missing_in_repository": [],
+  "extra_in_repository": [],
+  "hash_mismatches": [],
+  "result": "PASS",
+  "preserved_source_map": {
+    "00000-1stagent.jpg": {
+      "size": 974,
+      "sha256": "8f88cfd08d4770517dcca89f710cf3e8c323cadd70ee9f7768c7228500a5ffd6"
+    },
+    "00001-1stagent.jpg": {
+      "size": 984,
+      "sha256": "d49727793b5d57d5172e7070b21fff132ad7128bf84629e63d5ed631024f7574"
+    },
+    "00002-1stagent.jpg": {
+      "size": 982,
+      "sha256": "84060611b547c716a13d395a3cdd4f07ed820005e4b357026f14030f4be00cde"
+    },
+    "00003-1stagent.jpg": {
+      "size": 976,
+      "sha256": "76e7b293e84340f9442708439ebc98a7f9bb110a29ab22270254a25c14f1a31c"
+    },
+    "00004-1stagent.jpg": {
+      "size": 976,
+      "sha256": "df8f486cf6f81c832ca8658a9a9f5ffdedda277f599c03cc72ed92608096c5d2"
+    }
+  },
+  "preserved_repository_map": {
+    "00000-1stagent.jpg": {
+      "size": 974,
+      "sha256": "8f88cfd08d4770517dcca89f710cf3e8c323cadd70ee9f7768c7228500a5ffd6"
+    },
+    "00001-1stagent.jpg": {
+      "size": 984,
+      "sha256": "d49727793b5d57d5172e7070b21fff132ad7128bf84629e63d5ed631024f7574"
+    },
+    "00002-1stagent.jpg": {
+      "size": 982,
+      "sha256": "84060611b547c716a13d395a3cdd4f07ed820005e4b357026f14030f4be00cde"
+    },
+    "00003-1stagent.jpg": {
+      "size": 976,
+      "sha256": "76e7b293e84340f9442708439ebc98a7f9bb110a29ab22270254a25c14f1a31c"
+    },
+    "00004-1stagent.jpg": {
+      "size": 976,
+      "sha256": "df8f486cf6f81c832ca8658a9a9f5ffdedda277f599c03cc72ed92608096c5d2"
+    }
+  },
+  "preservation_verified": true
+}

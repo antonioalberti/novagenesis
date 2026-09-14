@@ -1,0 +1,3 @@
+SUPERVISOR pid=2280 pgid=2280
+TIMEOUT elapsed=180.000s signal=SIGTERM
+RESULT rc=-15 timed_out=1 escalated=0 elapsed=180.002s

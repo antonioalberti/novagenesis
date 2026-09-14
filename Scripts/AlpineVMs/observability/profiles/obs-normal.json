@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "id": "obs-normal",
+  "variant": "normal",
+  "defines": [],
+  "notes": "Baseline sem defines adicionais; auditar macros DEBUG já activas no código."
+}

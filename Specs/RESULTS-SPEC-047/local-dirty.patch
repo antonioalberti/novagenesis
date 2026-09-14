@@ -1,0 +1,403 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 809cefb..3f6a875 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3,6 +3,24 @@ project(novagenesis)
+ 
+ set(CMAKE_CXX_STANDARD 20)
+ 
++# Keep Debug as the default while exposing an explicit optimised profile for
++# measurements.  Do not use architecture-specific tuning, fast-math or LTO.
++if(NOT CMAKE_BUILD_TYPE)
++    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
++endif()
++set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
++set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
++set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -fmessage-length=0 -pthread -Wno-deprecated")
++option(NG_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
++if(NG_ENABLE_SANITIZERS)
++    # Sanitizer builds use O1 explicitly, independent of the selected CMake configuration.
++    set(CMAKE_CXX_FLAGS_DEBUG "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
++    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
++    set(CMAKE_CXX_FLAGS_RELEASE "-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer")
++    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
++endif()
++
+ option(NG_ENABLE_LEGACY_STANDALONE
+        "Build deprecated standalone PSS, GIRS and HTS services"
+        OFF)
+@@ -141,8 +159,12 @@ add_library(Common
+         Common/src/tinythread.h
+         Common/src/Tuple.h)
+ 
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer")
+-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -lrt")
++if(NG_ENABLE_SANITIZERS)
++    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
++else()
++    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
++endif()
+ 
+ add_executable(ContentApp
+         ContentApp/src/ContentApp.cpp
+diff --git a/Common/src/GW.cpp b/Common/src/GW.cpp
+index 4b3f06d..7cee652 100644
+--- a/Common/src/GW.cpp
++++ b/Common/src/GW.cpp
+@@ -75,6 +75,8 @@ GW::GW(string _LN, Process* _PP, unsigned int _Index, string _Path)
+     : Block(_LN, _PP, _Index, _Path)
+ {
+   InputQueueTag = 0;
++  InputWakeGeneration = 0;
++  NextSHMPoll = std::chrono::steady_clock::now() + std::chrono::milliseconds(1);
+   OutputQueueTag = 0;
+   StopGateway = false;
+   State = "initialization";
+@@ -257,6 +259,7 @@ void GW::PushToInputQueue(Message* M)
+ 
+           // Increases the tag counter
+           InputQueueTag++;
++          ++InputWakeGeneration;
+         }
+         // Notify after unlock to minimize time input thread is blocked
+         InputQueueCV.notify_one();
+@@ -275,6 +278,15 @@ void GW::PushToInputQueue(Message* M)
+   }
+ }
+ 
++void GW::NotifyInputWake()
++{
++  {
++    std::lock_guard<std::mutex> lock(InputQueueMutex);
++    ++InputWakeGeneration;
++  }
++  InputQueueCV.notify_one();
++}
++
+ // Push a Message into the output message priority queue
+ void GW::PushToOutputQueue(std::string OQS, Message* M)
+ {
+@@ -441,7 +453,7 @@ void GW::Gateway()
+   double ScheduledTime = 0;
+   double Time = 0;
+   long long int MessageSize = 0;
+-  std::chrono::milliseconds waitTimeout;
++  std::chrono::nanoseconds waitTimeout;
+   constexpr long long SHM_POLL_INTERVAL_MS = 1; // SHM poll every 1ms (SPEC-007a)
+   double secondsUntilNext = 1.0;                // default 1s when queue empty
+ 
+@@ -450,31 +462,52 @@ void GW::Gateway()
+ 
+   while (StopGateway == false)
+   {
+-    // Calculate how long to wait: time until next scheduled message
++    // Inspect the head, capture the generation and decide whether to wait
++    // under one InputQueueMutex protocol. This prevents an earlier producer
++    // publication from being consumed between inspection and sleep.
+     {
+-      std::lock_guard<std::mutex> lock(InputQueueMutex);
++      std::unique_lock<std::mutex> lock(InputQueueMutex);
++      const double now = GetTime();
++      bool headDue = false;
+       if (!InputQueue.empty())
+       {
+-        double nextTime = InputQueue.top()->GetTime();
+-        double now = GetTime();
+-        secondsUntilNext = nextTime - now;
++        secondsUntilNext = InputQueue.top()->GetTime() - now;
++        headDue = InputQueue.top()->GetTime() < now;
+         if (secondsUntilNext < 0)
+           secondsUntilNext = 0;
+       }
+       else
+       {
+-        secondsUntilNext = 1.0; // no messages, check SHM every 1s max
++        secondsUntilNext = 1.0;
+       }
+-    }
+ 
+-    // Wait for input queue or stop flag (timer-aware blocking wait)
+-    {
+-      std::unique_lock<std::mutex> lock(InputQueueMutex);
+-      waitTimeout = std::chrono::milliseconds(
+-          std::min((long long)(secondsUntilNext * 1000), SHM_POLL_INTERVAL_MS));
+-      InputQueueCV.wait_for(lock, waitTimeout,
+-                            [this]()
+-                            { return !InputQueue.empty() || StopGateway; });
++      if (!headDue)
++      {
++        const auto steadyNow = std::chrono::steady_clock::now();
++        const auto pollRemaining = std::chrono::duration_cast<std::chrono::nanoseconds>(
++            NextSHMPoll - steadyNow).count();
++        const long long requestedNanoseconds =
++            static_cast<long long>(secondsUntilNext * 1000000000.0);
++        const long long messageWait =
++            requestedNanoseconds > 0 ? requestedNanoseconds : 1000000LL;
++        const long long boundedNanoseconds =
++            std::min(messageWait, std::max(0LL, static_cast<long long>(pollRemaining)));
++        const unsigned long long observedWakeGeneration = InputWakeGeneration;
++
++        if (boundedNanoseconds > 0)
++        {
++          waitTimeout = std::chrono::nanoseconds(boundedNanoseconds);
++          InputQueueCV.wait_for(lock, waitTimeout,
++                                [this, observedWakeGeneration]()
++                                {
++                                  if (StopGateway ||
++                                      InputWakeGeneration != observedWakeGeneration)
++                                    return true;
++                                  std::lock_guard<std::mutex> networkLock(NetworkReceiveQueueMutex);
++                                  return !NetworkReceiveQueue.empty();
++                                });
++        }
++      }
+       if (StopGateway)
+         break;
+     }
+@@ -600,11 +633,16 @@ void GW::Gateway()
+     // The ReceiveDispatcher pushes raw char buffers here. The GW thread
+     // does NewMessage + deserialisation + PushToInputQueue.
+     {
+-      std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
+-      while (!NetworkReceiveQueue.empty())
++      std::queue<std::pair<char*, long long>> pendingNetwork;
++      {
++        std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
++        pendingNetwork.swap(NetworkReceiveQueue);
++      }
++
++      while (!pendingNetwork.empty())
+       {
+-        auto entry = NetworkReceiveQueue.front();
+-        NetworkReceiveQueue.pop();
++        auto entry = pendingNetwork.front();
++        pendingNetwork.pop();
+ 
+         char* buffer = entry.first;
+         long long size = entry.second;
+@@ -615,8 +653,8 @@ void GW::Gateway()
+           if (PP->NewMessage(0, 0, false, PM) == OK)
+           {
+           #ifdef DEBUG_NETWORK_QUEUE
+-            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size 
+-                 << " queue_remaining=" << NetworkReceiveQueue.size() << endl;
++            cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size
++                 << " queue_remaining=" << pendingNetwork.size() << endl;
+           #endif
+             PM->SetMessageFromCharArray(buffer, size);
+             PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+@@ -628,27 +666,14 @@ void GW::Gateway()
+       }
+     }
+ 
+-    // Step 4 : Read OS IPC — poll shared memory for messages from other processes
+-    // Phase 2: rate limit to 100ms when no due messages to process (idle or waiting for future messages)
++    // Step 4 : Read OS IPC — poll shared memory from its independent deadline.
+     {
+-      static auto lastSHMPoll = std::chrono::steady_clock::now();
+       auto now = std::chrono::steady_clock::now();
+-      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSHMPoll).count();
+-      bool hasDueMessage = false;
+-      {
+-        std::lock_guard<std::mutex> lock(InputQueueMutex);
+-        if (!InputQueue.empty())
+-        {
+-          double nextTime = InputQueue.top()->GetTime();
+-          double currentTime = GetTime();
+-          if (nextTime <= currentTime)
+-            hasDueMessage = true;
+-        }
+-      }
+-      if (!hasDueMessage && elapsed >= SHM_POLL_INTERVAL_MS)
++      if (now >= NextSHMPoll)
+       {
+         ReadFromSharedMemory3();
+-        lastSHMPoll = std::chrono::steady_clock::now();
++        NextSHMPoll = std::chrono::steady_clock::now() +
++                      std::chrono::milliseconds(SHM_POLL_INTERVAL_MS);
+       }
+     }
+ 
+@@ -1330,7 +1355,11 @@ int GW::ReturnIPCSHMID(key_t _Key, int& _shmid)
+ // Auxiliary functions
+ void GW::SetStopGatewayFlag(bool _F)
+ {
+-  StopGateway = _F;
++  {
++    std::lock_guard<std::mutex> lock(InputQueueMutex);
++    StopGateway = _F;
++    ++InputWakeGeneration;
++  }
+   // Wake up both threads blocked on wait()
+   InputQueueCV.notify_all();
+   OutputQueueCV.notify_all();
+diff --git a/Common/src/GW.h b/Common/src/GW.h
+index 18493ba..4e75cd4 100644
+--- a/Common/src/GW.h
++++ b/Common/src/GW.h
+@@ -180,6 +180,8 @@ private:
+   // Mutex and condition variable for input queue synchronization
+   std::mutex InputQueueMutex;
+   std::condition_variable InputQueueCV;
++  unsigned long long InputWakeGeneration;
++  std::chrono::steady_clock::time_point NextSHMPoll;
+ 
+   // ── NGAL: Network Receive Queue ──
+   // Thread-safe intermediate queue for raw char buffers from the NGAL
+@@ -251,6 +253,9 @@ public:
+   // Push a Message into the input message priority queue
+   void PushToInputQueue(Message* M);
+ 
++  // Publish a wake event for network/stop work through the Gateway wait channel.
++  void NotifyInputWake();
++
+   // Monitor IPC, read Messages from other processes and pushes to the InputQueue
+   // Read Messages from the InputQueue and call the GW::Run(Message *M)
+   // Read Messages from the OutputQueue and forward to other processes via IPC
+diff --git a/Common/src/NGAL_CS.cpp b/Common/src/NGAL_CS.cpp
+index ab2c2cd..fcdf1ba 100644
+--- a/Common/src/NGAL_CS.cpp
++++ b/Common/src/NGAL_CS.cpp
+@@ -68,7 +68,9 @@ int NGAL_CS::DeliverToGateway(GW* PGW,
+     PGW->NetworkReceiveQueue.push(std::make_pair(BufferCopy, MessageSize));
+   }
+ 
+-  PGW->NetworkReceiveQueueCV.notify_one();
++  // Network publication uses the Gateway's shared wake generation.  The
++  // network queue mutex is released before taking InputQueueMutex.
++  PGW->NotifyInputWake();
+ 
+   return 0; // OK
+ }
+diff --git a/Common/src/OutputVariable.cpp b/Common/src/OutputVariable.cpp
+index c880b6b..cb0c34c 100644
+--- a/Common/src/OutputVariable.cpp
++++ b/Common/src/OutputVariable.cpp
+@@ -41,7 +41,7 @@
+ 
+ OutputVariable::OutputVariable(Block* Owner_)
+ {
+-  double t = Owner->GetTime();
++  double t = Owner_->GetTime();
+ 
+   Name = "UNKNOWN";
+   Type = "UNKNOWN";
+diff --git a/Make/compile-parallel.sh b/Make/compile-parallel.sh
+index bd5be02..eacf618 100755
+--- a/Make/compile-parallel.sh
++++ b/Make/compile-parallel.sh
+@@ -11,9 +11,34 @@ shopt -s nullglob
+ 
+ cd "$(dirname "$0")/.." || exit 1
+ 
+-BUILD_DIR="cmake-build-debug"
+-rm -rf "$BUILD_DIR"
+-mkdir -p "$BUILD_DIR"
++NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
++case "$NG_BUILD_PROFILE" in
++  debug|performance|sanitizer) ;;
++  *)
++    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
++    exit 2
++    ;;
++esac
++
++BUILD_DIR="cmake-build-$NG_BUILD_PROFILE"
++
++NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
++case "$NG_BUILD_PROFILE" in
++  debug)
++    CXX_FLAGS="-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
++    ;;
++  performance)
++    CXX_FLAGS="-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
++    ;;
++  sanitizer)
++    CXX_FLAGS="-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fsanitize=address,undefined -fno-omit-frame-pointer"
++    ;;
++  *)
++    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
++    exit 2
++    ;;
++esac
++echo "Build profile: $NG_BUILD_PROFILE"
+ 
+ # ---- Parse arguments ----
+ JOBS=$(nproc)                    # Default: all cores
+@@ -31,6 +56,14 @@ if [ $# -gt 0 ]; then
+     fi
+ fi
+ 
++if [ "$JOBS" -lt 1 ]; then
++    echo "Job count must be at least 1" >&2
++    exit 2
++fi
++
++rm -rf "$BUILD_DIR"
++mkdir -p "$BUILD_DIR"
++
+ # Clamp to number of services (don't spawn more jobs than work)
+ NUM_SERVICES=$(echo "$SERVICES" | wc -w)
+ if [ "$JOBS" -gt "$NUM_SERVICES" ]; then
+@@ -87,7 +120,7 @@ for service in $SERVICES; do
+ 
+     (
+         # Compile, capture ALL stderr (errors + warnings) to log file
+-        if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
++        if g++ -std=c++20 $CXX_FLAGS \
+             -o "$BUILD_DIR/$service" "$service/src/"*.cpp Common/src/*.cpp \
+             -I Common/src/ -lpthread -lrt 2>"$LOG_DIR/$service.log"; then
+             echo 0 > "$STATUS_DIR/$service.exit"
+diff --git a/Make/compile.sh b/Make/compile.sh
+index 4639727..73fc193 100755
+--- a/Make/compile.sh
++++ b/Make/compile.sh
+@@ -8,10 +8,36 @@
+ 
+ cd "$(dirname "$0")/.." || exit 1
+ 
+-BUILD_DIR="cmake-build-debug"
++NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
++case "$NG_BUILD_PROFILE" in
++  debug|performance|sanitizer) ;;
++  *)
++    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
++    exit 2
++    ;;
++esac
++
++BUILD_DIR="cmake-build-$NG_BUILD_PROFILE"
+ rm -rf "$BUILD_DIR"
+ mkdir -p "$BUILD_DIR"
+ 
++case "$NG_BUILD_PROFILE" in
++  debug)
++    CXX_FLAGS="-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
++    ;;
++  performance)
++    CXX_FLAGS="-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
++    ;;
++  sanitizer)
++    CXX_FLAGS="-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fsanitize=address,undefined -fno-omit-frame-pointer"
++    ;;
++  *)
++    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
++    exit 2
++    ;;
++esac
++echo "Build profile: $NG_BUILD_PROFILE"
++
+ # If arguments provided, compile only those services
+ if [ $# -gt 0 ]; then
+     SERVICES="$@"
+@@ -21,7 +47,7 @@ fi
+ 
+ for i in $SERVICES; do
+   echo "Compiling $i..."
+-  if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
++  if g++ -std=c++20 $CXX_FLAGS \
+     -o "$BUILD_DIR/$i" "$i/src/"*.cpp Common/src/*.cpp \
+     -I Common/src/ -lpthread -lrt; then
+     echo "✓ $i compiled successfully"

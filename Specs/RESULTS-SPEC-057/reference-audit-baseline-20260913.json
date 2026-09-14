@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "needle": "ng_remote_executor.py",
+  "root": "/home/gandalf/workspace/novagenesis",
+  "matches": 68,
+  "summary": {
+    "normative/current": 23,
+    "migration-baseline": 10,
+    "historical/generated": 35
+  },
+  "rows": [
+    {
+      "path": "README.md",
+      "line": 277,
+      "classification": "normative/current",
+      "text": "python3 Scripts/AlpineVMs/ng_remote_executor.py dry-run \\\\"
+    },
+    {
+      "path": "README.md",
+      "line": 282,
+      "classification": "normative/current",
+      "text": "python3 Scripts/AlpineVMs/ng_remote_executor.py preflight \\\\"
+    },
+    {
+      "path": "README.md",
+      "line": 285,
+      "classification": "normative/current",
+      "text": "python3 Scripts/AlpineVMs/ng_remote_executor.py run \\\\"
+    },
+    {
+      "path": "Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+      "line": 34,
+      "classification": "normative/current",
+      "text": "Scripts/AlpineVMs/ng_remote_executor.py"
+    },
+    {
+      "path": "Specs/SPEC-054-release-master-plan-and-audit.md",
+      "line": 10,
+      "classification": "normative/current",
+      "text": "**Canonical experiment tool:** `NG Experiment Lifecycle Controller (NG-ELC)` — current implementation `Scripts/AlpineVMs/ng_remote_executor.py`; canonical rename proposed by SPEC-057: `Scripts/AlpineVMs/ng_elc.py`"
+    },
+    {
+      "path": "Specs/SPEC-056-ng-elc-evidence-provenance-hardening.md",
+      "line": 10,
+      "classification": "normative/current",
+      "text": "**Canonical tool during SPEC-056:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`; canonical rename is separately specified by SPEC-057 and must not alter this hardening contract."
+    },
+    {
+      "path": "Specs/SPEC-053-debug-log-observability-matrix.md",
+      "line": 309,
+      "classification": "normative/current",
+      "text": "| Planear NG-ELC | `python3 Scripts/AlpineVMs/ng_remote_executor.py dry-run --mode remote --plan <json> --scenario <L0..L5> --debug-profile <id>` ou `--mode local --scenario local-intra-os` |"
+    },
+    {
+      "path": "Specs/SPEC-053-debug-log-observability-matrix.md",
+      "line": 310,
+      "classification": "normative/current",
+      "text": "| Verificar NG-ELC | `python3 Scripts/AlpineVMs/ng_remote_executor.py preflight --mode remote --plan <json> --scenario <L0..L5> --debug-profile <id>` ou `--mode local --plan Scripts/AlpineVMs/plans/local-intra-os.example.json --scenario local-intra-os --debug-profile <id>` |"
+    },
+    {
+      "path": "Specs/SPEC-053-debug-log-observability-matrix.md",
+      "line": 311,
+      "classification": "normative/current",
+      "text": "| Executar NG-ELC | `python3 Scripts/AlpineVMs/ng_remote_executor.py run --mode remote --plan <json> --scenario <L0..L5> --debug-profile <id>` ou `--mode local --plan Scripts/AlpineVMs/plans/local-intra-os.example.json --scenario local-intra-os --debug-profile <id>` |"
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 10,
+      "classification": "migration-baseline",
+      "text": "**Current entrypoint:** `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 15,
+      "classification": "migration-baseline",
+      "text": "O componente deixou de ser apenas um executor remoto. O mesmo controlador coordena preflight, launch, readiness, observação, oracle, teardown, ownership e evidência nos modos local e remoto. O nome `ng_remote_executor.py` já não descreve o contrato actual e induz a interpretação de que o modo remoto é o caminho canónico."
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 37,
+      "classification": "migration-baseline",
+      "text": "- Manter temporariamente `ng_remote_executor.py` apenas como shim de compatibilidade, sem lógica duplicada, se consumidores existentes ainda o exigirem."
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 57,
+      "classification": "migration-baseline",
+      "text": "| Nome legado | `ng_remote_executor.py`, apenas shim durante migração |"
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 70,
+      "classification": "migration-baseline",
+      "text": "3. `ng_remote_executor.py`, se mantido, deve conter apenas delegação para `ng_elc.py` e aviso de compatibilidade."
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 112,
+      "classification": "migration-baseline",
+      "text": "4. Criar o shim mínimo `ng_remote_executor.py`."
+    },
+    {
+      "path": "Specs/SPEC-057-ng-elc-canonical-entrypoint-rename.md",
+      "line": 147,
+      "classification": "migration-baseline",
+      "text": "- A implementação actual continua sob `Scripts/AlpineVMs/ng_remote_executor.py`."
+    },
+    {
+      "path": "Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+      "line": 23,
+      "classification": "normative/current",
+      "text": "O controlador canónico é o **NG Experiment Lifecycle Controller (NG-ELC)**, com entry point `Scripts/AlpineVMs/ng_remote_executor.py`. Esta SPEC define o modo `remote`; o modo intra-OS do mesmo controlador é definido em `SPEC-055-ng-elc-local-mode.md`."
+    },
+    {
+      "path": "Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+      "line": 157,
+      "classification": "normative/current",
+      "text": "Entrada: `python3 Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+      "line": 181,
+      "classification": "normative/current",
+      "text": "- `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 10,
+      "classification": "normative/current",
+      "text": "**Canonical tool:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 14,
+      "classification": "normative/current",
+      "text": "O projecto possui o controlador de lifecycle `Scripts/AlpineVMs/ng_remote_executor.py`, mas a sua configuração e os seus roles estão actualmente limitados a dois guests SSH. O teste intra-OS anterior foi executado por um launcher paralelo e terminou com erro no agregador final. Mesmo tendo produzido uma observação de 5/5 ficheiros, não é uma experiência selada pelo mesmo contrato de lifecycle."
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 29,
+      "classification": "normative/current",
+      "text": "Scripts/AlpineVMs/ng_remote_executor.py"
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 32,
+      "classification": "normative/current",
+      "text": "`ng_remote_executor.py`, `remote executor`, `runner` e `supervisor` podem aparecer como descrições técnicas de componentes, mas o controlador integrado deve ser referido como `NG-ELC`."
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 43,
+      "classification": "normative/current",
+      "text": "python3 Scripts/AlpineVMs/ng_remote_executor.py run \\"
+    },
+    {
+      "path": "Specs/SPEC-055-ng-elc-local-mode.md",
+      "line": 52,
+      "classification": "normative/current",
+      "text": "python3 Scripts/AlpineVMs/ng_remote_executor.py run \\"
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/final-scan-audit-20260913.json",
+      "line": 271,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/final-scan-audit-20260913.json",
+      "line": 342,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/ng-elc-audit-20260913.json",
+      "line": 283,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/ng-elc-audit-20260913.json",
+      "line": 359,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/rerun-audit-20260913.json",
+      "line": 305,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/rerun-audit-20260913.json",
+      "line": 374,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/post-ownership-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/post-ownership-audit-20260913.json",
+      "line": 370,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/g1-current-audit-20260913.json",
+      "line": 273,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/g1-current-audit-20260913.json",
+      "line": 347,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/task-mapped-audit-20260913.json",
+      "line": 299,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/task-mapped-audit-20260913.json",
+      "line": 368,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/initial-audit-20260913.json",
+      "line": 307,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/initial-audit-20260913.json",
+      "line": 375,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/ng-elc-audit-final-20260913.json",
+      "line": 283,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/ng-elc-audit-final-20260913.json",
+      "line": 359,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/spec057-audit-20260913.json",
+      "line": 309,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/spec057-audit-20260913.json",
+      "line": 387,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/final-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/final-audit-20260913.json",
+      "line": 362,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/post-spec056-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/post-spec056-audit-20260913.json",
+      "line": 370,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-audit-20260913.json",
+      "line": 370,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/g2-preflight-20260913.md",
+      "line": 4,
+      "classification": "historical/generated",
+      "text": "**Ferramenta:** `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-r01c02-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-r01c02-audit-20260913.json",
+      "line": 370,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-r01c02-final-audit-20260913.json",
+      "line": 293,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/session-close-r01c02-final-audit-20260913.json",
+      "line": 370,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/current-audit-20260913.json",
+      "line": 283,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-054/current-audit-20260913.json",
+      "line": 359,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-055/local-intra-os-spec056-final-20260913/provenance.json",
+      "line": 23,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-055/local-intra-os-spec056-final-20260913/provenance.json",
+      "line": 71,
+      "classification": "historical/generated",
+      "text": "\"path\": \"/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-055/local-intra-os-spec056-guard-20260913/provenance.json",
+      "line": 23,
+      "classification": "historical/generated",
+      "text": "\"?? Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "Specs/RESULTS-SPEC-055/local-intra-os-spec056-guard-20260913/provenance.json",
+      "line": 71,
+      "classification": "historical/generated",
+      "text": "\"path\": \"/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_remote_executor.py\","
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-049-runner-multi-vm-safe-teardown-v1-20260912.md",
+      "line": 42,
+      "classification": "normative/current",
+      "text": "- O `NG Experiment Lifecycle Controller (NG-ELC)`, entry point `Scripts/AlpineVMs/ng_remote_executor.py`, implementa o modo remoto com helper, wrapper de processo, locks, leases, identidade PID/PGID, readiness gates, inventário IPC e teardown bounded; o modo local formal está em NG-055/SPEC-055."
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-049-runner-multi-vm-safe-teardown-v1-20260912.md",
+      "line": 74,
+      "classification": "normative/current",
+      "text": "- `Scripts/AlpineVMs/ng_remote_executor.py` — NG-ELC remoto/local"
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-057-ng-elc-canonical-entrypoint-rename-v1-20260913.md",
+      "line": 39,
+      "classification": "migration-baseline",
+      "text": "- Criar, se necessário, shim mínimo em `ng_remote_executor.py`."
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-057-ng-elc-canonical-entrypoint-rename-v1-20260913.md",
+      "line": 53,
+      "classification": "migration-baseline",
+      "text": "- [ ] `ng_remote_executor.py`, se mantido, é apenas shim sem lógica duplicada."
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-057-ng-elc-canonical-entrypoint-rename-v1-20260913.md",
+      "line": 104,
+      "classification": "migration-baseline",
+      "text": "- `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-056-ng-elc-evidence-hardening-v1-20260913.md",
+      "line": 116,
+      "classification": "normative/current",
+      "text": "- `Scripts/AlpineVMs/ng_remote_executor.py`"
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-055-ng-elc-local-mode-v1-20260913.md",
+      "line": 79,
+      "classification": "normative/current",
+      "text": "- Feito: `NG Experiment Lifecycle Controller (NG-ELC)` identificado no entry point `Scripts/AlpineVMs/ng_remote_executor.py`; modo remoto depende de SSH/configuração privada."
+    },
+    {
+      "path": "/home/gandalf/ObsidianVault/Tarefas/NG-055-ng-elc-local-mode-v1-20260913.md",
+      "line": 87,
+      "classification": "normative/current",
+      "text": "- `Scripts/AlpineVMs/ng_remote_executor.py`"
+    }
+  ]
+}

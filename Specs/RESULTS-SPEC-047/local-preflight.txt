@@ -1,0 +1,103 @@
+captured_utc=2026-09-12T10:47:52Z
+host=1stagent
+branch=AIOPT3
+head=1af604dad66148618cc0e578c28adb4a9829e607
+remote_head=1af604dad66148618cc0e578c28adb4a9829e607
+uid=1000
+gid=1000
+
+=== status ===
+## AIOPT3...origin/AIOPT3
+ M CMakeLists.txt
+ M Common/src/GW.cpp
+ M Common/src/GW.h
+ M Common/src/NGAL_CS.cpp
+ M Common/src/OutputVariable.cpp
+ M Make/compile-parallel.sh
+ M Make/compile.sh
+?? .hermes/
+?? Scripts/Performance/
+?? Specs/RESULTS-SPEC-039/
+?? Specs/RESULTS-SPEC-040-cmake-relwithdebinfo-compile_commands.json
+?? Specs/RESULTS-SPEC-040-cmake-sanitizer-compile_commands.json
+?? Specs/RESULTS-SPEC-040-manifest.json
+?? Specs/RESULTS-SPEC-041/
+?? Specs/RESULTS-SPEC-046/guest-prebuild-20260912/
+?? Specs/RESULTS-SPEC-047/
+?? Specs/SPEC-039-common-performance-measurement.md
+?? Specs/SPEC-040-common-performance-build-profiles.md
+?? Specs/SPEC-041-gw-deadline-aware-wait.md
+?? Specs/SPEC-042-message-serialization-performance.md
+?? Specs/SPEC-043-sar-ht-microoptimizations.md
+?? Specs/SPEC-047-pgcs-readiness-periodic-activation.md
+
+=== diff stat ===
+ CMakeLists.txt                |  26 +++++++++-
+ Common/src/GW.cpp             | 109 ++++++++++++++++++++++++++----------------
+ Common/src/GW.h               |   5 ++
+ Common/src/NGAL_CS.cpp        |   4 +-
+ Common/src/OutputVariable.cpp |   2 +-
+ Make/compile-parallel.sh      |  41 ++++++++++++++--
+ Make/compile.sh               |  30 +++++++++++-
+ 7 files changed, 167 insertions(+), 50 deletions(-)
+
+=== untracked ===
+.hermes/plans/2026-09-11_150000-common-performance-professionalisation.md
+Scripts/Performance/common_serialization_baseline.cpp
+Specs/RESULTS-SPEC-039/README.md
+Specs/RESULTS-SPEC-039/manifest.json
+Specs/RESULTS-SPEC-039/serialization-baseline.csv
+Specs/RESULTS-SPEC-040-cmake-relwithdebinfo-compile_commands.json
+Specs/RESULTS-SPEC-040-cmake-sanitizer-compile_commands.json
+Specs/RESULTS-SPEC-040-manifest.json
+Specs/RESULTS-SPEC-041/README.md
+Specs/RESULTS-SPEC-041/manifest.json
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm101/Service_Accepted_1595762265.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm101/Service_Offer_1677496306.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm101/StressTest_Stats.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm101/manifest.sha256
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm102/Service_Accepted_1595762265.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm102/Service_Offer_1677496306.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm102/StressTest_Stats.txt
+Specs/RESULTS-SPEC-046/guest-prebuild-20260912/vm102/manifest.sha256
+Specs/RESULTS-SPEC-047/local-preflight.txt
+Specs/SPEC-039-common-performance-measurement.md
+Specs/SPEC-040-common-performance-build-profiles.md
+Specs/SPEC-041-gw-deadline-aware-wait.md
+Specs/SPEC-042-message-serialization-performance.md
+Specs/SPEC-043-sar-ht-microoptimizations.md
+Specs/SPEC-047-pgcs-readiness-periodic-activation.md
+
+=== binaries ===
+d10e67511e9d436e525c6e8590cb818afb2451511b26529e49473dc6a8c832dd  cmake-build-debug/PGCS
+838a0559b6e70cd1c546353856aabda812956212a5f576742a8827c4eb680a21  cmake-build-debug/NRNCS
+67acaa869160e2b598351a0200b8d11fe5793979d07a782f79ff75ca9054bd00  cmake-build-debug/ContentApp
+2c26d088bcf5aa9b5e291b1c2db58ac7f2bbc637ac3045793de564c6496991de  cmake-build-debug/NBTestApp
+
+=== config ===
+85662bfe371745ff4d6e3b6d74cf80d44f6eb97155e53b961c4f7d7a05314d52  IO/PGCS/PGCS.ini
+DelayBeforePublishingServiceOffer 6
+DelayBeforeDiscovery 9
+DelayBeforeRunPeriodic 5
+DelayBeforeANewPeerEvaluation 6
+DelayBeforeANewPublish 7
+DelayBeforeFirstPeriodic 120
+DelayBetweenMessageEmissions 20
+DelayBetweenHellos01 2
+DelayBetweenHellos02 4
+StressTest 0
+StressInterval 5
+DelayBetweenExpositions 4
+
+=== initial process inventory ===
+241765 /usr/bin/bash -c source /home/gandalf/.hermes/cache/terminal/hermes-snap-457b93e73f53.sh >/dev/null 2>&1 || true export AI_AGENT="${AI_AGENT:-hermes-agent}" HERMES_AGENT="${HERMES_AGENT:-true}" export GIT_PAGER="${GIT_PAGER:-cat}" PAGER="${PAGER:-cat}" builtin cd -- /home/gandalf/workspace/novagenesis || exit 126 eval 'set -u BASE=$(pwd) RESULT="$BASE/Specs/RESULTS-SPEC-047" mkdir -p "$RESULT" {   printf '\''captured_utc='\''; date -u +%Y-%m-%dT%H:%M:%SZ   printf '\''host='\''; hostname   printf '\''branch='\''; git branch --show-current   printf '\''head='\''; git rev-parse HEAD   printf '\''remote_head='\''; git rev-parse origin/AIOPT3   printf '\''uid='\''; id -u   printf '\''gid='\''; id -g   printf '\''\n=== status ===\n'\''; git status --short --branch   printf '\''\n=== diff stat ===\n'\''; git diff --stat   printf '\''\n=== untracked ===\n'\''; git ls-files --others --exclude-standard   printf '\''\n=== binaries ===\n'\''; sha256sum cmake-build-debug/PGCS cmake-build-debug/NRNCS cmake-build-debug/ContentApp cmake-build-debug/NBTestApp   printf '\''\n=== config ===\n'\''; sha256sum IO/PGCS/PGCS.ini; sed -n '\''1,40p'\'' IO/PGCS/PGCS.ini   printf '\''\n=== initial process inventory ===\n'\''; pgrep -a -f '\''(^|/)(PGCS|NRNCS|ContentApp|NBTestApp|IoTTestApp)( |$)'\'' || true   printf '\''\n=== initial IPC inventory ===\n'\''; ipcs -m 2>/dev/null || true; ipcs -s 2>/dev/null || true } > "$RESULT/local-preflight.txt" git diff > "$RESULT/local-dirty.patch" git ls-files --others --exclude-standard > "$RESULT/local-untracked.txt" sudo -S -p '\'''\'' bash Scripts/Simple/clean.sh > "$RESULT/local-clean-before.log" 2>&1 cat "$RESULT/local-clean-before.log"' __hermes_ec=$? umask 077 __hermes_snap_tmp=$(mktemp /home/gandalf/.hermes/cache/terminal/hermes-snap-457b93e73f53.sh.tmp.XXXXXXXXXX) && { { ( unset ${!HERMES_SESSION_*} ${!HERMES_CRON_AUTO_DELIVER_*} ${!HERMES_BROWSER_CONTROL_*} AI_AGENT HERMES_AGENT HERMES_UI_SESSION_ID 2>/dev/null; export -p; ) || true; } > "$__hermes_snap_tmp" && mv -f "$__hermes_snap_tmp" /home/gandalf/.hermes/cache/terminal/hermes-snap-457b93e73f53.sh; } 2>/dev/null || rm -f "$__hermes_snap_tmp" 2>/dev/null || true printf '\n__HERMES_CWD_457b93e73f53__%s__HERMES_CWD_457b93e73f53__\n' "$(pwd -P)" exit $__hermes_ec
+
+=== initial IPC inventory ===
+
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status      
+
+
+------ Semaphore Arrays --------
+key        semid      owner      perms      nsems     
+

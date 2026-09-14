@@ -1,0 +1,4 @@
+[
+  {"id": "publish-progress", "pattern": "Publishing the content"},
+  {"id": "cache", "pattern": "cached payload"}
+]

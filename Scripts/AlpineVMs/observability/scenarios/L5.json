@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "scenario": "L5",
+  "roles": ["PGCS-Source", "PGCS-Repository", "NRNCS-Source", "Repository", "Source"],
+  "required_gates": ["pgcs", "nrncs-operational", "repository-readiness", "source-staging", "photo-hashes", "cleanup"],
+  "forbidden_roles": []
+}

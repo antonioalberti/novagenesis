@@ -1,0 +1,20 @@
+
+=== final process inventory ===
+
+=== final sysv shm ===
+
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status      
+0x0000000b 52         gandalf    666        33554532   0                       
+0x0000000c 53         gandalf    666        33554532   0                       
+0x0000000d 54         gandalf    666        33554532   0                       
+0x0000000e 55         gandalf    666        33554532   0                       
+
+
+=== final sysv sem ===
+
+------ Semaphore Arrays --------
+key        semid      owner      perms      nsems     
+
+
+=== final named sem ===

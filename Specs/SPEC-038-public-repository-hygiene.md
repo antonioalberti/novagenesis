@@ -3,8 +3,9 @@
 **Version:** v1.0
 **Date:** 2026-09-11
 **Author:** Antonio Alberti + Hermes Agent
-**Status:** Proposal
+**Status:** In Progress
 **Branch:** AIOPT3
+**Implementation commit:** `7b430a3`, `4f83b38`
 **Related:** SPEC-036-deprecate-standalone-pss-girs-hts.md; SPEC-037-promote-aiopt3-default-branch.md
 
 ## 1. Objective
@@ -73,18 +74,18 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 
 ## 5. Acceptance Criteria
 
-- [ ] The literal Alpine password is removed from all active files and no replacement credential is embedded.
-- [ ] SSH-key/operator-credential setup is documented without exposing a secret.
+- [x] The literal Alpine password is removed from all active files and no replacement credential is embedded.
+- [x] SSH-key/operator-credential setup is documented without exposing a secret.
 - [ ] The password is recorded as compromised in the task handoff, with credential rotation assigned outside this repository.
-- [ ] Active deployment scripts no longer require this laboratory's IPs, MACs, hostnames or absolute paths; they accept local configuration.
-- [ ] Active documentation uses roles/placeholders and does not expose private deployment identities.
-- [ ] Tracked binaries, temporary artefacts and generated outputs have a documented disposition and are removed or deliberately retained.
+- [x] Active deployment scripts no longer require this laboratory's IPs, MACs, hostnames or absolute paths; they accept local configuration.
+- [x] Active documentation uses roles/placeholders and does not expose private deployment identities.
+- [x] Tracked binaries, temporary artefacts and generated outputs have a documented disposition and are removed or deliberately retained.
 - [ ] Historical files retained in AIOPT3 are labelled and do not override active instructions.
-- [ ] Current-tree secret scan finds no credentials or private keys.
+- [x] Current-tree secret scan finds no credentials or private keys.
 - [ ] Public-data scan finds no unintended personal, infrastructure or local-path exposure in active documentation.
 - [ ] Build, normal runtime, legacy build profile and documented test procedures remain reproducible after cleanup.
-- [ ] A final evidence report maps every finding to a disposition.
-- [ ] No history rewrite or force-push occurs without separate explicit approval.
+- [x] A final evidence report maps every finding to a disposition.
+- [x] No history rewrite or force-push occurs without separate explicit approval.
 
 ## 6. Work Packages
 
@@ -94,6 +95,10 @@ Audit and clean the public NovaGenesis repository so that the active default bra
 - **D — Documentation/privacy review:** classify active versus historical docs and remove unintended local identities.
 - **E — Verification:** build/profile checks, secret scan, public-data scan, link checks and evidence report.
 - **F — Optional history remediation:** prepare a separate plan for Git history purge only if explicitly approved; do not execute as part of the initial cleanup.
+
+## 6.1 Current validation
+
+G1 validation is recorded in `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md`. The current-tree and build gates passed, while external credential rotation, historical classification and final public-data review remain open.
 
 ## 7. Rollback
 

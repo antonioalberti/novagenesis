@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "mode": "local",
+  "git_head": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "git_status": [
+    " M .gitignore",
+    " M CMakeLists.txt",
+    " M Common/src/GW.cpp",
+    " M Common/src/GW.h",
+    " D Common/src/MurmurHash3.cpp.bak",
+    " M Common/src/NGAL_CS.cpp",
+    " M Common/src/OutputVariable.cpp",
+    " M Make/compile-parallel.sh",
+    " M Make/compile.sh",
+    " M README.md",
+    " M Scripts/AlpineVMs/ng-vm.env.example",
+    " M Specs/SPEC-009-alpine-vm-ssh-run-scripts.md",
+    " M Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md",
+    " M Specs/SPEC-038-public-repository-hygiene.md",
+    "?? .hermes/",
+    "?? Scripts/AlpineVMs/ng_debug_compiler_launcher.py",
+    "?? Scripts/AlpineVMs/ng_observability.py",
+    "?? Scripts/AlpineVMs/ng_remote_executor.py",
+    "?? Scripts/AlpineVMs/observability/",
+    "?? Scripts/AlpineVMs/plans/",
+    "?? Scripts/AlpineVMs/remote/",
+    "?? Scripts/AlpineVMs/tests/",
+    "?? Scripts/Performance/",
+    "?? Scripts/ProjectAudit/",
+    "?? Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+    "?? Specs/RELEASE-READINESS-v1.0.0.md",
+    "?? Specs/RESULTS-MATCHED-A/",
+    "?? Specs/RESULTS-MATCHED-B-runner.py",
+    "?? Specs/RESULTS-MATCHED-B/",
+    "?? Specs/RESULTS-MATCHED-comparison.md",
+    "?? Specs/RESULTS-SPEC-038/",
+    "?? Specs/RESULTS-SPEC-039/",
+    "?? Specs/RESULTS-SPEC-040-cmake-relwithdebinfo-compile_commands.json",
+    "?? Specs/RESULTS-SPEC-040-cmake-sanitizer-compile_commands.json",
+    "?? Specs/RESULTS-SPEC-040-manifest.json",
+    "?? Specs/RESULTS-SPEC-041/",
+    "?? Specs/RESULTS-SPEC-046/guest-prebuild-20260912/",
+    "?? Specs/RESULTS-SPEC-047/",
+    "?? Specs/RESULTS-SPEC-048/",
+    "?? Specs/RESULTS-SPEC-049/",
+    "?? Specs/RESULTS-SPEC-050/",
+    "?? Specs/RESULTS-SPEC-054/",
+    "?? Specs/RESULTS-SPEC-055/",
+    "?? Specs/SPEC-039-common-performance-measurement.md",
+    "?? Specs/SPEC-040-common-performance-build-profiles.md",
+    "?? Specs/SPEC-041-gw-deadline-aware-wait.md",
+    "?? Specs/SPEC-042-message-serialization-performance.md",
+    "?? Specs/SPEC-043-sar-ht-microoptimizations.md",
+    "?? Specs/SPEC-047-pgcs-readiness-periodic-activation.md",
+    "?? Specs/SPEC-048-pgcs-receiver-processing-evidence.md",
+    "?? Specs/SPEC-049-nrncs-readiness-binding-oracles.md",
+    "?? Specs/SPEC-050-contentapp-repository-control-plane-readback.md",
+    "?? Specs/SPEC-051-cross-vm-nrncs-discovery-diagnosis.md",
+    "?? Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+    "?? Specs/SPEC-053-debug-log-observability-matrix.md",
+    "?? Specs/SPEC-054-release-master-plan-and-audit.md",
+    "?? Specs/SPEC-055-ng-elc-local-mode.md",
+    "?? Specs/SPEC-056-ng-elc-evidence-provenance-hardening.md"
+  ],
+  "git_clean": false,
+  "repo_path": "/home/gandalf/workspace/novagenesis",
+  "build_path": "/tmp/ng-spec056-build",
+  "io_path": "/tmp/ng-spec056-io",
+  "controller_identity": true,
+  "controller": {
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_remote_executor.py",
+    "sha256": "8201883e90210d32f24f3241b78016e2e90e7fa5e5a6d722597b66137f16cc48"
+  },
+  "build_linkage": false,
+  "build_manifest": null,
+  "plan_snapshot": true,
+  "binaries": {
+    "PGCS": {
+      "argv0": "/tmp/ng-spec056-build/PGCS",
+      "resolved_path": "/tmp/ng-spec056-build/PGCS",
+      "sha256": "edbd33eea3c95a4d8db8c5cb8af2703d3a0cae4f35902bf38818f7fb92642e22"
+    },
+    "NRNCS": {
+      "argv0": "/tmp/ng-spec056-build/NRNCS",
+      "resolved_path": "/tmp/ng-spec056-build/NRNCS",
+      "sha256": "a9c0e753b2b16be88a83105b02e9d8e746683eb148b630105ff60de5df968de6"
+    },
+    "Repository": {
+      "argv0": "/tmp/ng-spec056-build/ContentApp",
+      "resolved_path": "/tmp/ng-spec056-build/ContentApp",
+      "sha256": "ec6001110e1ae75d4ceb6ebe632d2c876eed4dd1e8f8c2f3ac52007b704ffcbe"
+    },
+    "Source": {
+      "argv0": "/tmp/ng-spec056-build/ContentApp",
+      "resolved_path": "/tmp/ng-spec056-build/ContentApp",
+      "sha256": "ec6001110e1ae75d4ceb6ebe632d2c876eed4dd1e8f8c2f3ac52007b704ffcbe"
+    }
+  },
+  "acceptance_eligibility": {
+    "eligible": false,
+    "blockers": [
+      "dirty source tree",
+      "build linkage missing"
+    ]
+  }
+}

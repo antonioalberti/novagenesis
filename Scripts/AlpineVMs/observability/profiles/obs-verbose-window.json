@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "id": "obs-verbose-window",
+  "variant": "verbose-diagnostic",
+  "defines": [],
+  "notes": "Perfil vazio por omissão; só pode ser composto por duas selecções direccionadas aprovadas."
+}

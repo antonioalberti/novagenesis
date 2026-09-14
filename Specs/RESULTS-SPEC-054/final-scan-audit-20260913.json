@@ -1,0 +1,381 @@
+{
+  "branch": "AIOPT3",
+  "gates": [
+    {
+      "evidence": "`Specs/RESULTS-SPEC-054/final-audit-20260913.md`",
+      "gate": "G0",
+      "objective": "Âmbito, baseline e freeze",
+      "prerequisite": "—",
+      "specs": [
+        "SPEC-036",
+        "SPEC-037",
+        "SPEC-054"
+      ],
+      "state": "BLOCKED",
+      "tasks": [
+        "NG-020",
+        "NG-036",
+        "NG-037",
+        "NG-050"
+      ]
+    },
+    {
+      "evidence": "—",
+      "gate": "G1",
+      "objective": "Higiene, segurança e provenance pública",
+      "prerequisite": "G0",
+      "specs": [
+        "SPEC-038"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-038"
+      ]
+    },
+    {
+      "evidence": "—",
+      "gate": "G2",
+      "objective": "Scripts de deployment reproduzíveis",
+      "prerequisite": "G0",
+      "specs": [
+        "SPEC-009"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-046"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-046/`",
+      "gate": "G3",
+      "objective": "Runner, observabilidade e teardown",
+      "prerequisite": "G2",
+      "specs": [
+        "SPEC-046",
+        "SPEC-052",
+        "SPEC-053"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-049"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-047/`",
+      "gate": "G4",
+      "objective": "PGCS on-wire e activação",
+      "prerequisite": "G3",
+      "specs": [
+        "SPEC-047"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-051"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-048/`",
+      "gate": "G5",
+      "objective": "Processamento receptor PGCS",
+      "prerequisite": "G4",
+      "specs": [
+        "SPEC-048"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-052"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-049/`",
+      "gate": "G6",
+      "objective": "NRNCS readiness e storage invocation",
+      "prerequisite": "G5",
+      "specs": [
+        "SPEC-049"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-053"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-050/`",
+      "gate": "G7",
+      "objective": "Discovery/readback Repository",
+      "prerequisite": "G6",
+      "specs": [
+        "SPEC-050",
+        "SPEC-051"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-054"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-SPEC-044/`",
+      "gate": "G8",
+      "objective": "Correctness de subscriptions",
+      "prerequisite": "G3",
+      "specs": [
+        "SPEC-044",
+        "SPEC-045"
+      ],
+      "state": "OPEN",
+      "tasks": [
+        "NG-047",
+        "NG-048"
+      ]
+    },
+    {
+      "evidence": "`Specs/RESULTS-MATCHED-comparison.md`",
+      "gate": "G9",
+      "objective": "Payload normal de 100 fotos segundo o modelo de cache",
+      "prerequisite": "G6, G7, G8",
+      "specs": [],
+      "state": "OPEN",
+      "tasks": [
+        "NG-050"
+      ]
+    },
+    {
+      "evidence": "—",
+      "gate": "G10",
+      "objective": "Revisão final e tag",
+      "prerequisite": "G1–G9",
+      "specs": [],
+      "state": "BLOCKED",
+      "tasks": [
+        "NG-050"
+      ]
+    }
+  ],
+  "head": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "issues": [
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-038-public-repository-hygiene.md está Proposal",
+      "open_criteria": 12,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-038-public-repository-hygiene.md",
+      "spec": "SPEC-038",
+      "status": "Proposal"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-044-core-run-evaluate-invalid-pg-downcast.md está In Progress",
+      "open_criteria": 5,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-044-core-run-evaluate-invalid-pg-downcast.md",
+      "spec": "SPEC-044",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-045-core-evaluate-functional-harness.md está In Progress",
+      "open_criteria": 15,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-045-core-evaluate-functional-harness.md",
+      "spec": "SPEC-045",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-046-multi-vm-runner-safe-teardown.md está In Progress",
+      "open_criteria": 8,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-046-multi-vm-runner-safe-teardown.md",
+      "spec": "SPEC-046",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-047-pgcs-readiness-periodic-activation.md está In Progress",
+      "open_criteria": 10,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-047-pgcs-readiness-periodic-activation.md",
+      "spec": "SPEC-047",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-048-pgcs-receiver-processing-evidence.md está In Progress",
+      "open_criteria": 14,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-048-pgcs-receiver-processing-evidence.md",
+      "spec": "SPEC-048",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-049-nrncs-readiness-binding-oracles.md está In Progress",
+      "open_criteria": 10,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-049-nrncs-readiness-binding-oracles.md",
+      "spec": "SPEC-049",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-050-contentapp-repository-control-plane-readback.md está In Progress",
+      "open_criteria": 9,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-050-contentapp-repository-control-plane-readback.md",
+      "spec": "SPEC-050",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-051-cross-vm-nrncs-discovery-diagnosis.md está In Progress",
+      "open_criteria": 9,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-051-cross-vm-nrncs-discovery-diagnosis.md",
+      "spec": "SPEC-051",
+      "status": "In Progress"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-052-remote-ssh-multi-vm-executor.md está Proposal",
+      "open_criteria": 0,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+      "spec": "SPEC-052",
+      "status": "Proposal"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-053-debug-log-observability-matrix.md está Proposal",
+      "open_criteria": 0,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-053-debug-log-observability-matrix.md",
+      "spec": "SPEC-053",
+      "status": "Proposal"
+    },
+    {
+      "code": "SPEC_OPEN",
+      "message": "SPEC-054-release-master-plan-and-audit.md está In Progress",
+      "open_criteria": 1,
+      "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-054-release-master-plan-and-audit.md",
+      "spec": "SPEC-054",
+      "status": "In Progress"
+    },
+    {
+      "code": "WORKTREE_DIRTY",
+      "message": "Árvore Git contém alterações não congeladas",
+      "paths": [
+        "M .gitignore",
+        " M CMakeLists.txt",
+        " M Common/src/GW.cpp",
+        " M Common/src/GW.h",
+        " M Common/src/NGAL_CS.cpp",
+        " M Common/src/OutputVariable.cpp",
+        " M Make/compile-parallel.sh",
+        " M Make/compile.sh",
+        " M README.md",
+        " M Scripts/AlpineVMs/ng-vm.env.example",
+        " M Specs/SPEC-009-alpine-vm-ssh-run-scripts.md",
+        " M Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md",
+        "?? .hermes/",
+        "?? Scripts/AlpineVMs/ng_debug_compiler_launcher.py",
+        "?? Scripts/AlpineVMs/ng_observability.py",
+        "?? Scripts/AlpineVMs/ng_remote_executor.py",
+        "?? Scripts/AlpineVMs/observability/",
+        "?? Scripts/AlpineVMs/plans/",
+        "?? Scripts/AlpineVMs/remote/",
+        "?? Scripts/AlpineVMs/tests/",
+        "?? Scripts/Performance/",
+        "?? Scripts/ProjectAudit/",
+        "?? Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+        "?? Specs/RELEASE-READINESS-v1.0.0.md",
+        "?? Specs/RESULTS-MATCHED-A/",
+        "?? Specs/RESULTS-MATCHED-B-runner.py",
+        "?? Specs/RESULTS-MATCHED-B/",
+        "?? Specs/RESULTS-MATCHED-comparison.md",
+        "?? Specs/RESULTS-SPEC-039/",
+        "?? Specs/RESULTS-SPEC-040-cmake-relwithdebinfo-compile_commands.json",
+        "?? Specs/RESULTS-SPEC-040-cmake-sanitizer-compile_commands.json",
+        "?? Specs/RESULTS-SPEC-040-manifest.json",
+        "?? Specs/RESULTS-SPEC-041/",
+        "?? Specs/RESULTS-SPEC-046/guest-prebuild-20260912/",
+        "?? Specs/RESULTS-SPEC-047/",
+        "?? Specs/RESULTS-SPEC-048/",
+        "?? Specs/RESULTS-SPEC-049/",
+        "?? Specs/RESULTS-SPEC-050/",
+        "?? Specs/RESULTS-SPEC-054/",
+        "?? Specs/SPEC-039-common-performance-measurement.md",
+        "?? Specs/SPEC-040-common-performance-build-profiles.md",
+        "?? Specs/SPEC-041-gw-deadline-aware-wait.md",
+        "?? Specs/SPEC-042-message-serialization-performance.md",
+        "?? Specs/SPEC-043-sar-ht-microoptimizations.md",
+        "?? Specs/SPEC-047-pgcs-readiness-periodic-activation.md",
+        "?? Specs/SPEC-048-pgcs-receiver-processing-evidence.md",
+        "?? Specs/SPEC-049-nrncs-readiness-binding-oracles.md",
+        "?? Specs/SPEC-050-contentapp-repository-control-plane-readback.md",
+        "?? Specs/SPEC-051-cross-vm-nrncs-discovery-diagnosis.md",
+        "?? Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+        "?? Specs/SPEC-053-debug-log-observability-matrix.md",
+        "?? Specs/SPEC-054-release-master-plan-and-audit.md"
+      ]
+    }
+  ],
+  "plan": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+  "read_only": true,
+  "release": "v1.0.0",
+  "schema_version": 1,
+  "summary": {
+    "blocking_issue_count": 13,
+    "gate_count": 11,
+    "issue_count": 13
+  },
+  "vault": "/home/gandalf/ObsidianVault",
+  "verdict": "BLOCKED",
+  "worktree": {
+    "branch": "AIOPT3",
+    "dirty": true,
+    "head": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "paths": [
+      "M .gitignore",
+      " M CMakeLists.txt",
+      " M Common/src/GW.cpp",
+      " M Common/src/GW.h",
+      " M Common/src/NGAL_CS.cpp",
+      " M Common/src/OutputVariable.cpp",
+      " M Make/compile-parallel.sh",
+      " M Make/compile.sh",
+      " M README.md",
+      " M Scripts/AlpineVMs/ng-vm.env.example",
+      " M Specs/SPEC-009-alpine-vm-ssh-run-scripts.md",
+      " M Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md",
+      "?? .hermes/",
+      "?? Scripts/AlpineVMs/ng_debug_compiler_launcher.py",
+      "?? Scripts/AlpineVMs/ng_observability.py",
+      "?? Scripts/AlpineVMs/ng_remote_executor.py",
+      "?? Scripts/AlpineVMs/observability/",
+      "?? Scripts/AlpineVMs/plans/",
+      "?? Scripts/AlpineVMs/remote/",
+      "?? Scripts/AlpineVMs/tests/",
+      "?? Scripts/Performance/",
+      "?? Scripts/ProjectAudit/",
+      "?? Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+      "?? Specs/RELEASE-READINESS-v1.0.0.md",
+      "?? Specs/RESULTS-MATCHED-A/",
+      "?? Specs/RESULTS-MATCHED-B-runner.py",
+      "?? Specs/RESULTS-MATCHED-B/",
+      "?? Specs/RESULTS-MATCHED-comparison.md",
+      "?? Specs/RESULTS-SPEC-039/",
+      "?? Specs/RESULTS-SPEC-040-cmake-relwithdebinfo-compile_commands.json",
+      "?? Specs/RESULTS-SPEC-040-cmake-sanitizer-compile_commands.json",
+      "?? Specs/RESULTS-SPEC-040-manifest.json",
+      "?? Specs/RESULTS-SPEC-041/",
+      "?? Specs/RESULTS-SPEC-046/guest-prebuild-20260912/",
+      "?? Specs/RESULTS-SPEC-047/",
+      "?? Specs/RESULTS-SPEC-048/",
+      "?? Specs/RESULTS-SPEC-049/",
+      "?? Specs/RESULTS-SPEC-050/",
+      "?? Specs/RESULTS-SPEC-054/",
+      "?? Specs/SPEC-039-common-performance-measurement.md",
+      "?? Specs/SPEC-040-common-performance-build-profiles.md",
+      "?? Specs/SPEC-041-gw-deadline-aware-wait.md",
+      "?? Specs/SPEC-042-message-serialization-performance.md",
+      "?? Specs/SPEC-043-sar-ht-microoptimizations.md",
+      "?? Specs/SPEC-047-pgcs-readiness-periodic-activation.md",
+      "?? Specs/SPEC-048-pgcs-receiver-processing-evidence.md",
+      "?? Specs/SPEC-049-nrncs-readiness-binding-oracles.md",
+      "?? Specs/SPEC-050-contentapp-repository-control-plane-readback.md",
+      "?? Specs/SPEC-051-cross-vm-nrncs-discovery-diagnosis.md",
+      "?? Specs/SPEC-052-remote-ssh-multi-vm-executor.md",
+      "?? Specs/SPEC-053-debug-log-observability-matrix.md",
+      "?? Specs/SPEC-054-release-master-plan-and-audit.md"
+    ]
+  }
+}

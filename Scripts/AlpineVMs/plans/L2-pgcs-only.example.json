@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scenario": "L2",
+  "roles": [
+    {
+      "name": "PGCS-Source",
+      "vm": "source",
+      "command": ["${NG_BUILD_PATH}/PGCS", "${NG_REPO_PATH}/IO/PGCS/", "0", "Intra_Domain", "-p", "Ethernet", "Intra_Domain", "${SOURCE_VM_IFACE}", "${REPO_VM_MAC}", "1200"],
+      "cwd": "${NG_BUILD_PATH}",
+      "readiness": [{"id": "client-socket", "pattern": "Created the client socket with CSID"}, {"id": "server-socket", "pattern": "Created the server socket with SSID"}]
+    },
+    {
+      "name": "PGCS-Repository",
+      "vm": "repository",
+      "command": ["${NG_BUILD_PATH}/PGCS", "${NG_REPO_PATH}/IO/PGCS/", "0", "Intra_Domain", "-p", "Ethernet", "Intra_Domain", "${REPO_VM_IFACE}", "${SOURCE_VM_MAC}", "1200"],
+      "cwd": "${NG_BUILD_PATH}",
+      "readiness": [{"id": "client-socket", "pattern": "Created the client socket with CSID"}, {"id": "server-socket", "pattern": "Created the server socket with SSID"}]
+    }
+  ],
+  "timeouts": {"readiness": 240, "observation": 30, "total": 1800},
+  "require_fresh_boot": true,
+  "diagnostic_only": true,
+  "debug_profile": "obs-normal"
+}

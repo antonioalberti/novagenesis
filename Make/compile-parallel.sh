@@ -11,9 +11,34 @@ shopt -s nullglob
 
 cd "$(dirname "$0")/.." || exit 1
 
-BUILD_DIR="cmake-build-debug"
-rm -rf "$BUILD_DIR"
-mkdir -p "$BUILD_DIR"
+NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
+case "$NG_BUILD_PROFILE" in
+  debug|performance|sanitizer) ;;
+  *)
+    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
+    exit 2
+    ;;
+esac
+
+BUILD_DIR="cmake-build-$NG_BUILD_PROFILE"
+
+NG_BUILD_PROFILE="${NG_BUILD_PROFILE:-debug}"
+case "$NG_BUILD_PROFILE" in
+  debug)
+    CXX_FLAGS="-O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
+    ;;
+  performance)
+    CXX_FLAGS="-O2 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer"
+    ;;
+  sanitizer)
+    CXX_FLAGS="-O1 -g -Wall -fmessage-length=0 -pthread -Wno-deprecated -fsanitize=address,undefined -fno-omit-frame-pointer"
+    ;;
+  *)
+    echo "Unknown NG_BUILD_PROFILE: $NG_BUILD_PROFILE (use debug, performance or sanitizer)" >&2
+    exit 2
+    ;;
+esac
+echo "Build profile: $NG_BUILD_PROFILE"
 
 # ---- Parse arguments ----
 JOBS=$(nproc)                    # Default: all cores
@@ -30,6 +55,14 @@ if [ $# -gt 0 ]; then
         SERVICES="$@"
     fi
 fi
+
+if [ "$JOBS" -lt 1 ]; then
+    echo "Job count must be at least 1" >&2
+    exit 2
+fi
+
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
 
 # Clamp to number of services (don't spawn more jobs than work)
 NUM_SERVICES=$(echo "$SERVICES" | wc -w)
@@ -87,7 +120,7 @@ for service in $SERVICES; do
 
     (
         # Compile, capture ALL stderr (errors + warnings) to log file
-        if g++ -std=c++20 -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated \
+        if g++ -std=c++20 $CXX_FLAGS \
             -o "$BUILD_DIR/$service" "$service/src/"*.cpp Common/src/*.cpp \
             -I Common/src/ -lpthread -lrt 2>"$LOG_DIR/$service.log"; then
             echo 0 > "$STATUS_DIR/$service.exit"

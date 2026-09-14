@@ -1,0 +1,24 @@
+role=source host=alpine-ng-source
+branch=AIOPT3
+head=357596a494891242a8390e95f414ef40c5e9a6e0
+fsck=peer_mac=08:00:27:65:00:08
+binaries
+1bb7966fa04fba9bc8f8a940376c3a902d5e8380808ee9eb788ae3f65b210dca  /root/workspace/novagenesis/cmake-build-debug/PGCS
+a858376ee1ae0c97249df1be394ba9849de3fb4e93c19c6edaabaa7dac13809c  /root/workspace/novagenesis/cmake-build-debug/NRNCS
+4c461bc22274613edad07fa167612e2d2505fa8e9587883be9bfb83df321457a  /root/workspace/novagenesis/cmake-build-debug/ContentApp
+config
+85662bfe371745ff4d6e3b6d74cf80d44f6eb97155e53b961c4f7d7a05314d52  /root/workspace/novagenesis/IO/PGCS/PGCS.ini
+DelayBeforePublishingServiceOffer 6
+DelayBeforeDiscovery 9
+DelayBeforeRunPeriodic 5
+DelayBeforeANewPeerEvaluation 6
+DelayBeforeANewPublish 7
+DelayBeforeFirstPeriodic 120
+DelayBetweenMessageEmissions 20
+DelayBetweenHellos01 2
+DelayBetweenHellos02 4
+StressTest 0
+StressInterval 5
+DelayBetweenExpositions 4
+processes
+2224 sh -c printf 'role=source host='; hostname; printf 'branch='; git -C /root/workspace/novagenesis branch --show-current; printf 'head='; git -C /root/workspace/novagenesis rev-parse HEAD; printf 'fsck='; git -C /root/workspace/novagenesis fsck --full --no-progress 2>&1 | tail -1; printf 'peer_mac=08:00:27:65:00:08\n'; printf 'binaries\n'; sha256sum /root/workspace/novagenesis/cmake-build-debug/PGCS /root/workspace/novagenesis/cmake-build-debug/NRNCS /root/workspace/novagenesis/cmake-build-debug/ContentApp; printf 'config\n'; sha256sum /root/workspace/novagenesis/IO/PGCS/PGCS.ini; sed -n '1,15p' /root/workspace/novagenesis/IO/PGCS/PGCS.ini; printf 'processes\n'; pgrep -a -f '(^|/)(PGCS|NRNCS|ContentApp|NBTestApp)( |$)' || true
