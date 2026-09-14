@@ -1,11 +1,11 @@
 {
-  "audit_tree_sha": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
+  "audit_tree_sha": "6f89ede76993f75d30bf517c4d8ef57d37fe696b",
   "audit_command": "python3 Scripts/ProjectAudit/ng_release_audit.py --repo . --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md --vault <obsidian-vault> --json",
   "result": {
     "branch": "AIOPT3",
     "gates": [
       {
-        "evidence": "`Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`",
+        "evidence": "`Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`",
         "gate": "M0",
         "objective": "Contrato suportado, higiene, baseline e freeze",
         "prerequisite": "—",
@@ -75,7 +75,7 @@
         ]
       }
     ],
-    "head": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
+    "head": "6f89ede76993f75d30bf517c4d8ef57d37fe696b",
     "issues": [
       {
         "code": "SPEC_OPEN",
@@ -180,7 +180,7 @@
     "worktree": {
       "branch": "AIOPT3",
       "dirty": false,
-      "head": "1bfa43b0806f0620cebe79fc4686a5d94941c49c",
+      "head": "6f89ede76993f75d30bf517c4d8ef57d37fe696b",
       "paths": []
     }
   }
