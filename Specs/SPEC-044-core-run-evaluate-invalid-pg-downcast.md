@@ -107,7 +107,7 @@ Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture,
 
 ## 10. Estado
 
-Esta SPEC separa formalmente o diagnóstico UBSan de SPEC-041. A alteração allowlisted foi implementada após revisão Astra e autorização do utilizador. Builds e smoke Sanitizer passaram; a aceitação funcional permanece aberta até à execução da matriz da SPEC-045 e à revisão Astra pós-correção.
+Esta SPEC separa formalmente o diagnóstico UBSan da alteração de espera do Gateway. A alteração allowlisted foi implementada após revisão Astra e autorização do utilizador. Builds e smoke Sanitizer passaram; a aceitação funcional permanece aberta até à execução da matriz da SPEC-045 e à revisão Astra pós-correção.
 
 ## 11. Gate histórico de release
 
