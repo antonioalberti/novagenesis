@@ -85,7 +85,7 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
-| M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-038/g1-hygiene-validation-20260913.md` | BLOCKED | Reconciliar candidato `4a8916e`, rotação externa e fronteira pública Linux/AIOPT3 |
+| M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md` | BLOCKED | Reconciliar candidato `203927e`, rotação externa e fronteira pública Linux/AIOPT3 |
 | M1 | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049, NG-055, NG-056 | SPEC-009, SPEC-046, SPEC-055, SPEC-056 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; `Specs/RESULTS-SPEC-056/` | OPEN | Fechar receipt/build real, bundle durável, ownership C01 e trial local/remote retido |
 | M2 | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050 | M1 | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/` | OPEN | Executar um trial candidato normal com os subcritérios observáveis e hashes independentes |
 | M3 | Revisão final, notas, tag e leitura de volta | NG-050 | SPEC-054, release criteria | M0–M2 | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
@@ -127,7 +127,7 @@ Verificação realizada em 2026-09-13:
 
 - A branch remota/default é `AIOPT3`.
 - `AIOPT1` e `AIOPT2` não existem no remoto consultado; referências a essas branches devem ser tratadas como históricas. O clone local ainda conserva refs stale de `AIOPT1`, que não são base operacional nem devem ser usadas para a release.
-- O candidato actual publicado/verificado é `4a8916e`; commits anteriores (`1af604d`, `18d9b18`, `fce8577`) permanecem apenas como evidência histórica.
+- O candidato actual publicado/verificado é `203927e`; commits anteriores (`1af604d`, `18d9b18`, `fce8577`, `4a8916e`) permanecem apenas como evidência histórica.
 - A matriz v4 cobre quatro macro-gates operacionais (`M0–M3`) para o perfil mínimo; o mapa G0–G10 completo foi preservado no Apêndice A para v1.1+.
 - R12–R14 de SPEC-056 estão publicados como incrementos técnicos não-aceites; Astra mantém HOLD para aceitação formal.
 - O downcast alvo de `CoreRunEvaluate01` foi corrigido no commit `21a5512`.
