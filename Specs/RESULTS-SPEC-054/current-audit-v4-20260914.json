@@ -1,0 +1,188 @@
+{
+  "audit_tree_sha": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
+  "audit_command": "python3 Scripts/ProjectAudit/ng_release_audit.py --repo . --plan Specs/RELEASE-MASTER-PLAN-v1.0.0.md --vault /home/gandalf/ObsidianVault --json",
+  "exit_code": 2,
+  "result": {
+    "branch": "AIOPT3",
+    "gates": [
+      {
+        "evidence": "`Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`",
+        "gate": "M0",
+        "objective": "Contrato suportado, higiene, baseline e freeze",
+        "prerequisite": "—",
+        "specs": [
+          "SPEC-038",
+          "SPEC-054"
+        ],
+        "state": "BLOCKED",
+        "tasks": [
+          "NG-038",
+          "NG-050"
+        ]
+      },
+      {
+        "evidence": "`Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; `Specs/RESULTS-SPEC-056/`",
+        "gate": "M1",
+        "objective": "Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado",
+        "prerequisite": "M0",
+        "specs": [
+          "SPEC-009",
+          "SPEC-046",
+          "SPEC-055",
+          "SPEC-056"
+        ],
+        "state": "OPEN",
+        "tasks": [
+          "NG-046",
+          "NG-049",
+          "NG-055",
+          "NG-056"
+        ]
+      },
+      {
+        "evidence": "`Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/`",
+        "gate": "M2",
+        "objective": "Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs",
+        "prerequisite": "M1",
+        "specs": [
+          "SPEC-044",
+          "SPEC-045",
+          "SPEC-047",
+          "SPEC-048",
+          "SPEC-049",
+          "SPEC-050"
+        ],
+        "state": "OPEN",
+        "tasks": [
+          "NG-047",
+          "NG-048",
+          "NG-051",
+          "NG-052",
+          "NG-053",
+          "NG-054"
+        ]
+      },
+      {
+        "evidence": "tag, manifest final e release notes",
+        "gate": "M3",
+        "objective": "Revisão final, notas, tag e leitura de volta",
+        "prerequisite": "M0–M2",
+        "specs": [
+          "SPEC-054"
+        ],
+        "state": "BLOCKED",
+        "tasks": [
+          "NG-050"
+        ]
+      }
+    ],
+    "head": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
+    "issues": [
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-038-public-repository-hygiene.md está In Progress",
+        "open_criteria": 3,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-038-public-repository-hygiene.md",
+        "spec": "SPEC-038",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-044-core-run-evaluate-invalid-pg-downcast.md está In Progress",
+        "open_criteria": 5,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-044-core-run-evaluate-invalid-pg-downcast.md",
+        "spec": "SPEC-044",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-045-core-evaluate-functional-harness.md está In Progress",
+        "open_criteria": 15,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-045-core-evaluate-functional-harness.md",
+        "spec": "SPEC-045",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-046-multi-vm-runner-safe-teardown.md está In Progress",
+        "open_criteria": 8,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-046-multi-vm-runner-safe-teardown.md",
+        "spec": "SPEC-046",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-047-pgcs-readiness-periodic-activation.md está In Progress",
+        "open_criteria": 10,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-047-pgcs-readiness-periodic-activation.md",
+        "spec": "SPEC-047",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-048-pgcs-receiver-processing-evidence.md está In Progress",
+        "open_criteria": 14,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-048-pgcs-receiver-processing-evidence.md",
+        "spec": "SPEC-048",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-049-nrncs-readiness-binding-oracles.md está In Progress",
+        "open_criteria": 10,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-049-nrncs-readiness-binding-oracles.md",
+        "spec": "SPEC-049",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-050-contentapp-repository-control-plane-readback.md está In Progress",
+        "open_criteria": 9,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-050-contentapp-repository-control-plane-readback.md",
+        "spec": "SPEC-050",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-054-release-master-plan-and-audit.md está In Progress",
+        "open_criteria": 1,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-054-release-master-plan-and-audit.md",
+        "spec": "SPEC-054",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-055-ng-elc-local-mode.md está In Progress",
+        "open_criteria": 1,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-055-ng-elc-local-mode.md",
+        "spec": "SPEC-055",
+        "status": "In Progress"
+      },
+      {
+        "code": "SPEC_OPEN",
+        "message": "SPEC-056-ng-elc-evidence-provenance-hardening.md está In Progress",
+        "open_criteria": 0,
+        "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-056-ng-elc-evidence-provenance-hardening.md",
+        "spec": "SPEC-056",
+        "status": "In Progress"
+      }
+    ],
+    "plan": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+    "read_only": true,
+    "release": "v1.0.0",
+    "schema_version": 1,
+    "summary": {
+      "blocking_issue_count": 11,
+      "gate_count": 4,
+      "issue_count": 11
+    },
+    "vault": "/home/gandalf/ObsidianVault",
+    "verdict": "BLOCKED",
+    "worktree": {
+      "branch": "AIOPT3",
+      "dirty": false,
+      "head": "50be67cb42209b4d0c1f7ca81f2d08d7b5412ef5",
+      "paths": []
+    }
+  }
+}
