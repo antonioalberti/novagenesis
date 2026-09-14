@@ -29,7 +29,7 @@ def test_snapshot_selected_files_is_content_addressed(tmp_path):
     ]
 
 
-def test_capture_git_state_contains_only_head_and_status(tmp_path):
+def test_capture_git_state_contains_source_and_index_identity(tmp_path):
     subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True)
     tracked = tmp_path / "tracked.txt"
     tracked.write_text("tracked\n", encoding="utf-8")
@@ -42,10 +42,13 @@ def test_capture_git_state_contains_only_head_and_status(tmp_path):
 
     state = capture_git_state(tmp_path)
 
-    assert set(state) == {"head", "status", "clean"}
+    assert {"head", "status", "clean", "index", "index_sha256", "index_entries"} <= set(state)
     assert len(state["head"]) == 40
     assert state["status"] == ["?? untracked.txt"]
     assert state["clean"] is False
+    assert state["index"]["captured"] is True
+    assert len(state["index_sha256"]) == 64
+    assert state["index_entries"][0]["path"] == "tracked.txt"
 
 
 def test_capture_code_identity_records_controller_and_helpers(tmp_path):

@@ -16,6 +16,7 @@ import pwd
 import re
 import shlex
 import signal
+import stat
 import shutil
 import subprocess
 import sys
@@ -24,11 +25,17 @@ import uuid
 from pathlib import Path
 from typing import Any, Mapping
 
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - non-Linux fail-closed path
+    fcntl = None  # type: ignore[assignment]
+
 from evidence_verifier import CODE_VALID, verify_bundle
 from local_provenance import (
     capture_local_provenance as local_provenance,
     capture_git_state,
     capture_plan_snapshot as local_write_v2_plan,
+    _current_index_blob as local_provenance_module_current_index_blob,
     file_identity,
     sanitize_config,
     validate_build_linkage,
@@ -415,7 +422,7 @@ def host_for(config: Mapping[str, str], role: Mapping[str, Any]) -> tuple[str, s
 
 def local_record(path: Path, event: str, **fields: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    record = {"utc": dt.datetime.now(dt.timezone.utc).isoformat(), "event": event, **fields}
+    record = {"utc": dt.datetime.now(dt.timezone.utc).isoformat(), "event": event, **sanitize_config(fields)}
     with path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(record, ensure_ascii=False) + "\n")
 
@@ -777,6 +784,7 @@ def local_process_snapshot(processes: Mapping[str, dict[str, Any]]) -> list[dict
             "returncode": proc.poll(),
             "running": proc.poll() is None,
             "executable": item["argv"][0],
+            "launched_identity": item.get("launched_identity"),
         })
     return result
 
@@ -1132,9 +1140,12 @@ def _source_identity_matches(provenance: Mapping[str, Any]) -> tuple[bool, str |
         current = capture_git_state(repo, include_tree=True)
     except (OSError, RuntimeError, subprocess.SubprocessError, ValueError) as exc:
         return False, f"source identity unavailable: {exc}"
-    for field in ("head", "status", "tree_sha256"):
+    for field in ("head", "status", "tree_sha256", "index_sha256", "index_entries", "submodules", "submodules_complete"):
         if source.get(field) != current.get(field):
             return False, f"source {field} drift"
+    index = source.get("index")
+    if not isinstance(index, Mapping) or index.get("captured") is not True:
+        return False, "source index identity is incomplete"
     content = source.get("content_snapshot")
     if not isinstance(content, Mapping) or content.get("captured") is not True or content.get("errors"):
         return False, "source content snapshot is incomplete"
@@ -1170,52 +1181,159 @@ def _source_identity_matches(provenance: Mapping[str, Any]) -> tuple[bool, str |
                 return False, f"staged source snapshot unavailable: {exc}"
             if staged["sha256"] != record.get("staged_sha256") or staged["size"] != record.get("staged_size"):
                 return False, f"staged source snapshot drift: {relative}"
+        captured_staged_hash = record.get("staged_sha256")
+        if captured_staged_hash is not None:
+            current_staged = local_provenance_module_current_index_blob(Path(repo), relative)
+            if current_staged is None:
+                return False, f"current staged source input unavailable: {relative}"
+            if current_staged["sha256"] != captured_staged_hash or current_staged["size"] != record.get("staged_size"):
+                return False, f"current index blob drift: {relative}"
     return True, None
 
 
-def local_executable_linkage(provenance: Mapping[str, Any], role: str, argv0: str, checked_path: str | None = None) -> tuple[bool, str | None]:
-    """Rehash the exact checked executable and source/build identity at spawn."""
+def _hash_open_fd(fd: int) -> tuple[int, str]:
+    """Hash an already-open regular file, never a pathname."""
+
+    digest = hashlib.sha256()
+    size = 0
+    os.lseek(fd, 0, os.SEEK_SET)
+    while True:
+        chunk = os.read(fd, 1024 * 1024)
+        if not chunk:
+            break
+        size += len(chunk)
+        digest.update(chunk)
+    os.lseek(fd, 0, os.SEEK_SET)
+    return size, digest.hexdigest()
+
+
+def prepare_local_executable(provenance: Mapping[str, Any], role: str, argv0: str) -> dict[str, Any]:
+    """Make a sealed executable image and bind the launch to that image.
+
+    The source pathname is opened once, copied to a Linux memfd, and sealed
+    against writes before ``Popen`` receives its inherited ``/proc`` path.
+    Other platforms deliberately fail closed: a pathname re-check is not a
+    binding primitive.
+    """
 
     if not provenance.get("build_linkage"):
-        return False, f"build linkage missing for {role}"
+        raise ValueError(f"build linkage missing for {role}")
     manifest_record = provenance.get("build_manifest")
     if isinstance(manifest_record, Mapping) and manifest_record.get("path") and manifest_record.get("sha256"):
         try:
             current_manifest = file_identity(manifest_record["path"])
         except (FileNotFoundError, OSError, ValueError) as exc:
-            return False, f"build manifest unavailable: {exc}"
+            raise ValueError(f"build manifest unavailable: {exc}") from exc
         if current_manifest["sha256"] != manifest_record["sha256"] or current_manifest["size"] != manifest_record.get("size"):
-            return False, "build manifest drift"
+            raise ValueError("build manifest drift")
         preserved_path = manifest_record.get("preserved_path")
         evidence_dir = provenance.get("evidence_dir")
         if not isinstance(preserved_path, str) or not isinstance(evidence_dir, str):
-            return False, "preserved manifest evidence is missing"
+            raise ValueError("preserved manifest evidence is missing")
         try:
             preserved_candidate = (Path(evidence_dir) / preserved_path).resolve(strict=False)
             preserved_candidate.relative_to(Path(evidence_dir).resolve())
             preserved = file_identity(preserved_candidate)
         except (FileNotFoundError, OSError, ValueError) as exc:
-            return False, f"preserved manifest evidence unavailable: {exc}"
+            raise ValueError(f"preserved manifest evidence unavailable: {exc}") from exc
         if preserved["sha256"] != manifest_record.get("preserved_sha256") or preserved["size"] != manifest_record.get("preserved_size"):
-            return False, "preserved manifest evidence drift"
+            raise ValueError("preserved manifest evidence drift")
     else:
-        return False, "preserved build manifest is missing"
+        raise ValueError("preserved build manifest is missing")
     expected = provenance.get("binaries", {}).get(role) if isinstance(provenance.get("binaries"), Mapping) else None
     if not isinstance(expected, Mapping) or not expected.get("resolved_path") or not expected.get("sha256"):
-        return False, f"build linkage missing for {role}"
-    try:
-        resolved = Path(checked_path or (argv0 if Path(argv0).is_absolute() else (shutil.which(argv0) or argv0))).resolve(strict=False)
-        if checked_path is not None and resolved != Path(checked_path).resolve(strict=False):
-            return False, f"checked executable path changed for {role}"
-        current = file_identity(resolved)
-    except (FileNotFoundError, OSError, ValueError) as exc:
-        return False, f"launched executable unavailable for {role}: {exc}"
-    if current["path"] != expected["resolved_path"] or current["sha256"] != expected["sha256"]:
-        return False, f"launched executable drift for {role}"
+        raise ValueError(f"build linkage missing for {role}")
+    if sys.platform != "linux" or fcntl is None or not hasattr(os, "memfd_create") or not hasattr(os, "MFD_ALLOW_SEALING") or not hasattr(os, "O_NOFOLLOW"):
+        raise ValueError(f"immutable executable binding is unavailable on this platform for {role}")
     source_ok, source_error = _source_identity_matches(provenance)
     if not source_ok:
-        return False, source_error
-    return True, None
+        raise ValueError(source_error or f"source identity unavailable for {role}")
+    candidate = Path(argv0) if Path(argv0).is_absolute() else Path(shutil.which(argv0) or argv0)
+    resolved = candidate.resolve(strict=False)
+    if str(resolved) != expected["resolved_path"]:
+        raise ValueError(f"launched executable path diverges for {role}")
+    source_fd: int | None = None
+    image_fd: int | None = None
+    try:
+        source_fd = os.open(str(resolved), os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW)
+        before = os.fstat(source_fd)
+        if not stat_is_regular_executable(before.st_mode):
+            raise ValueError(f"launched executable is not a regular executable for {role}")
+        source_size, source_hash = _hash_open_fd(source_fd)
+        if source_hash != expected["sha256"] or source_size != expected.get("size", source_size):
+            raise ValueError(f"launched executable drift for {role}")
+        image_fd = os.memfd_create(f"ng-elc-{role}", os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
+        os.fchmod(image_fd, before.st_mode & 0o7777)
+        os.lseek(source_fd, 0, os.SEEK_SET)
+        copied = 0
+        while True:
+            chunk = os.read(source_fd, 1024 * 1024)
+            if not chunk:
+                break
+            view = memoryview(chunk)
+            while view:
+                written = os.write(image_fd, view)
+                if written <= 0:
+                    raise OSError("short write while staging executable")
+                copied += written
+                view = view[written:]
+        os.lseek(image_fd, 0, os.SEEK_SET)
+        image_size, image_hash = _hash_open_fd(image_fd)
+        after = os.fstat(source_fd)
+        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns):
+            raise ValueError(f"executable source raced during immutable staging for {role}")
+        if copied != source_size or image_size != source_size or image_hash != expected["sha256"]:
+            raise ValueError(f"immutable executable image verification failed for {role}")
+        seals = fcntl.F_SEAL_SEAL | fcntl.F_SEAL_SHRINK | fcntl.F_SEAL_GROW | fcntl.F_SEAL_WRITE
+        fcntl.fcntl(image_fd, fcntl.F_ADD_SEALS, seals)
+        if fcntl.fcntl(image_fd, fcntl.F_GET_SEALS) & seals != seals:
+            raise ValueError(f"immutable executable image is not sealed for {role}")
+        proc_path = f"/proc/self/fd/{image_fd}"
+        return {
+            "source_path": str(resolved),
+            "source_dev": before.st_dev,
+            "source_ino": before.st_ino,
+            "source_size": source_size,
+            "source_sha256": source_hash,
+            "representation": "sealed-memfd",
+            "fd": image_fd,
+            "proc_path": proc_path,
+            "size": image_size,
+            "sha256": image_hash,
+            "seals": seals,
+        }
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        if image_fd is not None:
+            try:
+                os.close(image_fd)
+            except OSError:
+                pass
+        raise ValueError(f"immutable executable unavailable for {role}: {exc}") from exc
+    finally:
+        if source_fd is not None:
+            try:
+                os.close(source_fd)
+            except OSError:
+                pass
+
+
+def stat_is_regular_executable(mode: int) -> bool:
+    return stat.S_ISREG(mode) and bool(mode & 0o111)
+
+
+def local_executable_linkage(provenance: Mapping[str, Any], role: str, argv0: str, checked_path: str | None = None) -> tuple[bool, str | None]:
+    """Compatibility probe; actual launches use the returned sealed image."""
+
+    del checked_path  # retained only for the legacy diagnostic signature
+    try:
+        prepared = prepare_local_executable(provenance, role, argv0)
+        try:
+            os.close(prepared["fd"])
+        except OSError:
+            pass
+        return True, None
+    except (OSError, ValueError) as exc:
+        return False, str(exc)
 
 
 def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variables: Mapping[str, str], workload: Mapping[str, Any] | None = None, provenance: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -1393,6 +1511,57 @@ def local_stop_process_group(proc: subprocess.Popen[Any], pgid: int, expected_st
             return {"ok": False, "result": "kill-timeout", "pid": proc.pid, "pgid": pgid}
 
 
+def register_local_process(
+    processes: dict[str, dict[str, Any]],
+    role: str,
+    proc: subprocess.Popen[Any],
+    argv: list[str],
+    stdout: Any,
+    stderr: Any,
+    stdout_path: Path,
+    stderr_path: Path,
+    launched_identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Register a child before querying any fallible process identity."""
+
+    item: dict[str, Any] = {
+        "process": proc,
+        "argv": argv,
+        "pgid": None,
+        "starttime": None,
+        "tracked_descendants": {},
+        "descendant_scan_seen": False,
+        "descendant_scan_complete": True,
+        "stdout": stdout,
+        "stderr": stderr,
+        "stdout_path": stdout_path,
+        "stderr_path": stderr_path,
+        "launched_identity": dict(launched_identity),
+    }
+    processes[role] = item
+    try:
+        item["pgid"] = os.getpgid(proc.pid)
+        item["starttime"] = process_starttime(proc.pid)
+        if item["starttime"] is None:
+            raise RuntimeError("process starttime identity unavailable")
+    except BaseException as exc:
+        # The Popen object is the only safe identity available when metadata
+        # lookup fails.  Roll back immediately and leave no untracked child.
+        processes.pop(role, None)
+        try:
+            proc.kill()
+            proc.wait(timeout=5)
+        except (OSError, subprocess.SubprocessError):
+            pass
+        try:
+            stdout.close()
+            stderr.close()
+        except OSError:
+            pass
+        raise RuntimeError(f"process identity registration failed for {role}: {exc}") from exc
+    return item
+
+
 def run_local_trial(args: argparse.Namespace) -> int:
     config = load_local_config(getattr(args, "env", None))
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="local")
@@ -1471,18 +1640,30 @@ def run_local_trial(args: argparse.Namespace) -> int:
             stderr = stderr_path.open("w", encoding="utf-8")
             role_env = os.environ.copy()
             role_env.update({key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()})
-            # This is deliberately the last fallible identity check before
-            # spawning.  The child receives the resolved path that was checked.
-            linked, linkage_error = local_executable_linkage(provenance, role["name"], argv[0], checked_path=checked_executable)
-            if not linked:
+            # The immutable image, not the checked pathname, is the launch
+            # target.  Its inherited fd is closed in the parent only after
+            # Popen has completed the fork/exec handoff.
+            launch_identity: dict[str, Any] | None = None
+            try:
+                launch_identity = prepare_local_executable(provenance, role["name"], checked_executable)
+                argv[0] = launch_identity["proc_path"]
+                proc = subprocess.Popen(argv, cwd=cwd, env=role_env, stdout=stdout, stderr=stderr, start_new_session=True, text=True, pass_fds=(launch_identity["fd"],))
+            except Exception:
+                if launch_identity is not None and launch_identity.get("fd") is not None:
+                    try:
+                        os.close(launch_identity["fd"])
+                    except OSError:
+                        pass
                 stdout.close()
                 stderr.close()
-                raise ConfigError(linkage_error or f"build linkage missing for {role['name']}")
-            proc = subprocess.Popen(argv, cwd=cwd, env=role_env, stdout=stdout, stderr=stderr, start_new_session=True, text=True)
-            pgid = os.getpgid(proc.pid)
-            starttime = process_starttime(proc.pid)
-            processes[role["name"]] = {"process": proc, "argv": argv, "pgid": pgid, "starttime": starttime, "tracked_descendants": {}, "descendant_scan_seen": False, "descendant_scan_complete": True, "stdout": stdout, "stderr": stderr, "stdout_path": stdout_path, "stderr_path": stderr_path}
-            launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": pgid, "starttime": starttime, "executable": argv[0], "argv": argv, "cwd": cwd})
+                raise
+            try:
+                os.close(launch_identity["fd"])
+            except OSError:
+                pass
+            registered = register_local_process(processes, role["name"], proc, argv, stdout, stderr, stdout_path, stderr_path, launch_identity)
+            registered["launched_identity"]["child_pid"] = proc.pid
+            launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": registered["pgid"], "starttime": registered["starttime"], "executable": registered["launched_identity"]["proc_path"], "argv": argv, "cwd": cwd, "launched_identity": registered["launched_identity"]})
             local_record(events, "launch", **launch_public)
             local_json_write(role_dir / "launch.json", launch_public)
             expected = role.get("readiness", [])

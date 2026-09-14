@@ -137,16 +137,17 @@ def _status_xy(line: str) -> tuple[str, str]:
 
 
 _SECRET_SOURCE_RE = re.compile(
-    rb"(?:^|[\s\"'])(?:password|passwd|secret|token|api[_-]?key|private[_-]?key|credential)\s*[:=]",
+    rb"(?:^|[\s\"'])(?:export\s+)?(?:[A-Za-z_][A-Za-z0-9.-]*(?:password|passwd|secret|token|credential|private[_-]?key|api[_-]?key|ssh[_-]?key)|password|passwd|secret|token|api[_-]?key|private[_-]?key|credential)\s*[:=]",
     re.IGNORECASE | re.MULTILINE,
 )
+_URL_USERINFO_RE = re.compile(rb"[A-Za-z][A-Za-z0-9+.-]*://[^/\s:@]+:[^/@\s]+@", re.IGNORECASE)
 
 
 def _source_contains_secret(path: str, data: bytes) -> bool:
     name = Path(path).name.lower()
     if any(word in name for word in ("secret", "credential", "password", ".env")):
         return True
-    return bool(_SECRET_SOURCE_RE.search(data))
+    return bool(_SECRET_SOURCE_RE.search(data) or _URL_USERINFO_RE.search(data))
 
 
 def _copy_stable_bytes(source: Path, target: Path) -> tuple[int, str, str]:
@@ -339,6 +340,62 @@ def _capture_content_snapshot(
     }
 
 
+def _capture_index_identity(repository: Path) -> dict[str, Any]:
+    """Capture the index entries, including the exact staged blob ids."""
+
+    try:
+        run = subprocess.run(
+            ["git", "-C", str(repository), "ls-files", "--stage", "-z"],
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"captured": False, "entries": [], "errors": [f"git index unavailable: {exc}"]}
+    if run.returncode != 0:
+        return {"captured": False, "entries": [], "errors": ["git index unavailable"]}
+    entries: list[dict[str, Any]] = []
+    canonical: list[str] = []
+    for raw in run.stdout.split(b"\0"):
+        if not raw:
+            continue
+        try:
+            header, relative_bytes = raw.split(b"\t", 1)
+            mode, blob_id, stage = header.decode("ascii").split()
+            relative = relative_bytes.decode("utf-8")
+        except (UnicodeDecodeError, ValueError):
+            return {"captured": False, "entries": [], "errors": ["git index contains an invalid staged entry"]}
+        if not re.fullmatch(r"[0-7]{6}", mode) or not re.fullmatch(r"[0-9a-fA-F]{40,64}", blob_id) or stage not in {"0", "1", "2", "3"}:
+            return {"captured": False, "entries": [], "errors": [f"git index entry is invalid: {relative}"]}
+        item = {"path": Path(relative).as_posix(), "mode": mode, "blob_id": blob_id.lower(), "stage": int(stage)}
+        entries.append(item)
+        canonical.append(f"{mode} {blob_id.lower()} {stage}\t{item['path']}\n")
+    canonical_bytes = "".join(sorted(canonical)).encode("utf-8")
+    return {
+        "captured": True,
+        "entries": sorted(entries, key=lambda item: (item["path"], item["stage"])),
+        "sha256": hashlib.sha256(canonical_bytes).hexdigest(),
+        "errors": [],
+    }
+
+
+def _current_index_blob(repository: Path, relative: str) -> dict[str, Any] | None:
+    """Read the current index blob bytes without consulting working-tree bytes."""
+
+    try:
+        run = subprocess.run(
+            ["git", "-C", str(repository), "cat-file", "blob", f":{relative}"],
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if run.returncode != 0:
+        return None
+    return {"sha256": hashlib.sha256(run.stdout).hexdigest(), "size": len(run.stdout)}
+
+
 def capture_git_state(
     repo: os.PathLike[str] | str,
     snapshot_dir: os.PathLike[str] | str | None = None,
@@ -369,7 +426,17 @@ def capture_git_state(
     status = [line for line in status_run.stdout.splitlines() if line]
     if status_run.returncode != 0:
         status = ["git status unavailable"]
-    result: dict[str, Any] = {"head": head or None, "status": status, "clean": status_run.returncode == 0 and not status}
+    result: dict[str, Any] = {
+        "head": head or None,
+        "status": status,
+        "clean": status_run.returncode == 0 and not status,
+    }
+    index_identity = _capture_index_identity(repository)
+    result.update({
+        "index": index_identity,
+        "index_sha256": index_identity.get("sha256"),
+        "index_entries": index_identity.get("entries", []),
+    })
     if snapshot_dir is not None:
         content_snapshot = _capture_content_snapshot(
             repository,
@@ -382,6 +449,7 @@ def capture_git_state(
             content_snapshot["reason"] = "working tree clean"
         result["content_snapshot"] = content_snapshot
         result["tree_sha256"] = _tree_sha256(repository)
+    if snapshot_dir is not None or include_tree:
         submodule_run = subprocess.run(
             ["git", "-C", str(repository), "submodule", "status", "--recursive"],
             capture_output=True,
@@ -426,6 +494,11 @@ _VARIABLE_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 _SECRET_ASSIGN_RE = re.compile(r"((?:--?|/)?(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)(?:=|\s+))([^\s'\"&]+)", re.IGNORECASE)
 _SECRET_QUERY_RE = re.compile(r"([?&](?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key)=)[^&#\s]+", re.IGNORECASE)
 _AUTH_RE = re.compile(r"(\b(?:authorization\s*:\s*bearer|bearer)\s+)[^\s'\"]+", re.IGNORECASE)
+_URL_USERINFO_TEXT_RE = re.compile(r"(\b[A-Za-z][A-Za-z0-9+.-]*://)([^/@\s:]+):([^/@\s]+)@", re.IGNORECASE)
+_SECRET_SOURCE_ASSIGN_TEXT_RE = re.compile(
+    r"(\b(?:export\s+)?[A-Za-z_][A-Za-z0-9.-]*(?:password|passwd|secret|token|credential|private[-_]?key|api[-_]?key|ssh[-_]?key)\s*[:=]\s*)([^\s'\";&]+)",
+    re.IGNORECASE,
+)
 
 
 def _collect_secret_values(value: Any, key: str | None = None) -> set[str]:
@@ -451,6 +524,8 @@ def _redact_string(value: str, secrets: set[str]) -> str:
     result = _SECRET_QUERY_RE.sub(r"\1<redacted>", result)
     result = _SECRET_ASSIGN_RE.sub(r"\1<redacted>", result)
     result = _AUTH_RE.sub(r"\1<redacted>", result)
+    result = _URL_USERINFO_TEXT_RE.sub(r"\1<redacted>@", result)
+    result = _SECRET_SOURCE_ASSIGN_TEXT_RE.sub(r"\1<redacted>", result)
     return result
 
 
@@ -631,6 +706,40 @@ def _identity_unavailable(value: Any) -> bool:
     return False
 
 
+_PLACEHOLDER_IDENTITY_RE = re.compile(
+    r"^(?:$|<[^>]+>|unknown|unavailable|not[-_ ]?available|n/?a|none|null|placeholder|todo|tbd|dummy|example)$",
+    re.IGNORECASE,
+)
+
+
+def _require_meaningful_identity(value: Any, field: str) -> None:
+    """Reject empty and placeholder build identity instead of sealing fiction."""
+
+    if value is None or isinstance(value, bool):
+        raise ValueError(f"{field} identity is missing")
+    if isinstance(value, str):
+        if _PLACEHOLDER_IDENTITY_RE.fullmatch(value.strip()):
+            raise ValueError(f"{field} identity is a placeholder or unavailable")
+        return
+    if isinstance(value, Mapping):
+        if not value:
+            raise ValueError(f"{field} identity is missing")
+        for key, item in value.items():
+            if isinstance(item, Mapping):
+                _require_meaningful_identity(item, f"{field}.{key}")
+            elif isinstance(item, (list, tuple)):
+                if item:
+                    _require_meaningful_identity(item, f"{field}.{key}")
+            elif item is None or (isinstance(item, str) and _PLACEHOLDER_IDENTITY_RE.fullmatch(item.strip())):
+                raise ValueError(f"{field}.{key} identity is a placeholder or unavailable")
+        return
+    if isinstance(value, (list, tuple)):
+        if not value:
+            raise ValueError(f"{field} identity is missing")
+        for number, item in enumerate(value):
+            _require_meaningful_identity(item, f"{field}[{number}]")
+
+
 def validate_build_linkage(
     manifest: Mapping[str, Any],
     source_head: str | None,
@@ -652,20 +761,33 @@ def validate_build_linkage(
     if not isinstance(recipe, Mapping) or not recipe:
         raise ValueError("complete build recipe identity is required")
     recipe_commands = recipe.get("commands", recipe.get("command"))
-    if not recipe_commands:
+    if not isinstance(recipe_commands, (list, tuple)) or not recipe_commands:
         raise ValueError("complete build recipe commands are required")
+    _require_meaningful_identity(recipe_commands, "build recipe")
     toolchain = manifest.get("toolchain", manifest.get("toolchain_identity"))
     options = manifest.get("options", manifest.get("build_options"))
-    for field, value in (("toolchain", toolchain), ("options", options)):
-        if not value:
-            raise ValueError(f"complete build {field} identity is required")
-        if isinstance(value, Mapping) and value.get("status") == "unavailable":
-            raise ValueError(f"build {field} identity is unavailable")
+    if not isinstance(toolchain, Mapping) or not toolchain.get("compiler") or not toolchain.get("version"):
+        # Preserve the useful legacy diagnostic for an already-proven
+        # basename collision; semantic identity errors remain fail-closed.
+        try:
+            preliminary = _binary_records(manifest.get("binaries"), "manifest")
+            preliminary_names = [Path(str(record.get("path", record.get("resolved_path", "")))).name for record in preliminary.values()]
+            if len(preliminary_names) != len(set(preliminary_names)):
+                raise ValueError(f"executable basename/path collision for {preliminary_names[0]}")
+        except ValueError as exc:
+            if "collision" in str(exc):
+                raise
+        raise ValueError("complete compiler/toolchain identity is required")
+    _require_meaningful_identity(toolchain, "toolchain")
+    if not isinstance(options, Mapping) or not options:
+        raise ValueError("complete build options identity is required")
+    _require_meaningful_identity(options, "options")
     runtime_identity = manifest.get("runtime_library_identity")
     if runtime_identity is None:
         runtime_identity = manifest.get("runtime_libraries") or manifest.get("runtime_library")
     if not runtime_identity:
         raise ValueError("runtime-library identity is required")
+    _require_meaningful_identity(runtime_identity, "runtime-library")
     if _identity_unavailable(runtime_identity):
         raise ValueError("runtime-library identity is unavailable or incomplete")
     if manifest_evidence is None and isinstance(manifest.get("manifest_evidence"), Mapping):
@@ -703,6 +825,15 @@ def validate_build_linkage(
         raise ValueError("source content snapshot is incomplete")
     if any(entry.get("state") != "captured" for entry in content_snapshot.get("entries", []) if isinstance(entry, Mapping)):
         raise ValueError("source content snapshot contains unreconstructable entries")
+    if status and (content_snapshot.get("captured") is not True or not content_snapshot.get("entries")):
+        raise ValueError("dirty source status has an empty or partial content snapshot")
+    if source_state is not None:
+        if "index" in source_state:
+            captured_index = source_state.get("index")
+            if not isinstance(captured_index, Mapping) or captured_index.get("captured") is not True or not isinstance(captured_index.get("entries"), list):
+                raise ValueError("source index identity is incomplete")
+            if source_state.get("index_sha256") != captured_index.get("sha256"):
+                raise ValueError("source index identity is inconsistent")
     _snapshot_records(content_snapshot.get("files", [])) if content_snapshot.get("files") else []
 
     if not isinstance(source_head, str) or not source_head:
@@ -717,10 +848,16 @@ def validate_build_linkage(
     if manifest_head != source_head or manifest_head != snapshot_head:
         raise ValueError("source head divergence")
     if source_state is not None and isinstance(snapshot, Mapping):
+        if source_state.get("head") and snapshot.get("head") and source_state["head"] != snapshot["head"]:
+            raise ValueError("source HEAD divergence")
         if source_state.get("tree_sha256") and snapshot["tree_sha256"] != source_state["tree_sha256"]:
             raise ValueError("source content divergence")
         if source_state.get("status") is not None and source_state.get("status") != snapshot.get("status"):
             raise ValueError("source status divergence")
+        if source_state.get("submodules") is not None and source_state.get("submodules") != snapshot.get("submodules"):
+            raise ValueError("source submodule divergence")
+        if source_state.get("submodules_complete") is not None and source_state.get("submodules_complete") != snapshot.get("submodules_complete"):
+            raise ValueError("source submodule completeness divergence")
 
     expected_value = manifest.get("binaries")
     if not expected_value:
@@ -729,6 +866,25 @@ def validate_build_linkage(
     actual = _binary_records(executables, "executables") if executables else {}
     if not actual:
         raise ValueError("executables are required")
+
+    runtime_records = runtime_identity.get("binaries") if isinstance(runtime_identity, Mapping) else None
+    if runtime_records is None:
+        # Preserve the small legacy single-binary manifest shape, but never
+        # treat one aggregate identity as coverage for multiple launched roles.
+        if len(actual) != 1:
+            raise ValueError("runtime-library coverage is missing for launched executables")
+        _require_meaningful_identity(runtime_identity, "runtime-library")
+    elif not isinstance(runtime_records, Mapping) or not runtime_records:
+        raise ValueError("runtime-library coverage is incomplete")
+    else:
+        for role, record in actual.items():
+            manifest_name = str(record.get("manifest_name") or Path(str(record.get("path", ""))).name) if isinstance(record, Mapping) else Path(str(record)).name
+            coverage = runtime_records.get(role, runtime_records.get(manifest_name))
+            if coverage is None:
+                raise ValueError(f"runtime-library coverage is missing for {role}")
+            _require_meaningful_identity(coverage, f"runtime-library.{role}")
+            if _identity_unavailable(coverage):
+                raise ValueError(f"runtime-library coverage is unavailable for {role}")
     expected_identities = {
         name: _binary_identity(name, record, "manifest")
         for name, record in expected.items()
@@ -893,6 +1049,11 @@ def capture_local_provenance(
         **git_state,
         "content_snapshot": git_state.get("content_snapshot", {"captured": False, "files": [], "errors": ["not requested"]}),
     }
+    protected_inputs = list(source["content_snapshot"].get("errors", [])) if source["content_snapshot"].get("errors") else []
+    if plan_record.get("error"):
+        protected_inputs.append(f"protected-input plan snapshot unavailable: {plan_record['error']}")
+    if manifest_error:
+        protected_inputs.append(f"protected-input build manifest unavailable: {manifest_error}")
     controller_record = code_identity.get("controller") if isinstance(code_identity, Mapping) else None
     helper_records = code_identity.get("helpers", {}) if isinstance(code_identity, Mapping) else {}
     return {
@@ -903,7 +1064,7 @@ def capture_local_provenance(
         "source_status": git_state.get("status", []),
         "source_content_snapshot": source["content_snapshot"],
         "source_snapshot_complete": bool(source["content_snapshot"].get("captured", False)),
-        "protected_inputs": list(source["content_snapshot"].get("errors", [])) if source["content_snapshot"].get("errors") else [],
+        "protected_inputs": protected_inputs,
         "git_head": git_state.get("head"),
         "git_status": git_state.get("status", []),
         "git_clean": bool(git_state.get("clean", False)),
