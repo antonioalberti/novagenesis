@@ -1057,13 +1057,28 @@ def _normalise_loader_output(output: str) -> str:
     return re.sub(r"0x[0-9a-fA-F]+", "0xADDR", output)
 
 
+def _runtime_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ValueError(f"runtime identity command unavailable: {exc}") from exc
+
+
+def _runtime_output(run: subprocess.CompletedProcess[str]) -> str:
+    return (run.stdout or "") + (run.stderr or "")
+
+
+def _is_static_ldd_output(returncode: int, output: str) -> bool:
+    return returncode != 0 and output.strip().lower().endswith("not a dynamic executable")
+
+
 def _validate_runtime_record(
     record: Mapping[str, Any],
     field: str,
     expected_binary_hash: str | None = None,
     expected_binary_path: str | None = None,
 ) -> None:
-    """Validate the concrete loader identity for one launched role."""
+    """Validate dynamic ``ldd`` or independently proven static ELF identity."""
     if not isinstance(record, Mapping) or not record:
         raise ValueError(f"{field} identity is missing")
     if record.get("status") != "ok":
@@ -1073,12 +1088,71 @@ def _validate_runtime_record(
         raise ValueError(f"{field} must carry exactly one runtime output hash")
     _normalise_hash(record[hashes[0]], f"{field} {hashes[0]}")
     binary_hash = record.get("binary_sha256")
-    if expected_binary_hash is not None:
-        if not isinstance(binary_hash, str):
-            raise ValueError(f"{field} must carry the launched binary hash")
-        if _normalise_hash(binary_hash, f"{field} binary_sha256") != expected_binary_hash:
-            raise ValueError(f"{field} binary hash diverges from launched executable")
+    if not isinstance(binary_hash, str):
+        raise ValueError(f"{field} must carry the launched binary hash")
+    binary_hash = _normalise_hash(binary_hash, f"{field} binary_sha256")
+    if expected_binary_hash is not None and binary_hash != expected_binary_hash:
+        raise ValueError(f"{field} binary hash diverges from launched executable")
+    linkage = record.get("linkage", "dynamic")
+    if linkage not in {"dynamic", "static"}:
+        raise ValueError(f"{field} linkage mode is ambiguous")
+    expected_path = str(Path(expected_binary_path).resolve(strict=False)) if expected_binary_path is not None else None
+    recorded_path = record.get("binary_path")
+    if linkage == "static":
+        if not isinstance(recorded_path, str) or not recorded_path:
+            raise ValueError(f"{field} static executable path identity is missing")
+    if recorded_path is not None:
+        if not isinstance(recorded_path, str) or not recorded_path:
+            raise ValueError(f"{field} executable path identity is invalid")
+        if expected_path is not None and str(Path(recorded_path).resolve(strict=False)) != expected_path:
+            raise ValueError(f"{field} executable path diverges from launched executable")
     libraries = record.get("libraries")
+    if linkage == "static":
+        if libraries != [] or record.get("library_count") != 0:
+            raise ValueError(f"{field} static identity contains library dependencies")
+        if expected_path is None:
+            raise ValueError(f"{field} static executable path is required")
+        launched_path = expected_path
+        try:
+            observed_binary = file_identity(launched_path)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            raise ValueError(f"{field} launched executable is unavailable: {exc}") from exc
+        if observed_binary["sha256"] != binary_hash:
+            raise ValueError(f"{field} binary hash diverges from launched executable")
+        file_output = record.get("file_output")
+        header_output = record.get("elf_header_output")
+        program_output = record.get("elf_program_headers_output")
+        if not all(isinstance(value, str) and value for value in (file_output, header_output, program_output)):
+            raise ValueError(f"{field} static ELF identity is incomplete")
+        for label, output, digest in (
+            ("file", file_output, "file_output_sha256"),
+            ("ELF header", header_output, "elf_header_sha256"),
+            ("ELF program headers", program_output, "elf_program_headers_sha256"),
+        ):
+            if _normalise_hash(record.get(digest), f"{field} {digest}") != hashlib.sha256(output.encode()).hexdigest():
+                raise ValueError(f"{field} {label} identity hash diverges")
+        observed_file = _runtime_output(_runtime_command(["file", "-b", launched_path]))
+        observed_header_run = _runtime_command(["readelf", "-h", launched_path])
+        observed_header = _runtime_output(observed_header_run)
+        observed_program_run = _runtime_command(["readelf", "-l", launched_path])
+        observed_program = _runtime_output(observed_program_run)
+        if observed_file != file_output or observed_header != header_output or observed_program != program_output:
+            raise ValueError(f"{field} static ELF identity diverges")
+        if observed_header_run.returncode != 0 or observed_program_run.returncode != 0 or not observed_file.lstrip().startswith("ELF"):
+            raise ValueError(f"{field} static ELF identity is unavailable")
+        if "statically linked" not in observed_file.lower() and "static-pie linked" not in observed_file.lower():
+            raise ValueError(f"{field} static file identity is contradictory")
+        if "INTERP" in observed_program:
+            raise ValueError(f"{field} static ELF identity is contradictory")
+        ldd_run = _runtime_command(["ldd", launched_path])
+        ldd_output = _runtime_output(ldd_run)
+        if ldd_run.returncode != record.get("ldd_returncode") or ldd_output != record.get("ldd_output"):
+            raise ValueError(f"{field} static ldd identity diverges")
+        if not _is_static_ldd_output(ldd_run.returncode, ldd_output):
+            raise ValueError(f"{field} static ldd evidence is contradictory")
+        if record[hashes[0]] != hashlib.sha256(ldd_output.encode()).hexdigest():
+            raise ValueError(f"{field} static ldd output hash diverges")
+        return
     if not isinstance(libraries, list) or not libraries:
         raise ValueError(f"{field} library list is empty or invalid")
     for number, library in enumerate(libraries):
@@ -1087,10 +1161,13 @@ def _validate_runtime_record(
             raise ValueError(f"{field}.libraries[{number}] is synthetic or unavailable")
     if expected_binary_path is not None:
         try:
-            observed_run = subprocess.run(["ldd", expected_binary_path], capture_output=True, text=True, timeout=10, check=False)
-        except (OSError, subprocess.SubprocessError) as exc:
-            raise ValueError(f"{field} ldd evidence unavailable: {exc}") from exc
-        observed_output = observed_run.stdout + observed_run.stderr
+            observed_binary = file_identity(expected_binary_path)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            raise ValueError(f"{field} launched executable is unavailable: {exc}") from exc
+        if observed_binary["sha256"] != binary_hash:
+            raise ValueError(f"{field} binary hash diverges from launched executable")
+        observed_run = _runtime_command(["ldd", expected_binary_path])
+        observed_output = _runtime_output(observed_run)
         if observed_run.returncode != 0 or not observed_output.strip():
             raise ValueError(f"{field} ldd evidence is unavailable")
         stable_output = _normalise_loader_output(observed_output)
@@ -1326,9 +1403,10 @@ def validate_build_linkage(
     if not isinstance(runtime_identity, Mapping) or not runtime_identity:
         raise ValueError("runtime-library identity is required")
     _require_meaningful_identity(runtime_identity, "runtime-library")
-    _require_text(runtime_identity.get("method"), "runtime-library.method")
-    if runtime_identity.get("method") != "ldd":
-        raise ValueError("runtime-library method must be actual ldd evidence")
+    method = runtime_identity.get("method")
+    _require_text(method, "runtime-library.method")
+    if method not in {"ldd", "static"}:
+        raise ValueError("runtime-library method is ambiguous or unsupported")
     if _identity_unavailable(runtime_identity):
         raise ValueError("runtime-library identity is unavailable or incomplete")
     if manifest_evidence is None and isinstance(manifest.get("manifest_evidence"), Mapping):
@@ -1449,6 +1527,10 @@ def validate_build_linkage(
             raise ValueError(f"runtime-library coverage is missing for {role}")
         if not isinstance(coverage, Mapping):
             raise ValueError(f"runtime-library coverage is invalid for {role}")
+        if method == "static" and coverage.get("linkage") != "static":
+            raise ValueError(f"runtime-library coverage is not static for {role}")
+        if method == "ldd" and coverage.get("linkage") == "static":
+            raise ValueError(f"runtime-library coverage contradicts dynamic mode for {role}")
         expected_record = expected_identities.get(role)
         expected_hash = expected_record[1] if expected_record else None
         expected_path = expected_record[0] if expected_record else None

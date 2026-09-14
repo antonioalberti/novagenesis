@@ -203,22 +203,89 @@ def _normalise_loader_output(output: str) -> str:
     return re.sub(r"0x[0-9a-fA-F]+", "0xADDR", output)
 
 
+def _identity_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
+
+
+def _identity_output(run: subprocess.CompletedProcess[str]) -> str:
+    return (run.stdout or "") + (run.stderr or "")
+
+
+def _static_ldd_result(run: subprocess.CompletedProcess[str], output: str) -> bool:
+    """Recognise only the explicit non-dynamic-loader result."""
+    return run.returncode != 0 and output.strip().lower().endswith("not a dynamic executable")
+
+
+def _static_elf_identity(path: str, binary_sha256: str, ldd_run: subprocess.CompletedProcess[str], ldd_output: str) -> dict[str, Any] | None:
+    file_run = _identity_command(["file", "-b", path])
+    header_run = _identity_command(["readelf", "-h", path])
+    program_run = _identity_command(["readelf", "-l", path])
+    file_output = _identity_output(file_run)
+    header_output = _identity_output(header_run)
+    program_output = _identity_output(program_run)
+    file_static = "statically linked" in file_output.lower() or "static-pie linked" in file_output.lower()
+    elf_header_valid = header_run.returncode == 0 and "ELF Header:" in header_output
+    has_interpreter = "INTERP" in program_output
+    elf_static = program_run.returncode == 0 and not has_interpreter
+    if not (file_run.returncode == 0 and file_output.lstrip().startswith("ELF") and file_static and elf_header_valid and elf_static):
+        return None
+    if not _static_ldd_result(ldd_run, ldd_output):
+        return None
+    return {
+        "status": "ok",
+        "linkage": "static",
+        "binary_path": str(Path(path).resolve()),
+        "binary_sha256": binary_sha256,
+        "file_output": file_output,
+        "file_output_sha256": hashlib.sha256(file_output.encode()).hexdigest(),
+        "elf_header_output": header_output,
+        "elf_header_sha256": hashlib.sha256(header_output.encode()).hexdigest(),
+        "elf_program_headers_output": program_output,
+        "elf_program_headers_sha256": hashlib.sha256(program_output.encode()).hexdigest(),
+        "ldd_returncode": ldd_run.returncode,
+        "ldd_output": ldd_output,
+        "ldd_sha256": hashlib.sha256(ldd_output.encode()).hexdigest(),
+        "libraries": [],
+        "library_count": 0,
+    }
+
+
 def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    """Record the dynamic-loader view used by each produced executable."""
+    """Record dynamic ``ldd`` or independently proven static ELF identity."""
     records: dict[str, Any] = {}
+    methods: set[str] = set()
     for name, binary in binaries.items():
-        path = binary["path"]
-        run = subprocess.run(["ldd", path], capture_output=True, text=True, check=False)
-        output = run.stdout + run.stderr
-        stable_output = _normalise_loader_output(output)
+        path = str(Path(binary["path"]).resolve())
+        binary_sha256 = binary["sha256"]
+        try:
+            ldd_run = _identity_command(["ldd", path])
+            ldd_output = _identity_output(ldd_run)
+            static_record = _static_elf_identity(path, binary_sha256, ldd_run, ldd_output)
+        except (OSError, subprocess.SubprocessError):
+            static_record = None
+            ldd_run = None
+            ldd_output = ""
+        if static_record is not None:
+            records[name] = static_record
+            methods.add("static")
+            continue
+        if ldd_run is None:
+            records[name] = {"status": "unavailable", "linkage": "dynamic", "binary_path": path, "binary_sha256": binary_sha256, "libraries": []}
+            methods.add("ldd")
+            continue
+        stable_output = _normalise_loader_output(ldd_output)
         records[name] = {
-            "status": "ok" if run.returncode == 0 else "unavailable",
+            "status": "ok" if ldd_run.returncode == 0 else "unavailable",
+            "linkage": "dynamic",
+            "binary_path": path,
             "output_sha256": hashlib.sha256(stable_output.encode()).hexdigest(),
-            "binary_sha256": binary["sha256"],
+            "binary_sha256": binary_sha256,
             "libraries": sorted(line.strip() for line in stable_output.splitlines() if line.strip()),
             "library_count": len([line for line in stable_output.splitlines() if line.strip()]),
         }
-    return {"method": "ldd", "binaries": records}
+        methods.add("ldd")
+    method = next(iter(methods)) if len(methods) == 1 else "mixed"
+    return {"method": method, "binaries": records}
 
 
 def toolchain_identity() -> dict[str, Any]:
