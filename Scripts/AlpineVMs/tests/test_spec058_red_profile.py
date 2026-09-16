@@ -27,6 +27,13 @@ class Spec058ProfileRedTests(unittest.TestCase):
         self.assertEqual(result["name"], "native-privileged")
         self.assertEqual(result["euid"], 0)
 
+    def test_native_profile_requires_explicit_cli_selection(self):
+        with self.assertRaises(executor.ConfigError):
+            executor.validate_local_profile(
+                {"local_profile": "native-privileged"},
+                cli_profile=None, mode="local", euid=0
+            )
+
     def test_native_profile_rejects_non_root_before_side_effects(self):
         with self.assertRaises(executor.ConfigError):
             executor.validate_local_profile(
@@ -67,15 +74,16 @@ class Spec058CleanupRedTests(unittest.TestCase):
                 {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": []}},
             ])
             completed = subprocess.CompletedProcess(
-                ["bash", str(script)], 0, "cleaned\n", ""
+                ["bash", str(script)], 0, b"cleaned\n", b""
             )
             with patch.object(executor, "local_host_inventory", side_effect=lambda: next(snapshots)), \
-                 patch.object(executor.subprocess, "run", return_value=completed) as run:
+                 patch.object(executor, "_run_bounded_command", return_value=completed) as run:
                 result = executor.run_native_cleanup(repo, evidence, euid=0)
 
             self.assertTrue(result["ok"])
             self.assertEqual(run.call_count, 1)
-            self.assertEqual(run.call_args.args[0], ["bash", str(script.resolve())])
+            self.assertEqual(run.call_args.args[0][0], "bash")
+            self.assertTrue(run.call_args.args[0][1].startswith("/proc/self/fd/"))
             self.assertTrue((evidence / "native-cleanup.json").is_file())
 
     def test_cleanup_failure_blocks_launch_and_never_reports_zero(self):
@@ -91,11 +99,30 @@ class Spec058CleanupRedTests(unittest.TestCase):
                 ["bash", str(script)], 1, "", "failure\n"
             )
             with patch.object(executor, "local_host_inventory", return_value=snapshot), \
-                 patch.object(executor.subprocess, "run", return_value=completed):
+                 patch.object(executor.subprocess, "run", return_value=completed) as run:
                 result = executor.run_native_cleanup(repo, evidence, euid=0)
 
             self.assertFalse(result["ok"])
             self.assertNotEqual(result["baseline"], "ZERO")
+            run.assert_not_called()
+
+    def test_cleanup_uses_a_sanitized_privileged_environment(self):
+        with tempfile.TemporaryDirectory(prefix="spec058-cleanup-env-", dir=Path.home()) as td:
+            repo = Path(td)
+            script = repo / "Scripts" / "Simple" / "clean.sh"
+            script.parent.mkdir(parents=True)
+            script.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+            evidence = repo / "evidence"
+            evidence.mkdir()
+            snapshot = {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": []}}
+            completed = subprocess.CompletedProcess(["bash", str(script)], 0, b"", b"")
+            with patch.object(executor, "local_host_inventory", return_value=snapshot), \
+                 patch.object(executor, "_run_bounded_command", return_value=completed) as run:
+                executor.run_native_cleanup(repo, evidence, euid=0)
+            env = run.call_args.kwargs["env"]
+            self.assertNotIn("BASH_ENV", env)
+            self.assertNotIn("LD_PRELOAD", env)
+            self.assertEqual(env["PATH"], "/usr/sbin:/usr/bin:/sbin:/bin")
 
 
 class Spec058PtyRedTests(unittest.TestCase):
@@ -120,6 +147,22 @@ class Spec058PtyRedTests(unittest.TestCase):
             self.assertEqual(result["role"], "fixture")
             self.assertTrue(result["pty"])
             result["close"]()
+
+    def test_real_role_has_a_controlling_terminal_and_bounded_capture(self):
+        with tempfile.TemporaryDirectory(prefix="spec058-pty-real-test-", dir=Path.home()) as td:
+            root = Path(td)
+            stdout_path = root / "stdout.log"
+            stderr_path = root / "stderr.log"
+            code = "import os; print('TTY=%s FG=%s' % (os.isatty(1), os.tcgetpgrp(1) == os.getpgrp()), flush=True)"
+            result = executor.launch_local_role_pty(
+                "fixture", [sys.executable, "-c", code], cwd=str(root),
+                env=os.environ.copy(), stdout_path=stdout_path,
+                stderr_path=stderr_path, max_bytes=1024,
+            )
+            self.assertEqual(result["process"].wait(timeout=10), 0)
+            result["close"]()
+            self.assertIn("TTY=True FG=True", stdout_path.read_text(encoding="utf-8"))
+            self.assertIsNone(getattr(result["stdout"], "error", None))
 
 
 if __name__ == "__main__":

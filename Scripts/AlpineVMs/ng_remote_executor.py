@@ -145,6 +145,8 @@ def validate_local_profile(plan: Mapping[str, Any], cli_profile: str | None, *, 
     if cli_profile is not None and cli_profile != declared:
         raise ConfigError(f"local profile conflict: plan={declared}, cli={cli_profile}")
     if declared == "native-privileged":
+        if cli_profile != "native-privileged":
+            raise ConfigError("native-privileged local profile requires explicit CLI selection")
         effective_uid = os.geteuid() if euid is None else int(euid)
         if effective_uid != 0:
             raise ConfigError("native-privileged local profile requires effective UID 0")
@@ -155,7 +157,7 @@ def validate_local_profile(plan: Mapping[str, Any], cli_profile: str | None, *, 
 def local_host_inventory() -> dict[str, Any]:
     """Read a non-destructive host process/IPC inventory for native preflight."""
     processes: list[dict[str, Any]] = []
-    for name in ("PGCS", "NRNCS", "ContentApp"):
+    for name in ("PGCS", "NRNCS", "ContentApp", "IoTTestApp", "NBTestApp"):
         try:
             result = subprocess.run(["pgrep", "-x", name], capture_output=True, text=True, timeout=5, check=False)
         except (OSError, subprocess.SubprocessError):
@@ -166,7 +168,12 @@ def local_host_inventory() -> dict[str, Any]:
                     processes.append({"pid": int(raw_pid), "name": name})
         elif result.returncode not in {1}:
             return {"processes": None, "ipc": {"shm": None, "semaphores": None}}
-    return {"processes": processes, "ipc": local_ipc_snapshot()}
+    ipc = local_ipc_snapshot()
+    try:
+        ipc["posix_semaphores"] = sorted(str(path) for path in Path("/dev/shm").glob("sem.*"))
+    except OSError:
+        ipc["posix_semaphores"] = None
+    return {"processes": processes, "ipc": ipc}
 
 
 def _inventory_is_zero(inventory: Mapping[str, Any]) -> bool:
@@ -174,7 +181,87 @@ def _inventory_is_zero(inventory: Mapping[str, Any]) -> bool:
     ipc = inventory.get("ipc")
     if not isinstance(processes, list) or not isinstance(ipc, Mapping):
         return False
-    return not processes and all(isinstance(ipc.get(kind), (set, list, tuple)) and not ipc.get(kind) for kind in ("shm", "semaphores"))
+    kinds = ("shm", "semaphores", "queues")
+    if "posix_semaphores" in ipc:
+        kinds = kinds + ("posix_semaphores",)
+    return not processes and all(isinstance(ipc.get(kind), (set, list, tuple)) and not ipc.get(kind) for kind in kinds)
+
+
+def native_safe_environment(extra: Mapping[str, str] | None = None) -> dict[str, str]:
+    """Build a minimal privileged environment without loader/shell injection."""
+    safe = {
+        "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "TERM": "xterm",
+    }
+    if extra:
+        forbidden = {"BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "PYTHONHOME", "GCONV_PATH", "IFS", "CDPATH"}
+        for key, value in extra.items():
+            if key in forbidden or key.startswith("LD_"):
+                continue
+            if "\0" not in key and "\0" not in value:
+                safe[key] = value
+    return safe
+
+
+def _run_bounded_command(argv: list[str], *, env: Mapping[str, str], pass_fds: tuple[int, ...] = (), timeout: float = 60.0, output_limit: int = 65536) -> subprocess.CompletedProcess[bytes]:
+    """Run an argv command with bounded stdout/stderr capture and timeout."""
+    proc = subprocess.Popen(argv, env=dict(env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, pass_fds=pass_fds, close_fds=True)
+    buffers: dict[str, bytearray] = {"stdout": bytearray(), "stderr": bytearray()}
+    overflow: set[str] = set()
+
+    def drain(name: str, stream: Any) -> None:
+        if stream is None:
+            return
+        try:
+            while True:
+                chunk = stream.read(65536)
+                if not chunk:
+                    return
+                remaining = output_limit - len(buffers[name])
+                if remaining <= 0:
+                    overflow.add(name)
+                    stream.close()
+                    return
+                buffers[name].extend(chunk[:remaining])
+                if len(chunk) > remaining:
+                    overflow.add(name)
+                    stream.close()
+                    return
+        except (OSError, ValueError):
+            return
+
+    readers = [threading.Thread(target=drain, args=(name, getattr(proc, name)), daemon=True) for name in ("stdout", "stderr")]
+    for reader in readers:
+        reader.start()
+    deadline = time.monotonic() + timeout
+    while proc.poll() is None and time.monotonic() < deadline:
+        time.sleep(0.01)
+    timed_out = proc.poll() is None
+    if timed_out:
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait(timeout=5)
+    for reader in readers:
+        reader.join(timeout=2)
+    if any(reader.is_alive() for reader in readers):
+        for stream_name in ("stdout", "stderr"):
+            stream = getattr(proc, stream_name, None)
+            if stream is not None:
+                try:
+                    stream.close()
+                except OSError:
+                    pass
+    returncode = proc.returncode if proc.returncode is not None else 124
+    if timed_out:
+        returncode = 124
+    if overflow:
+        returncode = 125
+    return subprocess.CompletedProcess(argv, returncode, bytes(buffers["stdout"]), bytes(buffers["stderr"]))
 
 
 def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None = None) -> dict[str, Any]:
@@ -191,19 +278,46 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
     if script.name != "clean.sh" or not script.is_file():
         raise ConfigError("repository-owned clean.sh is missing")
     before = local_host_inventory()
+    if not _inventory_is_zero(before):
+        result = {
+            "schema_version": 1,
+            "effective_uid": effective_uid,
+            "command": None,
+            "script": file_identity(script),
+            "returncode": None,
+            "stdout": "",
+            "stderr": "",
+            "before": before,
+            "after": before,
+            "baseline": "NONZERO",
+            "ok": False,
+            "reason": "pre-clean inventory is non-empty or unavailable; refusing global cleanup",
+        }
+        local_json_write(Path(evidence_dir) / "native-cleanup.json", result)
+        return result
+    script_fd = os.open(str(script), os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0))
     try:
-        completed = subprocess.run(["bash", str(script)], capture_output=True, text=True, timeout=60, check=False)
+        command = ["bash", f"/proc/self/fd/{script_fd}"]
+        completed = _run_bounded_command(command, env=native_safe_environment(), pass_fds=(script_fd,), timeout=60.0, output_limit=65536)
     except (OSError, subprocess.SubprocessError) as exc:
-        completed = subprocess.CompletedProcess(["bash", str(script)], 125, "", str(exc))
+        command = ["bash", str(script)]
+        completed = subprocess.CompletedProcess(command, 125, b"", str(exc).encode())
+    finally:
+        try:
+            os.close(script_fd)
+        except OSError:
+            pass
     after = local_host_inventory()
+    stdout = completed.stdout.decode("utf-8", errors="replace") if isinstance(completed.stdout, bytes) else str(completed.stdout or "")
+    stderr = completed.stderr.decode("utf-8", errors="replace") if isinstance(completed.stderr, bytes) else str(completed.stderr or "")
     result = {
         "schema_version": 1,
         "effective_uid": effective_uid,
-        "command": ["bash", str(script)],
+        "command": command,
         "script": file_identity(script),
         "returncode": completed.returncode,
-        "stdout": completed.stdout[-65536:],
-        "stderr": completed.stderr[-65536:],
+        "stdout": stdout[-65536:],
+        "stderr": stderr[-65536:],
         "before": before,
         "after": after,
         "baseline": "ZERO" if _inventory_is_zero(after) else "NONZERO",
@@ -214,9 +328,11 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
 
 
 class _PtyCapture:
-    def __init__(self, master_fd: int, stdout_path: Path):
+    def __init__(self, master_fd: int, stdout_path: Path, max_bytes: int = 64 * 1024 * 1024):
         self.master_fd = master_fd
         self.stdout_path = stdout_path
+        self.max_bytes = max_bytes
+        self.bytes_captured = 0
         self.error: str | None = None
         self._closed = threading.Event()
         self._thread = threading.Thread(target=self._drain, name="ng-elc-pty-capture", daemon=True)
@@ -236,21 +352,35 @@ class _PtyCapture:
                         break
                     if not chunk:
                         break
-                    stream.write(chunk)
+                    remaining = self.max_bytes - self.bytes_captured
+                    if remaining <= 0:
+                        self.error = "PTY capture quota exceeded"
+                        break
+                    stream.write(chunk[:remaining])
                     stream.flush()
+                    self.bytes_captured += min(len(chunk), remaining)
+                    if len(chunk) > remaining:
+                        self.error = "PTY capture quota exceeded"
+                        break
         except OSError as exc:
             self.error = str(exc)
         finally:
             self._closed.set()
 
     def close(self) -> None:
+        self._thread.join(timeout=5)
+        if self._thread.is_alive():
+            try:
+                os.close(self.master_fd)
+            except OSError:
+                pass
+            self._thread.join(timeout=1)
+            if self._thread.is_alive() and self.error is None:
+                self.error = "PTY capture drain timeout"
         try:
             os.close(self.master_fd)
         except OSError:
             pass
-        self._thread.join(timeout=5)
-        if self._thread.is_alive() and self.error is None:
-            self.error = "PTY capture drain timeout"
 
 
 def _set_controlling_terminal(slave_fd: int) -> None:
@@ -259,11 +389,11 @@ def _set_controlling_terminal(slave_fd: int) -> None:
     fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)
 
 
-def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = ()) -> dict[str, Any]:
+def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = (), max_bytes: int = 64 * 1024 * 1024) -> dict[str, Any]:
     """Launch one role with a dedicated controlling PTY and bounded capture."""
     master_fd, slave_fd = pty.openpty()
     stderr = stderr_path.open("w", encoding="utf-8")
-    capture = _PtyCapture(master_fd, stdout_path)
+    capture: _PtyCapture | None = None
     try:
         proc = subprocess.Popen(
             argv,
@@ -277,17 +407,26 @@ def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: M
             text=False,
             pass_fds=pass_fds,
         )
+        capture = _PtyCapture(master_fd, stdout_path, max_bytes=max_bytes)
     except BaseException:
-        capture.close()
+        if capture is not None:
+            capture.close()
+        else:
+            try:
+                os.close(master_fd)
+            except OSError:
+                pass
         stderr.close()
-        os.close(slave_fd)
         raise
     finally:
         try:
             os.close(slave_fd)
         except OSError:
             pass
-    return {"role": role, "process": proc, "stdout": capture, "stderr": stderr, "pty": True, "close": capture.close}
+    def close_all() -> None:
+        capture.close()
+        stderr.close()
+    return {"role": role, "process": proc, "stdout": capture, "stderr": stderr, "pty": True, "close": close_all}
 
 
 def expand_argv(argv: list[str], variables: Mapping[str, str] | None = None) -> list[str]:
@@ -939,7 +1078,9 @@ def apply_local_verification(
 
 
 def local_ipc_ids(kind: str) -> set[str] | None:
-    command = ["ipcs", "-m" if kind == "shm" else "-s"]
+    command = ["ipcs", {"shm": "-m", "semaphores": "-s", "queues": "-q"}.get(kind, "")]
+    if not command[1]:
+        return None
     try:
         run = subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
     except (OSError, subprocess.SubprocessError):
@@ -947,10 +1088,15 @@ def local_ipc_ids(kind: str) -> set[str] | None:
     if run.returncode != 0:
         return None
     owner = pwd.getpwuid(os.getuid()).pw_name
-    header_token = "shmid" if kind == "shm" else "semid"
+    header_token = {"shm": "shmid", "semaphores": "semid", "queues": "msqid"}[kind]
     lines = run.stdout.splitlines()
     header_seen = False
-    header_required = {"key", header_token, "owner", "perms", "bytes", "nattch"} if kind == "shm" else {"key", header_token, "owner", "perms", "nsems"}
+    if kind == "shm":
+        header_required = {"key", header_token, "owner", "perms", "bytes", "nattch"}
+    elif kind == "semaphores":
+        header_required = {"key", header_token, "owner", "perms", "nsems"}
+    else:
+        header_required = {"key", header_token, "owner", "perms", "used-bytes", "messages"}
     ids: set[str] = set()
     for line in lines:
         fields = line.split()
@@ -968,6 +1114,8 @@ def local_ipc_ids(kind: str) -> set[str] | None:
         except ValueError:
             return None
         minimum_columns = 6 if kind == "shm" else 5
+        if kind == "queues":
+            minimum_columns = 6
         if len(fields) < minimum_columns or not fields[1].isdigit():
             return None
         permission_index = 3
@@ -976,7 +1124,10 @@ def local_ipc_ids(kind: str) -> set[str] | None:
         if kind == "shm":
             if not fields[4].isdigit() or not fields[5].isdigit():
                 return None
-        elif not fields[4].isdigit():
+        elif kind == "semaphores":
+            if not fields[4].isdigit():
+                return None
+        elif not fields[4].isdigit() or not fields[5].isdigit():
             return None
         if fields[2] == owner:
             ids.add(fields[1])
@@ -985,8 +1136,8 @@ def local_ipc_ids(kind: str) -> set[str] | None:
     return ids
 
 
-def local_ipc_snapshot() -> dict[str, set[str] | None]:
-    return {"shm": local_ipc_ids("shm"), "semaphores": local_ipc_ids("semaphores")}
+def local_ipc_snapshot() -> dict[str, Any]:
+    return {kind: local_ipc_ids(kind) for kind in ("shm", "semaphores", "queues")}
 
 
 def read_proc_stat(pid: int) -> dict[str, Any]:
@@ -2344,8 +2495,8 @@ def run_local_trial(args: argparse.Namespace) -> int:
             if profile["name"] != "native-privileged":
                 stdout = stdout_path.open("w", encoding="utf-8")
                 stderr = stderr_path.open("w", encoding="utf-8")
-            role_env = os.environ.copy()
-            role_env.update({key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()})
+            declared_role_env = {key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()}
+            role_env = native_safe_environment(declared_role_env) if profile["name"] == "native-privileged" else {**os.environ, **declared_role_env}
             role_env.update({"NG_ELC_TRIAL_ID": trial_id, "NG_ELC_TRIAL_ROLE": role["name"]})
             # The immutable image, not the checked pathname, is the launch
             # target. Its inherited fd is closed in the parent only after the
@@ -2355,7 +2506,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 launch_identity = prepare_local_executable(provenance, role["name"], checked_executable)
                 argv[0] = launch_identity["proc_path"]
                 if profile["name"] == "native-privileged":
-                    pty_launch = launch_local_role_pty(role["name"], argv, cwd=cwd, env=role_env, stdout_path=stdout_path, stderr_path=stderr_path, pass_fds=(launch_identity["fd"],))
+                    pty_launch = launch_local_role_pty(role["name"], argv, cwd=cwd, env=role_env, stdout_path=stdout_path, stderr_path=stderr_path, pass_fds=(launch_identity["fd"],), max_bytes=int(plan.get("log_quota_bytes", 64 * 1024 * 1024)))
                     proc = pty_launch["process"]
                     stdout = pty_launch["stdout"]
                     stderr = pty_launch["stderr"]
