@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -181,6 +182,27 @@ class Spec058PtyRedTests(unittest.TestCase):
             result["close"]()
             self.assertEqual(getattr(result["stdout"], "error", None), "PTY capture quota exceeded")
             self.assertLessEqual(stdout_path.stat().st_size, 128)
+
+    def test_local_observe_accepts_async_pty_capture_without_flush(self):
+        with tempfile.TemporaryDirectory(prefix="spec058-observe-pty-", dir=Path.home()) as td:
+            root = Path(td)
+            stdout_path = root / "stdout.log"
+            stderr_path = root / "stderr.log"
+            stdout_path.write_text("READY\\n", encoding="utf-8")
+            stderr_path.write_text("", encoding="utf-8")
+            item = {
+                "process": SimpleNamespace(pid=1234, poll=lambda: None),
+                "argv": ["fixture"],
+                "stdout": object(),
+                "stderr": object(),
+                "stdout_path": stdout_path,
+                "stderr_path": stderr_path,
+                "tracked_descendants": {},
+                "descendant_scan_complete": True,
+            }
+            with patch.object(executor, "local_process_descendants", return_value={"complete": True, "descendants": []}):
+                result = executor.local_observe({"Source": item}, {}, {}, [{"id": "ready", "pattern": "READY"}])
+            self.assertFalse(result.get("overflow"))
 
 
 if __name__ == "__main__":

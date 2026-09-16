@@ -1609,7 +1609,9 @@ def local_observe(processes: Mapping[str, dict[str, Any]], offsets: dict[str, in
     matches = []
     for role, item in processes.items():
         for stream, handle in (("stdout", item["stdout"]), ("stderr", item["stderr"])):
-            handle.flush()
+            flush = getattr(handle, "flush", None)
+            if callable(flush):
+                flush()
             path = item[stream + "_path"]
             if log_quota_exceeded([path], max_bytes):
                 return {"matches": matches, "processes": local_process_snapshot(processes), "overflow": True}
