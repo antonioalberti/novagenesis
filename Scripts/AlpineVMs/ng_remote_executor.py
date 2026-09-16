@@ -395,99 +395,52 @@ class _PtyCapture:
             pass
 
 
-class _PtyProcess:
-    def __init__(self, pid: int):
-        self.pid = pid
-        self.returncode: int | None = None
-
-    @staticmethod
-    def _status_code(status: int) -> int:
-        if os.WIFEXITED(status):
-            return os.WEXITSTATUS(status)
-        if os.WIFSIGNALED(status):
-            return -os.WTERMSIG(status)
-        return 125
-
-    def poll(self) -> int | None:
-        if self.returncode is not None:
-            return self.returncode
-        try:
-            pid, status = os.waitpid(self.pid, os.WNOHANG)
-        except ChildProcessError:
-            self.returncode = 125
-            return self.returncode
-        if pid == 0:
-            return None
-        self.returncode = self._status_code(status)
-        return self.returncode
-
-    def wait(self, timeout: float | None = None) -> int:
-        deadline = None if timeout is None else time.monotonic() + timeout
-        while True:
-            result = self.poll()
-            if result is not None:
-                return result
-            if deadline is not None and time.monotonic() >= deadline:
-                raise subprocess.TimeoutExpired(["pty-role"], timeout if timeout is not None else 0)
-            time.sleep(0.01)
-
-    def terminate(self) -> None:
-        os.kill(self.pid, signal.SIGTERM)
-
-    def kill(self) -> None:
-        os.kill(self.pid, signal.SIGKILL)
-
-
-def _exec_pty_child(argv: list[str], cwd: str | None, env: Mapping[str, str], pass_fds: tuple[int, ...]) -> None:
-    try:
-        if cwd:
-            os.chdir(cwd)
-        os.environ.clear()
-        os.environ.update(env)
-        keep = {0, 1, 2, *pass_fds}
-        max_fd = min(int(os.sysconf("SC_OPEN_MAX")), 4096)
-        for fd in range(3, max_fd):
-            if fd not in keep:
-                try:
-                    os.close(fd)
-                except OSError:
-                    pass
-        for fd in pass_fds:
-            os.set_inheritable(fd, True)
-        os.execvpe(argv[0], argv, dict(env))
-    except BaseException as exc:
-        try:
-            os.write(2, (f"NG-ELC PTY exec failed: {exc}\\n").encode("utf-8", errors="replace"))
-        finally:
-            os._exit(127)
-
-
 def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = (), max_bytes: int = 64 * 1024 * 1024) -> dict[str, Any]:
     """Launch one role with a dedicated controlling PTY and bounded capture."""
-    pid, master_fd = pty.fork()
-    if pid == 0:
-        _exec_pty_child(argv, cwd, env, pass_fds)
-        raise AssertionError("unreachable")
+    master_fd, slave_fd = pty.openpty()
     stderr = stderr_path.open("w", encoding="utf-8")
     capture: _PtyCapture | None = None
+    proc: subprocess.Popen[Any] | None = None
+    launch_argv = ["/usr/bin/setsid", "--wait", "--ctty", *argv]
     try:
+        proc = subprocess.Popen(
+            launch_argv,
+            cwd=cwd,
+            env=dict(env),
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=slave_fd,
+            start_new_session=False,
+            close_fds=True,
+            text=False,
+            pass_fds=pass_fds,
+        )
         capture = _PtyCapture(master_fd, stdout_path, max_bytes=max_bytes)
     except BaseException:
-        try:
-            os.kill(pid, signal.SIGKILL)
-        except OSError:
-            pass
+        if capture is not None:
+            capture.close()
+        if proc is not None:
+            try:
+                proc.terminate()
+                proc.wait(timeout=5)
+            except (OSError, subprocess.SubprocessError):
+                pass
         stderr.close()
         try:
             os.close(master_fd)
         except OSError:
             pass
         raise
-    process = _PtyProcess(pid)
+    finally:
+        try:
+            os.close(slave_fd)
+        except OSError:
+            pass
+    assert proc is not None
     def close_all() -> None:
         capture.close()
         stderr.close()
-    return {"role": role, "process": process, "stdout": capture, "stderr": stderr, "pty": True, "close": close_all}
+    return {"role": role, "process": proc, "stdout": capture, "stderr": stderr, "pty": True, "stream_topology": {"stdout_stderr_merged": True, "authoritative": "stdout.log"}, "close": close_all}
 
 
 def expand_argv(argv: list[str], variables: Mapping[str, str] | None = None) -> list[str]:
