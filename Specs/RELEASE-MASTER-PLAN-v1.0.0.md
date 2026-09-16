@@ -86,7 +86,7 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
 | M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md` | BLOCKED | Fechar runtime normal e revisão SPEC-054; a decisão fixture-only e a higiene documental do perfil já estão registadas |
-| M1 | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049, NG-055, NG-056 | SPEC-009, SPEC-046, SPEC-055, SPEC-056 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; `Specs/RESULTS-SPEC-056/` | OPEN | Fechar receipt/build real, bundle durável, ownership C01 e trial local/remote retido |
+| M1 | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049, NG-055, NG-056 | SPEC-009, SPEC-046, SPEC-055, SPEC-056, SPEC-058 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; `Specs/RESULTS-SPEC-056/` | OPEN | Fechar receipt/build real, bundle durável, ownership C01 e trial local/remote retido |
 | M2 | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050 | M1 | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/` | OPEN | Executar um trial candidato normal com os subcritérios observáveis e hashes independentes |
 | M3 | Revisão final, notas, tag e leitura de volta | NG-050 | SPEC-054, release criteria | M0–M2 | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
 
@@ -134,6 +134,7 @@ Verificação realizada em 2026-09-13:
 - Builds CMake Debug e Sanitizer passaram numa árvore temporária fora do repositório.
 - A suite local do runner passou `16/16`; a suite do NG-ELC passou `20/20`; `py_compile` e `bash -n` passaram.
 - SPEC-055 adicionou o modo local do NG-ELC; o ensaio local está selado, mas a revisão Astra devolveu `NO-GO` para aceitação.
+- SPEC-058 adiciona o perfil opt-in `native-privileged`, com root boundary, clean repository-owned e PTY; implementação/testes estão em curso, sem trial privilegiado retido.
 - O primeiro ensaio local pelo NG-ELC foi selado em `Specs/RESULTS-SPEC-055/local-intra-os-20260913-final/` com `PASS/PASS/COMPLETE`, 5 fotos, hashes Source↔Repository, manifesto íntegro e zero processos/IPC residuais; permanece evidência local reportada, não aceitação multi-VM.
 - A suite de contratos/lifecycle/observabilidade passou `44/44` na baseline actual; o ciclo anterior `42/42`, o ciclo `37/37` e o registo `30/30` são snapshots históricos; `py_compile` e `bash -n` passam nas ferramentas alteradas.
 - O trial real final `local-intra-os-spec056-final-20260913` (antes do último incremento de ownership) demonstrou `PASS/PASS/COMPLETE`, mas `local_acceptance_eligible=false` e `exit_code=21`.

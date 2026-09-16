@@ -79,7 +79,7 @@ Diferenças permitidas:
 
 | Aspecto | Remote | Local |
 |---|---|---|
-| Transporte de controlo | SSH/SCP sem PTY | subprocessos locais sem shell |
+| Transporte de controlo | SSH/SCP sem PTY | subprocessos locais sem shell por defeito; ver perfil opt-in `native-privileged` em SPEC-058 |
 | Identidade | VM, PID, starttime, executable | PID, PGID, starttime, executable |
 | Reboot | opcional, conforme plano | proibido |
 | Evidência | guest persistente + cópia local | directório local durável |
@@ -110,7 +110,7 @@ O plano deve fixar explicitamente:
 - workload de 5 fotos synthetic;
 - oráculo Source↔Repository por nomes e SHA-256.
 
-O modo local não deve chamar `run_*.sh`, `gnome-terminal`, `ssh`, `scp` ou `sudo`.
+O perfil local por defeito não deve chamar `run_*.sh`, `gnome-terminal`, `ssh`, `scp` ou `sudo`. A única excepção normativa é o perfil local opt-in `native-privileged`, definido na SPEC-058: o controlador já deve ser iniciado com EUID 0 e pode invocar apenas o `Scripts/Simple/clean.sh` do repositório por argv, sem sudo interno, wrappers arbitrários ou terminais gráficos.
 
 ## 7. Oráculo de artefactos local
 

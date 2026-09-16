@@ -5,7 +5,7 @@
 **Status:** In Progress  
 **Branch:** AIOPT3  
 **Implementation commits:** `a571e7e`, `dbf1241`, `c1f5ad8` (bounded verifier, deterministic workload and canonical R06 provenance/build-linkage increments; acceptance remains open)
-**Related:** SPEC-055-ng-elc-local-mode.md; SPEC-054-release-master-plan-and-audit.md; SPEC-046-multi-vm-runner-safe-teardown.md  
+**Related:** SPEC-055-ng-elc-local-mode.md; SPEC-058-ng-elc-privileged-local-profile.md; SPEC-054-release-master-plan-and-audit.md; SPEC-046-multi-vm-runner-safe-teardown.md
 **Task linkage:** NG-056 (child of NG-050); NG-055 (local NG-ELC)  
 **Canonical tool during SPEC-056:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`; canonical rename is separately specified by SPEC-057 and must not alter this hardening contract.
 
@@ -49,7 +49,7 @@ Use the existing NG-ELC entry point; do not introduce a parallel supervisor.
 
 - No C++ or NovaGenesis production-code changes.
 - No protocol, wire-format, payload-forwarding or pub/sub changes.
-- No SSH, SCP, VM reboot, `sudo`, shell launchers or terminal launchers in local mode.
+- No SSH, SCP, VM reboot, internal `sudo`, arbitrary shell launchers or graphical terminal launchers in the default local mode; the explicitly selected native profile is governed by SPEC-058, including its root boundary, repository-owned cleanup and PTY contract.
 - No implicit deletion of user-owned build/IO directories.
 - No remote behavior changes disguised as local hardening.
 - No local result closing G2, G3 overall, G0/G10, or any multi-VM/release gate.

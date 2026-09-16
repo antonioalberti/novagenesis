@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "local_profile": "native-privileged",
   "workload": {
     "schema_version": 1,
     "generator": {

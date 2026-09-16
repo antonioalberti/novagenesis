@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import os
+import pty
 import pwd
 import re
 import shlex
@@ -21,6 +22,8 @@ import stat
 import shutil
 import subprocess
 import sys
+import termios
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -130,6 +133,163 @@ def load_local_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     return {key: values[key] for key in LOCAL_REQUIRED_ENV} | optional
 
 
+def validate_local_profile(plan: Mapping[str, Any], cli_profile: str | None, *, mode: str, euid: int | None = None) -> dict[str, Any]:
+    """Resolve the explicit local profile without implicit privilege changes."""
+    declared = plan.get("local_profile", "unprivileged")
+    if declared not in {"unprivileged", "native-privileged"}:
+        raise ConfigError(f"unknown local profile: {declared}")
+    if mode != "local" and (declared != "unprivileged" or cli_profile is not None):
+        raise ConfigError("local profiles are not valid in remote mode")
+    if cli_profile is not None and cli_profile not in {"unprivileged", "native-privileged"}:
+        raise ConfigError(f"unknown local profile: {cli_profile}")
+    if cli_profile is not None and cli_profile != declared:
+        raise ConfigError(f"local profile conflict: plan={declared}, cli={cli_profile}")
+    if declared == "native-privileged":
+        effective_uid = os.geteuid() if euid is None else int(euid)
+        if effective_uid != 0:
+            raise ConfigError("native-privileged local profile requires effective UID 0")
+        return {"name": declared, "euid": effective_uid, "explicit": True}
+    return {"name": "unprivileged", "euid": os.geteuid() if euid is None else int(euid), "explicit": cli_profile is not None}
+
+
+def local_host_inventory() -> dict[str, Any]:
+    """Read a non-destructive host process/IPC inventory for native preflight."""
+    processes: list[dict[str, Any]] = []
+    for name in ("PGCS", "NRNCS", "ContentApp"):
+        try:
+            result = subprocess.run(["pgrep", "-x", name], capture_output=True, text=True, timeout=5, check=False)
+        except (OSError, subprocess.SubprocessError):
+            return {"processes": None, "ipc": {"shm": None, "semaphores": None}}
+        if result.returncode == 0:
+            for raw_pid in result.stdout.split():
+                if raw_pid.isdigit():
+                    processes.append({"pid": int(raw_pid), "name": name})
+        elif result.returncode not in {1}:
+            return {"processes": None, "ipc": {"shm": None, "semaphores": None}}
+    return {"processes": processes, "ipc": local_ipc_snapshot()}
+
+
+def _inventory_is_zero(inventory: Mapping[str, Any]) -> bool:
+    processes = inventory.get("processes")
+    ipc = inventory.get("ipc")
+    if not isinstance(processes, list) or not isinstance(ipc, Mapping):
+        return False
+    return not processes and all(isinstance(ipc.get(kind), (set, list, tuple)) and not ipc.get(kind) for kind in ("shm", "semaphores"))
+
+
+def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None = None) -> dict[str, Any]:
+    """Run only the repository-owned cleanup and fail closed on ambiguity."""
+    effective_uid = os.geteuid() if euid is None else int(euid)
+    if effective_uid != 0:
+        raise ConfigError("native cleanup requires effective UID 0")
+    repo = Path(repo_path).resolve(strict=True)
+    script = (repo / "Scripts" / "Simple" / "clean.sh").resolve(strict=True)
+    try:
+        script.relative_to(repo)
+    except ValueError as exc:
+        raise ConfigError("native cleanup script escapes repository") from exc
+    if script.name != "clean.sh" or not script.is_file():
+        raise ConfigError("repository-owned clean.sh is missing")
+    before = local_host_inventory()
+    try:
+        completed = subprocess.run(["bash", str(script)], capture_output=True, text=True, timeout=60, check=False)
+    except (OSError, subprocess.SubprocessError) as exc:
+        completed = subprocess.CompletedProcess(["bash", str(script)], 125, "", str(exc))
+    after = local_host_inventory()
+    result = {
+        "schema_version": 1,
+        "effective_uid": effective_uid,
+        "command": ["bash", str(script)],
+        "script": file_identity(script),
+        "returncode": completed.returncode,
+        "stdout": completed.stdout[-65536:],
+        "stderr": completed.stderr[-65536:],
+        "before": before,
+        "after": after,
+        "baseline": "ZERO" if _inventory_is_zero(after) else "NONZERO",
+        "ok": completed.returncode == 0 and _inventory_is_zero(after),
+    }
+    local_json_write(Path(evidence_dir) / "native-cleanup.json", result)
+    return result
+
+
+class _PtyCapture:
+    def __init__(self, master_fd: int, stdout_path: Path):
+        self.master_fd = master_fd
+        self.stdout_path = stdout_path
+        self.error: str | None = None
+        self._closed = threading.Event()
+        self._thread = threading.Thread(target=self._drain, name="ng-elc-pty-capture", daemon=True)
+        self._thread.start()
+
+    def _drain(self) -> None:
+        try:
+            self.stdout_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.stdout_path.open("wb") as stream:
+                while True:
+                    try:
+                        chunk = os.read(self.master_fd, 65536)
+                    except OSError as exc:
+                        if getattr(exc, "errno", None) == 5:
+                            break
+                        self.error = str(exc)
+                        break
+                    if not chunk:
+                        break
+                    stream.write(chunk)
+                    stream.flush()
+        except OSError as exc:
+            self.error = str(exc)
+        finally:
+            self._closed.set()
+
+    def close(self) -> None:
+        try:
+            os.close(self.master_fd)
+        except OSError:
+            pass
+        self._thread.join(timeout=5)
+        if self._thread.is_alive() and self.error is None:
+            self.error = "PTY capture drain timeout"
+
+
+def _set_controlling_terminal(slave_fd: int) -> None:
+    if fcntl is None:
+        raise RuntimeError("PTY controlling-terminal support is unavailable")
+    fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)
+
+
+def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = ()) -> dict[str, Any]:
+    """Launch one role with a dedicated controlling PTY and bounded capture."""
+    master_fd, slave_fd = pty.openpty()
+    stderr = stderr_path.open("w", encoding="utf-8")
+    capture = _PtyCapture(master_fd, stdout_path)
+    try:
+        proc = subprocess.Popen(
+            argv,
+            cwd=cwd,
+            env=dict(env),
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=stderr,
+            start_new_session=True,
+            preexec_fn=lambda: _set_controlling_terminal(slave_fd),
+            text=False,
+            pass_fds=pass_fds,
+        )
+    except BaseException:
+        capture.close()
+        stderr.close()
+        os.close(slave_fd)
+        raise
+    finally:
+        try:
+            os.close(slave_fd)
+        except OSError:
+            pass
+    return {"role": role, "process": proc, "stdout": capture, "stderr": stderr, "pty": True, "close": capture.close}
+
+
 def expand_argv(argv: list[str], variables: Mapping[str, str] | None = None) -> list[str]:
     vars_ = dict(os.environ if variables is None else variables)
     out = []
@@ -183,6 +343,11 @@ def validate_plan(plan: dict[str, Any], mode: str = "remote") -> None:
         raise ValueError("log_quota_bytes outside bounded range")
     if not isinstance(plan.get("diagnostic_only", False), bool):
         raise ValueError("diagnostic_only must be boolean")
+    profile = plan.get("local_profile", "unprivileged")
+    if mode == "local" and profile not in {"unprivileged", "native-privileged"}:
+        raise ValueError("local_profile must be unprivileged or native-privileged")
+    if mode != "local" and "local_profile" in plan:
+        raise ValueError("local_profile is only valid in local mode")
     if mode == "local" and "workload" in plan:
         validate_workload_spec(plan["workload"])
     oracle = plan.get("runtime_oracle")
@@ -2079,6 +2244,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     global _LOCAL_SECRET_VALUES
     config = load_local_config(getattr(args, "env", None))
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="local")
+    profile = validate_local_profile(plan, getattr(args, "local_profile", None), mode="local")
     trial_id = validate_trial_id(args.trial or utc_id())
     evidence_root = Path(config["NG_LOCAL_EVIDENCE_PATH"]).resolve()
     evidence_dir = evidence_root / trial_id
@@ -2086,7 +2252,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
         raise ConfigError(f"local evidence directory already exists: {evidence_dir}")
     evidence_dir.mkdir(parents=True)
     events = evidence_dir / "controller-events.jsonl"
-    local_record(events, "trial-start", trial_id=trial_id, scenario=args.scenario, debug_profile=args.debug_profile, contract_level=contract["level"], mode="local")
+    local_record(events, "trial-start", trial_id=trial_id, scenario=args.scenario, debug_profile=args.debug_profile, contract_level=contract["level"], mode="local", local_profile=profile["name"], effective_uid=profile["euid"])
     variables = dict(config)
     variables["TRIAL_ID"] = trial_id
     _LOCAL_SECRET_VALUES = collect_secret_values({"plan": _expand_value_for_secrets(plan, variables), "config": variables})
@@ -2119,6 +2285,8 @@ def run_local_trial(args: argparse.Namespace) -> int:
     provenance["workload_verified"] = bool(workload["verified"])
     provenance["workload_error"] = workload.get("reason")
     provenance["evidence_schema_v2"] = True
+    provenance["local_profile"] = profile["name"]
+    provenance["effective_uid"] = profile["euid"]
     provenance["ownership_anchor"] = ownership_anchor
     if not ownership_anchor.get("verified"):
         provenance.setdefault("protected_input_blockers", []).append("ownership anchor could not be verified")
@@ -2149,6 +2317,13 @@ def run_local_trial(args: argparse.Namespace) -> int:
         local_record(events, "preflight", result=preflight)
         if not preflight["ok"]:
             raise ConfigError("local preflight rejected: " + ", ".join(preflight["errors"]))
+        if profile["name"] == "native-privileged":
+            cleanup = run_native_cleanup(Path(effective_config["NG_LOCAL_REPO_PATH"]), evidence_dir, euid=profile["euid"])
+            local_record(events, "native-cleanup", result=cleanup)
+            if not cleanup["ok"]:
+                raise ConfigError("native privileged cleanup did not establish a zero baseline")
+            before_ipc = local_ipc_snapshot()
+            local_json_write(evidence_dir / "inventory" / "baseline.json", {"schema_version": 2, "processes": [], "ipc": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}})
         if not ownership_anchor.get("verified"):
             raise ConfigError("local ownership anchor is not verified; refusing to launch")
         for role in plan["roles"]:
@@ -2163,27 +2338,42 @@ def run_local_trial(args: argparse.Namespace) -> int:
             role_dir.mkdir(parents=True, exist_ok=True)
             stdout_path = role_dir / "stdout.log"
             stderr_path = role_dir / "stderr.log"
-            stdout = stdout_path.open("w", encoding="utf-8")
-            stderr = stderr_path.open("w", encoding="utf-8")
+            stdout: Any = None
+            stderr: Any = None
+            pty_launch: dict[str, Any] | None = None
+            if profile["name"] != "native-privileged":
+                stdout = stdout_path.open("w", encoding="utf-8")
+                stderr = stderr_path.open("w", encoding="utf-8")
             role_env = os.environ.copy()
             role_env.update({key: expand_argv([value], variables)[0] for key, value in role.get("env", {}).items()})
             role_env.update({"NG_ELC_TRIAL_ID": trial_id, "NG_ELC_TRIAL_ROLE": role["name"]})
             # The immutable image, not the checked pathname, is the launch
-            # target.  Its inherited fd is closed in the parent only after
-            # Popen has completed the fork/exec handoff.
+            # target. Its inherited fd is closed in the parent only after the
+            # Popen fork/exec handoff.
             launch_identity: dict[str, Any] | None = None
             try:
                 launch_identity = prepare_local_executable(provenance, role["name"], checked_executable)
                 argv[0] = launch_identity["proc_path"]
-                proc = subprocess.Popen(argv, cwd=cwd, env=role_env, stdout=stdout, stderr=stderr, start_new_session=True, text=True, pass_fds=(launch_identity["fd"],))
+                if profile["name"] == "native-privileged":
+                    pty_launch = launch_local_role_pty(role["name"], argv, cwd=cwd, env=role_env, stdout_path=stdout_path, stderr_path=stderr_path, pass_fds=(launch_identity["fd"],))
+                    proc = pty_launch["process"]
+                    stdout = pty_launch["stdout"]
+                    stderr = pty_launch["stderr"]
+                else:
+                    proc = subprocess.Popen(argv, cwd=cwd, env=role_env, stdout=stdout, stderr=stderr, start_new_session=True, text=True, pass_fds=(launch_identity["fd"],))
             except Exception:
                 if launch_identity is not None and launch_identity.get("fd") is not None:
                     try:
                         os.close(launch_identity["fd"])
                     except OSError:
                         pass
-                stdout.close()
-                stderr.close()
+                if pty_launch is not None:
+                    pty_launch["close"]()
+                else:
+                    if stdout is not None:
+                        stdout.close()
+                    if stderr is not None:
+                        stderr.close()
                 raise
             try:
                 os.close(launch_identity["fd"])
@@ -2354,6 +2544,12 @@ def run_local_trial(args: argparse.Namespace) -> int:
             local_json_write(evidence_dir / "roles" / role / "exit.json", {"role": role, "pid": proc.pid, "returncode": proc.returncode, "group_members_after_stop": members, "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)), "descendant_rollback_ledger": item.get("descendant_rollback_ledger", {}), "rollback_uncertain": item.get("rollback_uncertain", False), "unresolved": item.get("unresolved", False)})
             item["stdout"].close()
             item["stderr"].close()
+            capture_error = getattr(item["stdout"], "error", None)
+            if capture_error:
+                runtime = preserve_runtime_failure(runtime)
+                evidence_result = "INCOMPLETE"
+                teardown_result = "FAIL"
+                local_record(events, "pty-capture-error", role=role, error=capture_error)
         oracle = effective_oracle
         if oracle and oracle.get("type") == "files":
             try:
@@ -2398,7 +2594,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     code = 130 if interrupted and teardown_result == "PASS" and evidence_result == "COMPLETE" else classify_result(runtime, teardown_result, evidence_result)
     if not eligibility["eligible"] and code == 0:
         code = 21
-    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "protected_input_blockers": protected_input_blockers, "exit_code": code}
+    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "local_profile": profile["name"], "effective_uid": profile["euid"], "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "protected_input_blockers": protected_input_blockers, "exit_code": code}
     result_path = evidence_dir / "result.json"
     local_json_write(result_path, result)
     try:
@@ -2627,7 +2823,8 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
     mode = getattr(args, "mode", "remote")
     config = load_local_config() if mode == "local" else load_config_from_env()
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode=mode)
-    print(json.dumps({"ok": True, "operation": "dry-run", "mode": mode, "scenario": args.scenario, "debug_profile": args.debug_profile, "roles": [r["name"] for r in plan["roles"]], "contract_level": contract["level"], "config_keys": sorted(config)}, ensure_ascii=False, indent=2))
+    profile = validate_local_profile(plan, getattr(args, "local_profile", None), mode=mode)
+    print(json.dumps({"ok": True, "operation": "dry-run", "mode": mode, "scenario": args.scenario, "debug_profile": args.debug_profile, "local_profile": profile["name"], "roles": [r["name"] for r in plan["roles"]], "contract_level": contract["level"], "config_keys": sorted(config)}, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -2733,11 +2930,12 @@ def cmd_preflight(args: argparse.Namespace) -> int:
     if mode == "local":
         config = load_local_config()
         plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="local")
+        profile = validate_local_profile(plan, getattr(args, "local_profile", None), mode="local")
         paths = {key: str(Path(config[key]).resolve()) for key in LOCAL_REQUIRED_ENV}
         errors = [f"{key} path missing" for key, value in paths.items() if key != "NG_LOCAL_EVIDENCE_PATH" and not Path(value).exists()]
         if errors:
             raise ConfigError("local preflight rejected: " + ", ".join(errors))
-        print(json.dumps({"ok": True, "operation": "preflight", "mode": "local", "scenario": args.scenario, "contract_level": contract["level"], "paths": paths}, ensure_ascii=False, indent=2))
+        print(json.dumps({"ok": True, "operation": "preflight", "mode": "local", "scenario": args.scenario, "local_profile": profile["name"], "contract_level": contract["level"], "paths": paths}, ensure_ascii=False, indent=2))
         return 0
     config = load_config_from_env()
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="remote")
@@ -2765,12 +2963,14 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--scenario", required=True, choices=sorted(SCENARIOS))
         sp.add_argument("--mode", choices=("remote", "local"), default="remote")
         sp.add_argument("--debug-profile", default="obs-normal")
+        sp.add_argument("--local-profile", choices=("unprivileged", "native-privileged"), default=None)
         sp.set_defaults(func=fn)
     run = sub.add_parser("run")
     run.add_argument("--plan", required=True)
     run.add_argument("--scenario", required=True, choices=sorted(SCENARIOS))
     run.add_argument("--mode", choices=("remote", "local"), default="remote")
     run.add_argument("--debug-profile", default="obs-normal")
+    run.add_argument("--local-profile", choices=("unprivileged", "native-privileged"), default=None)
     run.add_argument("--helper-local", default=str(Path(__file__).parent / "remote" / "ng_trial_helper.py"))
     run.add_argument("--trial")
     run.set_defaults(func=cmd_run)
