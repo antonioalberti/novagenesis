@@ -4,7 +4,7 @@
 **Date:** 2026-09-16
 **Status:** In Progress
 **Branch:** AIOPT3
-**Implementation commit:** `6a28988` (profile validation, privileged cleanup preflight, PTY-backed native launch/capture, RED→GREEN tests; runtime acceptance remains open)
+**Implementation commit:** `6a28988`, `c12692a` (profile validation, pre-clean ownership gate, bounded privileged cleanup, PTY-backed native launch/capture, RED→GREEN tests; runtime acceptance remains open)
 **Related:** SPEC-055-ng-elc-local-mode.md; SPEC-056-ng-elc-evidence-provenance-hardening.md; SPEC-054-release-master-plan-and-audit.md
 **Task linkage:** NG-056 (child of NG-050)
 **Canonical tool:** `NG Experiment Lifecycle Controller (NG-ELC)` — `Scripts/AlpineVMs/ng_remote_executor.py`
