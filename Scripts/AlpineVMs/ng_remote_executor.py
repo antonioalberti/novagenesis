@@ -1219,7 +1219,7 @@ def process_euid(pid: int) -> int | None:
         for line in Path(f"/proc/{pid}/status").read_text(encoding="utf-8").splitlines():
             if line.startswith("Uid:"):
                 fields = line.split()
-                return int(fields[1])
+                return int(fields[2])
     except (OSError, ValueError, IndexError):
         return None
     return None
@@ -2268,8 +2268,8 @@ def attribute_new_ipc(before: Mapping[str, set[str] | None], after: Mapping[str,
     return {"ok": reason is None, "owned": owned, "unattributed": unattributed, "reason": reason}
 
 
-def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[int]) -> tuple[bool, dict[str, list[str]], str | None]:
-    after = local_ipc_snapshot()
+def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[int], *, include_foreign: bool = False) -> tuple[bool, dict[str, list[str]], str | None]:
+    after = local_ipc_snapshot(include_foreign=include_foreign)
     kinds = ("shm", "semaphores", "queues")
     new_ids = {kind: sorted((after.get(kind) or set()) - (before.get(kind) or set())) for kind in kinds}
     new_ids["posix_semaphores"] = sorted((after.get("posix_semaphores") or set()) - (before.get("posix_semaphores") or set()))
@@ -2291,7 +2291,7 @@ def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[
             if run.returncode != 0:
                 ipcrm_failed = True
                 ok = False
-    remaining = local_ipc_snapshot()
+    remaining = local_ipc_snapshot(include_foreign=include_foreign)
     if any(remaining.get(kind) is None or before.get(kind) is None for kind in (*kinds, "posix_semaphores")):
         return False, new_ids, "inventory-unavailable"
     residual = any((remaining.get(kind) or set()) - (before.get(kind) or set()) for kind in (*kinds, "posix_semaphores"))
@@ -2513,7 +2513,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     local_json_write(evidence_dir / "provenance.json", provenance)
     local_record(events, "provenance-written", provenance_path=str(evidence_dir / "provenance.json"), acceptance_eligibility=eligibility)
     processes: dict[str, dict[str, Any]] = {}
-    before_ipc = local_ipc_snapshot()
+    before_ipc = local_ipc_snapshot(include_foreign=profile["name"] == "native-privileged")
     local_json_write(evidence_dir / "inventory" / "baseline.json", {"schema_version": 2, "processes": [], "ipc": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}})
     runtime = "PASS"
     teardown_result = "PASS" if ownership_anchor.get("verified") else "UNKNOWN"
@@ -2540,7 +2540,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
             local_record(events, "native-cleanup", result=cleanup)
             if not cleanup["ok"]:
                 raise ConfigError("native privileged cleanup did not establish a zero baseline")
-            before_ipc = local_ipc_snapshot()
+            before_ipc = local_ipc_snapshot(include_foreign=profile["name"] == "native-privileged")
             local_json_write(evidence_dir / "inventory" / "baseline.json", {"schema_version": 2, "processes": [], "ipc": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}})
         if not ownership_anchor.get("verified"):
             raise ConfigError("local ownership anchor is not verified; refusing to launch")
@@ -2791,7 +2791,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
         local_json_write(evidence_dir / "oracle.json", oracle_snapshot)
         local_json_write(evidence_dir / "preservation.json", {"schema_version": 2, "verified": bool(oracle_snapshot.get("preservation_verified")), "before_temporary_cleanup": True, "oracle": "oracle.json"})
         local_json_write(evidence_dir / "inventory" / "pre-cleanup.json", {"schema_version": 2, "processes": local_process_snapshot(processes), "ipc": {"baseline": {kind: (sorted(value) if isinstance(value, set) else None) for kind, value in before_ipc.items()}}})
-        ipc_ok, new_ipc, ipc_reason = local_remove_new_ipc(before_ipc, {item["process"].pid for item in processes.values()})
+        ipc_ok, new_ipc, ipc_reason = local_remove_new_ipc(before_ipc, {item["process"].pid for item in processes.values()}, include_foreign=profile["name"] == "native-privileged")
         local_record(events, "inventory", processes=local_process_snapshot(processes), ipc_new_ids=new_ipc, ipc_cleanup=ipc_ok, ipc_cleanup_reason=ipc_reason)
         if not ipc_ok:
             teardown_result = "FAIL"
