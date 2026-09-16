@@ -123,6 +123,8 @@ class Spec058CleanupRedTests(unittest.TestCase):
             self.assertNotIn("BASH_ENV", env)
             self.assertNotIn("LD_PRELOAD", env)
             self.assertEqual(env["PATH"], "/usr/sbin:/usr/bin:/sbin:/bin")
+            self.assertEqual(env["NG_ELC_NATIVE"], "1")
+            self.assertEqual(env["NG_CLEAN_BASE"], str(repo.resolve()))
 
 
 class Spec058PtyRedTests(unittest.TestCase):

@@ -306,7 +306,7 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
         return result
     try:
         command = ["bash", f"/proc/self/fd/{script_fd}"]
-        completed = _run_bounded_command(command, env=native_safe_environment(), pass_fds=(script_fd,), timeout=60.0, output_limit=65536)
+        completed = _run_bounded_command(command, env=native_safe_environment({"NG_ELC_NATIVE": "1", "NG_CLEAN_BASE": str(repo)}), pass_fds=(script_fd,), timeout=60.0, output_limit=65536)
     except (OSError, subprocess.SubprocessError) as exc:
         command = ["bash", str(script)]
         completed = subprocess.CompletedProcess(command, 125, b"", str(exc).encode())

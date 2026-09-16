@@ -5,6 +5,18 @@
 # Active components: PGCS, NRNCS, ContentApp, IoTTestApp, NBTestApp
 
 set -e
+
+# The NG-ELC native profile performs complete process/IPC inventory itself.
+# Never run the legacy global cleanup actions from a /proc/fd script path.
+if [[ "${NG_ELC_NATIVE:-0}" == "1" ]]; then
+    BASE="${NG_CLEAN_BASE:-}"
+    if [[ -z "$BASE" || "$BASE" != /* || ! -d "$BASE" ]]; then
+        echo "native cleanup requires an absolute valid NG_CLEAN_BASE" >&2
+        exit 2
+    fi
+    echo "=== Native NG-ELC pre-clean: inventory delegated to controller ==="
+    exit 0
+fi
 BASE=$(cd "$(dirname "$0")/../.." && pwd)
 ME=$(whoami)
 
