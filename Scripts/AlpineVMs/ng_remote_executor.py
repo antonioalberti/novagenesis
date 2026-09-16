@@ -187,16 +187,18 @@ def _inventory_is_zero(inventory: Mapping[str, Any]) -> bool:
 
 def native_safe_environment(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """Build a minimal privileged environment without loader/shell injection."""
-    safe = {
+    protected = {
         "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
-        "LANG": "C",
-        "LC_ALL": "C",
+        "HOME": "/root",
+        "IFS": " \t\n",
         "TERM": "xterm",
     }
+    safe = dict(protected)
+    safe.update({"LANG": "C", "LC_ALL": "C"})
     if extra:
-        forbidden = {"BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "PYTHONHOME", "GCONV_PATH", "IFS", "CDPATH"}
+        forbidden = {"BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH", "PYTHONHOME", "GCONV_PATH", "CDPATH"}
         for key, value in extra.items():
-            if key in forbidden or key.startswith("LD_"):
+            if key in forbidden or key in protected or key.startswith("LD_"):
                 continue
             if "\0" not in key and "\0" not in value:
                 safe[key] = value
@@ -1212,6 +1214,17 @@ def process_starttime(pid: int) -> str | None:
     return record.get("starttime") if record.get("status") == "ok" else None
 
 
+def process_euid(pid: int) -> int | None:
+    try:
+        for line in Path(f"/proc/{pid}/status").read_text(encoding="utf-8").splitlines():
+            if line.startswith("Uid:"):
+                fields = line.split()
+                return int(fields[1])
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
+
+
 def process_state(pid: int) -> str | None:
     record = _safe_read_proc_stat(pid)
     return record.get("state") if record.get("status") == "ok" else None
@@ -1563,6 +1576,7 @@ def local_process_snapshot(processes: Mapping[str, dict[str, Any]]) -> list[dict
             "returncode": proc.poll(),
             "running": proc.poll() is None,
             "executable": item["argv"][0],
+            "euid": item.get("euid"),
             "launched_identity": item.get("launched_identity"),
             "tracked_descendants": sorted(item.get("tracked_descendants", {}).values(), key=lambda child: child.get("pid", 0)),
             "descendant_scan_seen": item.get("descendant_scan_seen", False),
@@ -2378,6 +2392,9 @@ def register_local_process(
         if executable.get("status") != "ok":
             raise RuntimeError("process executable identity unavailable")
         item["executable"] = executable["path"]
+        item["euid"] = process_euid(proc.pid)
+        if item["euid"] is None:
+            raise RuntimeError("process EUID identity unavailable")
     except BaseException as exc:
         # Keep the ledger entry while rollback checks complete.  Never use a
         # Popen handle alone as signalling authority when PID/starttime/PGID
@@ -2581,6 +2598,8 @@ def run_local_trial(args: argparse.Namespace) -> int:
             except OSError:
                 pass
             registered = register_local_process(processes, role["name"], proc, argv, stdout, stderr, stdout_path, stderr_path, launch_identity)
+            if profile["name"] == "native-privileged" and registered.get("euid") != 0:
+                raise ConfigError(f"native role {role['name']} did not run with effective UID 0")
             registered["launched_identity"]["child_pid"] = proc.pid
             launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": registered["pgid"], "starttime": registered["starttime"], "executable": registered["launched_identity"]["proc_path"], "argv": argv, "cwd": cwd, "launched_identity": registered["launched_identity"], "stream_topology": pty_launch.get("stream_topology") if pty_launch is not None else {"stdout_stderr_merged": False, "authoritative": "stdout.log"}})
             local_record(events, "launch", **launch_public)
