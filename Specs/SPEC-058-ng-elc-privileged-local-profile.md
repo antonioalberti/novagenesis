@@ -56,7 +56,7 @@ The native profile MUST be selected by both:
 
 The exact CLI spelling is an implementation detail to be fixed by the tests and implementation, but the plan and CLI MUST agree. Unknown, conflicting, omitted or remote-mode profile declarations MUST fail closed. Effective UID 0 alone MUST NOT select this profile.
 
-The selected profile, plan value, CLI value and effective UID MUST be persisted in the evidence bundle before any role launch.
+The selected profile, plan value, CLI value, explicitness of both selections and effective UID MUST be persisted in the evidence bundle before any role launch.
 
 ### 3.2 Root boundary
 
@@ -81,7 +81,7 @@ The controller MUST persist:
 - pre-clean inventory and ownership classification;
 - post-clean process and IPC inventory.
 
-Because the repository cleanup script contains legacy global process/IPC removal, the pre-clean inventory MUST already be complete and empty. Any foreign process, System V shared-memory/semaphore/message-queue object, named POSIX semaphore, unreadable inventory or ambiguous ownership MUST block invocation; the controller MUST never invoke the script merely to make the inventory empty. The script MUST be opened without symlink following and executed through a retained file descriptor, with a sanitized environment and bounded output capture. The recorded command and pre-execution script identity MUST be retained.
+Because the repository cleanup script contains legacy global process/IPC removal, the pre-clean inventory MUST already be complete and empty. Any foreign process, any System V shared-memory/semaphore/message-queue object regardless of owner, named POSIX semaphore, unreadable inventory or ambiguous ownership MUST block invocation; the controller MUST never invoke the script merely to make the inventory empty. Inventory commands MUST use trusted absolute tool paths and a sanitized environment. The script MUST be opened without symlink following and executed through a retained file descriptor, with a sanitized environment and bounded output capture. The recorded command and pre-execution script identity MUST be retained.
 
 Nonzero cleanup status, incomplete inventory, ambiguous ownership or failure to establish the declared zero-process/zero-IPC baseline MUST block role launch. The controller MUST not delete foreign resources to obtain a zero baseline. The exact baseline scope MUST be explicit in the plan and evidence.
 
@@ -103,7 +103,7 @@ Each role MUST use one dedicated PTY pair. The implementation MUST define and te
 - partial reads, decoding boundaries, PTY EOF/closure, output backpressure and final drain;
 - output/log quota enforcement, truncation/error recording and bounded drain finalization.
 
-The capture reader MUST NOT be started before a threaded `fork`/`preexec_fn` launch boundary. After launch it MUST drain concurrently, enforce the declared byte quota, preserve final output before closing the master, and record any timeout or write/EOF ambiguity.
+The implementation MUST use a PTY-native child/session boundary that establishes the controlling terminal without Python `preexec_fn` execution after capture threads exist. After the child boundary is established, the controller MUST drain concurrently, enforce the declared byte quota, preserve final output before closing the master, and record any timeout or write/EOF ambiguity.
 
 The initial implementation SHOULD attach the PTY to role stdin/stdout and retain stderr as a separate durable file, unless a reviewed alternative preserves equivalent provenance. The evidence schema MUST state which stream is authoritative; stdout/stderr MUST NOT be presented as independently captured when they were merged.
 

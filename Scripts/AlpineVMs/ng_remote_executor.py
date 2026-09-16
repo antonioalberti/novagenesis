@@ -150,8 +150,8 @@ def validate_local_profile(plan: Mapping[str, Any], cli_profile: str | None, *, 
         effective_uid = os.geteuid() if euid is None else int(euid)
         if effective_uid != 0:
             raise ConfigError("native-privileged local profile requires effective UID 0")
-        return {"name": declared, "euid": effective_uid, "explicit": True}
-    return {"name": "unprivileged", "euid": os.geteuid() if euid is None else int(euid), "explicit": cli_profile is not None}
+        return {"name": declared, "euid": effective_uid, "explicit": True, "plan_profile": declared, "cli_profile": cli_profile, "plan_explicit": True, "cli_explicit": True}
+    return {"name": "unprivileged", "euid": os.geteuid() if euid is None else int(euid), "explicit": cli_profile is not None, "plan_profile": declared, "cli_profile": cli_profile, "plan_explicit": "local_profile" in plan, "cli_explicit": cli_profile is not None}
 
 
 def local_host_inventory() -> dict[str, Any]:
@@ -159,7 +159,7 @@ def local_host_inventory() -> dict[str, Any]:
     processes: list[dict[str, Any]] = []
     for name in ("PGCS", "NRNCS", "ContentApp", "IoTTestApp", "NBTestApp"):
         try:
-            result = subprocess.run(["pgrep", "-x", name], capture_output=True, text=True, timeout=5, check=False)
+            result = subprocess.run(["/usr/bin/pgrep", "-x", name], capture_output=True, text=True, timeout=5, check=False, env=native_safe_environment())
         except (OSError, subprocess.SubprocessError):
             return {"processes": None, "ipc": {"shm": None, "semaphores": None}}
         if result.returncode == 0:
@@ -168,7 +168,7 @@ def local_host_inventory() -> dict[str, Any]:
                     processes.append({"pid": int(raw_pid), "name": name})
         elif result.returncode not in {1}:
             return {"processes": None, "ipc": {"shm": None, "semaphores": None}}
-    ipc = local_ipc_snapshot()
+    ipc = local_ipc_snapshot(include_foreign=True)
     try:
         ipc["posix_semaphores"] = sorted(str(path) for path in Path("/dev/shm").glob("sem.*"))
     except OSError:
@@ -270,20 +270,28 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
     if effective_uid != 0:
         raise ConfigError("native cleanup requires effective UID 0")
     repo = Path(repo_path).resolve(strict=True)
-    script = (repo / "Scripts" / "Simple" / "clean.sh").resolve(strict=True)
+    script_candidate = repo / "Scripts" / "Simple" / "clean.sh"
+    try:
+        script_fd = os.open(str(script_candidate), os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0))
+        script = Path(os.readlink(f"/proc/self/fd/{script_fd}")).resolve(strict=True)
+    except OSError as exc:
+        raise ConfigError(f"repository-owned clean.sh cannot be opened safely: {exc}") from exc
     try:
         script.relative_to(repo)
     except ValueError as exc:
+        os.close(script_fd)
         raise ConfigError("native cleanup script escapes repository") from exc
     if script.name != "clean.sh" or not script.is_file():
+        os.close(script_fd)
         raise ConfigError("repository-owned clean.sh is missing")
+    script_identity_before = file_identity(script)
     before = local_host_inventory()
     if not _inventory_is_zero(before):
         result = {
             "schema_version": 1,
             "effective_uid": effective_uid,
             "command": None,
-            "script": file_identity(script),
+            "script": script_identity_before,
             "returncode": None,
             "stdout": "",
             "stderr": "",
@@ -294,8 +302,8 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
             "reason": "pre-clean inventory is non-empty or unavailable; refusing global cleanup",
         }
         local_json_write(Path(evidence_dir) / "native-cleanup.json", result)
+        os.close(script_fd)
         return result
-    script_fd = os.open(str(script), os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0))
     try:
         command = ["bash", f"/proc/self/fd/{script_fd}"]
         completed = _run_bounded_command(command, env=native_safe_environment(), pass_fds=(script_fd,), timeout=60.0, output_limit=65536)
@@ -310,18 +318,22 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
     after = local_host_inventory()
     stdout = completed.stdout.decode("utf-8", errors="replace") if isinstance(completed.stdout, bytes) else str(completed.stdout or "")
     stderr = completed.stderr.decode("utf-8", errors="replace") if isinstance(completed.stderr, bytes) else str(completed.stderr or "")
+    script_identity_after = file_identity(script)
+    script_stable = script_identity_after == script_identity_before
     result = {
         "schema_version": 1,
         "effective_uid": effective_uid,
         "command": command,
-        "script": file_identity(script),
+        "script": script_identity_before,
+        "script_identity_after": script_identity_after,
+        "script_stable": script_stable,
         "returncode": completed.returncode,
         "stdout": stdout[-65536:],
         "stderr": stderr[-65536:],
         "before": before,
         "after": after,
         "baseline": "ZERO" if _inventory_is_zero(after) else "NONZERO",
-        "ok": completed.returncode == 0 and _inventory_is_zero(after),
+        "ok": completed.returncode == 0 and script_stable and _inventory_is_zero(after),
     }
     local_json_write(Path(evidence_dir) / "native-cleanup.json", result)
     return result
@@ -383,50 +395,99 @@ class _PtyCapture:
             pass
 
 
-def _set_controlling_terminal(slave_fd: int) -> None:
-    if fcntl is None:
-        raise RuntimeError("PTY controlling-terminal support is unavailable")
-    fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)
+class _PtyProcess:
+    def __init__(self, pid: int):
+        self.pid = pid
+        self.returncode: int | None = None
+
+    @staticmethod
+    def _status_code(status: int) -> int:
+        if os.WIFEXITED(status):
+            return os.WEXITSTATUS(status)
+        if os.WIFSIGNALED(status):
+            return -os.WTERMSIG(status)
+        return 125
+
+    def poll(self) -> int | None:
+        if self.returncode is not None:
+            return self.returncode
+        try:
+            pid, status = os.waitpid(self.pid, os.WNOHANG)
+        except ChildProcessError:
+            self.returncode = 125
+            return self.returncode
+        if pid == 0:
+            return None
+        self.returncode = self._status_code(status)
+        return self.returncode
+
+    def wait(self, timeout: float | None = None) -> int:
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while True:
+            result = self.poll()
+            if result is not None:
+                return result
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired(["pty-role"], timeout if timeout is not None else 0)
+            time.sleep(0.01)
+
+    def terminate(self) -> None:
+        os.kill(self.pid, signal.SIGTERM)
+
+    def kill(self) -> None:
+        os.kill(self.pid, signal.SIGKILL)
+
+
+def _exec_pty_child(argv: list[str], cwd: str | None, env: Mapping[str, str], pass_fds: tuple[int, ...]) -> None:
+    try:
+        if cwd:
+            os.chdir(cwd)
+        os.environ.clear()
+        os.environ.update(env)
+        keep = {0, 1, 2, *pass_fds}
+        max_fd = min(int(os.sysconf("SC_OPEN_MAX")), 4096)
+        for fd in range(3, max_fd):
+            if fd not in keep:
+                try:
+                    os.close(fd)
+                except OSError:
+                    pass
+        for fd in pass_fds:
+            os.set_inheritable(fd, True)
+        os.execvpe(argv[0], argv, dict(env))
+    except BaseException as exc:
+        try:
+            os.write(2, (f"NG-ELC PTY exec failed: {exc}\\n").encode("utf-8", errors="replace"))
+        finally:
+            os._exit(127)
 
 
 def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = (), max_bytes: int = 64 * 1024 * 1024) -> dict[str, Any]:
     """Launch one role with a dedicated controlling PTY and bounded capture."""
-    master_fd, slave_fd = pty.openpty()
+    pid, master_fd = pty.fork()
+    if pid == 0:
+        _exec_pty_child(argv, cwd, env, pass_fds)
+        raise AssertionError("unreachable")
     stderr = stderr_path.open("w", encoding="utf-8")
     capture: _PtyCapture | None = None
     try:
-        proc = subprocess.Popen(
-            argv,
-            cwd=cwd,
-            env=dict(env),
-            stdin=slave_fd,
-            stdout=slave_fd,
-            stderr=stderr,
-            start_new_session=True,
-            preexec_fn=lambda: _set_controlling_terminal(slave_fd),
-            text=False,
-            pass_fds=pass_fds,
-        )
         capture = _PtyCapture(master_fd, stdout_path, max_bytes=max_bytes)
     except BaseException:
-        if capture is not None:
-            capture.close()
-        else:
-            try:
-                os.close(master_fd)
-            except OSError:
-                pass
-        stderr.close()
-        raise
-    finally:
         try:
-            os.close(slave_fd)
+            os.kill(pid, signal.SIGKILL)
         except OSError:
             pass
+        stderr.close()
+        try:
+            os.close(master_fd)
+        except OSError:
+            pass
+        raise
+    process = _PtyProcess(pid)
     def close_all() -> None:
         capture.close()
         stderr.close()
-    return {"role": role, "process": proc, "stdout": capture, "stderr": stderr, "pty": True, "close": close_all}
+    return {"role": role, "process": process, "stdout": capture, "stderr": stderr, "pty": True, "close": close_all}
 
 
 def expand_argv(argv: list[str], variables: Mapping[str, str] | None = None) -> list[str]:
@@ -1077,12 +1138,12 @@ def apply_local_verification(
     return result, code, evidence_result
 
 
-def local_ipc_ids(kind: str) -> set[str] | None:
-    command = ["ipcs", {"shm": "-m", "semaphores": "-s", "queues": "-q"}.get(kind, "")]
+def local_ipc_ids(kind: str, *, include_foreign: bool = False) -> set[str] | None:
+    command = [{"shm": "/usr/bin/ipcs", "semaphores": "/usr/bin/ipcs", "queues": "/usr/bin/ipcs"}.get(kind, ""), {"shm": "-m", "semaphores": "-s", "queues": "-q"}.get(kind, "")]
     if not command[1]:
         return None
     try:
-        run = subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
+        run = subprocess.run(command, capture_output=True, text=True, timeout=10, check=False, env=native_safe_environment() if include_foreign else None)
     except (OSError, subprocess.SubprocessError):
         return None
     if run.returncode != 0:
@@ -1129,15 +1190,15 @@ def local_ipc_ids(kind: str) -> set[str] | None:
                 return None
         elif not fields[4].isdigit() or not fields[5].isdigit():
             return None
-        if fields[2] == owner:
+        if include_foreign or fields[2] == owner:
             ids.add(fields[1])
     if not header_seen:
         return None
     return ids
 
 
-def local_ipc_snapshot() -> dict[str, Any]:
-    return {kind: local_ipc_ids(kind) for kind in ("shm", "semaphores", "queues")}
+def local_ipc_snapshot(*, include_foreign: bool = False) -> dict[str, Any]:
+    return {kind: local_ipc_ids(kind, include_foreign=include_foreign) for kind in ("shm", "semaphores", "queues")}
 
 
 def read_proc_stat(pid: int) -> dict[str, Any]:
@@ -2437,6 +2498,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     provenance["workload_error"] = workload.get("reason")
     provenance["evidence_schema_v2"] = True
     provenance["local_profile"] = profile["name"]
+    provenance["local_profile_selection"] = dict(profile)
     provenance["effective_uid"] = profile["euid"]
     provenance["ownership_anchor"] = ownership_anchor
     if not ownership_anchor.get("verified"):
@@ -2745,7 +2807,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     code = 130 if interrupted and teardown_result == "PASS" and evidence_result == "COMPLETE" else classify_result(runtime, teardown_result, evidence_result)
     if not eligibility["eligible"] and code == 0:
         code = 21
-    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "local_profile": profile["name"], "effective_uid": profile["euid"], "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "protected_input_blockers": protected_input_blockers, "exit_code": code}
+    result = {"schema_version": 2, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "mode": "local", "local_profile": profile["name"], "local_profile_selection": dict(profile), "effective_uid": profile["euid"], "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "local_acceptance_eligible": eligibility["eligible"], "acceptance_blockers": eligibility["blockers"], "protected_input_blockers": protected_input_blockers, "exit_code": code}
     result_path = evidence_dir / "result.json"
     local_json_write(result_path, result)
     try:
@@ -2846,6 +2908,7 @@ def teardown(config: Mapping[str, str], plan: dict[str, Any], helper: str, state
 def run_trial(args: argparse.Namespace) -> int:
     config = load_config_from_env()
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile)
+    validate_local_profile(plan, getattr(args, "local_profile", None), mode="remote")
     trial_id = args.trial or utc_id()
     state_root, _ = trial_paths(config, trial_id)
     evidence_dir = Path(config["NG_EVIDENCE_PATH"]).resolve() / trial_id
@@ -3090,6 +3153,7 @@ def cmd_preflight(args: argparse.Namespace) -> int:
         return 0
     config = load_config_from_env()
     plan, contract = load_plan_for_trial(Path(args.plan), args.scenario, args.debug_profile, mode="remote")
+    validate_local_profile(plan, getattr(args, "local_profile", None), mode="remote")
     variables = dict(config)
     variables["TRIAL_ID"] = "preflight"
     by_host: dict[str, list[dict[str, Any]]] = {config["SOURCE_VM_IP"]: [], config["REPO_VM_IP"]: []}

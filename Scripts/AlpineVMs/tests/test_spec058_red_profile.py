@@ -131,22 +131,23 @@ class Spec058PtyRedTests(unittest.TestCase):
             root = Path(td)
             stdout_path = root / "stdout.log"
             stderr_path = root / "stderr.log"
-            with patch.object(executor.subprocess, "Popen") as popen:
-                popen.return_value.pid = 4321
-                result = executor.launch_local_role_pty(
-                    "fixture", [sys.executable, "-c", "print('READY')"],
-                    cwd=str(root), env=os.environ.copy(),
-                    stdout_path=stdout_path, stderr_path=stderr_path,
-                )
-
-            kwargs = popen.call_args.kwargs
-            self.assertTrue(kwargs["start_new_session"])
-            self.assertIsNotNone(kwargs["stdin"])
-            self.assertIsNotNone(kwargs["stdout"])
-            self.assertIsNotNone(kwargs["stderr"])
-            self.assertEqual(result["role"], "fixture")
-            self.assertTrue(result["pty"])
-            result["close"]()
+            master_fd, slave_fd = executor.pty.openpty()
+            try:
+                with patch.object(executor.pty, "fork", return_value=(4321, master_fd)):
+                    result = executor.launch_local_role_pty(
+                        "fixture", [sys.executable, "-c", "print('READY')"],
+                        cwd=str(root), env=os.environ.copy(),
+                        stdout_path=stdout_path, stderr_path=stderr_path,
+                    )
+                self.assertEqual(result["process"].pid, 4321)
+                self.assertEqual(result["role"], "fixture")
+                self.assertTrue(result["pty"])
+                result["close"]()
+            finally:
+                try:
+                    os.close(slave_fd)
+                except OSError:
+                    pass
 
     def test_real_role_has_a_controlling_terminal_and_bounded_capture(self):
         with tempfile.TemporaryDirectory(prefix="spec058-pty-real-test-", dir=Path.home()) as td:
@@ -163,6 +164,22 @@ class Spec058PtyRedTests(unittest.TestCase):
             result["close"]()
             self.assertIn("TTY=True FG=True", stdout_path.read_text(encoding="utf-8"))
             self.assertIsNone(getattr(result["stdout"], "error", None))
+
+    def test_pty_capture_quota_is_fail_closed(self):
+        with tempfile.TemporaryDirectory(prefix="spec058-pty-quota-", dir=Path.home()) as td:
+            root = Path(td)
+            stdout_path = root / "stdout.log"
+            stderr_path = root / "stderr.log"
+            code = "print('X' * 10000, flush=True)"
+            result = executor.launch_local_role_pty(
+                "fixture", [sys.executable, "-c", code], cwd=str(root),
+                env=os.environ.copy(), stdout_path=stdout_path,
+                stderr_path=stderr_path, max_bytes=128,
+            )
+            result["process"].wait(timeout=10)
+            result["close"]()
+            self.assertEqual(getattr(result["stdout"], "error", None), "PTY capture quota exceeded")
+            self.assertLessEqual(stdout_path.stat().st_size, 128)
 
 
 if __name__ == "__main__":
