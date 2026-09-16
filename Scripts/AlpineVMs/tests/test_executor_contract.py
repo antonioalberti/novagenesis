@@ -455,22 +455,22 @@ class ExecutorContractTests(unittest.TestCase):
             leader.wait(timeout=3)
 
     def test_ipc_attribution_rejects_unrelated_or_ambiguous_objects(self):
-        before = {"shm": {"10"}, "semaphores": set()}
-        after = {"shm": {"10", "11", "12"}, "semaphores": set()}
-        details = {"shm": {"11": {"creator_pid": 1234}, "12": {"creator_pid": 9999}}, "semaphores": {}}
+        before = {"shm": {"10"}, "semaphores": set(), "queues": set(), "posix_semaphores": set()}
+        after = {"shm": {"10", "11", "12"}, "semaphores": set(), "queues": set(), "posix_semaphores": set()}
+        details = {"shm": {"11": {"creator_pid": 1234}, "12": {"creator_pid": 9999}}, "semaphores": {}, "queues": {}}
         result = attribute_new_ipc(before, after, details, {1234})
         self.assertFalse(result["ok"])
-        self.assertEqual(result["owned"], {"shm": ["11"], "semaphores": []})
-        self.assertEqual(result["unattributed"], {"shm": ["12"], "semaphores": []})
-        ambiguous = attribute_new_ipc(before, after, {"shm": None, "semaphores": None}, {1234})
+        self.assertEqual(result["owned"], {"shm": ["11"], "semaphores": [], "queues": []})
+        self.assertEqual(result["unattributed"], {"shm": ["12"], "semaphores": [], "queues": []})
+        ambiguous = attribute_new_ipc(before, after, {"shm": None, "semaphores": None, "queues": None}, {1234})
         self.assertFalse(ambiguous["ok"])
-        self.assertEqual(ambiguous["owned"], {"shm": [], "semaphores": []})
+        self.assertEqual(ambiguous["owned"], {"shm": [], "semaphores": [], "queues": []})
         self.assertEqual(ambiguous["reason"], "inventory-unavailable")
     def test_ipcrm_failure_has_persistent_reason(self):
-        before = {"shm": set(), "semaphores": set()}
+        before = {"shm": set(), "semaphores": set(), "queues": set(), "posix_semaphores": set()}
         snapshots = [
-            {"shm": {"11"}, "semaphores": set()},
-            {"shm": set(), "semaphores": set()},
+            {"shm": {"11"}, "semaphores": set(), "queues": set(), "posix_semaphores": set()},
+            {"shm": set(), "semaphores": set(), "queues": set(), "posix_semaphores": set()},
         ]
         details = {"11": {"creator_pid": 1234}}
         failed_ipcrm = type("Run", (), {"returncode": 1, "stdout": "", "stderr": "denied"})()

@@ -79,8 +79,8 @@ class Spec056IpcParserRedTests(unittest.TestCase):
 class Spec056CleanupRedTests(unittest.TestCase):
     def test_local_remove_new_ipc_preserves_residual_reason_after_failed_removal(self):
         """A surviving post-removal object outranks the transient ipcrm error."""
-        before = {"shm": set(), "semaphores": set()}
-        after = {"shm": {"11"}, "semaphores": set()}
+        before = {"shm": set(), "semaphores": set(), "queues": set(), "posix_semaphores": set()}
+        after = {"shm": {"11"}, "semaphores": set(), "queues": set(), "posix_semaphores": set()}
         failed_ipcrm = SimpleNamespace(returncode=1, stdout="", stderr="denied")
 
         with (
@@ -95,7 +95,7 @@ class Spec056CleanupRedTests(unittest.TestCase):
             ok, new_ipc, reason = executor.local_remove_new_ipc(before, {1234})
 
         self.assertFalse(ok)
-        self.assertEqual(new_ipc, {"shm": ["11"], "semaphores": []})
+        self.assertEqual(new_ipc, {"shm": ["11"], "semaphores": [], "queues": [], "posix_semaphores": []})
         self.assertEqual(reason, "residual-ipc")
 
 

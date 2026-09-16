@@ -1170,7 +1170,12 @@ def local_ipc_ids(kind: str, *, include_foreign: bool = False) -> set[str] | Non
 
 
 def local_ipc_snapshot(*, include_foreign: bool = False) -> dict[str, Any]:
-    return {kind: local_ipc_ids(kind, include_foreign=include_foreign) for kind in ("shm", "semaphores", "queues")}
+    snapshot = {kind: local_ipc_ids(kind, include_foreign=include_foreign) for kind in ("shm", "semaphores", "queues")}
+    try:
+        snapshot["posix_semaphores"] = set(str(path) for path in Path("/dev/shm").glob("sem.*"))
+    except OSError:
+        snapshot["posix_semaphores"] = None
+    return snapshot
 
 
 def read_proc_stat(pid: int) -> dict[str, Any]:
@@ -2189,14 +2194,17 @@ def local_preflight(config: Mapping[str, str], plan: Mapping[str, Any], variable
 
 
 def local_ipc_details(kind: str) -> dict[str, dict[str, int]] | None:
+    flag = {"shm": "-m", "semaphores": "-s", "queues": "-q"}.get(kind)
+    if flag is None:
+        return None
     try:
-        run = subprocess.run(["ipcs", "-m" if kind == "shm" else "-s", "-p"], capture_output=True, text=True, timeout=10, check=False)
+        run = subprocess.run(["/usr/bin/ipcs", flag, "-p"], capture_output=True, text=True, timeout=10, check=False, env=native_safe_environment())
     except (OSError, subprocess.SubprocessError):
         return None
     if run.returncode != 0:
         return None
     owner = pwd.getpwuid(os.getuid()).pw_name
-    header_token = "shmid" if kind == "shm" else "semid"
+    header_token = {"shm": "shmid", "semaphores": "semid", "queues": "msqid"}[kind]
     lines = run.stdout.splitlines()
     if not any(header_token in line.split() for line in lines):
         return None
@@ -2224,38 +2232,44 @@ def local_ipc_details(kind: str) -> dict[str, dict[str, int]] | None:
 
 
 def attribute_new_ipc(before: Mapping[str, set[str] | None], after: Mapping[str, set[str] | None], details: Mapping[str, Mapping[str, Mapping[str, int]] | None] | None, trial_pids: set[int]) -> dict[str, Any]:
-    owned: dict[str, list[str]] = {kind: [] for kind in ("shm", "semaphores")}
-    unattributed: dict[str, list[str]] = {kind: [] for kind in ("shm", "semaphores")}
+    kinds = ("shm", "semaphores", "queues")
+    owned: dict[str, list[str]] = {kind: [] for kind in kinds}
+    unattributed: dict[str, list[str]] = {kind: [] for kind in kinds}
     inventory_unavailable = (
         details is None
-        or any((details.get(kind) if details else None) is None for kind in ("shm", "semaphores"))
-        or any(before.get(kind) is None or after.get(kind) is None for kind in ("shm", "semaphores"))
+        or any((details.get(kind) if details else None) is None for kind in kinds)
+        or any(before.get(kind) is None or after.get(kind) is None for kind in (*kinds, "posix_semaphores"))
     )
-    for kind in ("shm", "semaphores"):
+    for kind in kinds:
         for identifier in sorted((after.get(kind) or set()) - (before.get(kind) or set())):
             item = ((details or {}).get(kind) or {}).get(identifier)
             if item and item.get("creator_pid") in trial_pids:
                 owned[kind].append(identifier)
             else:
                 unattributed[kind].append(identifier)
+    posix_new = sorted((after.get("posix_semaphores") or set()) - (before.get("posix_semaphores") or set()))
+    if posix_new:
+        unattributed["posix_semaphores"] = posix_new
     reason = "inventory-unavailable" if inventory_unavailable else ("unattributed-ipc" if any(unattributed.values()) else None)
     return {"ok": reason is None, "owned": owned, "unattributed": unattributed, "reason": reason}
 
 
 def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[int]) -> tuple[bool, dict[str, list[str]], str | None]:
     after = local_ipc_snapshot()
-    new_ids = {kind: sorted((after.get(kind) or set()) - (before.get(kind) or set())) for kind in ("shm", "semaphores")}
-    details = {kind: (local_ipc_details(kind) if new_ids[kind] else {}) for kind in ("shm", "semaphores")}
+    kinds = ("shm", "semaphores", "queues")
+    new_ids = {kind: sorted((after.get(kind) or set()) - (before.get(kind) or set())) for kind in kinds}
+    new_ids["posix_semaphores"] = sorted((after.get("posix_semaphores") or set()) - (before.get("posix_semaphores") or set()))
+    details = {kind: (local_ipc_details(kind) if new_ids[kind] else {}) for kind in kinds}
     attribution = attribute_new_ipc(before, after, details, trial_pids)
     if not attribution["ok"]:
         return False, new_ids, attribution["reason"]
     ok = True
     ipcrm_failed = False
     for kind, ids in attribution["owned"].items():
-        flag = "-m" if kind == "shm" else "-s"
+        flag = {"shm": "-m", "semaphores": "-s", "queues": "-q"}[kind]
         for identifier in ids:
             try:
-                run = subprocess.run(["ipcrm", flag, identifier], capture_output=True, text=True, timeout=10, check=False)
+                run = subprocess.run(["/usr/bin/ipcrm", flag, identifier], capture_output=True, text=True, timeout=10, check=False, env=native_safe_environment())
             except (OSError, subprocess.SubprocessError):
                 ok = False
                 ipcrm_failed = True
@@ -2264,9 +2278,9 @@ def local_remove_new_ipc(before: Mapping[str, set[str] | None], trial_pids: set[
                 ipcrm_failed = True
                 ok = False
     remaining = local_ipc_snapshot()
-    if any(remaining.get(kind) is None or before.get(kind) is None for kind in ("shm", "semaphores")):
+    if any(remaining.get(kind) is None or before.get(kind) is None for kind in (*kinds, "posix_semaphores")):
         return False, new_ids, "inventory-unavailable"
-    residual = any((remaining.get(kind) or set()) - (before.get(kind) or set()) for kind in ("shm", "semaphores"))
+    residual = any((remaining.get(kind) or set()) - (before.get(kind) or set()) for kind in (*kinds, "posix_semaphores"))
     if residual:
         return False, new_ids, "residual-ipc"
     if ipcrm_failed:
