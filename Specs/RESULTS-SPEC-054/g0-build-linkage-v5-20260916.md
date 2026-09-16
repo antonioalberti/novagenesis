@@ -3,7 +3,8 @@
 **Date:** 2026-09-16
 **Branch:** `AIOPT3`
 **Candidate HEAD:** `4b01e5e258b7228958e027eb1df963048f6629c3`
-**Repository state:** clean; no untracked files
+**Documentation commit:** `b6c423e949f726d6835df2680f82b0374e050b26` (this receipt is stored after the build candidate was frozen)
+**Repository state at build capture:** clean; no untracked files
 **Acceptance status:** evidence receipt only; G0 remains blocked pending freeze reconciliation and release review
 
 ## Source and controller identity

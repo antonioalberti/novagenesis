@@ -148,6 +148,15 @@ Verificação realizada em 2026-09-13:
 - Referências de branches anteriores permanecem apenas em documentos históricos/decisões; instruções activas devem continuar em AIOPT3.
 - G2 teve hardening RED→GREEN local e o trial L5 canónico `e7-l5-direct-dfb95c9` fechou preflight, os cinco roles, markers de publicação/recepção, teardown e bundle. G2 está `PASS` operacional; G9 permanece `OPEN` porque ainda requer 100 fotos e mapas SHA-256 independentes.
 
+### Reconciliação de 2026-09-16
+
+- O candidato de código usado para os builds Debug/Sanitizer e para o receipt `Specs/RESULTS-SPEC-054/g0-build-linkage-v5-20260916.md` é `4b01e5e258b7228958e027eb1df963048f6629c3`.
+- O commit `b6c423e949f726d6835df2680f82b0374e050b26` contém apenas o receipt documental; não é reivindicado como a origem dos binários.
+- A árvore de `4b01e5e` estava limpa, os seis binários foram recompilados no Linux/VM 100 e os seus hashes foram verificados contra o receipt.
+- A suite do NG-ELC passou `85/85`; isso não substitui o ensaio `native-privileged`, o bundle runtime selado ou a revisão Astra de aceitação.
+- M0/G0 permanece `BLOCKED` até a reconciliação formal do freeze e a conclusão dos gates de SPEC-058. M1/M2 continuam abertos; M3 continua bloqueado.
+- O mapa G0–G10 é histórico/apêndice; os gates operacionais da release mínima são M0–M3.
+
 ## 7. Regras para novos agentes
 
 ### Início da sessão
