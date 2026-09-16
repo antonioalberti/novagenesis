@@ -70,8 +70,8 @@ class Spec058CleanupRedTests(unittest.TestCase):
             evidence = repo / "evidence"
             evidence.mkdir()
             snapshots = iter([
-                {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": []}},
-                {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": []}},
+                {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": [], "posix_semaphores": []}},
+                {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": [], "posix_semaphores": []}},
             ])
             completed = subprocess.CompletedProcess(
                 ["bash", str(script)], 0, b"cleaned\n", b""
@@ -114,7 +114,7 @@ class Spec058CleanupRedTests(unittest.TestCase):
             script.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
             evidence = repo / "evidence"
             evidence.mkdir()
-            snapshot = {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": []}}
+            snapshot = {"processes": [], "ipc": {"shm": [], "semaphores": [], "queues": [], "posix_semaphores": []}}
             completed = subprocess.CompletedProcess(["bash", str(script)], 0, b"", b"")
             with patch.object(executor, "local_host_inventory", return_value=snapshot), \
                  patch.object(executor, "_run_bounded_command", return_value=completed) as run:

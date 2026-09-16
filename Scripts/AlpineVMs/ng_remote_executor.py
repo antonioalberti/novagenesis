@@ -181,9 +181,7 @@ def _inventory_is_zero(inventory: Mapping[str, Any]) -> bool:
     ipc = inventory.get("ipc")
     if not isinstance(processes, list) or not isinstance(ipc, Mapping):
         return False
-    kinds = ("shm", "semaphores", "queues")
-    if "posix_semaphores" in ipc:
-        kinds = kinds + ("posix_semaphores",)
+    kinds = ("shm", "semaphores", "queues", "posix_semaphores")
     return not processes and all(isinstance(ipc.get(kind), (set, list, tuple)) and not ipc.get(kind) for kind in kinds)
 
 
@@ -264,6 +262,24 @@ def _run_bounded_command(argv: list[str], *, env: Mapping[str, str], pass_fds: t
     return subprocess.CompletedProcess(argv, returncode, bytes(buffers["stdout"]), bytes(buffers["stderr"]))
 
 
+def _fd_identity(fd: int, path: Path) -> dict[str, Any]:
+    duplicate = os.dup(fd)
+    try:
+        os.lseek(duplicate, 0, os.SEEK_SET)
+        digest = hashlib.sha256()
+        size = 0
+        while True:
+            chunk = os.read(duplicate, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+            size += len(chunk)
+        stat_result = os.fstat(duplicate)
+        return {"path": str(path), "size": size, "sha256": digest.hexdigest(), "st_dev": stat_result.st_dev, "st_ino": stat_result.st_ino}
+    finally:
+        os.close(duplicate)
+
+
 def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None = None) -> dict[str, Any]:
     """Run only the repository-owned cleanup and fail closed on ambiguity."""
     effective_uid = os.geteuid() if euid is None else int(euid)
@@ -284,7 +300,7 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
     if script.name != "clean.sh" or not script.is_file():
         os.close(script_fd)
         raise ConfigError("repository-owned clean.sh is missing")
-    script_identity_before = file_identity(script)
+    script_identity_before = _fd_identity(script_fd, script)
     before = local_host_inventory()
     if not _inventory_is_zero(before):
         result = {
@@ -310,15 +326,10 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
     except (OSError, subprocess.SubprocessError) as exc:
         command = ["bash", str(script)]
         completed = subprocess.CompletedProcess(command, 125, b"", str(exc).encode())
-    finally:
-        try:
-            os.close(script_fd)
-        except OSError:
-            pass
     after = local_host_inventory()
     stdout = completed.stdout.decode("utf-8", errors="replace") if isinstance(completed.stdout, bytes) else str(completed.stdout or "")
     stderr = completed.stderr.decode("utf-8", errors="replace") if isinstance(completed.stderr, bytes) else str(completed.stderr or "")
-    script_identity_after = file_identity(script)
+    script_identity_after = _fd_identity(script_fd, script)
     script_stable = script_identity_after == script_identity_before
     result = {
         "schema_version": 1,
@@ -336,6 +347,7 @@ def run_native_cleanup(repo_path: Path, evidence_dir: Path, *, euid: int | None 
         "ok": completed.returncode == 0 and script_stable and _inventory_is_zero(after),
     }
     local_json_write(Path(evidence_dir) / "native-cleanup.json", result)
+    os.close(script_fd)
     return result
 
 
@@ -347,6 +359,8 @@ class _PtyCapture:
         self.bytes_captured = 0
         self.error: str | None = None
         self._closed = threading.Event()
+        self._close_lock = threading.Lock()
+        self._master_closed = False
         self._thread = threading.Thread(target=self._drain, name="ng-elc-pty-capture", daemon=True)
         self._thread.start()
 
@@ -380,19 +394,24 @@ class _PtyCapture:
             self._closed.set()
 
     def close(self) -> None:
+        with self._close_lock:
+            if self._master_closed:
+                return
+            self._master_closed = True
         self._thread.join(timeout=5)
         if self._thread.is_alive():
+            if self.error is None:
+                self.error = "PTY capture drain timeout"
             try:
                 os.close(self.master_fd)
             except OSError:
                 pass
             self._thread.join(timeout=1)
-            if self._thread.is_alive() and self.error is None:
-                self.error = "PTY capture drain timeout"
-        try:
-            os.close(self.master_fd)
-        except OSError:
-            pass
+        else:
+            try:
+                os.close(self.master_fd)
+            except OSError:
+                pass
 
 
 def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: Mapping[str, str], stdout_path: Path, stderr_path: Path, pass_fds: tuple[int, ...] = (), max_bytes: int = 64 * 1024 * 1024) -> dict[str, Any]:
@@ -2547,7 +2566,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
                 pass
             registered = register_local_process(processes, role["name"], proc, argv, stdout, stderr, stdout_path, stderr_path, launch_identity)
             registered["launched_identity"]["child_pid"] = proc.pid
-            launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": registered["pgid"], "starttime": registered["starttime"], "executable": registered["launched_identity"]["proc_path"], "argv": argv, "cwd": cwd, "launched_identity": registered["launched_identity"]})
+            launch_public = sanitize_config({"role": role["name"], "pid": proc.pid, "pgid": registered["pgid"], "starttime": registered["starttime"], "executable": registered["launched_identity"]["proc_path"], "argv": argv, "cwd": cwd, "launched_identity": registered["launched_identity"], "stream_topology": pty_launch.get("stream_topology") if pty_launch is not None else {"stdout_stderr_merged": False, "authoritative": "stdout.log"}})
             local_record(events, "launch", **launch_public)
             local_json_write(role_dir / "launch.json", launch_public)
             expected = role.get("readiness", [])
