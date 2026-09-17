@@ -4,7 +4,7 @@
 **Date:** 2026-09-17
 **Status:** In Progress
 **Branch:** AIOPT3
-**Implementation commit:** pending
+**Implementation commit:** `4f206eb`
 **Related:** SPEC-054-release-master-plan-and-audit.md, SPEC-056-ng-elc-evidence-provenance-hardening.md, SPEC-058-ng-elc-privileged-local-profile.md
 **Task linkage:** NG-056 (child of NG-050)
 
