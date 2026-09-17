@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import ng_observability
 import ng_remote_executor as executor
 from proxmox_qga_channel import (
     QGAChannel,
@@ -113,3 +114,14 @@ def test_channel_evidence_is_persisted_outside_tmp():
         assert saved["schema_version"] == 1
         assert saved["channel"] == result
         assert "password" not in path.read_text().lower()
+
+
+def test_build_manifest_covers_contentapp_role_aliases():
+    binaries = {
+        "ContentApp": {"path": "/build/ContentApp", "size": 10, "sha256": "a" * 64},
+        "PGCS": {"path": "/build/PGCS", "size": 20, "sha256": "b" * 64},
+    }
+    outputs = ng_observability.manifest_outputs_for_roles(binaries)
+    assert outputs["Repository"] == outputs["ContentApp"]
+    assert outputs["Source"] == outputs["ContentApp"]
+    assert outputs["Repository"] is not outputs["ContentApp"]

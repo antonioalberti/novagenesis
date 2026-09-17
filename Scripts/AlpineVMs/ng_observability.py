@@ -10,7 +10,7 @@ import re
 import subprocess
 import shutil
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 
 DEBUG_RE = re.compile(r"^\s*#\s*define\s+(DEBUG[A-Z0-9_]*)\b")
@@ -298,6 +298,16 @@ def toolchain_identity() -> dict[str, Any]:
     return {"compiler": resolved, "version": version, "version_sha256": hashlib.sha256(version.encode()).hexdigest(), "status": "ok" if run.returncode == 0 else "unavailable"}
 
 
+def manifest_outputs_for_roles(binaries: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Expose build outputs under every role name used by the local plan."""
+    outputs = {str(name): dict(record) for name, record in binaries.items()}
+    contentapp = outputs.get("ContentApp")
+    if contentapp is not None:
+        outputs.setdefault("Repository", dict(contentapp))
+        outputs.setdefault("Source", dict(contentapp))
+    return outputs
+
+
 def build_variant(source: Path, profile_path: Path, variant: str, output: Path, jobs: int = 1, configure_only: bool = False) -> dict[str, Any]:
     inventory = build_inventory(source)
     profile = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -375,7 +385,7 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         "commands": receipt_commands,
         "outputs": {
             name: {"path": record["path"], "size": record["size"], "sha256": record["sha256"]}
-            for name, record in binaries.items()
+            for name, record in manifest_outputs_for_roles(binaries).items()
         },
     }
     receipt["receipt_sha256"] = hashlib.sha256(

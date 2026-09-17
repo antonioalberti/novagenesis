@@ -197,3 +197,9 @@ O trial `qga-r1-20260917` foi executado pelo NG-ELC como UID 0 e preservado em `
 - área de evidência de Repository incompleta antes do launch.
 
 O resultado é `runtime_result=INCONCLUSIVE`, `teardown_result=UNKNOWN` e `evidence_result=INCOMPLETE`. O bundle permanece diagnóstico e não constitui aceitação. A correção do `safe.directory` e o teste de exclusão do `NG_LOCAL_EVIDENCE_PATH` foram implementados; o próximo trial deve usar um build isolado com manifest real e um bundle novo.
+
+## 13. Trial diagnostic finding — r2
+
+O trial `qga-r2-20260917` confirmou que a correção de `safe.directory` permite capturar `git_clean=true` e o HEAD do candidato quando o controlador corre como root. O build isolado teve commands de configuração/build com `returncode=0`, mas o receipt cobria o binário `ContentApp` somente pelo nome do executável; o validador exige também a cobertura explícita dos roles `Repository` e `Source` que usam esse mesmo binário.
+
+A implementação corrigiu o gerador de receipts para publicar aliases por role, preservando o path, tamanho e SHA-256 do `ContentApp`. O bundle `qga-r2-20260917` permanece diagnóstico, sem roles lançados, porque foi produzido antes dessa correção.
