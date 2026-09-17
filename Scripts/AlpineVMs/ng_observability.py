@@ -188,7 +188,7 @@ def git_snapshot(root: Path) -> dict[str, Any]:
 
 def tree_sha256(root: Path) -> str:
     digest = hashlib.sha256()
-    excluded = {".git", "build", "cmake-build-debug", "cmake-build-sanitizer", "cmake-build-relwithdebinfo"}
+    excluded = {".git", "build", "cmake-build-debug", "cmake-build-sanitizer", "cmake-build-relwithdebinfo", "__pycache__"}
     for path in sorted(root.rglob("*")):
         if not path.is_file() or any(part in excluded for part in path.relative_to(root).parts):
             continue

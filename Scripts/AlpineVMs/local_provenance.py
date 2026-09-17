@@ -109,7 +109,7 @@ snapshot_files = snapshot_selected_files
 def _tree_sha256(repository: Path, excluded_root: Path | None = None) -> str:
     """Match the build helper's content identity without reading ``.git``."""
 
-    excluded = {".git", "build", "cmake-build-debug", "cmake-build-sanitizer", "cmake-build-relwithdebinfo"}
+    excluded = {".git", "build", "cmake-build-debug", "cmake-build-sanitizer", "cmake-build-relwithdebinfo", "__pycache__"}
     excluded_path = excluded_root.resolve() if excluded_root is not None else None
     digest = hashlib.sha256()
     for path in sorted(repository.rglob("*")):

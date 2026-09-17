@@ -1,0 +1,85 @@
+{
+  "aliasing_rejected": false,
+  "configured_repository_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/io/Repository1",
+  "configured_source_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/io/Source1",
+  "expected": [
+    {
+      "name": "spec056-photo-01.jpg",
+      "sha256": "7a4a72dbe4299193c661874444ba7231e686918d23d8f4de6c8fe0a2204bf69a",
+      "size": 4096
+    },
+    {
+      "name": "spec056-photo-02.jpg",
+      "sha256": "22a58d1a7790f6bec7f301c8937bbcd10e504b21c140c10a3216a4f682685679",
+      "size": 4096
+    },
+    {
+      "name": "spec056-photo-03.jpg",
+      "sha256": "9b34d1703095d09934da2a5f510daaaeb1a91dcf1c23137b9f43c9ee578b7014",
+      "size": 4096
+    },
+    {
+      "name": "spec056-photo-04.jpg",
+      "sha256": "30c05d73090c54695edb5fcd1d71caceb1a6a3218b9f4ded1bd2f319c8062957",
+      "size": 4096
+    },
+    {
+      "name": "spec056-photo-05.jpg",
+      "sha256": "b45ae72c1ec0911af07d0b6b5061fc0a7f25a70ae79e663b392392d06ccce9df",
+      "size": 4096
+    }
+  ],
+  "expected_map": {
+    "spec056-photo-01.jpg": {
+      "sha256": "7a4a72dbe4299193c661874444ba7231e686918d23d8f4de6c8fe0a2204bf69a",
+      "size": 4096
+    },
+    "spec056-photo-02.jpg": {
+      "sha256": "22a58d1a7790f6bec7f301c8937bbcd10e504b21c140c10a3216a4f682685679",
+      "size": 4096
+    },
+    "spec056-photo-03.jpg": {
+      "sha256": "9b34d1703095d09934da2a5f510daaaeb1a91dcf1c23137b9f43c9ee578b7014",
+      "size": 4096
+    },
+    "spec056-photo-04.jpg": {
+      "sha256": "30c05d73090c54695edb5fcd1d71caceb1a6a3218b9f4ded1bd2f319c8062957",
+      "size": 4096
+    },
+    "spec056-photo-05.jpg": {
+      "sha256": "b45ae72c1ec0911af07d0b6b5061fc0a7f25a70ae79e663b392392d06ccce9df",
+      "size": 4096
+    }
+  },
+  "generator": {
+    "id": "synthetic-jpeg",
+    "parameters": {
+      "count": 5,
+      "prefix": "spec056-photo",
+      "size_bytes": 4096
+    },
+    "seed": 56002,
+    "version": "1.0"
+  },
+  "names": [
+    "spec056-photo-01.jpg",
+    "spec056-photo-02.jpg",
+    "spec056-photo-03.jpg",
+    "spec056-photo-04.jpg",
+    "spec056-photo-05.jpg"
+  ],
+  "parameters": {
+    "count": 5,
+    "prefix": "spec056-photo",
+    "size_bytes": 4096
+  },
+  "reason": null,
+  "repository_empty": true,
+  "repository_initial": [],
+  "repository_initial_map": {},
+  "repository_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/staging/io/Repository1",
+  "schema_version": 2,
+  "source_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/staging/io/Source1",
+  "staging_io_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/staging/io",
+  "verified": true
+}

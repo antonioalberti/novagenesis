@@ -43,6 +43,16 @@ def test_capture_git_state_excludes_evidence_root_from_source_status(tmp_path):
     assert state["tree_sha256"] == _tree_sha256(tmp_path, excluded_root=evidence)
 
 
+def test_tree_hash_ignores_python_runtime_artifacts(tmp_path):
+    source = tmp_path / "source.txt"
+    source.write_text("stable", encoding="utf-8")
+    before = _tree_sha256(tmp_path)
+    cache = tmp_path / "Scripts" / "AlpineVMs" / "__pycache__"
+    cache.mkdir(parents=True)
+    (cache / "module.cpython-312.pyc").write_bytes(b"runtime artifact")
+    assert _tree_sha256(tmp_path) == before
+
+
 def test_snapshot_selected_files_is_content_addressed(tmp_path):
     source = tmp_path / "src" / "main.cpp"
     source.parent.mkdir()

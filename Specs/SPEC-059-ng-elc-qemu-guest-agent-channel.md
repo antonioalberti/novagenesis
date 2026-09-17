@@ -209,3 +209,9 @@ A implementação corrigiu o gerador de receipts para publicar aliases por role,
 O trial `qga-r3-20260917` confirmou `git_clean=true` e `git_head` coerente, mas rejeitou `source content divergence`: o hash de conteúdo do build foi capturado antes da criação do diretório de evidência do próprio trial, enquanto o capture do trial o incluía. Nenhum role foi lançado e o cleanup ficou `PASS`.
 
 A correção passa o `excluded_root` também ao cálculo de `tree_sha256`, mantendo status e hash de conteúdo consistentes sem ocultar alterações fora do diretório de evidência. O próximo build/trial deve ser feito após o commit desta correção, com um diretório de evidência novo.
+
+## 15. Trial diagnostic finding — r4
+
+O trial `qga-r4-20260917` confirmou `git_clean=true`, HEAD `58f99c2` e cobertura de receipt para `ContentApp`, `Repository` e `Source`. A elegibilidade ainda foi bloqueada por `source content divergence`: durante a execução, o interpretador Python criou `Scripts/AlpineVMs/__pycache__/local_provenance.cpython-312.pyc`, artefato transitório que não fazia parte do snapshot no momento do build. Nenhum role foi lançado; o bundle r4 permanece diagnóstico.
+
+A correção exclui diretórios `__pycache__` do hash de conteúdo tanto no gerador do build quanto no capturador de provenance, mantendo a integridade sobre os arquivos-fonte reais. Os testes relevantes passaram (`22 passed`). O próximo trial deve usar o build r5 criado após esse commit e evidência em diretório novo.
