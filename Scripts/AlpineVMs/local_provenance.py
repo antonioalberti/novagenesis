@@ -674,10 +674,11 @@ def sanitize_config(value: Any, key: str | None = None, _known_secrets: set[str]
             return _redact_string(item, secrets)
         if isinstance(item, Mapping):
             return {str(name): sanitize(child, str(name)) for name, child in sorted(item.items(), key=lambda pair: str(pair[0]))}
-        if isinstance(item, (list, tuple)):
+        if isinstance(item, (list, tuple, set, frozenset)):
             result: list[Any] = []
             redact_next = False
-            for child in item:
+            iterable = sorted(item, key=str) if isinstance(item, (set, frozenset)) else item
+            for child in iterable:
                 child_text = child if isinstance(child, str) else ""
                 result.append(sanitize(child, sensitive_next=redact_next))
                 redact_next = _is_secret_argv_flag(child_text)

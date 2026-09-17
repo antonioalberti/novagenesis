@@ -18,6 +18,10 @@ from local_provenance import (
 )
 
 
+def test_sanitize_config_serializes_sets_deterministically():
+    assert sanitize_config({"values": {"b", "a"}}) == {"values": ["a", "b"]}
+
+
 def test_git_commands_mark_repository_safe_for_root_execution(tmp_path):
     assert _git_argv(tmp_path, "status", "--porcelain") == [
         "git", "-c", f"safe.directory={tmp_path.resolve()}", "-C", str(tmp_path.resolve()), "status", "--porcelain"

@@ -239,3 +239,9 @@ A correção alinha o filtro de status com o hash, ignorando `__pycache__` e arq
 O trial `qga-r8-20260917` confirmou novamente a elegibilidade inicial, mas o segundo check de identidade do executor (`_source_identity_matches`) recapturava Git sem `excluded_root`. Assim, a própria árvore de evidência e artefatos transitórios apareciam como `source status drift`; nenhum role foi lançado e o teardown foi `PASS`.
 
 A correção passa `provenance["evidence_dir"]` à recaptura de Git, mantendo a mesma exclusão controlada usada no capture inicial. Os testes de provenance, canal e executor passaram com `29 passed`. O próximo trial deve usar build r9 e evidência nova.
+
+## 20. Trial diagnostic finding — r9
+
+O trial `qga-r9-20260917` passou o preflight (`ok=true`) e iniciou o fluxo `native-privileged`, mas falhou ao serializar a primeira evidência de cleanup: `Object of type set is not JSON serializable`. Nenhum launch foi registrado; a preservação do oracle e o teardown foram executados, mas a publicação final ficou incompleta.
+
+A correção torna `sanitize_config` capaz de converter `set`/`frozenset` em listas ordenadas, preservando determinismo para inventário IPC e demais payloads JSON. O teste dedicado e a suíte de provenance/canal/executor passaram com `30 passed`. O próximo trial deve usar build r10 e novo diretório de evidência.

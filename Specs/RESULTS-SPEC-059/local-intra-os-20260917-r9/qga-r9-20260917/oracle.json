@@ -1,0 +1,93 @@
+{
+  "changed_repository": [],
+  "changed_source": [],
+  "expected_count": 5,
+  "expected_map": {
+    "spec056-photo-01.jpg": {
+      "sha256": "7a4a72dbe4299193c661874444ba7231e686918d23d8f4de6c8fe0a2204bf69a",
+      "size": 4096
+    },
+    "spec056-photo-02.jpg": {
+      "sha256": "22a58d1a7790f6bec7f301c8937bbcd10e504b21c140c10a3216a4f682685679",
+      "size": 4096
+    },
+    "spec056-photo-03.jpg": {
+      "sha256": "9b34d1703095d09934da2a5f510daaaeb1a91dcf1c23137b9f43c9ee578b7014",
+      "size": 4096
+    },
+    "spec056-photo-04.jpg": {
+      "sha256": "30c05d73090c54695edb5fcd1d71caceb1a6a3218b9f4ded1bd2f319c8062957",
+      "size": 4096
+    },
+    "spec056-photo-05.jpg": {
+      "sha256": "b45ae72c1ec0911af07d0b6b5061fc0a7f25a70ae79e663b392392d06ccce9df",
+      "size": 4096
+    }
+  },
+  "extra_in_repository": [],
+  "hash_mismatches": [],
+  "missing_in_repository": [
+    "spec056-photo-01.jpg",
+    "spec056-photo-02.jpg",
+    "spec056-photo-03.jpg",
+    "spec056-photo-04.jpg",
+    "spec056-photo-05.jpg"
+  ],
+  "preservation_verified": true,
+  "preserved_repository_map": {},
+  "preserved_source_map": {
+    "spec056-photo-01.jpg": {
+      "sha256": "7a4a72dbe4299193c661874444ba7231e686918d23d8f4de6c8fe0a2204bf69a",
+      "size": 4096
+    },
+    "spec056-photo-02.jpg": {
+      "sha256": "22a58d1a7790f6bec7f301c8937bbcd10e504b21c140c10a3216a4f682685679",
+      "size": 4096
+    },
+    "spec056-photo-03.jpg": {
+      "sha256": "9b34d1703095d09934da2a5f510daaaeb1a91dcf1c23137b9f43c9ee578b7014",
+      "size": 4096
+    },
+    "spec056-photo-04.jpg": {
+      "sha256": "30c05d73090c54695edb5fcd1d71caceb1a6a3218b9f4ded1bd2f319c8062957",
+      "size": 4096
+    },
+    "spec056-photo-05.jpg": {
+      "sha256": "b45ae72c1ec0911af07d0b6b5061fc0a7f25a70ae79e663b392392d06ccce9df",
+      "size": 4096
+    }
+  },
+  "repository_count": 0,
+  "repository_extra": [],
+  "repository_map": {},
+  "repository_matches_expected": false,
+  "result": "INCONCLUSIVE",
+  "source_count": 5,
+  "source_equals_repository": false,
+  "source_extra": [],
+  "source_map": {
+    "spec056-photo-01.jpg": {
+      "sha256": "7a4a72dbe4299193c661874444ba7231e686918d23d8f4de6c8fe0a2204bf69a",
+      "size": 4096
+    },
+    "spec056-photo-02.jpg": {
+      "sha256": "22a58d1a7790f6bec7f301c8937bbcd10e504b21c140c10a3216a4f682685679",
+      "size": 4096
+    },
+    "spec056-photo-03.jpg": {
+      "sha256": "9b34d1703095d09934da2a5f510daaaeb1a91dcf1c23137b9f43c9ee578b7014",
+      "size": 4096
+    },
+    "spec056-photo-04.jpg": {
+      "sha256": "30c05d73090c54695edb5fcd1d71caceb1a6a3218b9f4ded1bd2f319c8062957",
+      "size": 4096
+    },
+    "spec056-photo-05.jpg": {
+      "sha256": "b45ae72c1ec0911af07d0b6b5061fc0a7f25a70ae79e663b392392d06ccce9df",
+      "size": 4096
+    }
+  },
+  "source_matches_expected": true,
+  "unsafe_repository": [],
+  "unsafe_source": []
+}
