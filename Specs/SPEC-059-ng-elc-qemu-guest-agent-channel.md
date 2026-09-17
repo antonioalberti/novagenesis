@@ -245,3 +245,9 @@ A correção passa `provenance["evidence_dir"]` à recaptura de Git, mantendo a 
 O trial `qga-r9-20260917` passou o preflight (`ok=true`) e iniciou o fluxo `native-privileged`, mas falhou ao serializar a primeira evidência de cleanup: `Object of type set is not JSON serializable`. Nenhum launch foi registrado; a preservação do oracle e o teardown foram executados, mas a publicação final ficou incompleta.
 
 A correção torna `sanitize_config` capaz de converter `set`/`frozenset` em listas ordenadas, preservando determinismo para inventário IPC e demais payloads JSON. O teste dedicado e a suíte de provenance/canal/executor passaram com `30 passed`. O próximo trial deve usar build r10 e novo diretório de evidência.
+
+## 21. Trial diagnostic finding — r10
+
+O trial `qga-r10-20260917` passou por elegibilidade, preflight, cleanup nativo e readiness dos quatro roles (`PGCS`, `NRNCS`, `Repository`, `Source`). O oracle foi executado por aproximadamente dois minutos, mas o cliente QGA usado tinha timeout de transporte de 30 s; a chamada retornou `QGA transport timeout` antes da publicação final. O processo continuou por algum tempo e terminou com `PGCS` encerrado e `stop` de `Source` em `identity-mismatch`; não houve `result.json`, manifest final nem teardown completo.
+
+O bundle parcial foi preservado como diagnóstico. O próximo trial deve usar timeout de transporte explícito maior que o orçamento do plano e validar a identidade de grupo/processo durante o teardown antes de aceitar o resultado.

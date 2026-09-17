@@ -1,0 +1,10 @@
+{
+  "description": "Intra-OS local ContentApp delivery using the NG-ELC controller.",
+  "level": "LOCAL",
+  "roles": [
+    "PGCS",
+    "NRNCS",
+    "Repository",
+    "Source"
+  ]
+}
