@@ -18,6 +18,12 @@ from pathlib import Path
 from typing import Any
 
 
+def _git_argv(repository: os.PathLike[str] | str, *args: str) -> list[str]:
+    """Build a Git argv safe for execution as root on a user-owned repo."""
+    root = str(Path(repository).resolve())
+    return ["git", "-c", f"safe.directory={root}", "-C", root, *args]
+
+
 _SHA256_LENGTH = 64
 
 
@@ -132,6 +138,27 @@ def _status_path(line: str) -> str | None:
     return value or None
 
 
+def _source_status(repository: Path, status_run: subprocess.CompletedProcess[str], excluded_root: Path | None) -> list[str]:
+    if status_run.returncode != 0:
+        return ["git status unavailable"]
+    status = [line for line in status_run.stdout.splitlines() if line]
+    if excluded_root is None:
+        return status
+    excluded = excluded_root.resolve()
+    filtered: list[str] = []
+    for line in status:
+        relative = _status_path(line)
+        if not relative:
+            filtered.append(line)
+            continue
+        candidate = (repository / relative).resolve(strict=False)
+        try:
+            candidate.relative_to(excluded)
+        except ValueError:
+            filtered.append(line)
+    return filtered
+
+
 def _status_xy(line: str) -> tuple[str, str]:
     return (line[0], line[1]) if len(line) >= 2 else ("?", "?")
 
@@ -217,7 +244,7 @@ def _write_snapshot_bytes(data: bytes, target: Path) -> tuple[int, str, str]:
 def _capture_staged_snapshot(repository: Path, relative: str, destination: Path) -> dict[str, Any]:
     try:
         run = subprocess.run(
-            ["git", "-C", str(repository), "cat-file", "blob", f":{relative}"],
+            _git_argv(repository, "cat-file", "blob", f":{relative}"),
             capture_output=True,
             timeout=10,
             check=False,
@@ -345,7 +372,7 @@ def _capture_index_identity(repository: Path) -> dict[str, Any]:
 
     try:
         run = subprocess.run(
-            ["git", "-C", str(repository), "ls-files", "--stage", "-z"],
+            _git_argv(repository, "ls-files", "--stage", "-z"),
             capture_output=True,
             timeout=10,
             check=False,
@@ -384,7 +411,7 @@ def _current_index_blob(repository: Path, relative: str) -> dict[str, Any] | Non
 
     try:
         run = subprocess.run(
-            ["git", "-C", str(repository), "cat-file", "blob", f":{relative}"],
+            _git_argv(repository, "cat-file", "blob", f":{relative}"),
             capture_output=True,
             timeout=10,
             check=False,
@@ -409,23 +436,21 @@ def capture_git_state(
         raise FileNotFoundError(repository)
 
     head_run = subprocess.run(
-        ["git", "-C", str(repository), "rev-parse", "HEAD"],
+        _git_argv(repository, "rev-parse", "HEAD"),
         capture_output=True,
         text=True,
         check=False,
         timeout=10,
     )
     status_run = subprocess.run(
-        ["git", "-C", str(repository), "status", "--porcelain=v1", "--untracked-files=all"],
+        _git_argv(repository, "status", "--porcelain=v1", "--untracked-files=all"),
         capture_output=True,
         text=True,
         check=False,
         timeout=10,
     )
     head = head_run.stdout.strip() if head_run.returncode == 0 else None
-    status = [line for line in status_run.stdout.splitlines() if line]
-    if status_run.returncode != 0:
-        status = ["git status unavailable"]
+    status = _source_status(repository, status_run, Path(excluded_root).resolve() if excluded_root is not None else None)
     result: dict[str, Any] = {
         "head": head or None,
         "status": status,
@@ -451,7 +476,7 @@ def capture_git_state(
         result["tree_sha256"] = _tree_sha256(repository)
     if snapshot_dir is not None or include_tree:
         submodule_run = subprocess.run(
-            ["git", "-C", str(repository), "submodule", "status", "--recursive"],
+            _git_argv(repository, "submodule", "status", "--recursive"),
             capture_output=True,
             text=True,
             check=False,

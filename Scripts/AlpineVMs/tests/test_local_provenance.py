@@ -7,6 +7,7 @@ import pytest
 
 import local_provenance
 from local_provenance import (
+    _git_argv,
     capture_code_identity,
     capture_git_state,
     file_identity,
@@ -14,6 +15,30 @@ from local_provenance import (
     sanitize_config,
     validate_build_linkage,
 )
+
+
+def test_git_commands_mark_repository_safe_for_root_execution(tmp_path):
+    assert _git_argv(tmp_path, "status", "--porcelain") == [
+        "git", "-c", f"safe.directory={tmp_path.resolve()}", "-C", str(tmp_path.resolve()), "status", "--porcelain"
+    ]
+
+
+
+def test_capture_git_state_excludes_evidence_root_from_source_status(tmp_path):
+    subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True)
+    tracked = tmp_path / "tracked.txt"
+    tracked.write_text("tracked\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(tmp_path), "add", "tracked.txt"], check=True)
+    subprocess.run([
+        "git", "-C", str(tmp_path), "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+        "commit", "--quiet", "-m", "initial"
+    ], check=True)
+    evidence = tmp_path / "evidence"
+    (evidence / "run").mkdir(parents=True)
+    (evidence / "run" / "result.json").write_text("{}\n", encoding="utf-8")
+    state = capture_git_state(tmp_path, excluded_root=evidence, snapshot_dir=tmp_path / "snapshot")
+    assert state["clean"] is True
+    assert state["status"] == []
 
 
 def test_snapshot_selected_files_is_content_addressed(tmp_path):

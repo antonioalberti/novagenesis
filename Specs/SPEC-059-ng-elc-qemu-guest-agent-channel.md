@@ -183,3 +183,17 @@ Desativar o adaptador QGA e manter o perfil unprivileged e o modo remoto inalter
 - Se a configuração local será um arquivo ignorado, variáveis de ambiente controladas ou parâmetros explícitos do executor.
 - Como o host Proxmox autorizado será identificado sem acoplar uma identidade pessoal ao bundle público.
 - Se o primeiro trial será apenas de capability/preflight ou também de runtime após autorização de cleanup.
+
+## 11. Recorded operator decision
+
+Em 2026-09-17, o operador autorizou a execução de `Scripts/Simple/clean.sh` como parte do fluxo `native-privileged` da Release 1.0.0, através do canal Proxmox/QEMU Guest Agent já verificado. Esta autorização é limitada a esse fluxo de teste e não substitui as validações fail-closed, o preflight, a preservação de evidência ou a necessidade de interromper quando o contexto mudar.
+
+## 12. Trial diagnostic finding — 2026-09-17
+
+O trial `qga-r1-20260917` foi executado pelo NG-ELC como UID 0 e preservado em `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/`. Nenhum role foi lançado. O cleanup terminou `PASS`, mas a elegibilidade foi corretamente bloqueada por:
+
+- `git` recusando o repositório user-owned quando executado como root (`dubious ownership`);
+- build linkage ausente porque nenhum manifest/receipt foi fornecido;
+- área de evidência de Repository incompleta antes do launch.
+
+O resultado é `runtime_result=INCONCLUSIVE`, `teardown_result=UNKNOWN` e `evidence_result=INCOMPLETE`. O bundle permanece diagnóstico e não constitui aceitação. A correção do `safe.directory` e o teste de exclusão do `NG_LOCAL_EVIDENCE_PATH` foram implementados; o próximo trial deve usar um build isolado com manifest real e um bundle novo.
