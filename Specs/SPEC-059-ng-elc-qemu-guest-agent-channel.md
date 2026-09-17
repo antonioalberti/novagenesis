@@ -233,3 +233,9 @@ A correção publica os aliases também em `manifest["binaries"]`, preservando o
 O trial `qga-r7-20260917` confirmou elegibilidade inicial (`local_acceptance_eligible=true`) e entrou no controlador, mas o preflight rejeitou quatro ocorrências de `source status drift`. A causa foi o `__pycache__` criado pelo próprio executor: o hash já o ignorava, porém o filtro de status Git ainda o reportava como untracked. Como nenhum role foi lançado, a cobertura de `artifacts/repository/` também falhou como consequência; o teardown foi `PASS`.
 
 A correção alinha o filtro de status com o hash, ignorando `__pycache__` e arquivos `.pyc` transitórios, mas mantendo alterações normais reportáveis. O caso foi adicionado aos testes; a suíte passou com `23 passed`. O próximo trial deve usar build r8 e nova evidência.
+
+## 19. Trial diagnostic finding — r8
+
+O trial `qga-r8-20260917` confirmou novamente a elegibilidade inicial, mas o segundo check de identidade do executor (`_source_identity_matches`) recapturava Git sem `excluded_root`. Assim, a própria árvore de evidência e artefatos transitórios apareciam como `source status drift`; nenhum role foi lançado e o teardown foi `PASS`.
+
+A correção passa `provenance["evidence_dir"]` à recaptura de Git, mantendo a mesma exclusão controlada usada no capture inicial. Os testes de provenance, canal e executor passaram com `29 passed`. O próximo trial deve usar build r9 e evidência nova.

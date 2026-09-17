@@ -1939,7 +1939,7 @@ def _source_identity_matches(provenance: Mapping[str, Any]) -> tuple[bool, str |
     if not isinstance(source, Mapping) or not isinstance(repo, str) or not repo:
         return False, "source identity is missing"
     try:
-        current = capture_git_state(repo, include_tree=True)
+        current = capture_git_state(repo, include_tree=True, excluded_root=provenance.get("evidence_dir"))
     except (OSError, RuntimeError, subprocess.SubprocessError, ValueError) as exc:
         return False, f"source identity unavailable: {exc}"
     for field in ("head", "status", "tree_sha256", "index_sha256", "index_entries", "submodules", "submodules_complete"):
