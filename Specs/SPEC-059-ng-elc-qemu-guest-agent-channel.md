@@ -257,3 +257,9 @@ O bundle parcial foi preservado como diagnóstico. O próximo trial deve usar ti
 O trial `qga-r13-20260917` foi bloqueado antes do launch porque a baseline nativa encontrou 16 segmentos SHM SysV e 16 semáforos POSIX residuais, todos atribuíveis aos PIDs dos roles lançados no r10. O cleanup recusou executar sobre baseline não zero, como previsto; não houve processos ativos no momento da inspeção.
 
 A remoção foi feita somente pelos IDs SysV e paths POSIX identificados no inventário e associados ao r10, via QGA root. A verificação posterior confirmou zero processos NG, zero SHM/semáforos/filas SysV e zero `sem.*` em `/dev/shm`. O r13 permanece diagnóstico e não constitui aceitação.
+
+## 23. Trial diagnostic finding — r14
+
+O trial `qga-r14-20260917` passou pela elegibilidade e pelo preflight, executou o cleanup nativo em baseline zero, lançou `PGCS`, `NRNCS`, `Repository` e `Source` com imagens `sealed-memfd`, e registrou readiness/discovery via SHM. O oracle observou os cinco ficheiros no Source, mas o Repository permaneceu vazio; não houve convergência de entrega.
+
+A chamada de transporte terminou com `QGAChannelError: QGA response has no guest exitcode`, e o bundle não contém `result.json`, `cleanup.json`, `preservation.json` nem seal final. A inspeção posterior encontrou 16 SHM e 16 semáforos POSIX criados pelos PIDs dos roles r14; eles foram removidos individualmente via QGA root e o inventário final ficou zero. O r14 é diagnóstico/incompleto, sem base para aceitação. A revisão Astra deve avaliar separadamente: (1) validade do harness/QGA para comandos longos, (2) comportamento do teardown após falha de transporte, e (3) ausência de entrega Source→Repository.

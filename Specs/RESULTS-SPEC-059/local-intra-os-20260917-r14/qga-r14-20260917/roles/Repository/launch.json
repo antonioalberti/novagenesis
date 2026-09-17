@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "/proc/self/fd/8",
+    "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/staging/io/Repository1/",
+    "Repository"
+  ],
+  "cwd": "/home/gandalf/workspace/ng-build-qga-r14-20260917",
+  "executable": "/proc/self/fd/8",
+  "launched_identity": {
+    "child_pid": 664915,
+    "fd": 8,
+    "proc_path": "/proc/self/fd/8",
+    "representation": "sealed-memfd",
+    "seals": 15,
+    "sha256": "7e146c778b8b3a34640189e72db79f6c9785db2e98705a89a937362622f09c5b",
+    "size": 9945216,
+    "source_dev": 64512,
+    "source_ino": 674181,
+    "source_path": "/home/gandalf/workspace/ng-build-qga-r14-20260917/ContentApp",
+    "source_sha256": "7e146c778b8b3a34640189e72db79f6c9785db2e98705a89a937362622f09c5b",
+    "source_size": 9945216
+  },
+  "pgid": 537518,
+  "pid": 664915,
+  "role": "Repository",
+  "starttime": "4999225",
+  "stream_topology": {
+    "authoritative": "stdout.log",
+    "stdout_stderr_merged": true
+  }
+}
