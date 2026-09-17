@@ -47,6 +47,7 @@ from local_provenance import (
     sanitize_evidence_tree,
     validate_build_linkage,
 )
+from proxmox_qga_channel import QGAChannel, persist_channel_evidence
 
 
 class ConfigError(ValueError):
@@ -3176,6 +3177,25 @@ def cmd_preflight(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_channel_check(args: argparse.Namespace) -> int:
+    """Verify an explicitly selected privileged execution channel."""
+    if args.channel != "proxmox-qga":
+        raise ConfigError(f"unsupported execution channel: {args.channel}")
+    channel = QGAChannel(
+        host=args.host,
+        vmid=args.vmid,
+        ssh_user=args.ssh_user,
+        ssh_key=args.ssh_key,
+        known_hosts=args.known_hosts,
+    )
+    result = channel.check()
+    if args.evidence:
+        persist_channel_evidence(args.evidence, result)
+        result = {**result, "evidence_path": str(Path(args.evidence).resolve())}
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result.get("channel_ready") else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="operation", required=True)
@@ -3187,6 +3207,15 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--debug-profile", default="obs-normal")
         sp.add_argument("--local-profile", choices=("unprivileged", "native-privileged"), default=None)
         sp.set_defaults(func=fn)
+    channel = sub.add_parser("channel-check")
+    channel.add_argument("--channel", choices=("proxmox-qga",), required=True)
+    channel.add_argument("--host", required=True)
+    channel.add_argument("--vmid", required=True)
+    channel.add_argument("--ssh-user", default="root")
+    channel.add_argument("--ssh-key")
+    channel.add_argument("--known-hosts")
+    channel.add_argument("--evidence")
+    channel.set_defaults(func=cmd_channel_check)
     run = sub.add_parser("run")
     run.add_argument("--plan", required=True)
     run.add_argument("--scenario", required=True, choices=sorted(SCENARIOS))

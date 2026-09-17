@@ -195,6 +195,40 @@ NG_BUILD_PROFILE=normal bash Scripts/AlpineVMs/pull-and-build-vms.sh
 
 Use `NG_BUILD_PROFILE=legacy` only when explicitly testing the deprecated standalone profile.
 
+### 7.1.1 Privileged local execution through Proxmox
+
+When Hermes operates from VM 100 without an interactive Linux terminal, do not use `sudo -v` or request a password in chat. On a Proxmox deployment with QEMU Guest Agent enabled, verify the privileged channel from VM 100:
+
+```bash
+python3 Scripts/AlpineVMs/ng_remote_executor.py channel-check \
+  --channel proxmox-qga \
+  --host "$NG_PROXMOX_HOST" \
+  --vmid "$NG_PROXMOX_VM_ID" \
+  --ssh-user "$NG_PROXMOX_SSH_USER" \
+  --ssh-key "$NG_PROXMOX_SSH_KEY" \
+  --known-hosts "$NG_PROXMOX_KNOWN_HOSTS"
+```
+
+The command must report `channel_ready: true` and `uid: 0`. To invoke the canonical NG-ELC as root inside the guest, use the QGA adapter; do not replace the controller with a manual launcher:
+
+```bash
+python3 Scripts/AlpineVMs/proxmox_qga_channel.py \
+  --host "$NG_PROXMOX_HOST" \
+  --vmid "$NG_PROXMOX_VM_ID" \
+  --ssh-user "$NG_PROXMOX_SSH_USER" \
+  --ssh-key "$NG_PROXMOX_SSH_KEY" \
+  --known-hosts "$NG_PROXMOX_KNOWN_HOSTS" \
+  exec /usr/bin/python3 "$NG_REPO_PATH/Scripts/AlpineVMs/ng_remote_executor.py" \
+  preflight --plan "$NG_REPO_PATH/Scripts/AlpineVMs/plans/local-intra-os.example.json" \
+  --scenario local-intra-os --mode local --local-profile native-privileged
+```
+
+The example paths above are guest paths and must be replaced by the frozen candidate paths in the local configuration. `preflight` is non-destructive; it must pass before any explicit authorization to invoke `Scripts/Simple/clean.sh`. Record the backend, Proxmox host, VM ID, UID proof, guest exit code, stdout/stderr and evidence path in the trial bundle. A transport success is not a guest success: use the `exitcode` returned by `qm guest exec`.
+
+This channel is a Proxmox-specific optional adapter. The NG-ELC core and remote SSH mode must remain usable on other hypervisors; if no supported channel proves UID 0, stop with `BLOCKED` rather than falling back to interactive sudo, passwords or unprivileged acceptance.
+
+The local configuration template includes the `NG_LOCAL_*` paths and optional `NG_PROXMOX_*` channel settings. Use a fresh IO directory and a durable evidence directory inside the repository for each acceptance candidate.
+
 The guests must independently verify:
 
 - the expected Git commit;

@@ -64,6 +64,8 @@ The controller MUST be invoked with effective UID 0 before cleanup or role launc
 
 The profile MUST validate trusted repository and evidence paths, reject symlink/path substitution and preserve the existing protected-input and provenance rules. Running the controller as root does not make arbitrary plans, environment variables, executables or evidence paths trusted.
 
+When the operator is using Hermes through Discord and cannot provide an interactive password in the same Linux terminal, the profile MAY use the optional Proxmox/QEMU Guest Agent channel defined by SPEC-059. That channel MUST prove `qm agent <vmid> ping` and guest UID 0 before invoking this controller; it MUST record the backend, host, VM ID and guest exit code. The unprivileged fixture and remote SSH contracts remain unchanged on other virtualization backends.
+
 ### 3.3 Privileged cleanup
 
 After non-destructive preflight and before the accepted baseline inventory, the controller MUST invoke only the repository-owned cleanup entry point:

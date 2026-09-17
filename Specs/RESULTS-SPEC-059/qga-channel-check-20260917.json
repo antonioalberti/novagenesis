@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "channel": {
+    "backend": "proxmox-qga",
+    "host": "192.168.0.200",
+    "vmid": "100",
+    "channel_ready": true,
+    "uid": 0,
+    "probe": {
+      "command": [
+        "/usr/bin/id",
+        "-u"
+      ],
+      "transport_exit_code": 0,
+      "guest_exit_code": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    }
+  }
+}
