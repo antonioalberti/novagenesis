@@ -1,0 +1,14 @@
+{
+  "ipc": {
+    "cleanup_ok": true,
+    "cleanup_reason": null,
+    "new_ids": {
+      "posix_semaphores": [],
+      "queues": [],
+      "semaphores": [],
+      "shm": []
+    }
+  },
+  "processes": [],
+  "schema_version": 2
+}

@@ -106,14 +106,22 @@ def snapshot_selected_files(
 snapshot_files = snapshot_selected_files
 
 
-def _tree_sha256(repository: Path) -> str:
+def _tree_sha256(repository: Path, excluded_root: Path | None = None) -> str:
     """Match the build helper's content identity without reading ``.git``."""
 
     excluded = {".git", "build", "cmake-build-debug", "cmake-build-sanitizer", "cmake-build-relwithdebinfo"}
+    excluded_path = excluded_root.resolve() if excluded_root is not None else None
     digest = hashlib.sha256()
     for path in sorted(repository.rglob("*")):
         if not path.is_file() or path.is_symlink() or any(part in excluded for part in path.relative_to(repository).parts):
             continue
+        if excluded_path is not None:
+            try:
+                path.resolve(strict=False).relative_to(excluded_path)
+            except ValueError:
+                pass
+            else:
+                continue
         relative = path.relative_to(repository).as_posix().encode("utf-8")
         before = path.stat()
         data = path.read_bytes()
@@ -473,7 +481,7 @@ def capture_git_state(
             content_snapshot["captured"] = True
             content_snapshot["reason"] = "working tree clean"
         result["content_snapshot"] = content_snapshot
-        result["tree_sha256"] = _tree_sha256(repository)
+        result["tree_sha256"] = _tree_sha256(repository, excluded_root=Path(excluded_root) if excluded_root is not None else None)
     if snapshot_dir is not None or include_tree:
         submodule_run = subprocess.run(
             _git_argv(repository, "submodule", "status", "--recursive"),
@@ -485,7 +493,7 @@ def capture_git_state(
         result["submodules"] = submodule_run.stdout.splitlines() if submodule_run.returncode == 0 else ["git submodule status unavailable"]
         result["submodules_complete"] = submodule_run.returncode == 0
     if include_tree:
-        result["tree_sha256"] = _tree_sha256(repository)
+        result["tree_sha256"] = _tree_sha256(repository, excluded_root=Path(excluded_root) if excluded_root is not None else None)
     return result
 
 

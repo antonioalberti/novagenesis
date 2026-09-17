@@ -203,3 +203,9 @@ O resultado é `runtime_result=INCONCLUSIVE`, `teardown_result=UNKNOWN` e `evide
 O trial `qga-r2-20260917` confirmou que a correção de `safe.directory` permite capturar `git_clean=true` e o HEAD do candidato quando o controlador corre como root. O build isolado teve commands de configuração/build com `returncode=0`, mas o receipt cobria o binário `ContentApp` somente pelo nome do executável; o validador exige também a cobertura explícita dos roles `Repository` e `Source` que usam esse mesmo binário.
 
 A implementação corrigiu o gerador de receipts para publicar aliases por role, preservando o path, tamanho e SHA-256 do `ContentApp`. O bundle `qga-r2-20260917` permanece diagnóstico, sem roles lançados, porque foi produzido antes dessa correção.
+
+## 14. Trial diagnostic finding — r3
+
+O trial `qga-r3-20260917` confirmou `git_clean=true` e `git_head` coerente, mas rejeitou `source content divergence`: o hash de conteúdo do build foi capturado antes da criação do diretório de evidência do próprio trial, enquanto o capture do trial o incluía. Nenhum role foi lançado e o cleanup ficou `PASS`.
+
+A correção passa o `excluded_root` também ao cálculo de `tree_sha256`, mantendo status e hash de conteúdo consistentes sem ocultar alterações fora do diretório de evidência. O próximo build/trial deve ser feito após o commit desta correção, com um diretório de evidência novo.

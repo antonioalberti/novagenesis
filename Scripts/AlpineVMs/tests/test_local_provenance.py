@@ -8,6 +8,7 @@ import pytest
 import local_provenance
 from local_provenance import (
     _git_argv,
+    _tree_sha256,
     capture_code_identity,
     capture_git_state,
     file_identity,
@@ -39,6 +40,7 @@ def test_capture_git_state_excludes_evidence_root_from_source_status(tmp_path):
     state = capture_git_state(tmp_path, excluded_root=evidence, snapshot_dir=tmp_path / "snapshot")
     assert state["clean"] is True
     assert state["status"] == []
+    assert state["tree_sha256"] == _tree_sha256(tmp_path, excluded_root=evidence)
 
 
 def test_snapshot_selected_files_is_content_addressed(tmp_path):
