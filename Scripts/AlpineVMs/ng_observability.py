@@ -418,7 +418,7 @@ def build_variant(source: Path, profile_path: Path, variant: str, output: Path, 
         "debug_launcher_log": str(output / "debug-launcher.jsonl") if variant != "normal" else None,
         "effective_debug_invocations": effective_debug,
         "compile_commands": {"path": str(output / "compile_commands.json"), "sha256": sha256(output / "compile_commands.json")} if (output / "compile_commands.json").is_file() else None,
-        "binaries": binaries,
+        "binaries": manifest_outputs_for_roles(binaries),
         "inventory_file_count": inventory["file_count"],
     }
     (output / "build-manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

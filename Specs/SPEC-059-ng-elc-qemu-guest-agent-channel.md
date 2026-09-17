@@ -221,3 +221,9 @@ A correção exclui diretórios `__pycache__` do hash de conteúdo tanto no gera
 O trial `qga-r5-20260917` confirmou a identidade completa da fonte: `git_clean=true`, HEAD `855c039`, `tree_sha256` idêntico ao build e receipt com aliases de output para `Repository` e `Source`. A elegibilidade foi então bloqueada por `runtime-library coverage is missing for Repository`; nenhum role foi lançado.
 
 A correção adiciona aliases explícitos de `runtime_library_identity` para `Repository` e `Source`, apontando para a mesma identidade `ldd`/estática real do `ContentApp`. O helper foi coberto por teste; a suíte de provenance/canal passou com `23 passed`. O próximo trial deve usar build r6 e novo diretório de evidência.
+
+## 17. Trial diagnostic finding — r6
+
+O trial `qga-r6-20260917` confirmou source linkage, output aliases e runtime records com todos os roles, mas o validator encontrou `runtime-library.Repository static executable path is required`. A causa foi que `manifest["binaries"]` top-level ainda continha apenas os nomes físicos, embora `build_receipt["outputs"]` já tivesse os aliases `Repository` e `Source`; por isso a identidade esperada do role não tinha `expected_path`.
+
+A correção publica os aliases também em `manifest["binaries"]`, preservando o mesmo path e SHA-256 do `ContentApp`. A suíte de provenance/canal permanece verde com `23 passed`. O próximo trial deve usar build r7 e novo diretório de evidência.
