@@ -227,3 +227,9 @@ A correção adiciona aliases explícitos de `runtime_library_identity` para `Re
 O trial `qga-r6-20260917` confirmou source linkage, output aliases e runtime records com todos os roles, mas o validator encontrou `runtime-library.Repository static executable path is required`. A causa foi que `manifest["binaries"]` top-level ainda continha apenas os nomes físicos, embora `build_receipt["outputs"]` já tivesse os aliases `Repository` e `Source`; por isso a identidade esperada do role não tinha `expected_path`.
 
 A correção publica os aliases também em `manifest["binaries"]`, preservando o mesmo path e SHA-256 do `ContentApp`. A suíte de provenance/canal permanece verde com `23 passed`. O próximo trial deve usar build r7 e novo diretório de evidência.
+
+## 18. Trial diagnostic finding — r7
+
+O trial `qga-r7-20260917` confirmou elegibilidade inicial (`local_acceptance_eligible=true`) e entrou no controlador, mas o preflight rejeitou quatro ocorrências de `source status drift`. A causa foi o `__pycache__` criado pelo próprio executor: o hash já o ignorava, porém o filtro de status Git ainda o reportava como untracked. Como nenhum role foi lançado, a cobertura de `artifacts/repository/` também falhou como consequência; o teardown foi `PASS`.
+
+A correção alinha o filtro de status com o hash, ignorando `__pycache__` e arquivos `.pyc` transitórios, mas mantendo alterações normais reportáveis. O caso foi adicionado aos testes; a suíte passou com `23 passed`. O próximo trial deve usar build r8 e nova evidência.

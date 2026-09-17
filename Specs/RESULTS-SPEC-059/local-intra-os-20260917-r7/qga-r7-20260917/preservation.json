@@ -1,0 +1,6 @@
+{
+  "before_temporary_cleanup": true,
+  "oracle": "oracle.json",
+  "schema_version": 2,
+  "verified": true
+}

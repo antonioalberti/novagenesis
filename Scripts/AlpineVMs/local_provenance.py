@@ -160,6 +160,9 @@ def _source_status(repository: Path, status_run: subprocess.CompletedProcess[str
             filtered.append(line)
             continue
         candidate = (repository / relative).resolve(strict=False)
+        relative_parts = Path(relative).parts
+        if "__pycache__" in relative_parts or Path(relative).suffix == ".pyc":
+            continue
         try:
             candidate.relative_to(excluded)
         except ValueError:

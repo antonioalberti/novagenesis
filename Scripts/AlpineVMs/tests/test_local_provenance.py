@@ -37,6 +37,9 @@ def test_capture_git_state_excludes_evidence_root_from_source_status(tmp_path):
     evidence = tmp_path / "evidence"
     (evidence / "run").mkdir(parents=True)
     (evidence / "run" / "result.json").write_text("{}\n", encoding="utf-8")
+    cache = tmp_path / "Scripts" / "AlpineVMs" / "__pycache__"
+    cache.mkdir(parents=True)
+    (cache / "module.cpython-312.pyc").write_bytes(b"runtime artifact")
     state = capture_git_state(tmp_path, excluded_root=evidence, snapshot_dir=tmp_path / "snapshot")
     assert state["clean"] is True
     assert state["status"] == []
