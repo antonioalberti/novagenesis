@@ -251,3 +251,9 @@ A correção torna `sanitize_config` capaz de converter `set`/`frozenset` em lis
 O trial `qga-r10-20260917` passou por elegibilidade, preflight, cleanup nativo e readiness dos quatro roles (`PGCS`, `NRNCS`, `Repository`, `Source`). O oracle foi executado por aproximadamente dois minutos, mas o cliente QGA usado tinha timeout de transporte de 30 s; a chamada retornou `QGA transport timeout` antes da publicação final. O processo continuou por algum tempo e terminou com `PGCS` encerrado e `stop` de `Source` em `identity-mismatch`; não houve `result.json`, manifest final nem teardown completo.
 
 O bundle parcial foi preservado como diagnóstico. O próximo trial deve usar timeout de transporte explícito maior que o orçamento do plano e validar a identidade de grupo/processo durante o teardown antes de aceitar o resultado.
+
+## 22. Trial diagnostic finding — r13
+
+O trial `qga-r13-20260917` foi bloqueado antes do launch porque a baseline nativa encontrou 16 segmentos SHM SysV e 16 semáforos POSIX residuais, todos atribuíveis aos PIDs dos roles lançados no r10. O cleanup recusou executar sobre baseline não zero, como previsto; não houve processos ativos no momento da inspeção.
+
+A remoção foi feita somente pelos IDs SysV e paths POSIX identificados no inventário e associados ao r10, via QGA root. A verificação posterior confirmou zero processos NG, zero SHM/semáforos/filas SysV e zero `sem.*` em `/dev/shm`. O r13 permanece diagnóstico e não constitui aceitação.

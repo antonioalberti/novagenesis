@@ -1,0 +1,12 @@
+{
+  "ipc_cleanup": true,
+  "ipc_reason": null,
+  "ordered_actions": [
+    "stop",
+    "evidence-preserve",
+    "ipc-cleanup",
+    "final-inventory"
+  ],
+  "result": "PASS",
+  "schema_version": 2
+}

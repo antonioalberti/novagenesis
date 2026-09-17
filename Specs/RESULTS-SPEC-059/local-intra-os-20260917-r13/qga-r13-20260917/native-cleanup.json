@@ -1,0 +1,104 @@
+{
+  "after": {
+    "ipc": {
+      "posix_semaphores": [
+        "/dev/shm/sem.1089430878",
+        "/dev/shm/sem.1089430879",
+        "/dev/shm/sem.1089430880",
+        "/dev/shm/sem.1089430881",
+        "/dev/shm/sem.11",
+        "/dev/shm/sem.12",
+        "/dev/shm/sem.13",
+        "/dev/shm/sem.14",
+        "/dev/shm/sem.1881993749",
+        "/dev/shm/sem.1881993750",
+        "/dev/shm/sem.1881993751",
+        "/dev/shm/sem.1881993752",
+        "/dev/shm/sem.2120632923",
+        "/dev/shm/sem.2120632924",
+        "/dev/shm/sem.2120632925",
+        "/dev/shm/sem.2120632926"
+      ],
+      "queues": [],
+      "semaphores": [],
+      "shm": [
+        "0",
+        "1",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    "processes": []
+  },
+  "baseline": "NONZERO",
+  "before": {
+    "ipc": {
+      "posix_semaphores": [
+        "/dev/shm/sem.1089430878",
+        "/dev/shm/sem.1089430879",
+        "/dev/shm/sem.1089430880",
+        "/dev/shm/sem.1089430881",
+        "/dev/shm/sem.11",
+        "/dev/shm/sem.12",
+        "/dev/shm/sem.13",
+        "/dev/shm/sem.14",
+        "/dev/shm/sem.1881993749",
+        "/dev/shm/sem.1881993750",
+        "/dev/shm/sem.1881993751",
+        "/dev/shm/sem.1881993752",
+        "/dev/shm/sem.2120632923",
+        "/dev/shm/sem.2120632924",
+        "/dev/shm/sem.2120632925",
+        "/dev/shm/sem.2120632926"
+      ],
+      "queues": [],
+      "semaphores": [],
+      "shm": [
+        "0",
+        "1",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    "processes": []
+  },
+  "command": null,
+  "effective_uid": 0,
+  "ok": false,
+  "reason": "pre-clean inventory is non-empty or unavailable; refusing global cleanup",
+  "returncode": null,
+  "schema_version": 1,
+  "script": {
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/Simple/clean.sh",
+    "sha256": "70e37f22ee2836ab2cb253005fd663109aafc06137d4334b73e7ef11a5246805",
+    "size": 2222,
+    "st_dev": 64512,
+    "st_ino": 673052
+  },
+  "stderr": "",
+  "stdout": ""
+}
