@@ -215,3 +215,9 @@ A correção passa o `excluded_root` também ao cálculo de `tree_sha256`, mante
 O trial `qga-r4-20260917` confirmou `git_clean=true`, HEAD `58f99c2` e cobertura de receipt para `ContentApp`, `Repository` e `Source`. A elegibilidade ainda foi bloqueada por `source content divergence`: durante a execução, o interpretador Python criou `Scripts/AlpineVMs/__pycache__/local_provenance.cpython-312.pyc`, artefato transitório que não fazia parte do snapshot no momento do build. Nenhum role foi lançado; o bundle r4 permanece diagnóstico.
 
 A correção exclui diretórios `__pycache__` do hash de conteúdo tanto no gerador do build quanto no capturador de provenance, mantendo a integridade sobre os arquivos-fonte reais. Os testes relevantes passaram (`22 passed`). O próximo trial deve usar o build r5 criado após esse commit e evidência em diretório novo.
+
+## 16. Trial diagnostic finding — r5
+
+O trial `qga-r5-20260917` confirmou a identidade completa da fonte: `git_clean=true`, HEAD `855c039`, `tree_sha256` idêntico ao build e receipt com aliases de output para `Repository` e `Source`. A elegibilidade foi então bloqueada por `runtime-library coverage is missing for Repository`; nenhum role foi lançado.
+
+A correção adiciona aliases explícitos de `runtime_library_identity` para `Repository` e `Source`, apontando para a mesma identidade `ldd`/estática real do `ContentApp`. O helper foi coberto por teste; a suíte de provenance/canal passou com `23 passed`. O próximo trial deve usar build r6 e novo diretório de evidência.

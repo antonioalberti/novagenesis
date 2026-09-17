@@ -125,3 +125,11 @@ def test_build_manifest_covers_contentapp_role_aliases():
     assert outputs["Repository"] == outputs["ContentApp"]
     assert outputs["Source"] == outputs["ContentApp"]
     assert outputs["Repository"] is not outputs["ContentApp"]
+
+
+def test_runtime_library_manifest_covers_contentapp_role_aliases():
+    records = {"ContentApp": {"status": "ok", "binary_sha256": "a" * 64, "libraries": []}}
+    identities = ng_observability.runtime_identity_for_roles(records)
+    assert identities["Repository"] == identities["ContentApp"]
+    assert identities["Source"] == identities["ContentApp"]
+    assert identities["Repository"] is not identities["ContentApp"]

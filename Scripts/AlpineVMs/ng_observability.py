@@ -285,7 +285,17 @@ def runtime_library_identity(binaries: dict[str, dict[str, Any]]) -> dict[str, A
         }
         methods.add("ldd")
     method = next(iter(methods)) if len(methods) == 1 else "mixed"
-    return {"method": method, "binaries": records}
+    return {"method": method, "binaries": runtime_identity_for_roles(records)}
+
+
+def runtime_identity_for_roles(records: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Expose runtime-library identity under every local-plan role name."""
+    identities = {str(name): dict(record) for name, record in records.items()}
+    contentapp = identities.get("ContentApp")
+    if contentapp is not None:
+        identities.setdefault("Repository", dict(contentapp))
+        identities.setdefault("Source", dict(contentapp))
+    return identities
 
 
 def toolchain_identity() -> dict[str, Any]:
