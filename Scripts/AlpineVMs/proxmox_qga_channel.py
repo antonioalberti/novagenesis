@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import tempfile
 from pathlib import Path
@@ -125,7 +126,7 @@ class QGAChannel:
         if self.known_hosts:
             argv.extend(["-o", "UserKnownHostsFile=" + _validate_token(self.known_hosts, "known_hosts")])
             argv.extend(["-o", "StrictHostKeyChecking=yes"])
-        return [*argv, target, *qm_argv]
+        return [*argv, target, shlex.join(qm_argv)]
 
     def _subprocess_run(self, argv: list[str]) -> Mapping[str, Any]:
         completed = subprocess.run(

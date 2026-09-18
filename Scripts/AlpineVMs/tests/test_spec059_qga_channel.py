@@ -1,4 +1,7 @@
 import json
+import os
+import shlex
+import subprocess
 import sys
 from pathlib import Path
 from unittest.mock import Mock
@@ -27,6 +30,21 @@ def test_build_qm_argv_requests_synchronous_unbounded_guest_wait():
     assert argv == [
         "qm", "guest", "exec", "100", "--synchronous", "1", "--timeout", "0", "--", "/usr/bin/id", "-u"
     ]
+
+
+def test_ssh_remote_shell_preserves_qm_argument_boundaries(tmp_path):
+    qm = tmp_path / "qm"
+    log = tmp_path / "argv.json"
+    qm.write_text("#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$QGA_ARG_LOG\"\n", encoding="utf-8")
+    qm.chmod(0o755)
+    channel = QGAChannel(host="192.168.0.200", vmid="100")
+    qm_argv = build_qm_argv("100", ["/usr/bin/printf", "%s", "hello world"])
+    ssh_argv = channel._ssh_argv(qm_argv)
+    target_index = ssh_argv.index("root@192.168.0.200")
+    remote_command = " ".join(ssh_argv[target_index + 1 :])
+    env = {**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}", "QGA_ARG_LOG": str(log)}
+    subprocess.run(["/bin/sh", "-c", remote_command], env=env, check=True)
+    assert log.read_text(encoding="utf-8").splitlines()[-3:] == ["/usr/bin/printf", "%s", "hello world"]
 
 
 def test_build_qm_argv_rejects_shell_command_strings():
