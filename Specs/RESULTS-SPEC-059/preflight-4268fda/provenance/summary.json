@@ -1,0 +1,47 @@
+{
+  "git_head": "4268fda748d09a09cd50dcc8b73b1b436b0d3f9d",
+  "git_clean": true,
+  "build_linkage": true,
+  "build_linkage_reason": null,
+  "capture_complete": true,
+  "build_manifest": {
+    "path": "/tmp/ng-observability-4268fda-normal/build-manifest.json",
+    "size": 612455,
+    "sha256": "ae3f2d201e3685ab732af2912108764ccd3ac8c63aee55285e2ff431698272e5",
+    "preserved_path": "provenance/build-manifest.json",
+    "preserved_size": 612455,
+    "preserved_sha256": "810c9597441363463a3dd1f3815764a175e5ae20e64b7b6b5c692ff7a950b378",
+    "evidence_dir": "/tmp/provenance-check-4268fda",
+    "valid": true
+  },
+  "binaries": {
+    "PGCS": {
+      "argv0": "/tmp/ng-observability-4268fda-normal/PGCS",
+      "resolved_path": "/tmp/ng-observability-4268fda-normal/PGCS",
+      "path": "/tmp/ng-observability-4268fda-normal/PGCS",
+      "size": 12434784,
+      "sha256": "0d20f3ab048c35ed10a79e003f20506c35353925d67df042afe4a4568993a29c"
+    },
+    "NRNCS": {
+      "argv0": "/tmp/ng-observability-4268fda-normal/NRNCS",
+      "resolved_path": "/tmp/ng-observability-4268fda-normal/NRNCS",
+      "path": "/tmp/ng-observability-4268fda-normal/NRNCS",
+      "size": 8541368,
+      "sha256": "011545c32fbb7e6592b55a7c48e1d7f9b27510880c942645ece2367c423ddadd"
+    },
+    "Repository": {
+      "argv0": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "resolved_path": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "path": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "size": 9945200,
+      "sha256": "53b1a06545e488cba21654e3e2d5228b58c840c59c2741ea5a3b4159431c3bbb"
+    },
+    "Source": {
+      "argv0": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "resolved_path": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "path": "/tmp/ng-observability-4268fda-normal/ContentApp",
+      "size": 9945200,
+      "sha256": "53b1a06545e488cba21654e3e2d5228b58c840c59c2741ea5a3b4159431c3bbb"
+    }
+  }
+}

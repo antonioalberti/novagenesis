@@ -1,0 +1,466 @@
+/home/gandalf/workspace/novagenesis/Common/src/Action.cpp: In constructor ‘Action::Action(std::string, Block*, MessageBuilder*)’:
+/home/gandalf/workspace/novagenesis/Common/src/Action.cpp:42:12: warning: unused variable ‘PR’ [-Wunused-variable]
+   42 |   Process* PR = NULL;
+      |            ^~
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp: In member function ‘void GW::PushToOutputQueue(std::string, Message*)’:
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp:298:42: warning: comparison of integer expressions of different signedness: ‘long long int’ and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  298 |       if (MessageSize > 0 && MessageSize <= (MaxSegmentSize - 8))
+      |                              ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp: In member function ‘void GW::Gateway()’:
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp:443:17: warning: unused variable ‘MessageSize’ [-Wunused-variable]
+  443 |   long long int MessageSize = 0;
+      |                 ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp: In member function ‘int GW::ReadFromSharedMemory3()’:
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp:819:26: warning: variable ‘TimeStamp’ set but not used [-Wunused-but-set-variable]
+  819 |                   double TimeStamp = 0;
+      |                          ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GW.cpp:673:10: warning: variable ‘StartingTime’ set but not used [-Wunused-but-set-variable]
+  673 |   double StartingTime;
+      |          ^~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp: In member function ‘int GWMsgCl01::ForwardMessageInsideOS(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp:268:12: warning: unused variable ‘GWStatusS01Msg’ [-Wunused-variable]
+  268 |   Message* GWStatusS01Msg = 0;
+      |            ^~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp:269:16: warning: unused variable ‘GWMsgCl01’ [-Wunused-variable]
+  269 |   CommandLine* GWMsgCl01 = 0;
+      |                ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp:279:10: warning: unused variable ‘mutex’ [-Wunused-variable]
+  279 |   sem_t* mutex;
+      |          ^~~~~
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp: In member function ‘virtual int GWMsgCl01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp:719:16: warning: unused variable ‘Category’ [-Wunused-variable]
+  719 |   unsigned int Category = 3;
+      |                ^~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp: In member function ‘virtual int HTMsgCl01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp:59:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+   59 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp:61:7: warning: variable ‘PGW’ set but not used [-Wunused-but-set-variable]
+   61 |   GW* PGW = 0;
+      |       ^~~
+/home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp:63:7: warning: variable ‘PHT’ set but not used [-Wunused-but-set-variable]
+   63 |   HT* PHT = 0;
+      |       ^~~
+/home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp: In member function ‘virtual int HTRunPeriodic01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp:63:12: warning: unused variable ‘BindReport’ [-Wunused-variable]
+   63 |   Message* BindReport = 0;
+      |            ^~~~~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/Message.cpp: In member function ‘int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray(File*)’:
+/home/gandalf/workspace/novagenesis/Common/src/Message.cpp:1849:20: warning: ‘void operator delete(void*, std::size_t)’ called on pointer returned from a mismatched allocation function [-Wmismatched-new-delete]
+ 1849 |             delete Temp;
+      |                    ^~~~
+/home/gandalf/workspace/novagenesis/Common/src/Message.cpp:1828:44: note: returned from ‘void* operator new [](std::size_t)’
+ 1828 |             Temp = new char[CommandLineSize];
+      |                                            ^
+/home/gandalf/workspace/novagenesis/Common/src/Process.cpp: In member function ‘int Process::DeleteMessage(Message*)’:
+/home/gandalf/workspace/novagenesis/Common/src/Process.cpp:763:8: warning: variable ‘Deleted’ set but not used [-Wunused-but-set-variable]
+  763 |   bool Deleted = false;
+      |        ^~~~~~~
+/home/gandalf/workspace/novagenesis/Common/src/Process.cpp:765:7: warning: variable ‘Index’ set but not used [-Wunused-but-set-variable]
+  765 |   int Index = 0;
+      |       ^~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/ContentApp.cpp:28:23: warning: missing terminating " character
+   28 | #ifndef _CONTENTAPP_H "
+      |                       ^
+/home/gandalf/workspace/novagenesis/ContentApp/src/ContentApp.cpp:28:23: warning: extra tokens at end of #ifndef directive
+In file included from /home/gandalf/workspace/novagenesis/Common/src/GW.h:80,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.h:36,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp:29:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp:33:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp: In member function ‘int Core::Exposition(std::string, std::vector<Message*>)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp:662:27: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  662 |         for (int i = 0; i < Keywords.size(); i++)
+      |                         ~~^~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp:635:15: warning: variable ‘PIoTTestApp’ set but not used [-Wunused-but-set-variable]
+  635 |   IoTTestApp* PIoTTestApp = 0;
+      |               ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp: In member function ‘void Core::SetKeywordsAndTheirHashes()’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp:818:21: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  818 |   for (int i = 0; i < Keywords.size(); i++)
+      |                   ~~^~~~~~~~~~~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/Common/src/GW.h:80,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.h:36,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreDeliveryBind01.cpp:33:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreDeliveryBind01.cpp:41:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreNotifyS01.cpp: In member function ‘virtual int CoreNotifyS01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreNotifyS01.cpp:73:12: warning: unused variable ‘RunSchedule’ [-Wunused-variable]
+   73 |   Message* RunSchedule = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreNotifyS01.cpp:81:19: warning: unused variable ‘Values’ [-Wunused-variable]
+   81 |   vector<string>* Values = new vector<string>;
+      |                   ^~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreNotifyS01.cpp: In member function ‘virtual int CoreNotifyS01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreNotifyS01.cpp:69:12: warning: unused variable ‘RunSchedule’ [-Wunused-variable]
+   69 |   Message* RunSchedule = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreNotifyS01.cpp:77:19: warning: unused variable ‘Values’ [-Wunused-variable]
+   77 |   vector<string>* Values = new vector<string>;
+      |                   ^~~~~~
+In file included from /home/gandalf/workspace/novagenesis/Common/src/GW.h:80,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.h:36,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.h:64,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:29:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:33:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘virtual int CoreRunEvaluate01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:77:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+   77 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:78:15: warning: variable ‘PIoTTestApp’ set but not used [-Wunused-but-set-variable]
+   78 |   IoTTestApp* PIoTTestApp = 0;
+      |               ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::CheckForPSAwareness(std::vector<Message*>&, bool&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:143:19: warning: unused variable ‘Values’ [-Wunused-variable]
+  143 |   vector<string>* Values = new vector<string>;
+      |                   ^~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::CheckForNewPeerApplication(std::vector<Message*>&, bool&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:284:15: warning: variable ‘PIoTTestApp’ set but not used [-Wunused-but-set-variable]
+  284 |   IoTTestApp* PIoTTestApp = 0;
+      |               ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ShowTheDiscoveredPeers()’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:443:15: warning: variable ‘PIoTTestApp’ set but not used [-Wunused-but-set-variable]
+  443 |   IoTTestApp* PIoTTestApp = 0;
+      |               ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::CheckSubscriptions(std::vector<Message*>&, bool)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:482:15: warning: variable ‘PIoTTestApp’ set but not used [-Wunused-but-set-variable]
+  482 |   IoTTestApp* PIoTTestApp = 0;
+      |               ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::PublishData()’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:557:19: warning: unused variable ‘PGCSBIDs’ [-Wunused-variable]
+  557 |   vector<string>* PGCSBIDs = new vector<string>;
+      |                   ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ScheduleASubscription(Subscription*, std::vector<Message*>&, bool)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:657:12: warning: unused variable ‘Run’ [-Wunused-variable]
+  657 |   Message* Run = 0;
+      |            ^~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ProcessASubscribedPayload(std::string, Subscription*, std::vector<Message*>&, bool)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:718:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+  718 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ProcessTXTFile(std::string, std::string)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp:754:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+  754 |   Core* PCore = NULL;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp: In member function ‘virtual int CoreRunEvaluate01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp:358:38: warning: unused variable ‘_I’ [-Wunused-variable]
+  358 |                         unsigned int _I = PCore->PeerClientAppTuples.size() - 1;
+      |                                      ^~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp:102:19: warning: unused variable ‘PGCSBIDs’ [-Wunused-variable]
+  102 |   vector<string>* PGCSBIDs = new vector<string>;
+      |                   ^~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp:103:12: warning: unused variable ‘IPCUpdate’ [-Wunused-variable]
+  103 |   Message* IPCUpdate = NULL;
+      |            ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInitialize01.cpp: In member function ‘virtual int CoreRunInitialize01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInitialize01.cpp:70:7: warning: unused variable ‘Temp_Int’ [-Wunused-variable]
+   70 |   int Temp_Int;
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInvite01.cpp: In member function ‘int CoreRunInvite01::CreateServiceOffer(std::string&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInvite01.cpp:287:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+  287 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPeriodic01.cpp: In member function ‘virtual int CoreRunPeriodic01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPeriodic01.cpp:63:12: warning: unused variable ‘RunPublishSSData’ [-Wunused-variable]
+   63 |   Message* RunPublishSSData = 0;
+      |            ^~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp: In member function ‘virtual int CoreRunPeriodic01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp:73:12: warning: unused variable ‘RunEvaluate’ [-Wunused-variable]
+   73 |   Message* RunEvaluate = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp:79:19: warning: unused variable ‘PGCSBIDs’ [-Wunused-variable]
+   79 |   vector<string>* PGCSBIDs = new vector<string>;
+      |                   ^~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp:80:12: warning: unused variable ‘IPCUpdate’ [-Wunused-variable]
+   80 |   Message* IPCUpdate = NULL;
+      |            ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunContentPublish01.cpp: In member function ‘virtual int CoreRunContentPublish01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunContentPublish01.cpp:118:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  118 |     for (int y = 0; y < FileNamesInThePath.size(); y++)
+      |                     ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunContentPublish01.cpp:72:18: warning: unused variable ‘dirpent’ [-Wunused-variable]
+   72 |   struct dirent* dirpent;
+      |                  ^~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp: In member function ‘virtual int CoreSCNAck01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp:58:16: warning: unused variable ‘PStoredCL’ [-Wunused-variable]
+   58 |   CommandLine* PStoredCL = 0;
+      |                ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp:65:12: warning: unused variable ‘PM’ [-Wunused-variable]
+   65 |   Message* PM = 0;           // Pointer to the message being analyzed
+      |            ^~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp:66:16: warning: unused variable ‘NCL’ [-Wunused-variable]
+   66 |   unsigned int NCL = 0;      // Number of command lines
+      |                ^~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp:67:16: warning: unused variable ‘NStoredA’ [-Wunused-variable]
+   67 |   unsigned int NStoredA = 0; // Number of arguments
+      |                ^~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp: In member function ‘virtual int CoreSCNAck01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp:69:12: warning: unused variable ‘PM’ [-Wunused-variable]
+   69 |   Message* PM = 0;           // Pointer to the message being analyzed
+      |            ^~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp:70:16: warning: unused variable ‘NCL’ [-Wunused-variable]
+   70 |   unsigned int NCL = 0;      // Number of command lines
+      |                ^~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp:71:16: warning: unused variable ‘NStoredA’ [-Wunused-variable]
+   71 |   unsigned int NStoredA = 0; // Number of arguments
+      |                ^~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/Common/src/GW.h:80,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.h:36,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:33:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:45:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp: In member function ‘virtual int CoreStatusS01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:63:16: warning: unused variable ‘NA’ [-Wunused-variable]
+   63 |   unsigned int NA = 0;
+      |                ^~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:69:12: warning: unused variable ‘RunEvaluate’ [-Wunused-variable]
+   69 |   Message* RunEvaluate = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:70:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+   70 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp:71:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+   71 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:44:23: warning: missing terminating " character
+   44 | #ifndef _CONTENTAPP_H "
+      |                       ^
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:44:23: warning: extra tokens at end of #ifndef directive
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:31,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/execIoTTestApp.cpp:28:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp: In member function ‘virtual int CoreStatusS01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:65:16: warning: unused variable ‘NA’ [-Wunused-variable]
+   65 |   unsigned int NA = 0;
+      |                ^~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:71:12: warning: unused variable ‘RunEvaluate’ [-Wunused-variable]
+   71 |   Message* RunEvaluate = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:72:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+   72 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp:73:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+   73 |   Core* PCore = 0;
+      |         ^~~~~
+In file included from /home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:31,
+                 from /home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.cpp:29:
+/home/gandalf/workspace/novagenesis/Common/src/Process.h:249:15: warning: ‘virtual int Process::NewBlock(std::string, Block*&)’ was hidden [-Woverloaded-virtual=]
+  249 |   virtual int NewBlock(string _LN, Block*& _PB);
+      |               ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.h:46:7: note:   by ‘int IoTTestApp::NewBlock(std::string, std::string, Block*&)’
+   46 |   int NewBlock(string _LN, string _ULN, Block*& _PB);
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.cpp: In constructor ‘IoTTestApp::IoTTestApp(std::string, std::string, key_t, std::string)’:
+/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.cpp:40:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+   40 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp: In member function ‘int Core::Exposition(std::string, std::vector<Message*>)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp:651:27: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  651 |         for (int i = 0; i < Keywords.size(); i++)
+      |                         ~~^~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp: In member function ‘void Core::SetKeywordsAndTheirHashes()’:
+/home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp:809:21: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::__cxx11::basic_string<char> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  809 |   for (int i = 0; i < Keywords.size(); i++)
+      |                   ~~^~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreDeliveryBind01.cpp: In member function ‘virtual int CoreDeliveryBind01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreDeliveryBind01.cpp:69:12: warning: unused variable ‘RunEvaluate’ [-Wunused-variable]
+   69 |   Message* RunEvaluate = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreNotifyS01.cpp: In member function ‘virtual int CoreNotifyS01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreNotifyS01.cpp:73:12: warning: unused variable ‘RunSchedule’ [-Wunused-variable]
+   73 |   Message* RunSchedule = 0;
+      |            ^~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreNotifyS01.cpp:81:19: warning: unused variable ‘Values’ [-Wunused-variable]
+   81 |   vector<string>* Values = new vector<string>;
+      |                   ^~~~~~
+/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunPeriodic01.cpp: In member function ‘virtual int CoreRunPeriodic01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunPeriodic01.cpp:115:34: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+  115 |       for (unsigned int q = 0; q < PCore->NumberOfMessagesPerBurst; q++)
+      |                                ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunPeriodic01.cpp:147:36: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+  147 |         for (unsigned int r = 0; r < PCore->NumberOfPubsPerMessage; r++)
+      |                                  ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::CheckForPSAwareness(std::vector<Message*>&, bool&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:115:19: warning: unused variable ‘Values’ [-Wunused-variable]
+  115 |   vector<string>* Values = new vector<string>;
+      |                   ^~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::CheckForNewPeerApplication(std::vector<Message*>&, bool&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:151:9: warning: variable ‘PPGCS’ set but not used [-Wunused-but-set-variable]
+  151 |   PGCS* PPGCS = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:154:12: warning: unused variable ‘Run’ [-Wunused-variable]
+  154 |   Message* Run = 0;
+      |            ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:156:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+  156 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ShowTheDiscoveredPeers()’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:375:9: warning: variable ‘PPGCS’ set but not used [-Wunused-but-set-variable]
+  375 |   PGCS* PPGCS = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ScheduleASubscription(Subscription*, std::vector<Message*>&, bool)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:541:12: warning: unused variable ‘Run’ [-Wunused-variable]
+  541 |   Message* Run = 0;
+      |            ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ProcessASubscribedPayload(std::string, unsigned int, Subscription*, std::vector<Message*>&, bool)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:599:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+  599 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp: In member function ‘int CoreRunEvaluate01::ProcessTXTFile(std::string, unsigned int, Subscription*, std::string)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:792:123: warning: unknown escape sequence: '\&'
+  792 |         "sudo /usr/bin/python coapclient.py -o POST -p coap://[aaaa::212:4b00:7ba:7607]:5683/dev/chan -P \"ch=" + Value + "\" \& sudo /usr/bin/python coapclient.py -o POST -p coap://[aaaa::212:4b00:6e3:660c]:5683/com/chan -P \"ch=" + Value + "\"";
+      |                                                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:632:10: warning: variable ‘PHTB’ set but not used [-Wunused-but-set-variable]
+  632 |   Block* PHTB = NULL;
+      |          ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:633:12: warning: unused variable ‘StoringLearnedBinds’ [-Wunused-variable]
+  633 |   Message* StoringLearnedBinds = NULL;
+      |            ^~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp:635:12: warning: unused variable ‘PublishAcceptanceCopy1’ [-Wunused-variable]
+  635 |   Message* PublishAcceptanceCopy1 = NULL;
+      |            ^~~~~~~~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunExpose01.cpp: In member function ‘virtual int CoreRunExpose01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunExpose01.cpp:238:1: warning: control reaches end of non-void function [-Wreturn-type]
+  238 | }
+      | ^
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp: In member function ‘virtual int CoreRunInitialize01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp:70:7: warning: unused variable ‘Temp_Int’ [-Wunused-variable]
+   70 |   int Temp_Int;
+      |       ^~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp:71:12: warning: unused variable ‘RunPublishSSData’ [-Wunused-variable]
+   71 |   Message* RunPublishSSData = 0;
+      |            ^~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp:72:12: warning: unused variable ‘RunGetInfo’ [-Wunused-variable]
+   72 |   Message* RunGetInfo = 0;
+      |            ^~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInvite01.cpp: In member function ‘int CoreRunInvite01::CreateServiceOffer(std::string&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInvite01.cpp:284:9: warning: variable ‘PCore’ set but not used [-Wunused-but-set-variable]
+  284 |   Core* PCore = 0;
+      |         ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPeriodic01.cpp: In member function ‘virtual int CoreRunPeriodic01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPeriodic01.cpp:63:12: warning: unused variable ‘RunPublishSSData’ [-Wunused-variable]
+   63 |   Message* RunPublishSSData = 0;
+      |            ^~~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp: In member function ‘virtual int CoreSCNAck01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp:58:16: warning: unused variable ‘PStoredCL’ [-Wunused-variable]
+   58 |   CommandLine* PStoredCL = 0;
+      |                ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp:65:12: warning: unused variable ‘PM’ [-Wunused-variable]
+   65 |   Message* PM = 0;           // Pointer to the message being analyzed
+      |            ^~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp:66:16: warning: unused variable ‘NCL’ [-Wunused-variable]
+   66 |   unsigned int NCL = 0;      // Number of command lines
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp:67:16: warning: unused variable ‘NStoredA’ [-Wunused-variable]
+   67 |   unsigned int NStoredA = 0; // Number of arguments
+      |                ^~~~~~~~
+/home/gandalf/workspace/novagenesis/NRNCS/src/NRMsgCl01.cpp: In member function ‘virtual int NRMsgCl01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/NRNCS/src/NRMsgCl01.cpp:63:12: warning: unused variable ‘StoreBindings’ [-Wunused-variable]
+   63 |   Message* StoreBindings = 0;
+      |            ^~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/NRNCS/src/NRMsgCl01.cpp:68:12: warning: unused variable ‘ForwardBindings’ [-Wunused-variable]
+   68 |   Message* ForwardBindings = 0;
+      |            ^~~~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp: In constructor ‘PGCS::PGCS(std::string, key_t, std::string, std::string, std::string, std::vector<std::__cxx11::basic_string<char> >*, std::vector<std::__cxx11::basic_string<char> >*, std::vector<std::__cxx11::basic_string<char> >*, std::vector<std::__cxx11::basic_string<char> >*, std::vector<unsigned int>*, std::string)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp:103:11: warning: unused variable ‘PCore’ [-Wunused-variable]
+  103 |     Core* PCore = (Core*)PCoreB;
+      |           ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp:106:15: warning: ignoring return value of ‘constexpr std::vector<_Tp, _Alloc>::size_type std::vector<_Tp, _Alloc>::size() const [with _Tp = std::__cxx11::basic_string<char>; _Alloc = std::allocator<std::__cxx11::basic_string<char> >; size_type = long unsigned int]’, declared with attribute ‘nodiscard’ [-Wunused-result]
+  106 |   Stacks->size();
+      |   ~~~~~~~~~~~~^~
+In file included from /usr/include/c++/13/vector:66,
+                 from /usr/include/c++/13/chrono:47,
+                 from /home/gandalf/workspace/novagenesis/PGCS/src/PG.h:32,
+                 from /home/gandalf/workspace/novagenesis/PGCS/src/PGCS.h:32,
+                 from /home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp:29:
+/usr/include/c++/13/bits/stl_vector.h:992:7: note: declared here
+  992 |       size() const _GLIBCXX_NOEXCEPT
+      |       ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp:94:7: warning: unused variable ‘PPG’ [-Wunused-variable]
+   94 |   PG* PPG = (PG*)PPGB;
+      |       ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp: In member function ‘virtual int PGHelloIHC01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp:80:10: warning: variable ‘PHTB’ set but not used [-Wunused-but-set-variable]
+   80 |   Block* PHTB = 0;
+      |          ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp:81:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+   81 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp:82:16: warning: unused variable ‘PSCNCL’ [-Wunused-variable]
+   82 |   CommandLine* PSCNCL = 0;
+      |                ^~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp: In member function ‘virtual int PGHelloIHC02::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:82:10: warning: variable ‘PHTB’ set but not used [-Wunused-but-set-variable]
+   82 |   Block* PHTB = 0;
+      |          ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:83:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+   83 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:84:16: warning: unused variable ‘PSCNCL’ [-Wunused-variable]
+   84 |   CommandLine* PSCNCL = 0;
+      |                ^~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp: In member function ‘int PGHelloIHC02::ScheduleStoreBindings(std::string, std::vector<std::__cxx11::basic_string<char> >&, std::string, std::string)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:281:16: warning: unused variable ‘StatusS01’ [-Wunused-variable]
+  281 |   CommandLine* StatusS01 = 0;
+      |                ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:299:10: warning: variable ‘PHTB’ set but not used [-Wunused-but-set-variable]
+  299 |   Block* PHTB = 0;
+      |          ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:300:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+  300 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp:301:16: warning: unused variable ‘PSCNCL’ [-Wunused-variable]
+  301 |   CommandLine* PSCNCL = 0;
+      |                ^~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC03.cpp: In member function ‘virtual int PGHelloIHC03::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC03.cpp:64:16: warning: unused variable ‘StatusS01’ [-Wunused-variable]
+   64 |   CommandLine* StatusS01 = 0;
+      |                ^~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC03.cpp:93:10: warning: variable ‘PHTB’ set but not used [-Wunused-but-set-variable]
+   93 |   Block* PHTB = 0;
+      |          ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunExposition01.cpp: In member function ‘virtual int PGRunExposition01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunExposition01.cpp:90:16: warning: variable ‘Index’ set but not used [-Wunused-but-set-variable]
+   90 |   unsigned int Index = 0;
+      |                ^~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunInitialization01.cpp: In member function ‘virtual int PGRunInitialization01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunInitialization01.cpp:311:13: warning: unused variable ‘CSID’ [-Wunused-variable]
+  311 |         int CSID = 0;
+      |             ^~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunPeriodic01.cpp: In member function ‘int PGRunPeriodic01::StresstestScheduling()’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunPeriodic01.cpp:593:12: warning: unused variable ‘RunStresstest’ [-Wunused-variable]
+  593 |   Message* RunStresstest = 0;
+      |            ^~~~~~~~~~~~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunPeriodic01.cpp:597:16: warning: unused variable ‘PCL’ [-Wunused-variable]
+  597 |   CommandLine* PCL = 0;
+      |                ^~~
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp: In member function ‘virtual int PGRunStresstest01::Run(Message*, CommandLine*, std::vector<Message*>&, Message*&)’:
+/home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp:68:9: warning: variable ‘PPGCS’ set but not used [-Wunused-but-set-variable]
+   68 |   PGCS* PPGCS = 0;
+      |         ^~~~~
