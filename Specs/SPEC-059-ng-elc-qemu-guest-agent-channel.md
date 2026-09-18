@@ -282,3 +282,9 @@ A revisão `spec059-qga-ssh-postchange`, enviada pelo tracker Hermes ao `gpt-6-a
 Veredicto Astra: **GO diagnóstico**, condicionado a baseline limpa, teardown/IPC verificável, conclusão QGA observável, provenance atualizada e gates separados de controle, payload e artefactos. O HOLD específico de quoting foi resolvido; isto não é aceitação de release/runtime.
 
 Permanecem gates SPEC-059 não fechados: persistência do JSON bruto em falhas, captura bounded de stdout/stderr, confirmação de conclusão/teardown após perda de transporte, e entrega Source→Repository. O próximo ensaio pode ser apenas diagnóstico e deve preservar falhas incompletas sem fabricar seal.
+
+## 26. Trial diagnostic finding — r15
+
+O trial `qga-r15-20260918` usou o build HEAD `4e27404`, baseline zero e o adapter com espera síncrona e quoting SSH corrigido. A execução longa passou da espera de 30 s: os quatro roles foram lançados, readiness/discovery ocorreu e o oracle confirmou cinco inputs no Source. O Repository permaneceu vazio; não houve convergência de entrega.
+
+O encerramento falhou novamente com `stop identity-mismatch` para `Source`, deixando 16 SHM e 16 semáforos POSIX atribuídos aos PIDs r15. O QGA terminou com `transport_exit_code=29`, `Agent error: PID ld does not exist`, e o bundle não possui fechamento final completo. Os 32 recursos foram removidos individualmente via QGA root e o inventário final ficou zero. O r15 é diagnóstico/incompleto: confirmou a correção da espera longa/argv, mas isolou teardown/process identity e Source→Repository como blockers independentes.

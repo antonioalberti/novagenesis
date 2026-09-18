@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "/proc/self/fd/4",
+    "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/staging/io/PGCS/",
+    "0",
+    "Intra_Domain",
+    "-lc"
+  ],
+  "cwd": "/home/gandalf/workspace/ng-build-qga-r15-20260918",
+  "executable": "/proc/self/fd/4",
+  "launched_identity": {
+    "child_pid": 1145638,
+    "fd": 4,
+    "proc_path": "/proc/self/fd/4",
+    "representation": "sealed-memfd",
+    "seals": 15,
+    "sha256": "ac1edc1c4139f00b7dd112742d927a3aa5d671aeb038cef9e509b8f4955e8d22",
+    "size": 12434800,
+    "source_dev": 64512,
+    "source_ino": 674663,
+    "source_path": "/home/gandalf/workspace/ng-build-qga-r15-20260918/PGCS",
+    "source_sha256": "ac1edc1c4139f00b7dd112742d927a3aa5d671aeb038cef9e509b8f4955e8d22",
+    "source_size": 12434800
+  },
+  "pgid": 665318,
+  "pid": 1145638,
+  "role": "PGCS",
+  "starttime": "8770065",
+  "stream_topology": {
+    "authoritative": "stdout.log",
+    "stdout_stderr_merged": true
+  }
+}
