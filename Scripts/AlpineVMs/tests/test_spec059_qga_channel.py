@@ -8,6 +8,8 @@ import time
 from pathlib import Path
 from unittest.mock import Mock
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import ng_observability
@@ -114,6 +116,24 @@ def test_ng_elc_exposes_qga_channel_check():
     assert result["transport_exit_code"] == 0
     assert result["exit_code"] == 21
     assert result["stderr"] == "blocked\n"
+
+
+def test_channel_exec_rejects_async_pid_without_guest_exitcode():
+    run = Mock(return_value={
+        "returncode": 0,
+        "stdout": json.dumps({"pid": 12345}),
+        "stderr": "",
+    })
+    channel = QGAChannel(host="192.168.0.200", vmid="100", run=run)
+    with pytest.raises(QGAChannelError, match="no guest exitcode"):
+        channel.exec(["/bin/true"])
+
+
+def test_channel_exec_classifies_ssh_timeout_as_transport_error():
+    run = Mock(side_effect=subprocess.TimeoutExpired(["ssh"], timeout=3))
+    channel = QGAChannel(host="192.168.0.200", vmid="100", run=run)
+    with pytest.raises(QGAChannelError, match="transport timeout"):
+        channel.exec(["/bin/sleep", "8"])
 
 
 def test_channel_evidence_is_persisted_outside_tmp():

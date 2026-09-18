@@ -311,3 +311,9 @@ A suíte relevante passou com `36 passed`, incluindo parada normal, processo já
 Foi adicionada uma fixture SysV real que cria dois SHM com `ipcmk`, captura `creator_pid` via `local_ipc_details` e marca apenas um como pertencente à execução. O caminho real `local_remove_new_ipc` foi exercitado. Quando há um recurso novo estrangeiro, o resultado é `ok=false`, `reason=unattributed-ipc`, e ambos os recursos permanecem; a fixture limpa-os apenas no teardown independente do teste.
 
 A suíte passou com `37 passed` e o inventário final ficou zero. Isto confirma comportamento fail-closed, mas também demonstra a lacuna Astra: o cleanup atual não remove seletivamente o recurso comprovadamente autorizado enquanto preserva o estrangeiro. Sem resolver ou delimitar essa política, não há evidência de recuperação IPC seletiva nem autorização para novo trial NG.
+
+## 30. Transport-loss fixture gate
+
+Foram adicionadas caracterizações sem NovaGenesis para os dois estados ambíguos do adaptador: resposta QGA assíncrona contendo apenas `pid`, rejeitada sem `guest exitcode`, e `subprocess.TimeoutExpired`, classificada como erro de transporte. A suíte relevante passou com `39 passed`; os módulos compilam.
+
+Essas fixtures confirmam classificação fail-closed, mas não simulam ainda reconexão e reconciliação de um processo real após perda de transporte. O conjunto atual cobre: argv SSH, espera síncrona longa, exitcode não zero, timeout controlado, árvore líder/filho, identidade divergente e IPC SysV estrangeiro. Novo trial NG permanece bloqueado até a próxima revisão Astra e fechamento do contrato de recuperação.
