@@ -200,13 +200,27 @@ def test_local_stop_process_group_stops_owned_process(tmp_path):
 
 
 
+def _reaping_leader_program():
+    return """\
+import signal, subprocess, sys, time
+child = subprocess.Popen([sys.executable, '-c', sys.argv[1]])
+def stop(_signum, _frame):
+    if child.poll() is None:
+        child.terminate()
+    try:
+        child.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        child.kill()
+        child.wait(timeout=5)
+    raise SystemExit(0)
+signal.signal(signal.SIGTERM, stop)
+time.sleep(30)
+"""
+
+
 def test_local_stop_process_group_stops_leader_and_child(tmp_path):
     child_code = "import time; time.sleep(30)"
-    leader_code = (
-        "import subprocess,sys,time; "
-        "subprocess.Popen([sys.executable, '-c', sys.argv[1]]); "
-        "time.sleep(30)"
-    )
+    leader_code = _reaping_leader_program()
     stdout_path = tmp_path / "leader.stdout"
     stderr_path = tmp_path / "leader.stderr"
     stdout = stdout_path.open("w", encoding="utf-8")
@@ -256,11 +270,7 @@ def test_local_stop_process_group_stops_leader_and_child(tmp_path):
 
 def test_transport_loss_then_reconciliation_stops_real_process_tree(tmp_path):
     child_code = "import time; time.sleep(30)"
-    leader_code = (
-        "import subprocess,sys,time; "
-        "subprocess.Popen([sys.executable, '-c', sys.argv[1]]); "
-        "time.sleep(30)"
-    )
+    leader_code = _reaping_leader_program()
     stdout_path = tmp_path / "reconcile.stdout"
     stderr_path = tmp_path / "reconcile.stderr"
     stdout = stdout_path.open("w", encoding="utf-8")
