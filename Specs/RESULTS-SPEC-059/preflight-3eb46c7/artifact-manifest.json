@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "candidate": "3eb46c78ff89604687147c2be23244c3140396ff",
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 3076,
+      "sha256": "bde0af0b1e61b8f72551fa232e4488800c82053ec4f6b5fe5d3dec4cb2e5169a"
+    },
+    {
+      "path": "build/debug/build-manifest.json",
+      "size": 598029,
+      "sha256": "4086d5973deb2093720c4b1f5f956c8c82e3dfacbeaae5d43b71fc972accd9ac"
+    },
+    {
+      "path": "build/debug/build.stderr.log",
+      "size": 41151,
+      "sha256": "188ecc5297583e384c571d4d55323515f16f0a4dd9f04c3cfd355d882543bd36"
+    },
+    {
+      "path": "build/debug/build.stdout.log",
+      "size": 12049,
+      "sha256": "914763266eed789b8ff468e19719394eea52dbbc24025ba6323383daaac69bac"
+    },
+    {
+      "path": "build/debug/compile_commands.json",
+      "size": 137772,
+      "sha256": "6a34dbf5b04dc79a4e60981a7000f5bed94091e527e9ac473dc824d1dd1f89d0"
+    },
+    {
+      "path": "build/debug/configure.stderr.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/debug/configure.stdout.log",
+      "size": 632,
+      "sha256": "8ef7d631f8f1c6384bacdfb549780d22d981e64e4bedc7cf4a9aba69e49022e3"
+    },
+    {
+      "path": "build/debug/manual-build.log",
+      "size": 53823,
+      "sha256": "40158cc18ac7357ba2a942bc2b3002a6cb4abd4afcfdb0fbaab822866d45ac6b"
+    },
+    {
+      "path": "build/sanitizer/manual-build.log",
+      "size": 53827,
+      "sha256": "d6fa5d2c4e39319ed9e422053345e7cfff7d228434fcae52d8a7210879fbba09"
+    },
+    {
+      "path": "preflight/nonroot-direct.json",
+      "size": 454,
+      "sha256": "3f431e849ce3b2fe8334432ce8964f54058fa61ffc077e3a419a398b2fe424d3"
+    },
+    {
+      "path": "qga-channel.json",
+      "size": 352,
+      "sha256": "2d1c5b75b5b2593504f0f5c7352419ab5bf060f801107b511c4b2c473953b451"
+    },
+    {
+      "path": "qga-preflight.json",
+      "size": 1746,
+      "sha256": "b912e9fc2a3b5445028eb815109adc41e4269cbe2d1ec1fd97189af83a584eb5"
+    }
+  ]
+}

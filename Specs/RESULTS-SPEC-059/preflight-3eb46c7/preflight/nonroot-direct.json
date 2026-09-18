@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "operation": "preflight",
+  "mode": "local",
+  "local_profile": "native-privileged",
+  "execution_channel": "direct-local-process",
+  "ok": false,
+  "exit_code": 2,
+  "stderr": "CONFIG_ERROR: native-privileged local profile requires effective UID 0",
+  "roles_launched": false,
+  "cleanup_called": false,
+  "interpretation": "expected channel limitation; the same preflight passed inside VM 100 through Proxmox QGA as UID 0"
+}
