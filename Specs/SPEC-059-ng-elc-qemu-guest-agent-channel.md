@@ -263,3 +263,9 @@ A remoção foi feita somente pelos IDs SysV e paths POSIX identificados no inve
 O trial `qga-r14-20260917` passou pela elegibilidade e pelo preflight, executou o cleanup nativo em baseline zero, lançou `PGCS`, `NRNCS`, `Repository` e `Source` com imagens `sealed-memfd`, e registrou readiness/discovery via SHM. O oracle observou os cinco ficheiros no Source, mas o Repository permaneceu vazio; não houve convergência de entrega.
 
 A chamada de transporte terminou com `QGAChannelError: QGA response has no guest exitcode`, e o bundle não contém `result.json`, `cleanup.json`, `preservation.json` nem seal final. A inspeção posterior encontrou 16 SHM e 16 semáforos POSIX criados pelos PIDs dos roles r14; eles foram removidos individualmente via QGA root e o inventário final ficou zero. O r14 é diagnóstico/incompleto, sem base para aceitação. A revisão Astra deve avaliar separadamente: (1) validade do harness/QGA para comandos longos, (2) comportamento do teardown após falha de transporte, e (3) ausência de entrega Source→Repository.
+
+## 24. QGA adapter increment after Astra HOLD
+
+A validação do host Proxmox confirmou que `qm guest exec` usa `--timeout 30` por padrão e retorna apenas o PID quando esse limite é atingido. O adaptador agora solicita `--synchronous 1 --timeout 0` em `build_qm_argv`, mantendo o timeout externo do canal como limite de transporte. O comportamento foi coberto por teste RED→GREEN e por smoke real de `/usr/bin/id -u` via QGA: `transport_exit_code=0`, guest `exit_code=0`, `stdout=0`, `exited=true`.
+
+Esta alteração é limitada ao adaptador QGA e não constitui aceitação do runtime NG-ELC. A revisão Astra pós-mudança ainda é obrigatória antes de um novo trial.

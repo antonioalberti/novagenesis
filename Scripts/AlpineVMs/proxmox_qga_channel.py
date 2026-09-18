@@ -36,7 +36,7 @@ def build_qm_argv(vmid: str, command: Sequence[str] | str) -> list[str]:
     argv = [str(item) for item in command]
     if any(not item or "\x00" in item for item in argv):
         raise QGAChannelError("command contains an empty or NUL argument")
-    return ["qm", "guest", "exec", vmid, "--", *argv]
+    return ["qm", "guest", "exec", vmid, "--synchronous", "1", "--timeout", "0", "--", *argv]
 
 
 def parse_qga_exec_response(payload: Mapping[str, Any] | str) -> dict[str, Any]:

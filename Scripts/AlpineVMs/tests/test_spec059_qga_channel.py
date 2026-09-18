@@ -18,7 +18,14 @@ from proxmox_qga_channel import (
 
 def test_build_qm_argv_preserves_guest_argument_boundaries():
     assert build_qm_argv("100", ["/usr/bin/id", "-u"]) == [
-        "qm", "guest", "exec", "100", "--", "/usr/bin/id", "-u"
+        "qm", "guest", "exec", "100", "--synchronous", "1", "--timeout", "0", "--", "/usr/bin/id", "-u"
+    ]
+
+
+def test_build_qm_argv_requests_synchronous_unbounded_guest_wait():
+    argv = build_qm_argv("100", ["/usr/bin/id", "-u"])
+    assert argv == [
+        "qm", "guest", "exec", "100", "--synchronous", "1", "--timeout", "0", "--", "/usr/bin/id", "-u"
     ]
 
 
