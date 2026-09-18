@@ -1,4 +1,5 @@
 import hashlib
+import json
 import subprocess
 import shutil
 from pathlib import Path
@@ -20,6 +21,21 @@ from local_provenance import (
 
 def test_sanitize_config_serializes_sets_deterministically():
     assert sanitize_config({"values": {"b", "a"}}) == {"values": ["a", "b"]}
+
+
+def test_preserve_manifest_retains_byte_identical_raw_copy(tmp_path):
+    source = tmp_path / "build-manifest.json"
+    raw = b'{"API_TOKEN":"secret","value":1}\n'
+    source.write_bytes(raw)
+    evidence = tmp_path / "evidence"
+
+    record = local_provenance._preserve_manifest(source, evidence, json.loads(raw))
+
+    raw_copy = evidence / record["raw_preserved_path"]
+    assert raw_copy.read_bytes() == raw
+    assert record["raw_preserved_size"] == len(raw)
+    assert record["raw_preserved_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert (evidence / record["preserved_path"]).read_text(encoding="utf-8").endswith("\n")
 
 
 def test_git_commands_mark_repository_safe_for_root_execution(tmp_path):

@@ -816,13 +816,16 @@ def _preserve_manifest(path: Path, evidence_root: Path, manifest: Mapping[str, A
 
     source_stat = path.stat()
     target = evidence_root / "provenance" / "build-manifest.json"
+    raw_target = evidence_root / "provenance" / "build-manifest.raw.json"
     target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(path, raw_target)
     safe = sanitize_config(manifest)
     target.write_text(json.dumps(safe, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     after = path.stat()
     if (source_stat.st_size, source_stat.st_mtime_ns, source_stat.st_ino) != (after.st_size, after.st_mtime_ns, after.st_ino):
         raise ValueError("build manifest raced during preservation")
     preserved = _evidence_file_record(target, "provenance/build-manifest.json")
+    raw_preserved = _evidence_file_record(raw_target, "provenance/build-manifest.raw.json")
     return {
         "path": str(path.resolve()),
         "size": source_stat.st_size,
@@ -830,6 +833,9 @@ def _preserve_manifest(path: Path, evidence_root: Path, manifest: Mapping[str, A
         "preserved_path": preserved["path"],
         "preserved_size": preserved["size"],
         "preserved_sha256": preserved["sha256"],
+        "raw_preserved_path": raw_preserved["path"],
+        "raw_preserved_size": raw_preserved["size"],
+        "raw_preserved_sha256": raw_preserved["sha256"],
         "evidence_dir": str(evidence_root.resolve()),
     }
 
