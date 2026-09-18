@@ -323,3 +323,9 @@ Essas fixtures confirmam classificação fail-closed, mas não simulam ainda rec
 Foi adicionada uma fixture sem NovaGenesis que usa líder/filho reais e registro real de identidade, injeta `TimeoutExpired` na primeira chamada QGA, confirma que o processo continua vivo, reconecta por uma segunda resposta QGA sintética com `exitcode=0`, e então encerra o process group real verificando grupo vazio.
 
 A suíte relevante passou com `40 passed`, `py_compile` passou e o inventário IPC final ficou zero. A fixture cobre reconciliação in-process com transporte injetado; não prova ainda reconexão QGA real nem resolve o `Agent error: PID ld does not exist` observado no r15. Novo trial NG permanece bloqueado até revisão Astra deste incremento.
+
+## 32. Real QGA post-start reconciliation gate
+
+Foi executada uma fixture sem NovaGenesis pelo QGA real: `/bin/sh` iniciou `/bin/sleep 20` e gravou seu PID; o canal foi interrompido por timeout de 3 s depois do início; uma nova conexão leu o PID via `cat`, confirmou `kill -0`, enviou `SIGTERM`, verificou ausência posterior via `ps` e removeu o pidfile.
+
+Resultados verificados: perda classificada como `QGAChannelError: QGA transport timeout`; reconexão com `exit_code=0`; processo vivo antes do stop; `kill -TERM` com `exit_code=0`; estado posterior ausente (`ps` exit 1); cleanup do pidfile com `exit_code=0`. Esta é evidência de reconciliação QGA real para um processo controlado, não prova de teardown de árvore NG nem de ownership IPC seletivo.
