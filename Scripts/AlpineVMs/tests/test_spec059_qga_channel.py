@@ -252,6 +252,62 @@ def test_local_stop_process_group_stops_leader_and_child(tmp_path):
 
 
 
+
+
+def test_transport_loss_then_reconciliation_stops_real_process_tree(tmp_path):
+    child_code = "import time; time.sleep(30)"
+    leader_code = (
+        "import subprocess,sys,time; "
+        "subprocess.Popen([sys.executable, '-c', sys.argv[1]]); "
+        "time.sleep(30)"
+    )
+    stdout_path = tmp_path / "reconcile.stdout"
+    stderr_path = tmp_path / "reconcile.stderr"
+    stdout = stdout_path.open("w", encoding="utf-8")
+    stderr = stderr_path.open("w", encoding="utf-8")
+    proc = subprocess.Popen(
+        [sys.executable, "-c", leader_code, child_code],
+        start_new_session=True,
+        stdout=stdout,
+        stderr=stderr,
+        text=True,
+    )
+    processes = {}
+    run = Mock(side_effect=[
+        subprocess.TimeoutExpired(["ssh"], timeout=3),
+        {"returncode": 0, "stdout": json.dumps({"exitcode": 0, "exited": 1}), "stderr": ""},
+    ])
+    channel = QGAChannel(host="192.168.0.200", vmid="100", timeout=3, run=run)
+    try:
+        time.sleep(0.2)
+        item = executor.register_local_process(
+            processes,
+            "fixture-reconcile",
+            proc,
+            [sys.executable, "-c", leader_code, child_code],
+            stdout,
+            stderr,
+            stdout_path,
+            stderr_path,
+            {"representation": "fixture"},
+        )
+        with pytest.raises(QGAChannelError, match="transport timeout"):
+            channel.exec(["/bin/true"])
+        assert proc.poll() is None
+        reconciled = channel.exec(["/bin/true"])
+        assert reconciled["exit_code"] == 0
+        result = executor.local_stop_process_group(proc, item["pgid"], item["starttime"], item["executable"])
+        assert result["ok"] is True
+        proc.wait(timeout=5)
+        assert executor.local_group_members_status(item["pgid"])["members"] == []
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+        stdout.close()
+        stderr.close()
+
+
 def test_local_remove_new_ipc_fails_closed_on_foreign_sysv_resource():
     before = executor.local_ipc_snapshot()
     created: list[tuple[str, str]] = []

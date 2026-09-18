@@ -317,3 +317,9 @@ A suíte passou com `37 passed` e o inventário final ficou zero. Isto confirma 
 Foram adicionadas caracterizações sem NovaGenesis para os dois estados ambíguos do adaptador: resposta QGA assíncrona contendo apenas `pid`, rejeitada sem `guest exitcode`, e `subprocess.TimeoutExpired`, classificada como erro de transporte. A suíte relevante passou com `39 passed`; os módulos compilam.
 
 Essas fixtures confirmam classificação fail-closed, mas não simulam ainda reconexão e reconciliação de um processo real após perda de transporte. O conjunto atual cobre: argv SSH, espera síncrona longa, exitcode não zero, timeout controlado, árvore líder/filho, identidade divergente e IPC SysV estrangeiro. Novo trial NG permanece bloqueado até a próxima revisão Astra e fechamento do contrato de recuperação.
+
+## 31. Transport-loss reconciliation fixture
+
+Foi adicionada uma fixture sem NovaGenesis que usa líder/filho reais e registro real de identidade, injeta `TimeoutExpired` na primeira chamada QGA, confirma que o processo continua vivo, reconecta por uma segunda resposta QGA sintética com `exitcode=0`, e então encerra o process group real verificando grupo vazio.
+
+A suíte relevante passou com `40 passed`, `py_compile` passou e o inventário IPC final ficou zero. A fixture cobre reconciliação in-process com transporte injetado; não prova ainda reconexão QGA real nem resolve o `Agent error: PID ld does not exist` observado no r15. Novo trial NG permanece bloqueado até revisão Astra deste incremento.
