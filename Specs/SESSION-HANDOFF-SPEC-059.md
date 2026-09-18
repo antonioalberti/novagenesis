@@ -66,3 +66,10 @@ Não iniciar outro trial NG ainda. O próximo incremento deve ser revisado por A
 5. decidir a política `unattributed-ipc` all-or-nothing versus remoção selectiva, sem remover recursos estrangeiros.
 
 Qualquer novo trial deve ser apenas diagnóstico, com baseline zero verificada, build ligado ao HEAD exato, evidência nova e cleanup atribuído; não alterar C++ NovaGenesis sem nova SPEC/autorização.
+
+## Fecho da sessão — 2026-09-18
+
+- Release audit após os write-backs: `BLOCKED`, 4 gates, 13 problemas `SPEC_OPEN`; árvore Git limpa.
+- Memória hierárquica auditada em modo read-only: `MEMORY.md` 2998/3000 B e pointer presente; `MEMORY_EXTENSION.md` 20104 B; `USER.md` 1407/1375 B e avisos de conteúdo operacional permanecem preexistentes. Nenhum ficheiro de memória foi alterado.
+- Relatório persistido em `Specs/RESULTS-SPEC-059/session-closeout-20260918.md`.
+- Próximo reinício: carregar este handoff, `session-closure-reconciliation`, `hermes-memory-architecture` e as skills NovaGenesis afectadas; resolver primeiro QGA completion/teardown, sem retry automático.
