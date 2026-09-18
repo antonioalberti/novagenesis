@@ -3,6 +3,7 @@ import os
 import shlex
 import subprocess
 import sys
+import time
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -174,6 +175,58 @@ def test_local_stop_process_group_stops_owned_process(tmp_path):
         if proc.poll() is None:
             proc.kill()
             proc.wait(timeout=5)
+
+
+
+
+def test_local_stop_process_group_stops_leader_and_child(tmp_path):
+    child_code = "import time; time.sleep(30)"
+    leader_code = (
+        "import subprocess,sys,time; "
+        "subprocess.Popen([sys.executable, '-c', sys.argv[1]]); "
+        "time.sleep(30)"
+    )
+    stdout_path = tmp_path / "leader.stdout"
+    stderr_path = tmp_path / "leader.stderr"
+    stdout = stdout_path.open("w", encoding="utf-8")
+    stderr = stderr_path.open("w", encoding="utf-8")
+    proc = subprocess.Popen(
+        [sys.executable, "-c", leader_code, child_code],
+        start_new_session=True,
+        stdout=stdout,
+        stderr=stderr,
+        text=True,
+    )
+    processes = {}
+    try:
+        time.sleep(0.2)
+        item = executor.register_local_process(
+            processes,
+            "fixture-tree",
+            proc,
+            [sys.executable, "-c", leader_code, child_code],
+            stdout,
+            stderr,
+            stdout_path,
+            stderr_path,
+            {"representation": "fixture"},
+        )
+        pgid = item["pgid"]
+        members_before = executor.local_group_members_status(pgid)
+        assert members_before["complete"] is True
+        assert len(members_before["members"]) >= 2
+        result = executor.local_stop_process_group(proc, pgid, item["starttime"], item["executable"])
+        assert result["ok"] is True
+        proc.wait(timeout=5)
+        members_after = executor.local_group_members_status(pgid)
+        assert members_after["complete"] is True
+        assert members_after["members"] == []
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+        stdout.close()
+        stderr.close()
 
 
 def test_local_stop_process_group_records_already_exited_process():

@@ -294,3 +294,14 @@ O encerramento falhou novamente com `stop identity-mismatch` para `Source`, deix
 A revisão `spec059-r15-posttrial-review`, enviada ao `gpt-6-astra` com os fatos r15 completos, classificou o estado como **HOLD**. A prioridade recomendada é tornar teardown e recuperação verificáveis antes de investigar o payload: `identity-mismatch`, `Agent error: PID ld does not exist`, resíduos IPC e ausência de seal são blockers independentes. O Repository vazio continua sendo apenas oráculo negativo; não há localização da causa no fluxo Source→Repository.
 
 Foi adicionada uma fixture sem NovaGenesis para `local_stop_process_group`, cobrindo parada de processo pertencente, processo já encerrado e divergência de `starttime` fail-closed. A suíte QGA/provenance/executor passou com `35 passed`; os módulos alterados compilam. A fixture caracteriza o contrato atual, mas não prova ainda que o teardown completo do controlador sobreviva à perda de transporte.
+
+## 28. Composite teardown fixture gate
+
+Foi adicionada uma fixture sem NovaGenesis que usa o caminho real de registro de identidade para lançar um líder Python e um filho no mesmo grupo de processos. A fixture verifica que:
+
+- o grupo contém líder e filho antes da parada;
+- `local_stop_process_group` encerra o grupo pertencente;
+- o processo líder termina;
+- nenhum membro permanece no PGID depois do stop.
+
+A suíte relevante passou com `36 passed`, incluindo parada normal, processo já encerrado e divergência de `starttime` fail-closed. Esta fatia cobre árvore de processos local, mas ainda não cobre perda de transporte, memfd/PTY, ownership seletivo de IPC ou recuperação QGA; o próximo ensaio NG continua bloqueado.
