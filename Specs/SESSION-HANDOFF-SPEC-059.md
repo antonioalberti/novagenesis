@@ -4,7 +4,7 @@
 
 - Repositório: `/home/gandalf/workspace/novagenesis`
 - Branch: `AIOPT3`
-- HEAD de handoff: `474a86dda3512891cfa55ba50c98a29ba33d50ec`
+- HEAD de handoff: `eef38fd1fb5d760668893c1b4663d968fadc450b`
 - Estado Git no momento do handoff: limpo, à frente de `origin/AIOPT3`.
 - Host Proxmox: `192.168.0.200`; VM alvo: `100`.
 - Não executar novo trial NG sem revisar este documento, a SPEC e os blockers abaixo.
