@@ -305,3 +305,9 @@ Foi adicionada uma fixture sem NovaGenesis que usa o caminho real de registro de
 - nenhum membro permanece no PGID depois do stop.
 
 A suíte relevante passou com `36 passed`, incluindo parada normal, processo já encerrado e divergência de `starttime` fail-closed. Esta fatia cobre árvore de processos local, mas ainda não cobre perda de transporte, memfd/PTY, ownership seletivo de IPC ou recuperação QGA; o próximo ensaio NG continua bloqueado.
+
+## 29. IPC ownership fixture gate
+
+Foi adicionada uma fixture SysV real que cria dois SHM com `ipcmk`, captura `creator_pid` via `local_ipc_details` e marca apenas um como pertencente à execução. O caminho real `local_remove_new_ipc` foi exercitado. Quando há um recurso novo estrangeiro, o resultado é `ok=false`, `reason=unattributed-ipc`, e ambos os recursos permanecem; a fixture limpa-os apenas no teardown independente do teste.
+
+A suíte passou com `37 passed` e o inventário final ficou zero. Isto confirma comportamento fail-closed, mas também demonstra a lacuna Astra: o cleanup atual não remove seletivamente o recurso comprovadamente autorizado enquanto preserva o estrangeiro. Sem resolver ou delimitar essa política, não há evidência de recuperação IPC seletiva nem autorização para novo trial NG.

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -227,6 +228,47 @@ def test_local_stop_process_group_stops_leader_and_child(tmp_path):
             proc.wait(timeout=5)
         stdout.close()
         stderr.close()
+
+
+
+
+def test_local_remove_new_ipc_fails_closed_on_foreign_sysv_resource():
+    before = executor.local_ipc_snapshot()
+    created: list[tuple[str, str]] = []
+    creator_pids: set[int] = set()
+
+    def make(kind: str) -> tuple[str, int]:
+        proc = subprocess.Popen(
+            ["/usr/bin/ipcmk", "-M" if kind == "shm" else "-S", "1"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        stdout, stderr = proc.communicate(timeout=5)
+        assert proc.returncode == 0, stderr
+        match = re.search(r"(\d+)\s*$", stdout.strip())
+        assert match, stdout
+        identifier = match.group(1)
+        created.append((kind, identifier))
+        return identifier, proc.pid
+
+    try:
+        owned_shm, owned_pid = make("shm")
+        foreign_shm, foreign_pid = make("shm")
+        details = executor.local_ipc_details("shm")
+        assert details is not None
+        creator_pids.update({details[owned_shm]["creator_pid"]})
+        after = executor.local_ipc_snapshot()
+        ok, new_ids, reason = executor.local_remove_new_ipc(before, creator_pids)
+        assert ok is False
+        assert reason == "unattributed-ipc"
+        remaining = executor.local_ipc_snapshot()
+        assert owned_shm in (remaining["shm"] or set())
+        assert foreign_shm in (remaining["shm"] or set())
+    finally:
+        for kind, identifier in created:
+            flag = "-m" if kind == "shm" else "-s"
+            subprocess.run(["/usr/bin/ipcrm", flag, identifier], check=False, capture_output=True)
 
 
 def test_local_stop_process_group_records_already_exited_process():
