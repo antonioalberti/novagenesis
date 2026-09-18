@@ -4,7 +4,7 @@
 
 - Repositório: `/home/gandalf/workspace/novagenesis`
 - Branch: `AIOPT3`
-- HEAD de handoff: `eef38fd1fb5d760668893c1b4663d968fadc450b`
+- HEAD de handoff: `ce5a7869ff61733362553b3a8d5bb3a0a627cc3e`
 - Estado Git no momento do handoff: limpo, à frente de `origin/AIOPT3`.
 - Host Proxmox: `192.168.0.200`; VM alvo: `100`.
 - Não executar novo trial NG sem revisar este documento, a SPEC e os blockers abaixo.
@@ -27,7 +27,7 @@
    - `qm guest exec` usa `--synchronous 1 --timeout 0`;
    - argv remoto é serializado com `shlex.join(qm_argv)`;
    - testes e smoke real validaram `sleep 35`, `false`, argumentos com espaços/metacaracteres, timeout externo e resposta sem exitcode.
-4. Suíte relevante mais recente: `40 passed`; `py_compile` passou.
+4. Suíte AlpineVM mais recente: `190 passed, 7 subtests passed`; `py_compile` passou.
 5. Fixture QGA real de reconciliação sem NG passou: perda após iniciar `/bin/sleep`, reconexão, leitura de PID, `kill -0`, `SIGTERM`, verificação de ausência e remoção do pidfile.
 6. Fixtures sem NG cobrem processo líder/filho, identidade divergente, resposta QGA só com PID, timeout de transporte e IPC SysV estrangeiro fail-closed.
 
@@ -49,17 +49,20 @@
 - Pós-r15: **HOLD** — prioridade teardown/process identity e IPC ownership antes de payload.
 - Fixtures de processo/IPC/transporte: fecham caracterizações parciais, mas não o HOLD global.
 - Real QGA reconciliation fixture: passou, mas não prova teardown de árvore NG nem ownership IPC seletivo.
+- r17: quatro roles/readiness observados e cinco JPEGs no Source; Repository permaneceu vazio; QGA terminou com transport exit 29 / `Agent error: PID ld does not exist`; teardown automático ficou incompleto e a recuperação externa deixou inventário zero.
+- Revisão controller-only r17: a corrida PTY foi isolada; o wrapper `setsid --wait --ctty` podia ser registado antes de estabilizar o PGID. O patch `ce5a786` usa `Popen(start_new_session=True)` + `TIOCSCTTY`, com teste RED→GREEN.
+- Astra pós-r17: patch `CONDITIONAL_READY`, depois `READY_FOR_REVIEW_COMMIT` após inspeção de threading; SPEC-059 `DIAGNOSTIC_VALIDATED / ACCEPTANCE_PENDING`; M1 `NOT_ACCEPTED`; Release `NOT_RELEASE_READY`.
 
 Tracker Astra: `~/CodeRepository/tool-codex-usage-tracker/`; usar a skill `codex-delegation-loop` e `tool-codex-usage-tracker`. O Codex standalone não funciona com a autenticação Hermes (`401`); usar `codex_usage_tracker.py send --model gpt-6-astra` e sempre enviar todo o contexto, pois Astra é stateless.
 
-## Próximo passo obrigatório
+## Estado actual e próximo passo obrigatório
 
 Não iniciar outro trial NG ainda. O próximo incremento deve ser revisado por Astra e deve resolver/definir:
 
-1. como o teardown obtém/revalida PID, PGID, starttime e descendentes após `identity-mismatch`;
+1. validar a correcção PTY `ce5a786` numa futura execução diagnóstica, sem assumir que ela resolve o QGA;
 2. como o estado QGA `Agent error: PID ld does not exist` é classificado e reconciliado;
-3. se a política `unattributed-ipc` all-or-nothing permanece normativa ou precisa de SPEC explícita para remoção seletiva;
-4. cobertura de semáforos SysV/POSIX — no host, `ipcs -s -p` não expôs PID utilizável e o parser falha fechado;
-5. persistência de JSON bruto, stdout/stderr bounded e seal final em falhas de transporte.
+3. confirmar teardown automático completo, seal final e persistência de JSON bruto em falhas de transporte;
+4. separar Source→Repository delivery da evidência de controlo/teardown;
+5. decidir a política `unattributed-ipc` all-or-nothing versus remoção selectiva, sem remover recursos estrangeiros.
 
 Qualquer novo trial deve ser apenas diagnóstico, com baseline zero verificada, build ligado ao HEAD exato, evidência nova e cleanup atribuído; não alterar C++ NovaGenesis sem nova SPEC/autorização.

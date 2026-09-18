@@ -329,3 +329,11 @@ A suíte relevante passou com `40 passed`, `py_compile` passou e o inventário I
 Foi executada uma fixture sem NovaGenesis pelo QGA real: `/bin/sh` iniciou `/bin/sleep 20` e gravou seu PID; o canal foi interrompido por timeout de 3 s depois do início; uma nova conexão leu o PID via `cat`, confirmou `kill -0`, enviou `SIGTERM`, verificou ausência posterior via `ps` e removeu o pidfile.
 
 Resultados verificados: perda classificada como `QGAChannelError: QGA transport timeout`; reconexão com `exit_code=0`; processo vivo antes do stop; `kill -TERM` com `exit_code=0`; estado posterior ausente (`ps` exit 1); cleanup do pidfile com `exit_code=0`. Esta é evidência de reconciliação QGA real para um processo controlado, não prova de teardown de árvore NG nem de ownership IPC seletivo.
+
+## 33. r17 diagnostic and controller-only PTY closeout — 2026-09-18
+
+O trial `qga-r17-20260918` lançou os quatro roles com o candidato exacto `68f0678`, observou readiness e cinco JPEGs no Source, mas encontrou Repository vazio. A chamada QGA terminou com `transport_exit_code=29`, sem guest exitcode e com `Agent error: PID ld does not exist`; o teardown automático não produziu seal final. A recuperação autorizada via `Scripts/Simple/clean.sh` removeu os 16 SHM e 16 semáforos POSIX atribuíveis e o inventário independente final ficou zero. O r17 permanece diagnóstico/incompleto.
+
+A revisão controller-only isolou a corrida no caminho PTY: o wrapper externo `/usr/bin/setsid --wait --ctty` podia devolver o PID antes de estabilizar o PGID, que era registado como o PGID herdado do controller. O commit `ce5a786` substitui esse caminho por `Popen(start_new_session=True)` e `TIOCSCTTY`, preservando o PTY e os limites de argv. A regressão falhava antes e passa depois; a suíte AlpineVM passou `190 passed, 7 subtests passed`. A inspeção confirmou que o callback corre antes da criação da thread de captura e não há threads do controller activas no ponto de launch.
+
+Veredicto Astra: patch `READY_FOR_REVIEW_COMMIT`; SPEC-059 `DIAGNOSTIC_VALIDATED / ACCEPTANCE_PENDING`. O erro QGA, o teardown automático, o seal final e Source→Repository permanecem abertos; M1 e Release 1.0.0 não são aceites.
