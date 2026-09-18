@@ -423,7 +423,12 @@ def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: M
     stderr = stderr_path.open("w", encoding="utf-8")
     capture: _PtyCapture | None = None
     proc: subprocess.Popen[Any] | None = None
-    launch_argv = ["/usr/bin/setsid", "--wait", "--ctty", *argv]
+    launch_argv = list(argv)
+    # Popen creates the session before this callback; the PTY drain thread is
+    # created only after Popen returns, so this launch point is single-threaded.
+    def attach_controlling_tty() -> None:
+        if fcntl is not None:
+            fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)
     try:
         proc = subprocess.Popen(
             launch_argv,
@@ -432,7 +437,8 @@ def launch_local_role_pty(role: str, argv: list[str], *, cwd: str | None, env: M
             stdin=slave_fd,
             stdout=slave_fd,
             stderr=slave_fd,
-            start_new_session=False,
+            start_new_session=True,
+            preexec_fn=attach_controlling_tty,
             close_fds=True,
             text=False,
             pass_fds=pass_fds,

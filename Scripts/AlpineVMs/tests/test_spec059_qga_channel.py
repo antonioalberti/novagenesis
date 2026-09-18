@@ -182,6 +182,25 @@ def test_runtime_library_manifest_covers_contentapp_role_aliases():
     assert identities["Repository"] is not identities["ContentApp"]
 
 
+def test_pty_launch_exposes_stable_process_group_identity(tmp_path):
+    result = executor.launch_local_role_pty(
+        "pty-probe",
+        ["/bin/sleep", "30"],
+        cwd=str(tmp_path),
+        env=os.environ.copy(),
+        stdout_path=tmp_path / "stdout.log",
+        stderr_path=tmp_path / "stderr.log",
+    )
+    proc = result["process"]
+    try:
+        assert os.getpgid(proc.pid) == proc.pid
+    finally:
+        if proc.poll() is None:
+            proc.terminate()
+            proc.wait(timeout=5)
+        result["close"]()
+
+
 def test_local_stop_process_group_stops_owned_process(tmp_path):
     del tmp_path
     proc = subprocess.Popen(["/bin/sleep", "30"], start_new_session=True)

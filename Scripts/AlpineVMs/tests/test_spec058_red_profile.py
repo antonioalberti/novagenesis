@@ -143,10 +143,11 @@ class Spec058PtyRedTests(unittest.TestCase):
                 )
                 argv = popen.call_args.args[0]
                 kwargs = popen.call_args.kwargs
-                self.assertEqual(argv[:3], ["/usr/bin/setsid", "--wait", "--ctty"])
+                self.assertEqual(argv, [sys.executable, "-c", "print('READY')"])
                 self.assertIs(kwargs["stdin"], kwargs["stdout"])
                 self.assertIs(kwargs["stdout"], kwargs["stderr"])
-                self.assertFalse(kwargs["start_new_session"])
+                self.assertTrue(kwargs["start_new_session"])
+                self.assertTrue(callable(kwargs["preexec_fn"]))
                 self.assertEqual(result["process"].pid, 4321)
                 self.assertTrue(result["stream_topology"]["stdout_stderr_merged"])
                 result["close"]()
