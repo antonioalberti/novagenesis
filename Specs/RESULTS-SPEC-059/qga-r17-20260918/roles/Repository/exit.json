@@ -1,0 +1,42 @@
+{
+  "descendant_rollback_ledger": {
+    "ok": true,
+    "residual": [],
+    "scan_count": 4,
+    "scans": [
+      {
+        "ancestry_complete": true,
+        "anchor_complete": true,
+        "group_complete": true,
+        "round": 1
+      },
+      {
+        "ancestry_complete": true,
+        "anchor_complete": true,
+        "group_complete": true,
+        "round": 2
+      },
+      {
+        "ancestry_complete": true,
+        "anchor_complete": true,
+        "group_complete": true,
+        "round": 3
+      },
+      {
+        "ancestry_complete": true,
+        "anchor_complete": true,
+        "group_complete": true,
+        "round": 4
+      }
+    ],
+    "tracked": [],
+    "unknown": []
+  },
+  "group_members_after_stop": [],
+  "pid": 1256182,
+  "returncode": -15,
+  "role": "Repository",
+  "rollback_uncertain": false,
+  "tracked_descendants": [],
+  "unresolved": false
+}

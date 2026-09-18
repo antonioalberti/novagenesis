@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "recovery": "qga-r17",
+  "execution_channel": "proxmox-qga",
+  "host": "192.168.0.200",
+  "vmid": "100",
+  "command": [
+    "/usr/bin/env",
+    "NG_ELC_NATIVE=0",
+    "/usr/bin/bash",
+    "/home/gandalf/workspace/novagenesis/Scripts/Simple/clean.sh"
+  ],
+  "result": {
+    "backend": "proxmox-qga",
+    "host": "192.168.0.200",
+    "vmid": "100",
+    "transport_exit_code": 0,
+    "exit_code": 0,
+    "stdout": "=== Killing NovaGenesis processes ===\n\n=== Cleaning IO directories ===\n\n=== Cleaning IPC resources ===\n  Removed shmid 32782\n  Removed shmid 32783\n  Removed shmid 32784\n  Removed shmid 32785\n  Removed shmid 32786\n  Removed shmid 32787\n  Removed shmid 32788\n  Removed shmid 32789\n  Removed shmid 32790\n  Removed shmid 32791\n  Removed shmid 32792\n  Removed shmid 32793\n  Removed shmid 32794\n  Removed shmid 32795\n  Removed shmid 32796\n  Removed shmid 32797\n  Removing 16 named semaphore(s) from /dev/shm...\nremoved '/dev/shm/sem.11'\nremoved '/dev/shm/sem.12'\nremoved '/dev/shm/sem.13'\nremoved '/dev/shm/sem.14'\nremoved '/dev/shm/sem.1594327388'\nremoved '/dev/shm/sem.1594327389'\nremoved '/dev/shm/sem.1594327390'\nremoved '/dev/shm/sem.1594327391'\nremoved '/dev/shm/sem.349249833'\nremoved '/dev/shm/sem.349249834'\nremoved '/dev/shm/sem.349249835'\nremoved '/dev/shm/sem.349249836'\nremoved '/dev/shm/sem.667056914'\nremoved '/dev/shm/sem.667056915'\nremoved '/dev/shm/sem.667056916'\nremoved '/dev/shm/sem.667056917'\n\n=== Done ===\n",
+    "stderr": "",
+    "exited": true
+  }
+}
