@@ -269,3 +269,16 @@ A chamada de transporte terminou com `QGAChannelError: QGA response has no guest
 A validação do host Proxmox confirmou que `qm guest exec` usa `--timeout 30` por padrão e retorna apenas o PID quando esse limite é atingido. O adaptador agora solicita `--synchronous 1 --timeout 0` em `build_qm_argv`, mantendo o timeout externo do canal como limite de transporte. O comportamento foi coberto por teste RED→GREEN e por smoke real de `/usr/bin/id -u` via QGA: `transport_exit_code=0`, guest `exit_code=0`, `stdout=0`, `exited=true`.
 
 Esta alteração é limitada ao adaptador QGA e não constitui aceitação do runtime NG-ELC. A revisão Astra pós-mudança ainda é obrigatória antes de um novo trial.
+
+## 25. Astra post-change review — QGA adapter
+
+A revisão `spec059-qga-ssh-postchange`, enviada pelo tracker Hermes ao `gpt-6-astra` após o commit `fc78d84`, classificou o fix `shlex.join(qm_argv)` como mínimo e correto sob shell remoto POSIX. O teste fake-`qm` reproduz a transformação relevante e os smokes reais confirmaram:
+
+- `sleep 35` síncrono: exitcode 0 e `exited=true`;
+- `false`: exitcode 1 preservado;
+- argumentos com espaço e metacaracteres: stdout literal preservado;
+- timeout externo: classificado como transporte, com recuperação do processo controlado.
+
+Veredicto Astra: **GO diagnóstico**, condicionado a baseline limpa, teardown/IPC verificável, conclusão QGA observável, provenance atualizada e gates separados de controle, payload e artefactos. O HOLD específico de quoting foi resolvido; isto não é aceitação de release/runtime.
+
+Permanecem gates SPEC-059 não fechados: persistência do JSON bruto em falhas, captura bounded de stdout/stderr, confirmação de conclusão/teardown após perda de transporte, e entrega Source→Repository. O próximo ensaio pode ser apenas diagnóstico e deve preservar falhas incompletas sem fabricar seal.
