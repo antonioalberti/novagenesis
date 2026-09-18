@@ -158,3 +158,43 @@ def test_runtime_library_manifest_covers_contentapp_role_aliases():
     assert identities["Repository"] == identities["ContentApp"]
     assert identities["Source"] == identities["ContentApp"]
     assert identities["Repository"] is not identities["ContentApp"]
+
+
+def test_local_stop_process_group_stops_owned_process(tmp_path):
+    del tmp_path
+    proc = subprocess.Popen(["/bin/sleep", "30"], start_new_session=True)
+    try:
+        pgid = os.getpgid(proc.pid)
+        starttime = executor.process_starttime(proc.pid)
+        result = executor.local_stop_process_group(proc, pgid, starttime)
+        assert result["ok"] is True
+        assert result["result"] == "SIGTERM"
+        assert proc.poll() is not None
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+
+
+def test_local_stop_process_group_records_already_exited_process():
+    proc = subprocess.Popen(["/bin/sleep", "1"], start_new_session=True)
+    pgid = os.getpgid(proc.pid)
+    proc.wait(timeout=5)
+    result = executor.local_stop_process_group(proc, pgid, None)
+    assert result["ok"] is True
+    assert result["result"] == "already-exited"
+
+
+def test_local_stop_process_group_fails_closed_on_identity_mismatch():
+    proc = subprocess.Popen(["/bin/sleep", "30"], start_new_session=True)
+    try:
+        pgid = os.getpgid(proc.pid)
+        starttime = executor.process_starttime(proc.pid)
+        result = executor.local_stop_process_group(proc, pgid, "wrong-starttime")
+        assert result["ok"] is False
+        assert result["result"] == "identity-mismatch"
+        assert proc.poll() is None
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)

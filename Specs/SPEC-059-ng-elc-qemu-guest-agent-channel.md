@@ -288,3 +288,9 @@ Permanecem gates SPEC-059 não fechados: persistência do JSON bruto em falhas, 
 O trial `qga-r15-20260918` usou o build HEAD `4e27404`, baseline zero e o adapter com espera síncrona e quoting SSH corrigido. A execução longa passou da espera de 30 s: os quatro roles foram lançados, readiness/discovery ocorreu e o oracle confirmou cinco inputs no Source. O Repository permaneceu vazio; não houve convergência de entrega.
 
 O encerramento falhou novamente com `stop identity-mismatch` para `Source`, deixando 16 SHM e 16 semáforos POSIX atribuídos aos PIDs r15. O QGA terminou com `transport_exit_code=29`, `Agent error: PID ld does not exist`, e o bundle não possui fechamento final completo. Os 32 recursos foram removidos individualmente via QGA root e o inventário final ficou zero. O r15 é diagnóstico/incompleto: confirmou a correção da espera longa/argv, mas isolou teardown/process identity e Source→Repository como blockers independentes.
+
+## 27. Astra post-r15 review and teardown fixture gate
+
+A revisão `spec059-r15-posttrial-review`, enviada ao `gpt-6-astra` com os fatos r15 completos, classificou o estado como **HOLD**. A prioridade recomendada é tornar teardown e recuperação verificáveis antes de investigar o payload: `identity-mismatch`, `Agent error: PID ld does not exist`, resíduos IPC e ausência de seal são blockers independentes. O Repository vazio continua sendo apenas oráculo negativo; não há localização da causa no fluxo Source→Repository.
+
+Foi adicionada uma fixture sem NovaGenesis para `local_stop_process_group`, cobrindo parada de processo pertencente, processo já encerrado e divergência de `starttime` fail-closed. A suíte QGA/provenance/executor passou com `35 passed`; os módulos alterados compilam. A fixture caracteriza o contrato atual, mas não prova ainda que o teardown completo do controlador sobreviva à perda de transporte.
