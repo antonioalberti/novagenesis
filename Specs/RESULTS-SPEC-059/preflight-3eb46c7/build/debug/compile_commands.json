@@ -1,0 +1,854 @@
+[
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/Action.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Action.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/Action.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/Action.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/Block.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Block.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/Block.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/Block.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/CLI.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/CLI.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/CLI.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/CLI.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/CLIRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/CLIRunInitialization01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/CLIRunInitialization01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/CLIRunInitialization01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/CLISCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/CLISCNAck01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/CLISCNAck01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/CLISCNAck01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/CommandLine.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/CommandLine.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/CommandLine.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/CommandLine.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/File.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/File.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/File.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/File.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GW.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GW.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GW.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GW.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GWHelloIPC02.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GWHelloIPC02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GWMsgCl01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GWMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWRunInitialization01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GWRunInitialization01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GWRunInitialization01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GWRunHelloIPC02.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GWRunHelloIPC02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/GWExposition02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/GWExposition02.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/GWExposition02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HT.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HT.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HT.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HT.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTBindReport01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTBindReport01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTBindReport01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTDeliveryBind01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTGetBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTGetBind01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTGetBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTInfoPayload01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTInfoPayload01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTInfoPayload01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTListBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTListBind01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTListBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTMessageSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTMessageSeq01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTMessageSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTMsgCl01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRevokeBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTRevokeBind01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTRevokeBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRunInitialization01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTRunInitialization01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTRunInitialization01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTRunPeriodic01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTSCNSeq01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTStatusS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTStatusS01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTStatusS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/HTStoreBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/HTStoreBind01.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/HTStoreBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/Message.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Message.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/Message.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/Message.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/MessageBuilder.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/MessageBuilder.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/MessageBuilder.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/MurmurHash3.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/MurmurHash3.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/MurmurHash3.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/MurmurHash3Strategy.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/MurmurHash3Strategy.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/MurmurHash3Strategy.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/MurmurHash3Strategy.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/NameGenerator.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/NameGenerator.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/NameGenerator.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/NameGenerator.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/NGAL_SAR.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/NGAL_SAR.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/NGAL_SAR.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/NGAL_SAR.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/NGAL_CS.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/NGAL_CS.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/NGAL_CS.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/NGAL_CS.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/DefaultNameStrategy.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/DefaultNameStrategy.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/DefaultNameStrategy.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/DefaultNameStrategy.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/OutputVariable.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/OutputVariable.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/OutputVariable.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/Process.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Process.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/Process.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/Process.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/Prompt_iostream.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/Prompt_iostream.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/Prompt_iostream.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/Common.dir/Common/src/tinythread.cpp.o -c /home/gandalf/workspace/novagenesis/Common/src/tinythread.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/Common/src/tinythread.cpp",
+  "output": "CMakeFiles/Common.dir/Common/src/tinythread.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/ContentApp.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/ContentApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/ContentApp.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/ContentApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/Core.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/Core.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/Core.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/Core.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreDeliveryBind01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreInfoPayload01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreInfoPayload01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreInfoPayload01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreMsgCl01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreNotifyS01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreNotifyS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreNotifyS01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreNotifyS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunDiscover01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunDiscover01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunDiscover01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunDiscover01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunEvaluate01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunEvaluate01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunEvaluate01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunExpose01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunExpose01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunExpose01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunExpose01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunInitialize01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunInitialize01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunInitialize01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunInitialize01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunInvite01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunInvite01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunInvite01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunInvite01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPeriodic01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunContentPublish01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunContentPublish01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunContentPublish01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunContentPublish01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish02.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish02.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish03.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish03.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunPublish03.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunPublish03.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunSubscribe01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunSubscribe01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreRunSubscribe01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreRunSubscribe01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreSCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNAck01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreSCNAck01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreSCNSeq01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/CoreStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/CoreStatusS01.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/CoreStatusS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/ContentApp.dir/ContentApp/src/execContentApp.cpp.o -c /home/gandalf/workspace/novagenesis/ContentApp/src/execContentApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/ContentApp/src/execContentApp.cpp",
+  "output": "CMakeFiles/ContentApp.dir/ContentApp/src/execContentApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/Core.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/Core.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/Core.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreDeliveryBind01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreInfoPayload01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreInfoPayload01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreInfoPayload01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreMsgCl01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreNotifyS01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreNotifyS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreNotifyS01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreNotifyS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunDiscover01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunDiscover01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunDiscover01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunDiscover01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunEvaluate01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunEvaluate01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunEvaluate01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunExpose01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunExpose01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunExpose01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunExpose01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunInitialize01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInitialize01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInitialize01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunInitialize01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunInvite01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInvite01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunInvite01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunInvite01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPeriodic01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish02.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish02.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish03.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish03.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunPublish03.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunPublish03.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunSubscribe01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunSubscribe01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreRunSubscribe01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreRunSubscribe01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreSCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNAck01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreSCNAck01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreSCNSeq01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/CoreStatusS01.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/CoreStatusS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/execIoTTestApp.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/execIoTTestApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/execIoTTestApp.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/execIoTTestApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/IoTTestApp.dir/IoTTestApp/src/IoTTestApp.cpp.o -c /home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/IoTTestApp/src/IoTTestApp.cpp",
+  "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp/src/IoTTestApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/NBTestApp.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/NBTestApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/NBTestApp.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/NBTestApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/Core.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/Core.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/Core.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/Core.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreDeliveryBind01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreMsgCl01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunDiscover01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunDiscover01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunDiscover01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunDiscover01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunEvaluate01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunEvaluate01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunEvaluate01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunEvaluate01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunInitialize01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunInitialize01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunInitialize01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunInitialize01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunPeriodic01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunSubscribe01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunSubscribe01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreRunSubscribe01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreRunSubscribe01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreSCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreSCNAck01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreSCNAck01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreSCNAck01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreSCNSeq01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/CoreStatusS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/CoreStatusS01.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/CoreStatusS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NBTestApp.dir/NBTestApp/src/execNBTestApp.cpp.o -c /home/gandalf/workspace/novagenesis/NBTestApp/src/execNBTestApp.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NBTestApp/src/execNBTestApp.cpp",
+  "output": "CMakeFiles/NBTestApp.dir/NBTestApp/src/execNBTestApp.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/Core.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/Core.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/Core.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreDeliveryBind01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreInfoPayload01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreInfoPayload01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreInfoPayload01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreMsgCl01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreNotifyS01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreNotifyS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreNotifyS01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreNotifyS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunDiscover01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunDiscover01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunDiscover01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunDiscover01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunEvaluate01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunEvaluate01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunEvaluate01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunExpose01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunExpose01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunExpose01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunExpose01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunInitialize01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInitialize01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunInitialize01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunInvite01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInvite01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunInvite01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunInvite01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPeriodic01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish02.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish02.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish03.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish03.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunPublish03.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunPublish03.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreRunSubscribe01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreRunSubscribe01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreRunSubscribe01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreRunSubscribe01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreSCNAck01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNAck01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreSCNAck01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreSCNSeq01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/CoreStatusS01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/CoreStatusS01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/CoreStatusS01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/CoreStatusS01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/execPGCS.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/execPGCS.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/execPGCS.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/execPGCS.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PG.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PG.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PG.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PG.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGCS.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGCS.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGCS.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC02.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC02.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC03.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC03.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGHelloIHC03.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGHelloIHC03.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/NGAL_Transport_RAW.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/NGAL_Transport_RAW.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/NGAL_Transport_RAW.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/NGAL_Transport_RAW.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGMsgCl01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunExposition01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunExposition01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunExposition01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunExposition01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunHello01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunHello01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunHello02.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello02.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello02.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunHello02.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunHello03.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello03.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunHello03.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunHello03.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunInitialization01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunInitialization01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunInitialization01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunPeriodic01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunPublishing01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunPublishing01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunPublishing01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGRunStresstest01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGRunStresstest01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o -c /home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/PGCS/src/PGStresstestPing01.cpp",
+  "output": "CMakeFiles/PGCS.dir/PGCS/src/PGStresstestPing01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/execNRNCS.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/execNRNCS.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/execNRNCS.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/execNRNCS.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NR.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NR.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NR.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NR.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRDeliveryBind01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRDeliveryBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRDeliveryBind01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRDeliveryBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRInfoPayload01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRInfoPayload01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRInfoPayload01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRInfoPayload01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRMessageSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRMessageSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRMessageSeq01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRMessageSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRMsgCl01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRMsgCl01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRMsgCl01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRMsgCl01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRPubBind01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRPubBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRPubBind01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRPubBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRPubNotify01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRPubNotify01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRPubNotify01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRPubNotify01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRRevokeBind01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRRevokeBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRRevokeBind01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRRevokeBind01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRRunInitialization01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRRunInitialization01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRRunInitialization01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRRunInitialization01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRRunPeriodic01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRRunPeriodic01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRRunPeriodic01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRRunPeriodic01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRNCS.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRNCS.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRNCS.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRNCS.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRSCNSeq01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRSCNSeq01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRSCNSeq01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRSCNSeq01.cpp.o"
+},
+{
+  "directory": "/tmp/ng-observability-3eb46c7-normal",
+  "command": "/usr/bin/c++  -I/home/gandalf/workspace/novagenesis/ContentApp/src -I/home/gandalf/workspace/novagenesis/Common/src -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/error -I/home/gandalf/workspace/novagenesis/Common/src/rapidjson/internal -I/home/gandalf/workspace/novagenesis/IoTTestApp/src -I/home/gandalf/workspace/novagenesis/NBTestApp/src -I/home/gandalf/workspace/novagenesis/PGCS/src -I/home/gandalf/workspace/novagenesis/NRNCS/src  -lpthread -lrt -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -fno-omit-frame-pointer -std=gnu++20 -o CMakeFiles/NRNCS.dir/NRNCS/src/NRSubBind01.cpp.o -c /home/gandalf/workspace/novagenesis/NRNCS/src/NRSubBind01.cpp",
+  "file": "/home/gandalf/workspace/novagenesis/NRNCS/src/NRSubBind01.cpp",
+  "output": "CMakeFiles/NRNCS.dir/NRNCS/src/NRSubBind01.cpp.o"
+}
+]
