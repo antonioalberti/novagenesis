@@ -136,6 +136,74 @@ def test_channel_exec_classifies_ssh_timeout_as_transport_error():
         channel.exec(["/bin/sleep", "8"])
 
 
+def test_channel_exec_terminalizes_timeout_with_partial_raw_output():
+    run = Mock(side_effect=subprocess.TimeoutExpired(
+        ["ssh"], timeout=3, output="partial stdout", stderr="partial stderr"
+    ))
+    channel = QGAChannel(host="192.168.0.200", vmid="100", run=run)
+
+    result = channel.exec(["/bin/sleep", "8"])
+
+    assert result["failure_class"] == "transport-timeout"
+    assert result["guest_outcome"] == "unknown"
+    assert result["transport_exit_code"] is None
+    assert result["raw_transport"] == {
+        "returncode": None,
+        "stdout": "partial stdout",
+        "stderr": "partial stderr",
+        "exception": "TimeoutExpired",
+        "timeout_seconds": 3,
+    }
+
+
+def test_channel_exec_terminalizes_r17_transport_loss_with_raw_evidence():
+    from tempfile import TemporaryDirectory
+
+    channel = QGAChannel(
+        host="192.168.0.200",
+        vmid="100",
+        run=Mock(return_value={
+            "returncode": 29,
+            "stdout": "",
+            "stderr": "Agent error: PID ld does not exist\\n",
+        }),
+    )
+
+    result = channel.exec(["/usr/bin/python3", "ng_remote_executor.py", "run"])
+    assert result["guest_outcome"] == "unknown"
+    assert result["failure_class"] == "transport-loss"
+    assert result["guest_exit_code"] is None
+    assert result["raw_transport"] == {
+        "returncode": 29,
+        "stdout": "",
+        "stderr": "Agent error: PID ld does not exist\\n",
+    }
+
+    with TemporaryDirectory(dir=Path.home()) as td:
+        evidence = persist_channel_evidence(
+            Path(td) / "qga-loss.json",
+            result,
+            operation_id="qga-r17-20260918",
+            phase="observation-teardown",
+            sequence=7,
+        )
+        saved = json.loads(evidence.read_text(encoding="utf-8"))
+        raw_path = evidence.with_name("qga-loss.raw.json")
+        raw = json.loads(raw_path.read_text(encoding="utf-8"))
+        assert saved["terminal_event"] == {
+            "event": "qga-transport-loss",
+            "operation_id": "qga-r17-20260918",
+            "phase": "observation-teardown",
+            "sequence": 7,
+            "timestamp": saved["terminal_event"]["timestamp"],
+            "guest_outcome": "unknown",
+            "raw_artifact": raw_path.name,
+            "raw_sha256": saved["terminal_event"]["raw_sha256"],
+        }
+        assert raw == result["raw_transport"]
+        assert len(saved["terminal_event"]["raw_sha256"]) == 64
+
+
 def test_channel_evidence_is_persisted_outside_tmp():
     from tempfile import TemporaryDirectory
 
