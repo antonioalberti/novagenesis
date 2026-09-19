@@ -73,3 +73,13 @@ Qualquer novo trial deve ser apenas diagnóstico, com baseline zero verificada, 
 - Memória hierárquica auditada em modo read-only: `MEMORY.md` 2998/3000 B e pointer presente; `MEMORY_EXTENSION.md` 20104 B; `USER.md` 1407/1375 B e avisos de conteúdo operacional permanecem preexistentes. Nenhum ficheiro de memória foi alterado.
 - Relatório persistido em `Specs/RESULTS-SPEC-059/session-closeout-20260918.md`.
 - Próximo reinício: carregar este handoff, `session-closure-reconciliation`, `hermes-memory-architecture` e as skills NovaGenesis afectadas; resolver primeiro QGA completion/teardown, sem retry automático.
+
+## Fecho da sessão — 2026-09-19 (retoma da sessão interrompida por falta de créditos)
+
+- Sessão `20260918_163007_fcceee` (NovaGenesis com GPT-6 Astra para validação) foi interrompida durante o hardening QGA, com `proxmox_qga_channel.py` + testes modificados sem commit e o fecho (Obsidian/memória/handoff) por executar.
+- Incremento concluído e publicado: `aa5621b` — terminalização de timeout/perda de transporte QGA com `raw_transport` (evidência host parcial preservada), `persist_channel_evidence` schema v2 fora de `/tmp` com operation/phase/sequence, e raise preservado para timeout sem saída parcial. `QGAChannelError` passou a transportar `raw_transport`.
+- Verificação: suite QGA `22 passed`; suite Alpine completa `192 passed, 7 subtests passed`; `py_compile` PASS; `git diff --check` PASS; árvore limpa no fecho.
+- Skills: `novagenesis-evidence-hardening` §7 recebeu a regra 9 (terminalizar timeout com saída parcial em vez de levantar).
+- Obsidian: NG-056 e Dashboard actualizados (data 2026-09-19, incremento `aa5621b`, próximo passo Astra).
+- Memória: nenhuma alteração (estado transitório em Obsidian/repo, conforme regras L1/L2/L3); avisos preexistentes do audit de 2026-09-18 permanecem para revisão com `hermes-memory-architecture`.
+- Próximo reinício: rever com Astra o diff `aa5621b`; classificar `Agent error: PID ld does not exist`; teardown automático/seal final; Source→Repository. Sem novo trial automático.
