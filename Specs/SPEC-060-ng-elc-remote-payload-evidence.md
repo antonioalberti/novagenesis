@@ -2,8 +2,8 @@
 
 **Author:** Antonio Alberti / Hermes Agent<br>
 **Date:** 2026-09-20<br>
-**Status:** In Progress — controller-only increment<br>
-**Branch:** AIOPT3<br>
+**Status:** In Progress — controller-only increment
+**Branch:** AIOPT3
 **Implementation commit:**<br>
 **Related:** SPEC-052-remote-ssh-multi-vm-executor.md, SPEC-054-release-master-plan-and-audit.md, SPEC-046-multi-vm-runner-safe-teardown.md, SPEC-050-contentapp-repository-control-plane-readback.md<br>
 **Task linkage:** NG-058 / M2-R / NG-050
