@@ -577,13 +577,37 @@ def classify_result(runtime: str, teardown: str, evidence: str) -> int:
     return 10
 
 
+def _payload_attestation_blocker(payload_result: object | None) -> str | None:
+    """Validate the minimum verifier attestation for normal-payload acceptance."""
+    if payload_result is None:
+        return "payload evidence not collected"
+    if not isinstance(payload_result, Mapping):
+        return "payload evidence attestation is invalid"
+    if payload_result.get("status") != "COMPLETE" or payload_result.get("accepted") is not True:
+        return "payload evidence is incomplete or not accepted"
+    verification = payload_result.get("offline_verification")
+    if not isinstance(verification, Mapping):
+        return "payload evidence offline verification is missing or invalid"
+    schema_version = verification.get("schema_version")
+    if (
+        verification.get("code") != CODE_VALID
+        or verification.get("integrity") is not True
+        or verification.get("accepted") is not True
+        or isinstance(schema_version, bool)
+        or not isinstance(schema_version, int)
+        or schema_version != 2
+    ):
+        return "payload evidence offline verification is invalid"
+    return None
+
+
 def evaluate_remote_acceptance(
     plan: Mapping[str, Any],
     *,
     runtime: str,
     teardown: str,
     evidence: str,
-    payload_result: Mapping[str, Any] | None = None,
+    payload_result: object | None = None,
 ) -> tuple[int, dict[str, Any]]:
     """Keep remote marker results separate from normal-payload acceptance."""
     code = classify_result(runtime, teardown, evidence)
@@ -591,10 +615,9 @@ def evaluate_remote_acceptance(
         return code, {"eligible": False, "blockers": ["marker-only plan is not normal-payload acceptance"]}
     if not payload_acceptance_eligible(plan):
         return (21 if code == 0 else code), {"eligible": False, "blockers": ["normal-payload plan contract is not acceptance-eligible"]}
-    if payload_result is None:
-        return (21 if code == 0 else code), {"eligible": False, "blockers": ["payload evidence not collected"]}
-    if payload_result.get("status") != "COMPLETE" or payload_result.get("accepted") is not True:
-        return (21 if code == 0 else code), {"eligible": False, "blockers": ["payload evidence is incomplete or not accepted"]}
+    attestation_blocker = _payload_attestation_blocker(payload_result)
+    if attestation_blocker is not None:
+        return (21 if code == 0 else code), {"eligible": False, "blockers": [attestation_blocker]}
     if code != 0:
         return code, {"eligible": False, "blockers": ["runtime, teardown, or evidence is not acceptance-eligible"]}
     return 0, {"eligible": True, "blockers": []}

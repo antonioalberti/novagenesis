@@ -550,6 +550,19 @@ def test_remote_marker_result_never_grants_normal_payload_acceptance():
     assert "marker-only" in eligibility["blockers"][0]
 
 
+def _verified_payload_result() -> dict[str, object]:
+    return {
+        "status": "COMPLETE",
+        "accepted": True,
+        "offline_verification": {
+            "code": "NGELC-VALID",
+            "integrity": True,
+            "accepted": True,
+            "schema_version": 2,
+        },
+    }
+
+
 def test_normal_payload_acceptance_requires_complete_payload_result():
     plan = _valid_normal_plan()
 
@@ -572,8 +585,104 @@ def test_normal_payload_acceptance_requires_complete_payload_result():
         payload_result={"status": "COMPLETE", "accepted": True},
     )
 
+    assert code == 21
+    assert eligibility["eligible"] is False
+    assert eligibility["blockers"] == ["payload evidence offline verification is missing or invalid"]
+
+    code, eligibility = executor.evaluate_remote_acceptance(
+        plan,
+        runtime="PASS",
+        teardown="PASS",
+        evidence="COMPLETE",
+        payload_result=_verified_payload_result(),
+    )
+
     assert code == 0
     assert eligibility == {"eligible": True, "blockers": []}
+
+
+@pytest.mark.parametrize(
+    ("payload_result", "expected_blocker"),
+    (
+        (None, "payload evidence not collected"),
+        ([], "payload evidence attestation is invalid"),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": []},
+            "payload evidence offline verification is missing or invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-TAMPERED", "integrity": True, "accepted": True, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": 1, "accepted": True, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": 1, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True, "schema_version": "2"}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True, "schema_version": 2.0}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "INCOMPLETE", "accepted": False, "offline_verification": _verified_payload_result()["offline_verification"]},
+            "payload evidence is incomplete or not accepted",
+        ),
+    ),
+)
+def test_normal_payload_rejects_invalid_offline_attestation(payload_result: object, expected_blocker: str):
+    code, eligibility = executor.evaluate_remote_acceptance(
+        _valid_normal_plan(),
+        runtime="PASS",
+        teardown="PASS",
+        evidence="COMPLETE",
+        payload_result=payload_result,
+    )
+
+    assert code == 21
+    assert eligibility == {"eligible": False, "blockers": [expected_blocker]}
+
+
+def test_invalid_attestation_does_not_mask_nonzero_runtime_code():
+    code, eligibility = executor.evaluate_remote_acceptance(
+        _valid_normal_plan(),
+        runtime="FAIL",
+        teardown="PASS",
+        evidence="COMPLETE",
+        payload_result={"status": "COMPLETE", "accepted": True},
+    )
+
+    assert code == 10
+    assert eligibility == {
+        "eligible": False,
+        "blockers": ["payload evidence offline verification is missing or invalid"],
+    }
+
+
+def test_valid_attestation_does_not_mask_nonzero_runtime_code():
+    code, eligibility = executor.evaluate_remote_acceptance(
+        _valid_normal_plan(),
+        runtime="FAIL",
+        teardown="PASS",
+        evidence="COMPLETE",
+        payload_result=_verified_payload_result(),
+    )
+
+    assert code == 10
+    assert eligibility == {
+        "eligible": False,
+        "blockers": ["runtime, teardown, or evidence is not acceptance-eligible"],
+    }
 
 
 def test_three_origins_are_preserved_in_canonical_namespaces_and_checkpointed(tmp_path: Path):
