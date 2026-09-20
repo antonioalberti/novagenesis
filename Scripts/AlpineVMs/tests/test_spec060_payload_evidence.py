@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from payload_evidence import PayloadContractError, _copy_bounded_file, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
+from payload_evidence import PayloadContractError, _copy_bounded_file, _write_json, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
 import ng_remote_executor as executor
 
 
@@ -191,6 +191,63 @@ def test_payload_origin_inventory_honors_explicit_deadline(tmp_path: Path):
     assert "deadline-expired" in result["errors"]
 
 
+def test_empty_origin_honors_expired_deadline_before_enumeration(tmp_path: Path):
+    root = tmp_path / "empty"
+    root.mkdir()
+
+    result = inventory_payload_origin(root, max_files=10, max_bytes=1024, timeout_s=0)
+
+    assert result["status"] == "INCOMPLETE"
+    assert "deadline-expired" in result["errors"]
+
+
+def test_zero_length_observed_file_is_incomplete_not_unexpected_exception(tmp_path: Path):
+    root = tmp_path / "source"
+    root.mkdir()
+    (root / "photo-01.jpg").write_bytes(b"")
+
+    result = inventory_payload_origin(root, max_files=10, max_bytes=1024)
+
+    assert result["status"] == "INCOMPLETE"
+    assert result["map"] == {}
+    assert "invalid-observed-size:photo-01.jpg" in result["errors"]
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        "payload/expected.json",
+        "payload/maps/source.json",
+        "payload/metadata/source.json",
+        "payload/preservation-checkpoint.json",
+    ),
+)
+def test_json_preservation_refuses_final_symlink(tmp_path: Path, relative: str):
+    outside = tmp_path / "outside.json"
+    outside.write_text("sentinel\n", encoding="utf-8")
+    target = tmp_path / "bundle" / relative
+    target.parent.mkdir(parents=True)
+    target.symlink_to(outside)
+
+    with pytest.raises((PayloadContractError, OSError), match="symlink|stale|destination|unsafe|exists"):
+        _write_json(target, {"safe": True})
+
+    assert outside.read_text(encoding="utf-8") == "sentinel\n"
+
+
+def test_json_preservation_refuses_symlinked_ancestor(tmp_path: Path):
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    bundle = tmp_path / "bundle"
+    bundle.mkdir()
+    (bundle / "payload").symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises((PayloadContractError, OSError), match="symlink|unsafe|exists"):
+        _write_json(bundle / "payload" / "expected.json", {"safe": True})
+
+    assert not (outside / "expected.json").exists()
+
+
 def test_bounded_copy_refuses_to_write_past_byte_budget(tmp_path: Path):
     source = tmp_path / "source.jpg"
     destination = tmp_path / "destination.jpg"
@@ -202,6 +259,71 @@ def test_bounded_copy_refuses_to_write_past_byte_budget(tmp_path: Path):
     assert error == "byte-bound-exceeded"
     assert written <= 8
     assert destination.exists() is False
+
+
+def test_preservation_enforces_aggregate_origin_quota(tmp_path: Path):
+    roots: dict[str, Path] = {}
+    expected: dict[str, dict[str, object]] = {}
+    for origin in ("source", "nrncs", "repository"):
+        root = tmp_path / f"{origin}-root"
+        root.mkdir()
+        roots[origin] = root
+        for number in range(1, 6):
+            (root / f"photo-{number:02d}.jpg").write_bytes(b"data")
+        if origin == "source":
+            expected = inventory_payload_origin(root, max_files=10, max_bytes=1024)["map"]
+
+    result = preserve_payload_origins(
+        tmp_path / "bundle",
+        roots,
+        expected=expected,
+        max_files=10,
+        max_bytes=1024,
+        max_bytes_total=59,
+    )
+
+    assert result["status"] == "INCOMPLETE"
+    assert result["accepted"] is False
+    assert any("aggregate-byte-bound-exceeded" in error for error in result["origins"]["repository"]["errors"])
+
+
+def test_remote_marker_result_never_grants_normal_payload_acceptance():
+    code, eligibility = executor.evaluate_remote_acceptance(
+        _remote_marker_plan(),
+        runtime="PASS",
+        teardown="PASS",
+        evidence="COMPLETE",
+    )
+
+    assert code == 0
+    assert eligibility["eligible"] is False
+    assert "marker-only" in eligibility["blockers"][0]
+
+
+def test_normal_payload_acceptance_requires_complete_payload_result():
+    plan = _valid_normal_plan()
+
+    code, eligibility = executor.evaluate_remote_acceptance(
+        plan,
+        runtime="PASS",
+        teardown="PASS",
+        evidence="COMPLETE",
+    )
+
+    assert code != 0
+    assert eligibility["eligible"] is False
+    assert "not collected" in eligibility["blockers"][0]
+
+    code, eligibility = executor.evaluate_remote_acceptance(
+        plan,
+        runtime="PASS",
+        teardown="PASS",
+        evidence="COMPLETE",
+        payload_result={"status": "COMPLETE", "accepted": True},
+    )
+
+    assert code == 0
+    assert eligibility == {"eligible": True, "blockers": []}
 
 
 def test_three_origins_are_preserved_in_canonical_namespaces_and_checkpointed(tmp_path: Path):

@@ -48,7 +48,7 @@ from local_provenance import (
     validate_build_linkage,
 )
 from proxmox_qga_channel import QGAChannel, QGAChannelError, persist_channel_evidence
-from payload_evidence import PayloadContractError, loads_rejecting_duplicate_keys, validate_payload_plan
+from payload_evidence import PayloadContractError, loads_rejecting_duplicate_keys, payload_acceptance_eligible, validate_payload_plan
 
 
 class ConfigError(ValueError):
@@ -575,6 +575,29 @@ def classify_result(runtime: str, teardown: str, evidence: str) -> int:
     if runtime in {"INCONCLUSIVE", "NOT_RUN", "ABORTED"}:
         return 11
     return 10
+
+
+def evaluate_remote_acceptance(
+    plan: Mapping[str, Any],
+    *,
+    runtime: str,
+    teardown: str,
+    evidence: str,
+    payload_result: Mapping[str, Any] | None = None,
+) -> tuple[int, dict[str, Any]]:
+    """Keep remote marker results separate from normal-payload acceptance."""
+    code = classify_result(runtime, teardown, evidence)
+    if plan.get("acceptance_profile") != "normal-payload":
+        return code, {"eligible": False, "blockers": ["marker-only plan is not normal-payload acceptance"]}
+    if not payload_acceptance_eligible(plan):
+        return (21 if code == 0 else code), {"eligible": False, "blockers": ["normal-payload plan contract is not acceptance-eligible"]}
+    if payload_result is None:
+        return (21 if code == 0 else code), {"eligible": False, "blockers": ["payload evidence not collected"]}
+    if payload_result.get("status") != "COMPLETE" or payload_result.get("accepted") is not True:
+        return (21 if code == 0 else code), {"eligible": False, "blockers": ["payload evidence is incomplete or not accepted"]}
+    if code != 0:
+        return code, {"eligible": False, "blockers": ["runtime, teardown, or evidence is not acceptance-eligible"]}
+    return 0, {"eligible": True, "blockers": []}
 
 
 def ssh_base(config: Mapping[str, str], host: str) -> list[str]:
@@ -3109,8 +3132,27 @@ def run_trial(args: argparse.Namespace) -> int:
         evidence_result = "INCOMPLETE"
         teardown_result = "UNKNOWN"
         local_record(evidence_dir / "controller-events.jsonl", "manifest-error", error=str(exc))
-    code = 130 if interrupted and teardown_result == "PASS" and evidence_result == "COMPLETE" else classify_result(runtime, teardown_result, evidence_result)
-    result = {"schema_version": 1, "trial_id": trial_id, "scenario": args.scenario, "debug_profile": args.debug_profile, "runtime_result": runtime, "teardown_result": teardown_result, "evidence_result": evidence_result, "exit_code": code}
+    code, acceptance = evaluate_remote_acceptance(
+        plan,
+        runtime=runtime,
+        teardown=teardown_result,
+        evidence=evidence_result,
+        payload_result=None,
+    )
+    if interrupted and teardown_result == "PASS" and evidence_result == "COMPLETE" and code == 0:
+        code = 130
+    result = {
+        "schema_version": 1,
+        "trial_id": trial_id,
+        "scenario": args.scenario,
+        "debug_profile": args.debug_profile,
+        "runtime_result": runtime,
+        "teardown_result": teardown_result,
+        "evidence_result": evidence_result,
+        "local_acceptance_eligible": acceptance["eligible"],
+        "acceptance_blockers": acceptance["blockers"],
+        "exit_code": code,
+    }
     (evidence_dir / "result.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return code

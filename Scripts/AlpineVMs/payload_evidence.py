@@ -251,38 +251,103 @@ def _validate_map_records(value: Mapping[str, Any], label: str, *, allow_empty: 
     return dict(sorted(normalized.items()))
 
 
-def _read_bounded_file(path: Path, budget: int, deadline: float | None) -> tuple[bytes, str | None]:
-    if budget <= 0:
-        return b"", "byte-bound-exceeded"
-    if deadline is not None and time.monotonic() >= deadline:
-        return b"", "deadline-expired"
-    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+def _normalized_absolute_path(path: str | Path, label: str) -> str:
+    raw = os.fspath(path)
+    if not isinstance(raw, str) or "\x00" in raw or not raw.startswith("/") or os.path.normpath(raw) != raw:
+        raise PayloadContractError(f"{label} must be an absolute, normalized path")
+    return raw
+
+
+def _deadline_expired(deadline: float | None) -> bool:
+    return deadline is not None and time.monotonic() >= deadline
+
+
+def _check_deadline(deadline: float | None, label: str) -> None:
+    if _deadline_expired(deadline):
+        raise TimeoutError(f"deadline-expired:{label}")
+
+
+def _open_absolute_directory(path: str | Path, *, create: bool, deadline: float | None) -> int:
+    """Open every directory component with O_NOFOLLOW and retain its fd."""
+    raw = _normalized_absolute_path(path, "directory")
+    directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    current = os.open("/", directory_flags)
     try:
-        fd = os.open(path, flags)
+        for component in raw.split("/")[1:]:
+            _check_deadline(deadline, f"open-directory:{component}")
+            try:
+                child = os.open(component, directory_flags, dir_fd=current)
+            except FileNotFoundError:
+                if not create:
+                    raise
+                os.mkdir(component, 0o700, dir_fd=current)
+                _check_deadline(deadline, f"open-directory:{component}")
+                child = os.open(component, directory_flags, dir_fd=current)
+            os.close(current)
+            current = child
+        return current
+    except TimeoutError:
+        os.close(current)
+        raise
     except OSError as exc:
-        return b"", f"read-failed:{type(exc).__name__}"
+        os.close(current)
+        raise PayloadContractError(f"unsafe directory boundary {raw}: {exc}") from exc
+
+
+def _open_parent_directory(path: str | Path, *, create: bool, deadline: float | None) -> tuple[int, str]:
+    raw = _normalized_absolute_path(path, "file")
+    file_name = Path(raw).name
+    if not file_name or file_name in {".", ".."}:
+        raise PayloadContractError("file destination has an unsafe basename")
+    parent = str(Path(raw).parent)
+    return _open_absolute_directory(parent, create=create, deadline=deadline), file_name
+
+
+def _read_bounded_file(path: Path, budget: int, deadline: float | None) -> tuple[bytes, str | None, int]:
+    if budget <= 0:
+        return b"", "byte-bound-exceeded", 0
+    chunks: list[bytes] = []
+    consumed = 0
     try:
+        _check_deadline(deadline, "open-source")
+        flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        fd = os.open(_normalized_absolute_path(path, "source file"), flags)
+    except TimeoutError:
+        return b"", "deadline-expired", 0
+    except (OSError, PayloadContractError) as exc:
+        return b"", f"read-failed:{type(exc).__name__}", 0
+    try:
+        _check_deadline(deadline, "stat-source")
         before = os.fstat(fd)
         if not stat.S_ISREG(before.st_mode):
-            return b"", "unsafe-source-entry"
-        chunks: list[bytes] = []
-        total = 0
+            return b"", "unsafe-source-entry", 0
+        if before.st_size > budget:
+            return b"", "byte-bound-exceeded", 0
         while True:
-            if deadline is not None and time.monotonic() >= deadline:
-                return b"", "deadline-expired"
-            chunk = os.read(fd, min(65536, budget - total + 1))
+            _check_deadline(deadline, "read-source")
+            if consumed >= budget:
+                current = os.fstat(fd)
+                if current.st_size > consumed:
+                    return b"".join(chunks), "byte-bound-exceeded", consumed
+                break
+            chunk = os.read(fd, min(65536, budget - consumed))
             if not chunk:
                 break
             chunks.append(chunk)
-            total += len(chunk)
-            if total > budget:
-                return b"", "byte-bound-exceeded"
+            consumed += len(chunk)
+            if consumed > budget:
+                return b"".join(chunks), "byte-bound-exceeded", consumed
+        _check_deadline(deadline, "restat-source")
         after = os.fstat(fd)
-        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or total != after.st_size:
-            return b"", "read-race"
-        return b"".join(chunks), None
+        before_identity = (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
+        after_identity = (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
+        if before_identity != after_identity or consumed != after.st_size:
+            return b"".join(chunks), "read-race", consumed
+        return b"".join(chunks), None, consumed
+    except TimeoutError:
+        return b"".join(chunks), "deadline-expired", consumed
     except OSError as exc:
-        return b"", f"read-failed:{type(exc).__name__}"
+        return b"".join(chunks), f"read-failed:{type(exc).__name__}", consumed
     finally:
         os.close(fd)
 
@@ -296,12 +361,15 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
     if timeout_s is not None and (isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)) or timeout_s < 0 or not math.isfinite(timeout_s)):
         raise PayloadContractError("timeout_s must be a finite non-negative number")
     deadline = None if timeout_s is None else time.monotonic() + float(timeout_s)
-    root_path = Path(root)
+    root_path = Path(_normalized_absolute_path(root, "payload root"))
     errors: list[str] = []
     payload_map: dict[str, dict[str, Any]] = {}
     total_bytes = 0
     try:
+        _check_deadline(deadline, "stat-root")
         root_stat = root_path.lstat()
+    except TimeoutError:
+        return {"status": "INCOMPLETE", "map": {}, "identity": None, "bytes": 0, "errors": ["deadline-expired"]}
     except OSError as exc:
         return {
             "status": "INCOMPLETE",
@@ -310,7 +378,7 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
             "bytes": 0,
             "errors": [f"root-unavailable:{type(exc).__name__}"],
         }
-    if root_path.is_symlink() or not root_path.is_dir():
+    if stat.S_ISLNK(root_stat.st_mode) or not stat.S_ISDIR(root_stat.st_mode):
         return {
             "status": "INCOMPLETE",
             "map": {},
@@ -319,34 +387,62 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
             "errors": ["root-is-not-exclusive-directory"],
         }
 
+    if _deadline_expired(deadline):
+        return {"status": "INCOMPLETE", "map": {}, "identity": {"st_dev": root_stat.st_dev, "st_ino": root_stat.st_ino}, "bytes": 0, "errors": ["deadline-expired"]}
     children: list[Path] = []
     try:
         with os.scandir(root_path) as iterator:
-            for entry in iterator:
+            while True:
+                _check_deadline(deadline, "enumerate-root")
+                try:
+                    entry = next(iterator)
+                except StopIteration:
+                    break
                 children.append(Path(entry.path))
                 if len(children) > max_files:
                     errors.append("file-count-bound-exceeded")
                     break
+    except TimeoutError:
+        errors.append("deadline-expired")
     except OSError as exc:
         errors.append(f"enumeration-failed:{type(exc).__name__}")
+    try:
+        root_after_enumeration = root_path.lstat()
+        if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode) != (root_after_enumeration.st_dev, root_after_enumeration.st_ino, root_after_enumeration.st_mode):
+            errors.append("root-identity-changed")
+    except OSError as exc:
+        errors.append(f"root-restat-failed:{type(exc).__name__}")
     children.sort(key=lambda item: item.name)
     for child in children[:max_files]:
-        if deadline is not None and time.monotonic() >= deadline:
+        if _deadline_expired(deadline):
             errors.append("deadline-expired")
             break
-        if child.is_symlink() or not child.is_file() or not _NAME_RE.fullmatch(child.name):
+        try:
+            child_stat = child.lstat()
+        except OSError as exc:
+            errors.append(f"stat-failed:{child.name}:{type(exc).__name__}")
+            continue
+        if stat.S_ISLNK(child_stat.st_mode) or not stat.S_ISREG(child_stat.st_mode) or not _NAME_RE.fullmatch(child.name):
             errors.append(f"unsafe-or-unexpected-entry:{child.name}")
             continue
         remaining = max_bytes - total_bytes
-        data, error = _read_bounded_file(child, remaining, deadline)
+        data, error, consumed = _read_bounded_file(child, remaining, deadline)
+        total_bytes += consumed
         if error is not None:
             errors.append(f"{error}:{child.name}" if error not in {"byte-bound-exceeded", "deadline-expired", "read-race"} else error)
             if error in {"byte-bound-exceeded", "deadline-expired"}:
-                total_bytes = max_bytes if error == "byte-bound-exceeded" else total_bytes
                 break
             continue
-        total_bytes += len(data)
+        if not data:
+            errors.append(f"invalid-observed-size:{child.name}")
+            continue
         payload_map[child.name] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+    try:
+        root_after_reads = root_path.lstat()
+        if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode) != (root_after_reads.st_dev, root_after_reads.st_ino, root_after_reads.st_mode):
+            errors.append("root-identity-changed")
+    except OSError as exc:
+        errors.append(f"root-restat-failed:{type(exc).__name__}")
     return {
         "status": "COMPLETE" if not errors else "INCOMPLETE",
         "map": dict(sorted(payload_map.items())),
@@ -356,49 +452,105 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
     }
 
 
-def _write_json(path: Path, value: Mapping[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-
-
-def _ensure_directory_tree_safe(path: Path) -> None:
-    current = path
-    while True:
-        if os.path.lexists(current):
-            if current.is_symlink() or not current.is_dir():
-                raise PayloadContractError(f"unsafe preservation directory: {current.name}")
-        if current == current.parent:
-            return
-        current = current.parent
-
-
-def _copy_bounded_file(source: Path, destination: Path, *, budget: int, deadline: float | None) -> tuple[bool, str | None, int]:
-    data, error = _read_bounded_file(source, budget, deadline)
-    if error is not None:
-        return False, error, min(len(data), budget)
+def _write_json(path: Path, value: Mapping[str, Any], *, deadline: float | None = None) -> None:
+    """Write one new JSON object without following stale path components."""
+    _check_deadline(deadline, "serialize-json")
+    data = (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    parent_fd, file_name = _open_parent_directory(path, create=True, deadline=deadline)
+    file_fd: int | None = None
+    created = False
+    success = False
     try:
-        _ensure_directory_tree_safe(destination.parent)
-        if os.path.lexists(destination):
-            return False, "unsafe-or-stale-destination", 0
+        _check_deadline(deadline, "open-json")
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
-        fd = os.open(destination, flags, 0o600)
+        try:
+            file_fd = os.open(file_name, flags, 0o600, dir_fd=parent_fd)
+            created = True
+        except FileExistsError as exc:
+            raise PayloadContractError(f"refusing stale or symlink destination: {path}") from exc
         try:
             written = 0
             while written < len(data):
-                if deadline is not None and time.monotonic() >= deadline:
-                    return False, "deadline-expired", written
-                written += os.write(fd, data[written:])
-            os.fsync(fd)
+                _check_deadline(deadline, "write-json")
+                written += os.write(file_fd, data[written:])
+            _check_deadline(deadline, "fsync-json")
+            os.fsync(file_fd)
+        except TimeoutError:
+            raise
         finally:
-            os.close(fd)
-        return True, None, len(data)
+            os.close(file_fd)
+            file_fd = None
+        _check_deadline(deadline, "fsync-json-directory")
+        os.fsync(parent_fd)
+        success = True
+    except TimeoutError:
+        raise
+    except PayloadContractError:
+        raise
     except OSError as exc:
+        raise PayloadContractError(f"unsafe JSON destination {path}: {exc}") from exc
+    finally:
+        if file_fd is not None:
+            os.close(file_fd)
+        if created and not success:
+            try:
+                os.unlink(file_name, dir_fd=parent_fd)
+            except OSError:
+                pass
+        os.close(parent_fd)
+
+
+def _ensure_directory_tree_safe(path: Path, *, deadline: float | None = None) -> None:
+    fd = _open_absolute_directory(path, create=True, deadline=deadline)
+    os.close(fd)
+
+
+def _copy_bounded_file(source: Path, destination: Path, *, budget: int, deadline: float | None) -> tuple[bool, str | None, int]:
+    data, error, _consumed = _read_bounded_file(source, budget, deadline)
+    if error is not None:
+        return False, error, 0
+    parent_fd: int | None = None
+    file_fd: int | None = None
+    file_name: str | None = None
+    created = False
+    success = False
+    try:
+        parent_fd, file_name = _open_parent_directory(destination, create=True, deadline=deadline)
+        _check_deadline(deadline, "open-preserved-file")
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
-            if os.path.lexists(destination) and not destination.is_symlink():
-                destination.unlink()
-        except OSError:
-            pass
+            file_fd = os.open(file_name, flags, 0o600, dir_fd=parent_fd)
+            created = True
+        except FileExistsError:
+            return False, "unsafe-or-stale-destination", 0
+        written = 0
+        while written < len(data):
+            _check_deadline(deadline, "write-preserved-file")
+            written += os.write(file_fd, data[written:])
+        _check_deadline(deadline, "fsync-preserved-file")
+        os.fsync(file_fd)
+        os.close(file_fd)
+        file_fd = None
+        _check_deadline(deadline, "fsync-preserved-directory")
+        os.fsync(parent_fd)
+        success = True
+        return True, None, len(data)
+    except TimeoutError:
+        return False, "deadline-expired", 0
+    except PayloadContractError:
+        return False, "unsafe-or-stale-destination", 0
+    except OSError as exc:
         return False, f"copy-failed:{type(exc).__name__}", 0
+    finally:
+        if file_fd is not None:
+            os.close(file_fd)
+        if created and not success and parent_fd is not None and file_name is not None:
+            try:
+                os.unlink(file_name, dir_fd=parent_fd)
+            except OSError:
+                pass
+        if parent_fd is not None:
+            os.close(parent_fd)
 
 
 def preserve_payload_origins(
@@ -408,35 +560,46 @@ def preserve_payload_origins(
     expected: Mapping[str, Any],
     max_files: int,
     max_bytes: int,
+    max_bytes_total: int | None = None,
     timeout_s: float | None = None,
 ) -> dict[str, Any]:
     """Preserve three fake/fixture origins under the SPEC-060 canonical layout."""
     if set(roots) != set(_ORIGIN_NAMES):
         raise PayloadContractError("payload origins must be exactly source, nrncs, repository")
     expected = _validate_map_records(expected, "expected payload map", allow_empty=False)
+    if max_bytes_total is None:
+        max_bytes_total = 3 * max_bytes
+    if isinstance(max_bytes_total, bool) or not isinstance(max_bytes_total, int) or max_bytes_total <= 0:
+        raise PayloadContractError("max_bytes_total must be a positive integer")
     if timeout_s is not None and (isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)) or timeout_s < 0 or not math.isfinite(timeout_s)):
         raise PayloadContractError("timeout_s must be a finite non-negative number")
     deadline = None if timeout_s is None else time.monotonic() + float(timeout_s)
-    bundle_path = Path(bundle)
+    bundle_path = Path(_normalized_absolute_path(bundle, "payload bundle"))
     payload_root = bundle_path / "payload"
     origins_root = payload_root / "origins"
     maps_root = payload_root / "maps"
     metadata_root = payload_root / "metadata"
     for directory in (origins_root, maps_root, metadata_root):
-        _ensure_directory_tree_safe(directory)
-        directory.mkdir(parents=True, exist_ok=True)
-    _write_json(payload_root / "expected.json", {"count": len(expected), "hash": "sha256", "map": dict(sorted(expected.items()))})
+        _ensure_directory_tree_safe(directory, deadline=deadline)
+    _write_json(payload_root / "expected.json", {"count": len(expected), "hash": "sha256", "map": dict(sorted(expected.items()))}, deadline=deadline)
 
     origin_results: dict[str, dict[str, Any]] = {}
+    aggregate_bytes = 0
+    expected_bytes = sum(int(record["size"]) for record in expected.values())
     for name in _ORIGIN_NAMES:
         source_root = Path(roots[name])
         remaining_timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
-        source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=max_bytes, timeout_s=remaining_timeout)
+        remaining_total = max_bytes_total - aggregate_bytes
+        inventory_budget = min(max_bytes, max(1, remaining_total))
+        source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=inventory_budget, timeout_s=remaining_timeout)
         comparison = compare_payload_maps(expected, source_result["map"])
         destination = origins_root / name / "files"
-        _ensure_directory_tree_safe(destination)
-        destination.mkdir(parents=True, exist_ok=True)
+        _ensure_directory_tree_safe(destination, deadline=deadline)
         errors = list(source_result["errors"])
+        source_bytes = int(source_result.get("bytes", 0))
+        if aggregate_bytes + expected_bytes > max_bytes_total:
+            errors.append("aggregate-byte-bound-exceeded")
+        aggregate_bytes += source_bytes
         copied_bytes = 0
         for filename in sorted(source_result["map"]):
             source_file = source_root / filename
@@ -453,7 +616,7 @@ def preserve_payload_origins(
             errors.extend(preserved_result["errors"])
         complete = not errors and source_result["status"] == "COMPLETE" and preserved_result["status"] == "COMPLETE"
         status = "COMPLETE" if complete else "INCOMPLETE"
-        _write_json(maps_root / f"{name}.json", preserved_result["map"])
+        _write_json(maps_root / f"{name}.json", preserved_result["map"], deadline=deadline)
         _write_json(
             metadata_root / f"{name}.json",
             {
@@ -467,6 +630,7 @@ def preserve_payload_origins(
                 "errors": sorted(set(errors)),
                 "status": status,
             },
+            deadline=deadline,
         )
         origin_results[name] = {
             "status": status,
@@ -488,13 +652,17 @@ def preserve_payload_origins(
         "schema_version": 1,
         "kind": "payload-preservation-checkpoint",
         "complete": complete,
+        "aggregate_bytes": aggregate_bytes,
+        "max_bytes_total": max_bytes_total,
         "origins": {name: result["status"] for name, result in origin_results.items()},
     }
     checkpoint_path = payload_root / "preservation-checkpoint.json"
-    _write_json(checkpoint_path, checkpoint)
+    _write_json(checkpoint_path, checkpoint, deadline=deadline)
     return {
         "status": "COMPLETE" if complete else "INCOMPLETE",
         "accepted": accepted,
+        "aggregate_bytes": aggregate_bytes,
+        "max_bytes_total": max_bytes_total,
         "origins": origin_results,
         "checkpoint": str(checkpoint_path.relative_to(bundle_path)),
     }
