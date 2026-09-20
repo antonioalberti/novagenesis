@@ -86,8 +86,9 @@ Qualquer novo trial deve ser apenas diagnóstico, com baseline zero verificada, 
 
 ## Rebaseline de release — 2026-09-20
 
-- O Plano Mestre v5 separa o perfil remoto v1.0 (`M0 → M1-R → M2-R → M3`) da linha local/native-privileged/QGA (`M1-L`, v1.1+).
-- SPEC-055/056/058/059, NG-055/056 e o seam QGA-loss permanecem `OPEN`/`BLOCKED` na linha local; não são promovidos a PASS nem fechados por esta rebaseline.
-- A revisão Astra da separação documental foi `CONDITIONAL GO`; o gate operacional continua `HOLD`.
+- O Plano Mestre v6 separa o primeiro marco RDEMO local R0–R7 da engenharia remota (`M0 → M1-R → M2-R → M3`) e da linha local/native-privileged/QGA (`M1-L`, B-QGALOSS).
+- SPEC-055/056/058/059, NG-055/056 e o seam QGA-loss permanecem `OPEN`/`BLOCKED` na linha QGA; não são promovidos a PASS nem importados automaticamente para o RDEMO.
+- NG-060 é a tarefa finita do primeiro demonstrador; o próximo passo é revisão exact-SHA R0–R2 sem iniciar runtime.
+- A revisão Astra do replaneamento TRL3→TRL4 foi `CONDITIONAL GO`; o gate operacional continua `HOLD`.
 - Nenhum trial, VM, QGA, `clean.sh`, reboot, push, tag ou release foi autorizado por esta decisão.
-- Próximo gate v1.0: preparar, sem executar, um único pacote de trial normal remoto ligado a SHA/build/configuração exactos, com critérios de readiness, payload, teardown e seal definidos antes da execução.
+- Regra anti-loop: não acrescentar novo hardening remoto, metas 100/1000, readback, subscriptions completas ou QGA-loss como pré-requisitos do RDEMO; só reabrir implementação perante blocker concreto de R0–R7.

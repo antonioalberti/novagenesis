@@ -7,45 +7,48 @@
 **Candidato documental:** `0f410ca`<br>
 **Candidato funcional:** `f1bf3bc`<br>
 **Última revisão Astra:** `CONDITIONAL GO` controller-only; proposta documental condicional<br>
-**Estado:** `PROPOSTA — não aprovada para trial`
+**Estado:** `REBASELINE APROVADA DOCUMENTALMENTE — sem autorização operacional`
 
 ## 1. Objetivo
 
 Separar explicitamente três claims que continuam misturados nos registos da release:
 
-- **A — A-LNORMAL:** um candidato local/native-privileged de caminho normal;
+- **A — A-RDEMO-LOCAL:** um demonstrador local de caminho normal, limitado ao perfil experimental R0–R7;
 - **B — B-QGALOSS:** resiliência à perda QGA e recuperação do failure path;
-- **C — C-RELEASE:** gates da release pública e do perfil distribuído remoto.
+- **C — C-ENGINEERING-REMOTE:** gates da release de engenharia pública e do perfil distribuído remoto.
 
 A proposta preserva os trials reais históricos como positive controls, sem os promover retroactivamente a acceptance e sem tornar B uma pré-condição automática para A.
 
 Nenhuma parte deste documento autoriza VM, QGA, SSH real, `clean.sh`, reboot, trial, push, tag ou release.
 
-## 2. Gate A — A-LNORMAL
+## 2. Gate A — A-RDEMO-LOCAL
 
-**Nome:** `local-native-normal candidate`<br>
+**Nome:** `NovaGenesis Research Demonstrator 0.1 — Local Normal Path`<br>
+**Identificador proposto:** `v0.1.0-research.1-AIOPT3`<br>
 **Estado:** `OPEN / BLOCKED`<br>
-**Escopo:** exactamente um candidato local com `mode=local`, `local_profile=native-privileged`, plano e CLI concordantes, quatro roles, workload determinístico de cinco JPEGs, oráculo independente Source/Repository, provenance/build linkage, teardown identity-safe e bundle schema-v2 selado.
+**Escopo:** exactamente uma experiência local bounded, ligada a um exact-SHA e plano congelado, com workload determinístico de cinco JPEGs, oráculo independente expected/Source/Repository, provenance/build linkage, teardown identity-safe e bundle schema-v2 selado. O demonstrador não depende de QGA, retry, fallback ou injecção de falha.
 
 ### Governing material
 
 - SPEC-055: lifecycle local e readiness;
 - SPEC-056: provenance, build linkage, oracle, ownership, bundle e teardown aplicáveis ao candidato local;
-- SPEC-058: EUID 0, paths, cleanup e perfil native-privileged;
-- SPEC-059: capability/preflight e completion normal confirmado; critérios de perda QGA pertencem a B.
+- NG-060: perfil reduzido R0–R7 do demonstrador;
+- SPEC-058/059: permanecem na linha M1-L/B-QGALOSS e não são pré-requisitos do RDEMO.
 
 ### Claims permitidos
 
-A pode demonstrar apenas o caminho normal local definido pelo plano e pelo oráculo. Um mapa independente Source/Repository prova apenas presença, nome, tamanho e bytes nos roots declarados; não prova por si só readback através da interface/protocolo do Repository, persistência independente no NRNCS ou subscription semantics. Cada uma dessas claims exige oráculo e gate próprios. A não demonstra automaticamente:
+A pode demonstrar apenas uma demonstração integrada de laboratório numa configuração Linux local específica: cinco JPEGs novos, igualdade byte-exact Source↔Repository, lifecycle observado e bundle verificável. Um mapa independente Source/Repository prova apenas presença, nome, tamanho e bytes nos roots declarados. A não demonstra automaticamente:
 
-- QGA-loss resilience;
-- multi-VM deployment ou remote-v1;
-- persistência independente de NRNCS, subscription semantics ou Repository readback, mesmo que seja acrescentado um terceiro mapa: cada claim continua a exigir a evidência semântica correspondente;
-- M1-R, M2-R, M3 ou a release pública `v1.0.0`.
+- três origens Source/NRNCS/Repository;
+- persistência independente de NRNCS, subscription semantics ou Repository readback;
+- multi-VM deployment, remote-v1, performance ou QGA-loss;
+- M0, M1-R, M2-R, M3 ou a release pública `v1.0.0`.
+
+Para A-RDEMO, três origens, readback Repository, subscriptions completas, multi-VM e QGA-loss são `N/A`/diferidos. `N/A` não é `PASS` implícito.
 
 ### Falha durante A
 
-Perda QGA, guest completion desconhecido, teardown ambíguo ou bundle não selado tornam A `INCONCLUSIVE`/`FAIL`. Não existe fallback não aprovado e não há retry automático.
+Perda/ambiguidade de transporte local, completion desconhecido, teardown ambíguo ou bundle não selado tornam A-RDEMO `INCONCLUSIVE`/`FAIL`. Não existe fallback não aprovado e não há retry automático.
 
 ## 3. Gate B — B-QGALOSS
 
@@ -67,28 +70,28 @@ B continua aberto e não é fechado pelos helpers de raw transport, pelo verifie
 
 B não é pré-requisito de A quando A declara continuidade normal do transporte. Porém, qualquer perda durante A é não-aceite; A não pode usar B como atalho de recuperação.
 
-## 4. Gate C — C-RELEASE
+## 4. Gate C — C-ENGINEERING-REMOTE
 
-**Nome:** `broader public release gates`<br>
+**Nome:** `NovaGenesis Engineering Release 1.0 — Remote Normal Profile`<br>
 **Estado:** `BLOCKED / OPEN`<br>
-**Escopo:** M0 → M1-R → M2-R → M3, incluindo deployment remoto, multi-VM lifecycle/teardown, PGCS/NRNCS/Repository, subscription/readback, hygiene, release review e tag.
+**Escopo:** M0 → M1-R → M2-R → M3, incluindo deployment remoto, multi-VM lifecycle/teardown, PGCS/NRNCS/Repository, subscription/readback, hygiene, release review e tag. C é um marco posterior e não é pré-requisito operacional do RDEMO.
 
-Para um candidato A isolado, estes gates podem ser `N/A por perfil`, nunca `PASS`, apenas depois de uma matriz de aplicabilidade rastreável ligar cada row ao perfil, ao plano, ao SPEC governante e à claim explicitamente fora do escopo. `N/A` não dispensa requisitos de C nem converte uma ausência de evidência em aceitação. Continuam requisitos da release pública C:
+Para um candidato A-RDEMO isolado, estes gates podem ser `N/A por perfil`, nunca `PASS`, apenas depois de uma matriz de aplicabilidade rastreável ligar cada row ao perfil, ao plano, ao SPEC governante e à claim explicitamente fora do escopo. `N/A` não dispensa requisitos de C nem converte uma ausência de evidência em aceitação. Continuam requisitos da release de engenharia C:
 
 - SPEC-009, SPEC-044–054 e NG-046/047/048/049/050/051/052/053/054;
 - deployment SSH multi-VM, teardown remoto e payload/readback distribuído;
 - provenance/build linkage e auditoria final;
 - release notes, revisão final e tag.
 
-A não pode ser chamado `v1.0.0` sem decisão explícita que redefina C e sem fechar os gates retidos.
+A-RDEMO não pode ser chamado `v1.0.0` sem decisão explícita que redefina C e sem fechar os gates retidos.
 
-## 5. Preparação, execução e saída de um A futuro
+## 5. Preparação, execução e saída de um RDEMO futuro
 
 ### 5.1 Aprovação e autorização — antes de qualquer operação
 
 Antes de qualquer preparação, launch ou cleanup, devem existir:
 
-- decisão A/B/C commitada e reconciliada em Plano Mestre, NG-050, NG-056, Dashboard, handoff e SPECs afectadas;
+- decisão A/B/C commitada e reconciliada em Plano Mestre, NG-050, NG-060, Dashboard, handoff e SPECs afectadas;
 - matriz de aplicabilidade que identifica `PASS`, `OPEN`, `BLOCKED` e `N/A por perfil`, sem tratar `N/A` como aceitação;
 - revisão Astra do candidato funcional exact-SHA;
 - autorização operacional explícita e separada para a preparação, sem autorização implícita de trial ou release.
@@ -97,29 +100,29 @@ Antes de qualquer preparação, launch ou cleanup, devem existir:
 
 Depois da autorização, e ainda antes do launch, devem ser verificados:
 
-- checkout limpo no SHA funcional imutável; o commit documental da proposta permanece separado;
-- build fora da source tree com receipt, manifest bruto/normalizado e hashes dos quatro aliases/roles lançados;
-- `mode=local`, `local_profile=native-privileged` no plano e CLI, EUID 0 e paths absolutos confiáveis;
-- inventário baseline de processos, SysV IPC e POSIX semáforos; `clean.sh` só pode ser executado se a baseline não estiver zero, com novo inventário obrigatório e scope fail-closed;
+- checkout limpo no SHA funcional imutável; o commit documental permanece separado;
+- build fora da source tree com receipt, manifest bruto/normalizado e hashes dos binários lançados;
+- `mode=local` no plano e CLI, sem QGA, retry, fallback ou injecção de falha;
+- inventário baseline de processos/IPC e paths absolutos confiáveis;
 - IO novo e workload novo de cinco JPEGs com mapa expected nome/tamanho/SHA-256;
-- Repository vazio ou namespace de Repository exclusivamente isolado, com condição e inventário equivalentes explicitamente ligados à claim;
-- oráculo file-map Source/Repository obrigatório para A; readback do Repository, persistence NRNCS e subscription semantics só são obrigatórios quando reclamados, e devem aparecer na matriz quando excluídos.
+- roots Source e Repository exclusivamente isolados, com condição e inventário equivalentes ligados à claim;
+- oráculo file-map Source/Repository obrigatório; NRNCS, readback, subscriptions, multi-VM e QGA-loss entram na matriz como `N/A`/diferidos.
 
 ### 5.3 Acções da execução — não são pré-condições
 
-- launch PGCS → NRNCS → Repository → Source, PTY/stream/captura bounded e markers de readiness;
-- recolha das origens declaradas após stop/quiescence, preservação independente e checkpoint antes de cleanup;
+- launch local pelo NG-ELC, captura bounded e completion conhecido;
+- recolha Source/Repository após stop/quiescence, preservação independente e checkpoint antes de cleanup;
 - teardown reverse-order identity-safe, com reconciliação de processos/IPC e sem fallback não aprovado;
 - construção do manifest, verificação offline e seal terminal.
 
 ### 5.4 Critérios de saída
 
-- completion normal confirmado; qualquer perda de transporte ou completion desconhecido permanece não aceite;
-- mapas esperados e observados completos, comparáveis e coerentes com o oráculo aplicável;
+- completion normal confirmado; qualquer completion desconhecido permanece não aceite;
+- mapas expected/Source/Repository completos, comparáveis e coerentes com o oráculo aplicável;
 - divergência comprovada com evidência completa: `runtime=FAIL`, `evidence=COMPLETE`, `accepted=false`;
 - recolha ausente, instável, truncada ou insuficiente: `runtime=INCONCLUSIVE`, `evidence=INCOMPLETE`, `accepted=false`, salvo `FAIL` sticky anterior;
 - teardown ambíguo, ausência de seal ou falha de cobertura/hash: nunca `accepted=true`;
-- manifest/seal schema-v2, `verify_bundle` com `NGELC-VALID`, `integrity=true` e `accepted=true` apenas quando ligados às claims do perfil A;
+- manifest/seal schema-v2, `verify_bundle` com `NGELC-VALID`, `integrity=true` e `accepted=true` apenas quando ligados às claims do perfil RDEMO;
 - resultado final, inventories e artefactos preservados lidos de volta e ligados ao SHA funcional exacto.
 
 A packetização anterior baseada em `1b21ae7` é apenas desenho histórico: não deve ser executada sem novo freeze, porque a branch contém commits posteriores de documentação e hardening.
@@ -132,14 +135,14 @@ A packetização anterior baseada em `1b21ae7` é apenas desenho histórico: nã
 - `qga-r17-20260918`: roles/readiness/Source observados, mas perda QGA, Repository vazio e ausência de seal;
 - `g2-e7-canonical-20260914`: lifecycle remoto marker-only, sem prova de payload independente.
 
-## 7. Decisão solicitada a Astra
+## 7. Decisão aplicada e regra anti-loop
 
-Rever esta proposta exacta e responder:
+O parecer Astra de 2026-09-20 é aplicado exactamente:
 
-1. se A-LNORMAL, B-QGALOSS e C-RELEASE devem ser gates separados;
-2. se B pode permanecer `HOLD/NO-GO` sem bloquear um único A normal-path;
-3. se as claims e não-claims de A estão suficientemente fechadas;
-4. se o packet A deve ser reconstruído a partir de um novo SHA exacto, e não de `1b21ae7`;
-5. quais pré-condições devem ser obrigatórias antes de qualquer autorização operacional.
+1. A passa a `A-RDEMO-LOCAL`, com R0–R7 e identificador experimental `v0.1.0-research.1-AIOPT3`.
+2. B permanece `HOLD / NO-GO` e não bloqueia o primeiro caminho normal local; qualquer perda durante o RDEMO invalida a experiência.
+3. C passa a `C-ENGINEERING-REMOTE`, preservando M0/M1-R/M2-R/M3 e a release futura `v1.0.0-AIOPT3`.
+4. SPEC-060/NG-058 permanecem no caminho remoto de engenharia; controller-only/fixtures estão concluídos, mas a integração collector/helper remota continua `OPEN`.
+5. Não serão acrescentados hardening remoto, matrizes cosméticas, metas 100/1000, readback, subscriptions completas ou QGA-loss como pré-requisitos do RDEMO. Só se reabre implementação perante bloqueio concreto de R0–R7.
 
-**Veredicto actual:** proposta não aprovada; release continua `NO-GO`; trial continua `HOLD`.
+O replaneamento não autoriza VM, SSH, QGA, `clean.sh`, reboot, trial, push, tag, publicação ou release. A única experiência futura será uma execução local bounded, sem retry, fallback ou injecção de falha, após revisão exact-SHA e autorização operacional separada.

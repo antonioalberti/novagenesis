@@ -1,12 +1,12 @@
-# SPEC-060: Evidência remota de payload para o caminho normal v1.0
+# SPEC-060: Gate de evidência remota de payload para a release de engenharia v1.0
 
 **Author:** Antonio Alberti / Hermes Agent<br>
 **Date:** 2026-09-20<br>
-**Status:** In Progress — controller-only increment
+**Status:** In Progress — gate remoto de engenharia; controller-only concluído; integração remota OPEN
 **Branch:** AIOPT3
 **Implementation commit:**<br>
 **Related:** SPEC-052-remote-ssh-multi-vm-executor.md, SPEC-054-release-master-plan-and-audit.md, SPEC-046-multi-vm-runner-safe-teardown.md, SPEC-050-contentapp-repository-control-plane-readback.md<br>
-**Task linkage:** NG-058 / M2-R / NG-050
+**Task linkage:** NG-058 / M2-R / NG-050; não aplicável ao RDEMO local
 
 ## 1. Decisão e problema
 
@@ -15,6 +15,8 @@ O perfil remoto v1.0 precisa demonstrar o caminho normal Source → PGCS → NRN
 O executor remoto actual aceita apenas `runtime_oracle.type=markers` para o modo remoto. Markers de publicação/recepção demonstram progresso, mas não preservam nem permitem re-hashar os artefactos observados em Source, no cache/área NRNCS e no Repository. O pacote de preparação do trial normal foi, por isso, mantido em `HOLD` por Astra.
 
 Esta SPEC define o menor contrato controller-only para recolher, preservar e verificar a evidência de payload remoto antes de qualquer novo trial normal de aceitação.
+
+Esta SPEC governa exclusivamente a futura `NovaGenesis Engineering Release 1.0 — Remote Normal Profile`. Não governa nem bloqueia o `NovaGenesis Research Demonstrator 0.1 — Local Normal Path`; o RDEMO usa o seu perfil reduzido R0–R7 e não pode reclamar conformidade com as três origens remotas desta SPEC.
 
 ## 2. Âmbito
 
@@ -200,23 +202,25 @@ Depois de escrever o manifest, o verifier offline MUST reabrir e re-hashar as c�
 - Bundle intacto mas não elegível: integridade válida, `accepted=false`.
 - Qualquer falha de manifest, hash, cobertura ou seal: `evidence_result=INCOMPLETE` e `accepted=false`.
 
-## 4. Implementação bounded autorizada após aprovação
+## 4. Estado da implementação e integração remota
 
-O primeiro incremento proposto desta SPEC MUST ser controller-only e limitar-se a:
+O incremento controller-only desta SPEC está concluído no escopo de componente e fixture:
 
-1. validar o bloco `payload_evidence` sem contactar guests;
-2. definir helpers puros para mapas e comparação fail-closed;
-3. implementar recolha fake/fixture de três origens em namespaces distintos;
-4. integrar preservação, manifest e verificação offline em fixture sem VM;
-5. manter planos marker-only existentes sem alteração semântica;
-6. executar RED→GREEN focado e suite completa do controller;
-7. obter aprovação Astra da versão exacta desta SPEC antes de implementar; a revisão do diff/testes ocorre depois da implementação e antes de qualquer preparação operacional.
+1. valida o bloco `payload_evidence` sem contactar guests;
+2. define helpers bounded para mapas e comparação fail-closed;
+3. preserva três origens fake/fixture em namespaces distintos;
+4. integra preservation, manifest, terminal seal e verificação offline em fixture sem VM;
+5. mantém planos marker-only existentes sem alteração semântica;
+6. fecha a attestation do verifier no seam `evaluate_remote_acceptance`;
+7. passa a suite focada e a suite completa do controller, com `compileall` e `git diff --check`.
 
-A primeira implementação MUST NOT executar VMs, SSH real, QGA, `clean.sh`, reboot, alterar C++/protocolo ou promover o gate M2-R.
+Este estado não demonstra recolha remota produtiva. O bloqueio efectivo que permanece é a ausência de collector/helper bounded ligado ao ciclo remoto e a produção end-to-end de um bundle v2 durante `run_trial`. Não acrescentar novo hardening controller-only como pré-requisito do RDEMO; reabrir implementação apenas perante um blocker concreto de M2-R ou da integração remota.
 
-### 4.1 — Incremento seguinte: attestation do verifier no seam remoto
+A implementação controller-only MUST NOT ser interpretada como autorização para executar VMs, SSH real, QGA, `clean.sh`, reboot, trial, push, tag, release, alterar C++/protocolo ou promover M2-R.
 
-O próximo incremento controller-only MUST fechar apenas a decisão de aceitação no seam `evaluate_remote_acceptance`; não deve iniciar recolha remota nem alterar o ciclo de execução/teardown.
+### 4.1 — Attestation do verifier no seam remoto
+
+O seam `evaluate_remote_acceptance` está fechado apenas para impedir aceitação sem attestation válida; não inicia recolha remota nem altera o ciclo de execução/teardown.
 
 Para um plano `normal-payload`, `payload_result` só pode satisfazer a decisão de aceitação quando contiver simultaneamente:
 
@@ -231,6 +235,18 @@ Para um plano `normal-payload`, `payload_result` só pode satisfazer a decisão 
 Um resumo que contenha apenas `status=COMPLETE` e `accepted=true` MUST ser rejeitado como attestation insuficiente. A ausência, tipo inválido ou valor contraditório em qualquer campo MUST produzir `local_acceptance_eligible=false` e um blocker estável. O fluxo remoto actual continua a passar `payload_result=None` até existir collector/helper bounded e bundle v2 efectivamente produzido; este incremento não pode transformar essa ausência em PASS.
 
 O teste deste seam deve ser feito com payloads sintéticos e relatório de verifier fake/fixture, sem VM, SSH, QGA, cleanup, reboot, trial ou alteração de protocolo.
+
+### 4.2 — Anexo: perfil RDEMO local
+
+O RDEMO não é candidato `normal-payload` desta SPEC. Para evitar ambiguidade documental:
+
+- Source/NRNCS/Repository como três origens remotas: `N/A`/diferido no RDEMO;
+- mapa Source/Repository, cinco JPEGs, lifecycle local bounded, teardown por identidade, manifest/seal schema-v2 e verifier: governados por `NG-060` e pelo Plano Mestre R0–R7;
+- marker-only: compatível para diagnóstico, nunca aceitação do RDEMO;
+- M0/M1-R/M2-R/M3 e a release `v1.0.0-AIOPT3`: não fechados pelo RDEMO;
+- QGA-loss, multi-VM, readback de protocolo e subscriptions completas: `N/A`/diferidos.
+
+Esta separação é de aplicabilidade, não uma redução silenciosa do contrato remoto.
 
 ## 5. Testes obrigatórios
 
@@ -257,22 +273,23 @@ O teste deste seam deve ser feito com payloads sintéticos e relatório de verif
 
 ## 6. Critérios de aceitação da SPEC
 
-- [ ] Contrato `payload_evidence` versionado, fechado e documentado; classes marker-only versus candidato normal são explícitas.
-- [ ] Três origens independentes e namespaces separados implementados.
-- [ ] Mapas expected/Source/NRNCS/Repository preservados e re-hasháveis.
-- [ ] Falhas de recolha e divergências impedem PASS.
-- [ ] Manifest/seal/verificador cobrem as novas áreas.
-- [ ] Planos marker-only continuam compatíveis.
-- [ ] Testes RED→GREEN e suite completa passam no intérprete canónico.
-- [ ] Diff exacto revisto por Astra.
-- [ ] Nenhum trial real executado nesta SPEC.
-- [ ] Um plano candidato normal só será criado/activado depois da revisão Astra e da conclusão de M0/M1-R.
-- [ ] Revisão Astra da versão corrigida da SPEC concluída antes de implementar o collector.
-- [ ] Revisão Astra do diff exacto e dos resultados dos testes concluída depois da implementação e antes da preparação operacional.
+- [x] Contrato `payload_evidence` versionado, fechado e documentado; classes marker-only versus candidato normal são explícitas.
+- [x] Três origens independentes e namespaces separados implementados no escopo controller-only/fixture.
+- [x] Mapas expected/Source/NRNCS/Repository preservados e re-hasháveis no escopo controller-only/fixture.
+- [x] Falhas de recolha e divergências impedem PASS.
+- [x] Manifest/seal/verificador cobrem as novas áreas no escopo controller-only/fixture.
+- [x] Planos marker-only continuam compatíveis.
+- [x] Testes RED→GREEN e suite completa passam no intérprete canónico.
+- [x] Diff exacto do incremento controller-only revisto por Astra.
+- [x] Nenhum trial real executado nesta SPEC.
+- [ ] Collector/helper bounded integrado ao ciclo remoto.
+- [ ] `run_trial` produz bundle v2 real das origens remotas e attestation ligada ao exact-SHA.
+- [ ] Um plano candidato normal é criado/activado depois da revisão Astra e da conclusão de M0/M1-R.
+- [ ] Revisão Astra do diff do collector e dos resultados end-to-end concluída antes da preparação operacional.
 
 ## 7. Relação com a release
 
-Esta SPEC fecha uma lacuna de M2-R, mas não fecha M2-R sozinha. A release v1.0 continua dependente de M0, M1-R, SPEC-044/045/047/048/049/050, provenance/build, teardown remoto, revisão Astra e auditoria sem drift. A referência a SPEC-056 limita-se ao contrato controller-only de re-hash/manifest/seal; não importa a tarefa, o perfil local ou a dependência operacional M1-L/QGA.
+Esta SPEC fecha uma lacuna de M2-R, mas não fecha M2-R sozinha. A release de engenharia v1.0 continua dependente de M0, M1-R, SPEC-044/045/047/048/049/050, provenance/build, teardown remoto, revisão Astra e auditoria sem drift. O RDEMO não depende desta SPEC e não pode usar os seus fixtures para reivindicar aceitação remota. A referência a SPEC-056 limita-se ao contrato controller-only de re-hash/manifest/seal; não importa a tarefa, o perfil local ou a dependência operacional M1-L/QGA.
 
 SPEC-055/056/058/059 e o seam QGA-loss permanecem na linha M1-L/v1.1+; esta SPEC não reintroduz dependência operacional de QGA nem altera a rebaseline aprovada.
 

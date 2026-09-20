@@ -1,10 +1,10 @@
-# NovaGenesis — Plano Mestre da Release v1.0.0
+# NovaGenesis — Plano Mestre de Investigação TRL3→TRL4 e Engenharia v1.0.0
 
 **Plano:** `RELEASE-MASTER-PLAN-v1.0.0`  
-**Versão:** 5 — normal path remoto separado do perfil local/QGA
+**Versão:** 6 — demonstrador local TRL4 separado da engenharia remota/QGA
 **Data de criação:** 2026-09-13; rebaseline documental 2026-09-20<br>
 **Branch candidata:** `AIOPT3`  
-**Estado:** `BLOCKED — rebaseline documental aprovada condicionalmente; gates operacionais em HOLD`
+**Estado:** `RDEMO em preparação documental; engenharia v1.0.0 e QGA em HOLD`
 **Tarefa guarda-chuva:** [[NG-050-release-master-control-v1-20260913]]  
 **SPEC do método:** `Specs/SPEC-054-release-master-plan-and-audit.md`
 
@@ -12,11 +12,16 @@
 
 ## 1. Objectivo
 
-Controlar a primeira release pública `v1.0.0` da NovaGenesis através de uma cadeia rastreável:
+Controlar dois marcos separados da NovaGenesis através de uma cadeia rastreável:
 
 ```text
 Tarefa → SPEC → gate → hipótese → experiência → evidência → commit/configuração → veredicto
 ```
+
+1. **RDEMO:** `NovaGenesis Research Demonstrator 0.1 — Local Normal Path`, primeira demonstração TRL3→TRL4, com o caminho local mínimo R0–R7.
+2. **Engenharia:** `NovaGenesis Engineering Release 1.0 — Remote Normal Profile`, mantendo os gates M0–M3 e SPEC-060 remotos estritos.
+
+QGA-loss permanece uma linha de investigação separada, em `HOLD/NO-GO`. O RDEMO não fecha, não substitui e não promove os gates de engenharia remota.
 
 O plano é actualizado somente quando existe evidência verificável. Contradições são registadas como `DRIFT`; não são corrigidas silenciosamente.
 
@@ -36,35 +41,36 @@ Scripts/AlpineVMs/ng_remote_executor.py
 
 Após a implementação e aceitação da SPEC-057, o entrypoint canónico será `Scripts/AlpineVMs/ng_elc.py`; o caminho antigo poderá permanecer apenas como shim de compatibilidade. O modo remoto usa `--mode remote`; o cenário intra-OS usa `--mode local` e o plano `Scripts/AlpineVMs/plans/local-intra-os.example.json`.
 
-## 2. Âmbito da release
+## 2. Âmbito dos marcos
 
-### Incluído
+### 2.1 Incluído no RDEMO local
+
+- exact-SHA e plano congelado;
+- build receipt e hashes dos binários efectivamente usados;
+- configuração Linux local específica e NG-ELC local bounded;
+- workload novo de cinco JPEGs determinísticos;
+- mapas independentes expected/Source/Repository, sem substituir a observação por markers;
+- cópias preservadas, re-hash independente, teardown por identidade e inventário final;
+- bundle durável com manifest/seal schema-v2 e verificador offline;
+- revisão do bundle e matriz explícita de claims e limitações.
+
+O RDEMO não reclama produção, M2-R, multi-VM, persistência NRNCS, readback de protocolo, semântica geral de subscriptions, performance ou QGA-loss.
+
+### 2.2 Mantido como engenharia remota v1.0.0
 
 - baseline/proveniência e freeze do candidato;
-- higiene actual e segurança pública do perfil suportado;
-- deployment, runner, observabilidade e teardown bounded;
-- correctness do caminho normal de subscription;
-- gates PGCS/NRNCS/Repository necessários ao caminho normal;
-- workload novo de cinco JPEGs com mapas independentes;
-
-### 2.1 Perfil mínimo suportado da v1.0.0
-
-Para evitar que a primeira release pública misture todas as linhas históricas de investigação, a v1.0.0 certificará somente:
-
-- Linux, branch `AIOPT3`, dois guests Alpine e a topologia normal documentada;
-- executor remoto actual `Scripts/AlpineVMs/ng_remote_executor.py` — o rename da SPEC-057 fica para v1.1+;
-- perfil normal NRNCS, uma subscription normal e o caminho Source → PGCS → NRNCS → Repository;
-- workload novo de cinco JPEGs determinísticos, com mapas independentes nome → tamanho → SHA-256;
-- lifecycle bounded, provenance/build receipt, bundle durável, teardown por identidade e revisão final.
-- o perfil local/native-privileged, o adaptador Proxmox/QGA e a resiliência QGA-loss ficam explicitamente fora do perfil certificado v1.0.0 e são preservados como linha v1.1+;
-
-O perfil mínimo não anuncia suporte genérico ao modo local, todos os caminhos de erro de subscriptions, performance/soak, 100/1000 fotos, multiplataforma ou equivalência completa dos perfis legacy. Essas claims permanecem rastreadas no Apêndice A para v1.1+.
+- deployment, runner, observabilidade e teardown bounded multi-VM;
+- correctness do caminho normal Source → PGCS → NRNCS → Repository;
+- workload de cinco JPEGs com mapas independentes das três origens;
+- SPEC-060 completa, collector/helper remoto, manifest/seal e verificação offline;
 - revisão Astra, release notes e tag verificável.
 
-### Excluído
+### 2.3 Diferido ou fora do primeiro marco
 
+- três origens Source/NRNCS/Repository no RDEMO;
+- readback do Repository, semântica completa de subscriptions e multi-VM no RDEMO;
+- Proxmox/QGA, QGA-loss, performance/soak, 100/1000 fotos e claims de produção;
 - implementação de optimizações NG-041, NG-043, NG-044 e NG-045;
-- alterações experimentais de performance no candidato;
 - criação ou promoção de AIOPT4;
 - qualquer SPEC não relacionada sem decisão explícita.
 
@@ -82,28 +88,54 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 `concluída` numa tarefa e `Implemented` numa SPEC não fecham automaticamente um gate.
 
-## 4. Gate register — perfil v1.0.0 remoto rebaseado
+## 4. Gate register — RDEMO local e engenharia remota v1.0
+
+### 4.1 Caminho RDEMO local
+
+| Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
+|---|---|---|---|---|---|---|---|
+| R0 | Exact-SHA e plano congelado | NG-060 | SPEC-054, SPEC-055 | — | freeze/plan receipt | OPEN | revisão exact-SHA |
+| R1 | Build receipt e identidade dos binários | NG-060 | SPEC-054, SPEC-056 | R0 | receipt e hashes | OPEN | preparar build ligado |
+| R2 | Cinco JPEGs e isolamento Source/Repository | NG-060 | SPEC-055, SPEC-056 | R0, R1 | mapa expected + roots isolados | OPEN | preparar workload |
+| R3 | Runtime local bounded e completion conhecido | NG-060 | SPEC-055 | R0–R2 | eventos NG-ELC e result | OPEN | autorização para uma experiência |
+| R4 | Mapas independentes e cópias re-hashable | NG-060 | SPEC-056 | R3 | mapas/cópias Source/Repository | OPEN | recolha durante o trial |
+| R5 | Teardown e inventário por identidade | NG-060 | SPEC-055, SPEC-056 | R3, R4 | inventário baseline/final | OPEN | verificar zero resíduos atribuíveis |
+| R6 | Bundle durável, manifest/seal schema-v2 e verifier | NG-060 | SPEC-056 | R4, R5 | bundle selado + verificação | OPEN | verificar offline |
+| R7 | Revisão e claims/limitações | NG-060, NG-050 | SPEC-054, SPEC-056 | R0–R6 | revisão Astra e matriz | OPEN | decisão RDEMO |
+
+O RDEMO é um demonstrador experimental local. `N/A` significa exclusão explícita; nunca é `PASS` implícito. Uma perda de transporte, completion desconhecido, bundle não selado ou evidência incompleta impede aceitação.
+
+### 4.2 Caminho de engenharia remota v1.0
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
 | M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md` | BLOCKED | Fechar runtime normal e revisão SPEC-054; a decisão fixture-only e a higiene documental do perfil já estão registadas |
 | M1-R | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049 | SPEC-009, SPEC-046, SPEC-052, SPEC-054 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; receipt/build remoto e bundle candidato | HOLD | Fixar SHA, receipt ligado aos binários e procedimento remoto fail-closed |
-| M2-R | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054, NG-058 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050, SPEC-060 | M1-R | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/`; SPEC-060 payload contract | OPEN | Aprovar/implementar o oráculo independente e preparar um único trial candidato normal remoto |
-| M1-L | Perfil local/native-privileged, QGA e QGA-loss → reconciliação → teardown → seal | NG-055, NG-056 | SPEC-055, SPEC-056, SPEC-058, SPEC-059 | linha v1.1+ | resultados locais históricos e `Specs/RESULTS-SPEC-059/` | DEFERRED / OPEN | Implementar seam C+D e rever separadamente; não bloqueia v1.0 remoto |
+| M2-R | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054, NG-058 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050, SPEC-060 | M1-R | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/`; SPEC-060 payload contract | OPEN | Implementar collector/helper e preparar um único trial candidato normal remoto |
+| M1-L | Perfil local/native-privileged, QGA e QGA-loss → reconciliação → teardown → seal | NG-055, NG-056 | SPEC-055, SPEC-056, SPEC-058, SPEC-059 | linha QGA diferida | resultados locais históricos e `Specs/RESULTS-SPEC-059/` | DEFERRED / OPEN | Implementar seam C+D e rever separadamente; não bloqueia RDEMO nem v1.0 remoto |
 | M3 | Revisão final, notas, tag e leitura de volta do perfil remoto | NG-050 | SPEC-054, release criteria | M0, M1-R, M2-R | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
 
-M2-R mantém os subcritérios técnicos de G4–G8, mas a v1.0.0 certifica apenas o caminho normal remoto suportado. O workload de cinco JPEGs é o contrato mínimo; 100/1000 fotos, stress, matrizes completas de erro, modo local/native-privileged e resiliência QGA-loss ficam para v1.1+. SPEC-060 está em `Proposal — Astra GO` para o incremento controller-only; a implementação, o diff/testes e a promoção de M2-R continuam abertos.
+M2-R mantém os subcritérios técnicos de G4–G8 para a engenharia remota. O RDEMO não fecha M0, M1-R, M2-R ou M3. SPEC-060 permanece estrita para o perfil remoto: o incremento controller-only está concluído, mas collector/helper e integração operacional continuam abertos.
 
-## 5. Ordem de execução
+## 5. Ordem dos marcos
 
 ```text
+R0 exact-SHA/plano
+ → R1 build receipt
+ → R2 workload/isolamento
+ → R3 runtime local bounded
+ → R4 mapas/cópias
+ → R5 teardown/inventário
+ → R6 manifest/seal/verifier
+ → R7 revisão/claims
+
 M0 contrato/higiene/freeze
  → M1-R deployment/lifecycle/teardown remoto
  → M2-R caminho normal remoto end-to-end
  → M3 revisão/tag
 ```
 
-M2-R pode preparar os seus oráculos em paralelo, mas a aceitação depende de M1-R. M1-L é uma linha diferida e não bloqueia a v1.0 remoto. Nenhum subcritério histórico é promovido a PASS por narrativa; claims adiadas são marcadas N/A para o perfil v1.0.0 e preservadas no Apêndice A.
+O primeiro marco deve parar depois de uma única experiência local bounded e da revisão R7. Não há retry automático, fallback ou injecção de falha no RDEMO. Só se reabre implementação se existir um bloqueio concreto de R0–R7. A engenharia remota segue separadamente; nenhum subcritério histórico é promovido a PASS por narrativa.
 
 ### 5.1 Matriz de aplicabilidade da rebaseline
 
@@ -113,9 +145,9 @@ M2-R pode preparar os seus oráculos em paralelo, mas a aceitação depende de M
 | SPEC-056 / NG-056 | `N/A — contrato local de evidência fora do perfil remoto` | Provenance, build linkage, bundle durável, manifest, seal e verificação exigidos pelo remoto permanecem em M1-R | M1-L / v1.1+ |
 | SPEC-058 | `N/A — native-privileged local não certificado na v1.0` | Nenhum fallback local/QGA pode ser usado para certificar o perfil remoto | M1-L / v1.1+ |
 | SPEC-059 | `N/A — Proxmox/QGA não é dependência operacional do perfil remoto` | Perda SSH/teardown remoto deve ser tratada fail-closed no procedimento remoto declarado | M1-L / v1.1+ |
-| SPEC-060 | `Aplicável — contrato de evidência do payload remoto M2-R` | Mapas independentes Source/NRNCS/Repository, cópias re-hashable, manifest, seal e verificação offline | M2-R / v1.0 |
+| SPEC-060 | `N/A no RDEMO; aplicável à engenharia remota M2-R` | No remoto: mapas independentes Source/NRNCS/Repository, cópias re-hashable, manifest, seal e verificação offline | M2-R / v1.0 |
 
-`N/A` é relativo ao perfil v1.0.0; não fecha nem abandona as SPECs/tarefas diferidas.
+`N/A` é relativo ao perfil explicitamente seleccionado; não fecha nem abandona as SPECs/tarefas diferidas.
 
 ## Apêndice A — mapa completo G0–G10 para v1.1+
 
@@ -171,8 +203,9 @@ Verificação realizada em 2026-09-13:
 - A integração SPEC-059 adicionou o adaptador Proxmox/QEMU Guest Agent, `channel-check` no NG-ELC e persistência de prova; a suite Alpine actual passou `172/172` com 7 subtestes.
 - M0/G0 permanece `BLOCKED` até a reconciliação formal do freeze. M1-R/M2-R continuam em HOLD/OPEN; M3 continua bloqueado. SPEC-058 pertence à linha M1-L/v1.1+ e não é requisito do perfil remoto v1.0.
 - O mapa G0–G10 é histórico/apêndice; os gates operacionais da release mínima são M0, M1-R, M2-R e M3, com M1-L diferido.
-- Rebaseline documental de 2026-09-20: M1-R/M2-R são o caminho crítico da v1.0 remoto; M1-L preserva SPEC-055/056/058/059 e QGA-loss como linha v1.1+, sem promover resultados históricos a PASS.
-- Astra deu `CONDITIONAL GO` apenas para esta alteração documental; execução de trial, VM, QGA, `clean.sh`, reboot, push, tag e release continuam em `HOLD`.
+- Rebaseline documental de 2026-09-20: o primeiro marco passa a ser o RDEMO local R0–R7; M1-R/M2-R/M3 continuam o caminho separado da engenharia remota v1.0; QGA-loss permanece `HOLD/NO-GO`.
+- Astra deu `CONDITIONAL GO` ao replaneamento TRL3→TRL4, não à operação: controller-only e fixtures de SPEC-060 ficam concluídos como evidência de componente; collector remoto, trial remoto, VM, SSH, QGA, `clean.sh`, reboot, push, tag e release continuam não autorizados.
+- A regra anti-loop fica activa: não acrescentar novo hardening remoto, matrizes cosméticas, metas 100/1000, readback, subscriptions completas ou QGA-loss como pré-requisitos do RDEMO; só reabrir implementação perante blocker concreto de R0–R7.
 
 ## 7. Regras para novos agentes
 
@@ -224,6 +257,10 @@ A release v1.0 remoto só pode avançar quando:
 - Astra reviu o diff, resultados e limitações;
 - a tag e as release notes foram verificadas após publicação.
 
+## 9.1 Critério de Go/No-Go do RDEMO
+
+O RDEMO só pode ser aceite como demonstrador experimental quando R0–R7 estiverem satisfeitos por evidência ligada ao exact-SHA, com claims limitadas a: configuração Linux local específica, cinco JPEGs novos, igualdade byte-exact Source↔Repository, lifecycle observado e bundle verificável. Os itens explicitamente fora do perfil — NRNCS independente, readback de protocolo, subscriptions gerais, multi-VM, performance e QGA-loss — devem aparecer como `N/A`/diferidos, nunca como `PASS`.
+
 ## 10. Ferramenta de auditoria
 
 Auditor read-only:
@@ -262,3 +299,4 @@ A ferramenta não altera tarefas, SPECs, código, commits ou configuração.
 | v3 | 2026-09-13 | Hardening RED→GREEN dos launchers/builder e reconciliação de SPEC-009; novo build/smoke canónico ainda pendente |
 | v4 | 2026-09-14 | Rebaseline do perfil mínimo Linux/AIOPT3, dois guests, cinco JPEGs e macro-gates M0–M3; G0–G10 preservados como Apêndice A |
 | v5 | 2026-09-20 | Separação documental M1-R/M2-R (perfil remoto v1.0) de M1-L (local/native-privileged/QGA v1.1+), com matriz de aplicabilidade e Astra `CONDITIONAL GO` |
+| v6 | 2026-09-20 | Replaneamento Astra TRL3→TRL4: RDEMO local R0–R7 como primeiro marco; engenharia remota v1.0 e QGA-loss mantidos em linhas separadas, sem autorização operacional |
