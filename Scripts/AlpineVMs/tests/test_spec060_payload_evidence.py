@@ -833,15 +833,25 @@ def test_complete_payload_fixture_seals_and_verifies_as_accepted(tmp_path: Path)
     assert report["schema_version"] == 2
     seal_path = bundle / "terminal-seal.json"
     assert seal_path.is_file()
+    seal_bytes = seal_path.read_bytes()
     seal = json.loads(seal_path.read_text(encoding="utf-8"))
     manifest_digest = hashlib.sha256((bundle / "manifest.json").read_bytes()).hexdigest()
     assert seal["manifest_sha256"] == manifest_digest
 
-    (bundle / "payload" / "origins" / "repository" / "files" / "photo-01.jpg").write_bytes(b"tampered")
+    seal["manifest_sha256"] = "0" * 64
+    seal_path.write_text(json.dumps(seal) + "\n", encoding="utf-8")
+    tampered_seal = executor.verify_bundle(bundle)
+    assert tampered_seal["code"] == "NGELC-TAMPERED"
+    assert tampered_seal["integrity"] is False
+    seal_path.write_bytes(seal_bytes)
+
+    payload_file = bundle / "payload" / "origins" / "repository" / "files" / "photo-01.jpg"
+    payload_file.write_bytes(b"tampered")
     tampered = executor.verify_bundle(bundle)
     assert tampered["code"] == "NGELC-TAMPERED"
     assert tampered["integrity"] is False
 
+    payload_file.write_bytes(b"synthetic-jpeg-1")
     seal_path.unlink()
     missing_seal = executor.verify_bundle(bundle)
     assert missing_seal["code"] == "NGELC-TERMINAL-SEAL-MISSING"
