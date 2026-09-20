@@ -214,6 +214,24 @@ O primeiro incremento proposto desta SPEC MUST ser controller-only e limitar-se 
 
 A primeira implementação MUST NOT executar VMs, SSH real, QGA, `clean.sh`, reboot, alterar C++/protocolo ou promover o gate M2-R.
 
+### 4.1 — Incremento seguinte: attestation do verifier no seam remoto
+
+O próximo incremento controller-only MUST fechar apenas a decisão de aceitação no seam `evaluate_remote_acceptance`; não deve iniciar recolha remota nem alterar o ciclo de execução/teardown.
+
+Para um plano `normal-payload`, `payload_result` só pode satisfazer a decisão de aceitação quando contiver simultaneamente:
+
+- `status=COMPLETE`;
+- `accepted=true`;
+- `offline_verification` como objecto;
+- `offline_verification.code=NGELC-VALID`;
+- `offline_verification.integrity=true`;
+- `offline_verification.accepted=true`;
+- `offline_verification.schema_version=2`.
+
+Um resumo que contenha apenas `status=COMPLETE` e `accepted=true` MUST ser rejeitado como attestation insuficiente. A ausência, tipo inválido ou valor contraditório em qualquer campo MUST produzir `local_acceptance_eligible=false` e um blocker estável. O fluxo remoto actual continua a passar `payload_result=None` até existir collector/helper bounded e bundle v2 efectivamente produzido; este incremento não pode transformar essa ausência em PASS.
+
+O teste deste seam deve ser feito com payloads sintéticos e relatório de verifier fake/fixture, sem VM, SSH, QGA, cleanup, reboot, trial ou alteração de protocolo.
+
 ## 5. Testes obrigatórios
 
 - bloco ausente, versão inválida, origem repetida ou path relativo → rejeição antes de launch;
