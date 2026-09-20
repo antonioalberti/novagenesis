@@ -830,6 +830,22 @@ def test_complete_payload_fixture_seals_and_verifies_as_accepted(tmp_path: Path)
     assert report["code"] == "NGELC-VALID"
     assert report["integrity"] is True
     assert report["accepted"] is True
+    assert report["schema_version"] == 2
+    seal_path = bundle / "terminal-seal.json"
+    assert seal_path.is_file()
+    seal = json.loads(seal_path.read_text(encoding="utf-8"))
+    manifest_digest = hashlib.sha256((bundle / "manifest.json").read_bytes()).hexdigest()
+    assert seal["manifest_sha256"] == manifest_digest
+
+    (bundle / "payload" / "origins" / "repository" / "files" / "photo-01.jpg").write_bytes(b"tampered")
+    tampered = executor.verify_bundle(bundle)
+    assert tampered["code"] == "NGELC-TAMPERED"
+    assert tampered["integrity"] is False
+
+    seal_path.unlink()
+    missing_seal = executor.verify_bundle(bundle)
+    assert missing_seal["code"] == "NGELC-TERMINAL-SEAL-MISSING"
+    assert missing_seal["integrity"] is False
 
 
 def test_complete_divergence_is_fail_complete_not_inconclusive(tmp_path: Path):
