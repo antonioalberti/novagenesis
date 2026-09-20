@@ -47,7 +47,7 @@ from local_provenance import (
     sanitize_evidence_tree,
     validate_build_linkage,
 )
-from proxmox_qga_channel import QGAChannel, persist_channel_evidence
+from proxmox_qga_channel import QGAChannel, QGAChannelError, persist_channel_evidence
 
 
 class ConfigError(ValueError):
@@ -1678,6 +1678,30 @@ def preserve_runtime_failure(previous: str) -> str:
     return previous if previous == "FAIL" else "INCONCLUSIVE"
 
 
+def qga_transport_loss_envelope(error: QGAChannelError) -> dict[str, Any]:
+    """Normalize a QGA loss without inventing a guest exit status."""
+    raw_transport = error.raw_transport
+    if not isinstance(raw_transport, Mapping):
+        raw_transport = {
+            "returncode": None,
+            "stdout": "",
+            "stderr": "",
+            "exception": type(error).__name__,
+        }
+    raw = dict(raw_transport)
+    return {
+        "backend": "proxmox-qga",
+        "transport_exit_code": raw.get("returncode"),
+        "guest_exit_code": None,
+        "exit_code": None,
+        "guest_outcome": "unknown",
+        "failure_class": "transport-timeout" if raw.get("exception") == "TimeoutExpired" else "transport-loss",
+        "stdout": str(raw.get("stdout", "")),
+        "stderr": str(raw.get("stderr", "")),
+        "raw_transport": raw,
+    }
+
+
 def local_file_oracle(oracle: Mapping[str, Any], variables: Mapping[str, str]) -> dict[str, Any]:
     def digest_map(raw_path: str) -> tuple[dict[str, dict[str, Any]], list[str]]:
         path = Path(expand_argv([raw_path], variables)[0])
@@ -2526,6 +2550,7 @@ def run_local_trial(args: argparse.Namespace) -> int:
     teardown_result = "PASS" if ownership_anchor.get("verified") else "UNKNOWN"
     evidence_result = "COMPLETE"
     interrupted = False
+    qga_sequence = 0
     offsets: dict[str, int] = {}
     carries: dict[str, str] = {}
     oracle = plan.get("runtime_oracle")
@@ -2685,6 +2710,24 @@ def run_local_trial(args: argparse.Namespace) -> int:
         interrupted = True
         runtime = "ABORTED"
         local_record(events, "interrupted")
+    except QGAChannelError as exc:
+        runtime = preserve_runtime_failure(runtime)
+        qga_sequence += 1
+        qga_result = qga_transport_loss_envelope(exc)
+        try:
+            qga_path = persist_channel_evidence(
+                evidence_dir / "qga" / "transport-loss.json",
+                qga_result,
+                operation_id=trial_id,
+                phase="observation-teardown",
+                sequence=qga_sequence,
+            )
+        except Exception as persist_exc:
+            evidence_result = "INCOMPLETE"
+            local_record(events, "qga-transport-loss-evidence-error", error=str(persist_exc), sequence=qga_sequence)
+        else:
+            local_record(events, "qga-transport-loss", evidence_path=str(qga_path), sequence=qga_sequence, guest_outcome="unknown")
+        local_record(events, "runtime-error", error=str(exc), failure_class=qga_result["failure_class"], guest_outcome="unknown")
     except Exception as exc:
         runtime = preserve_runtime_failure(runtime)
         local_record(events, "runtime-error", error=str(exc))
