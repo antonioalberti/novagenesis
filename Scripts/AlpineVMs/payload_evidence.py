@@ -273,7 +273,7 @@ def _open_absolute_directory(path: str | Path, *, create: bool, deadline: float 
     directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
     current = os.open("/", directory_flags)
     try:
-        for component in raw.split("/")[1:]:
+        for component in (part for part in raw.split("/")[1:] if part):
             _check_deadline(deadline, f"open-directory:{component}")
             try:
                 child = os.open(component, directory_flags, dir_fd=current)
@@ -303,7 +303,7 @@ def _open_parent_directory(path: str | Path, *, create: bool, deadline: float | 
     return _open_absolute_directory(parent, create=create, deadline=deadline), file_name
 
 
-def _read_bounded_file(path: Path, budget: int, deadline: float | None) -> tuple[bytes, str | None, int]:
+def _read_bounded_file(path: str | Path, budget: int, deadline: float | None, *, dir_fd: int | None = None) -> tuple[bytes, str | None, int]:
     if budget <= 0:
         return b"", "byte-bound-exceeded", 0
     chunks: list[bytes] = []
@@ -311,7 +311,14 @@ def _read_bounded_file(path: Path, budget: int, deadline: float | None) -> tuple
     try:
         _check_deadline(deadline, "open-source")
         flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
-        fd = os.open(_normalized_absolute_path(path, "source file"), flags)
+        if dir_fd is None:
+            target: str | bytes = _normalized_absolute_path(path, "source file")
+            fd = os.open(target, flags)
+        else:
+            target = os.fspath(path)
+            if not isinstance(target, str) or not target or "/" in target or "\\" in target or target in {".", ".."} or "\x00" in target:
+                return b"", "unsafe-source-entry", 0
+            fd = os.open(target, flags, dir_fd=dir_fd)
     except TimeoutError:
         return b"", "deadline-expired", 0
     except (OSError, PayloadContractError) as exc:
@@ -365,91 +372,107 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
     errors: list[str] = []
     payload_map: dict[str, dict[str, Any]] = {}
     total_bytes = 0
+    root_fd: int | None = None
     try:
-        _check_deadline(deadline, "stat-root")
-        root_stat = root_path.lstat()
-    except TimeoutError:
-        return {"status": "INCOMPLETE", "map": {}, "identity": None, "bytes": 0, "errors": ["deadline-expired"]}
-    except OSError as exc:
-        return {
-            "status": "INCOMPLETE",
-            "map": {},
-            "identity": None,
-            "bytes": 0,
-            "errors": [f"root-unavailable:{type(exc).__name__}"],
-        }
-    if stat.S_ISLNK(root_stat.st_mode) or not stat.S_ISDIR(root_stat.st_mode):
-        return {
-            "status": "INCOMPLETE",
-            "map": {},
-            "identity": None,
-            "bytes": 0,
-            "errors": ["root-is-not-exclusive-directory"],
-        }
-
-    if _deadline_expired(deadline):
-        return {"status": "INCOMPLETE", "map": {}, "identity": {"st_dev": root_stat.st_dev, "st_ino": root_stat.st_ino}, "bytes": 0, "errors": ["deadline-expired"]}
-    children: list[Path] = []
-    try:
-        with os.scandir(root_path) as iterator:
-            while True:
-                _check_deadline(deadline, "enumerate-root")
-                try:
-                    entry = next(iterator)
-                except StopIteration:
-                    break
-                children.append(Path(entry.path))
-                if len(children) > max_files:
-                    errors.append("file-count-bound-exceeded")
-                    break
-    except TimeoutError:
-        errors.append("deadline-expired")
-    except OSError as exc:
-        errors.append(f"enumeration-failed:{type(exc).__name__}")
-    try:
-        root_after_enumeration = root_path.lstat()
-        if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode) != (root_after_enumeration.st_dev, root_after_enumeration.st_ino, root_after_enumeration.st_mode):
-            errors.append("root-identity-changed")
-    except OSError as exc:
-        errors.append(f"root-restat-failed:{type(exc).__name__}")
-    children.sort(key=lambda item: item.name)
-    for child in children[:max_files]:
-        if _deadline_expired(deadline):
-            errors.append("deadline-expired")
-            break
         try:
-            child_stat = child.lstat()
+            _check_deadline(deadline, "open-root")
+            root_fd = _open_absolute_directory(root_path, create=False, deadline=deadline)
+            _check_deadline(deadline, "stat-root")
+            root_stat = os.fstat(root_fd)
+        except TimeoutError:
+            return {"status": "INCOMPLETE", "map": {}, "identity": None, "bytes": 0, "errors": ["deadline-expired"]}
+        except (OSError, PayloadContractError) as exc:
+            return {
+                "status": "INCOMPLETE",
+                "map": {},
+                "identity": None,
+                "bytes": 0,
+                "errors": [f"root-unavailable:{type(exc).__name__}"],
+            }
+        if not stat.S_ISDIR(root_stat.st_mode):
+            return {
+                "status": "INCOMPLETE",
+                "map": {},
+                "identity": None,
+                "bytes": 0,
+                "errors": ["root-is-not-exclusive-directory"],
+            }
+
+        if _deadline_expired(deadline):
+            return {"status": "INCOMPLETE", "map": {}, "identity": {"st_dev": root_stat.st_dev, "st_ino": root_stat.st_ino}, "bytes": 0, "errors": ["deadline-expired"]}
+        children: list[str] = []
+        try:
+            with os.scandir(root_fd) as iterator:
+                while True:
+                    _check_deadline(deadline, "enumerate-root")
+                    try:
+                        entry = next(iterator)
+                    except StopIteration:
+                        break
+                    children.append(entry.name)
+                    if len(children) > max_files:
+                        errors.append("file-count-bound-exceeded")
+                        break
+        except TimeoutError:
+            errors.append("deadline-expired")
         except OSError as exc:
-            errors.append(f"stat-failed:{child.name}:{type(exc).__name__}")
-            continue
-        if stat.S_ISLNK(child_stat.st_mode) or not stat.S_ISREG(child_stat.st_mode) or not _NAME_RE.fullmatch(child.name):
-            errors.append(f"unsafe-or-unexpected-entry:{child.name}")
-            continue
-        remaining = max_bytes - total_bytes
-        data, error, consumed = _read_bounded_file(child, remaining, deadline)
-        total_bytes += consumed
-        if error is not None:
-            errors.append(f"{error}:{child.name}" if error not in {"byte-bound-exceeded", "deadline-expired", "read-race"} else error)
-            if error in {"byte-bound-exceeded", "deadline-expired"}:
+            errors.append(f"enumeration-failed:{type(exc).__name__}")
+        try:
+            _check_deadline(deadline, "restat-root-after-enumeration")
+            root_after_enumeration = os.fstat(root_fd)
+            if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode, root_stat.st_mtime_ns, root_stat.st_ctime_ns) != (root_after_enumeration.st_dev, root_after_enumeration.st_ino, root_after_enumeration.st_mode, root_after_enumeration.st_mtime_ns, root_after_enumeration.st_ctime_ns):
+                errors.append("root-contents-changed")
+            _check_deadline(deadline, "restat-root-after-enumeration")
+        except TimeoutError:
+            errors.append("deadline-expired")
+        except OSError as exc:
+            errors.append(f"root-restat-failed:{type(exc).__name__}")
+        children.sort()
+        for child_name in children[:max_files]:
+            if _deadline_expired(deadline):
+                errors.append("deadline-expired")
                 break
-            continue
-        if not data:
-            errors.append(f"invalid-observed-size:{child.name}")
-            continue
-        payload_map[child.name] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
-    try:
-        root_after_reads = root_path.lstat()
-        if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode) != (root_after_reads.st_dev, root_after_reads.st_ino, root_after_reads.st_mode):
-            errors.append("root-identity-changed")
-    except OSError as exc:
-        errors.append(f"root-restat-failed:{type(exc).__name__}")
-    return {
-        "status": "COMPLETE" if not errors else "INCOMPLETE",
-        "map": dict(sorted(payload_map.items())),
-        "identity": {"st_dev": root_stat.st_dev, "st_ino": root_stat.st_ino},
-        "bytes": total_bytes,
-        "errors": sorted(set(errors)),
-    }
+            try:
+                child_stat = os.stat(child_name, dir_fd=root_fd, follow_symlinks=False)
+            except OSError as exc:
+                errors.append(f"stat-failed:{child_name}:{type(exc).__name__}")
+                continue
+            if stat.S_ISLNK(child_stat.st_mode) or not stat.S_ISREG(child_stat.st_mode) or not _NAME_RE.fullmatch(child_name):
+                errors.append(f"unsafe-or-unexpected-entry:{child_name}")
+                continue
+            remaining = max_bytes - total_bytes
+            data, error, consumed = _read_bounded_file(child_name, remaining, deadline, dir_fd=root_fd)
+            total_bytes += consumed
+            if error is not None:
+                errors.append(f"{error}:{child_name}" if error not in {"byte-bound-exceeded", "deadline-expired", "read-race"} else error)
+                if error in {"byte-bound-exceeded", "deadline-expired"}:
+                    break
+                continue
+            if not data:
+                errors.append(f"invalid-observed-size:{child_name}")
+                continue
+            payload_map[child_name] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+        try:
+            _check_deadline(deadline, "restat-root-after-reads")
+            root_after_reads = os.fstat(root_fd)
+            if (root_stat.st_dev, root_stat.st_ino, root_stat.st_mode, root_stat.st_mtime_ns, root_stat.st_ctime_ns) != (root_after_reads.st_dev, root_after_reads.st_ino, root_after_reads.st_mode, root_after_reads.st_mtime_ns, root_after_reads.st_ctime_ns):
+                errors.append("root-contents-changed")
+            _check_deadline(deadline, "restat-root-after-reads")
+        except TimeoutError:
+            errors.append("deadline-expired")
+        except OSError as exc:
+            errors.append(f"root-restat-failed:{type(exc).__name__}")
+        return {
+            "status": "COMPLETE" if not errors else "INCOMPLETE",
+            "map": dict(sorted(payload_map.items())),
+            "identity": {"st_dev": root_stat.st_dev, "st_ino": root_stat.st_ino},
+            "bytes": total_bytes,
+            "errors": sorted(set(errors)),
+        }
+    finally:
+        if root_fd is not None:
+            os.close(root_fd)
+
 
 
 def _write_json(path: Path, value: Mapping[str, Any], *, deadline: float | None = None) -> None:
@@ -482,6 +505,7 @@ def _write_json(path: Path, value: Mapping[str, Any], *, deadline: float | None 
             file_fd = None
         _check_deadline(deadline, "fsync-json-directory")
         os.fsync(parent_fd)
+        _check_deadline(deadline, "after-fsync-json-directory")
         success = True
     except TimeoutError:
         raise
@@ -505,8 +529,17 @@ def _ensure_directory_tree_safe(path: Path, *, deadline: float | None = None) ->
     os.close(fd)
 
 
-def _copy_bounded_file(source: Path, destination: Path, *, budget: int, deadline: float | None) -> tuple[bool, str | None, int]:
-    data, error, _consumed = _read_bounded_file(source, budget, deadline)
+def _copy_bounded_file(
+    source: Path,
+    destination: Path,
+    *,
+    budget: int,
+    deadline: float | None,
+    source_dir_fd: int | None = None,
+    source_name: str | None = None,
+) -> tuple[bool, str | None, int]:
+    read_path: str | Path = source if source_dir_fd is None else (source_name or source.name)
+    data, error, _consumed = _read_bounded_file(read_path, budget, deadline, dir_fd=source_dir_fd)
     if error is not None:
         return False, error, 0
     parent_fd: int | None = None
@@ -533,6 +566,7 @@ def _copy_bounded_file(source: Path, destination: Path, *, budget: int, deadline
         file_fd = None
         _check_deadline(deadline, "fsync-preserved-directory")
         os.fsync(parent_fd)
+        _check_deadline(deadline, "after-fsync-preserved-directory")
         success = True
         return True, None, len(data)
     except TimeoutError:
@@ -590,8 +624,17 @@ def preserve_payload_origins(
         source_root = Path(roots[name])
         remaining_timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
         remaining_total = max_bytes_total - aggregate_bytes
-        inventory_budget = min(max_bytes, max(1, remaining_total))
-        source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=inventory_budget, timeout_s=remaining_timeout)
+        if remaining_total <= 0:
+            source_result = {
+                "status": "INCOMPLETE",
+                "map": {},
+                "identity": None,
+                "bytes": 0,
+                "errors": ["aggregate-byte-bound-exceeded"],
+            }
+        else:
+            inventory_budget = min(max_bytes, remaining_total)
+            source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=inventory_budget, timeout_s=remaining_timeout)
         comparison = compare_payload_maps(expected, source_result["map"])
         destination = origins_root / name / "files"
         _ensure_directory_tree_safe(destination, deadline=deadline)
@@ -601,14 +644,34 @@ def preserve_payload_origins(
             errors.append("aggregate-byte-bound-exceeded")
         aggregate_bytes += source_bytes
         copied_bytes = 0
-        for filename in sorted(source_result["map"]):
-            source_file = source_root / filename
-            destination_file = destination / filename
-            copied, copy_error, written = _copy_bounded_file(source_file, destination_file, budget=max_bytes - copied_bytes, deadline=deadline)
-            copied_bytes += written
-            if not copied:
-                errors.append(f"preservation-failed:{copy_error}")
-                break
+        source_fd: int | None = None
+        try:
+            if source_result.get("identity") is not None:
+                source_fd = _open_absolute_directory(source_root, create=False, deadline=deadline)
+                source_fd_stat = os.fstat(source_fd)
+                source_identity = source_result["identity"]
+                if (source_fd_stat.st_dev, source_fd_stat.st_ino) != (source_identity.get("st_dev"), source_identity.get("st_ino")):
+                    errors.append("source-root-identity-changed")
+                else:
+                    for filename in sorted(source_result["map"]):
+                        destination_file = destination / filename
+                        copied, copy_error, written = _copy_bounded_file(
+                            source_root / filename,
+                            destination_file,
+                            budget=max_bytes - copied_bytes,
+                            deadline=deadline,
+                            source_dir_fd=source_fd,
+                            source_name=filename,
+                        )
+                        copied_bytes += written
+                        if not copied:
+                            errors.append(f"preservation-failed:{copy_error}")
+                            break
+        except (OSError, PayloadContractError) as exc:
+            errors.append(f"source-copy-root-unavailable:{type(exc).__name__}")
+        finally:
+            if source_fd is not None:
+                os.close(source_fd)
         remaining_timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
         preserved_result = inventory_payload_origin(destination, max_files=max_files, max_bytes=max_bytes, timeout_s=remaining_timeout)
         preserved_comparison = compare_payload_maps(expected, preserved_result["map"])

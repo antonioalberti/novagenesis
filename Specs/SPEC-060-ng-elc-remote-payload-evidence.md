@@ -107,7 +107,7 @@ Cada entrada do mapa MUST ter nome basename case-sensitive sem `/`, `\\`, NUL, `
 
 O plano efectivo MUST congelar paths absolutos/expandidos, host, trial ID, workload e regras de ownership antes do launch. Paths relativos no plano são rejeitados; a expansão de uma variável para um path absoluto é legítima apenas antes do freeze e deve ser preservada no plano efectivo. O mapa esperado MUST ser produzido pelo gerador/workload associado ao trial e não inferido a partir de uma origem observada depois. A extensão `.jpg` e o hash não provam formato JPEG; se o formato for requisito, o gerador/verificador MUST declarar e testar essa propriedade separadamente.
 
-`pattern="*.jpg"` restringe apenas o conjunto esperado; a enumeração efectiva percorre a raiz exclusiva inteira, sem filtro que esconda extras. Qualquer ficheiro não esperado, subdirectório, symlink ou entrada fora da regra de nomes bloqueia aceitação.
+`pattern="*.jpg"` restringe apenas o conjunto esperado; a enumeração efectiva percorre a raiz exclusiva inteira, sem filtro que esconda extras. Qualquer ficheiro não esperado, subdirectório, symlink ou entrada fora da regra de nomes bloqueia aceitação. A enumeração e a abertura das origens devem ser ancoradas em descritores de directório obtidos com `O_NOFOLLOW`; `lstat` seguido de uma abertura por path absoluto não é suficiente contra troca de ancestrais.
 
 ### R02 — Independência das origens
 
@@ -156,7 +156,7 @@ payload/
 
 `files/` contém os bytes preservados; `maps/` contém os mapas re-hasháveis; `metadata/` contém path, identidade, bounds, sequência e estado de recolha. O manifest cobre todos esses objectos e os artefactos de resultado definidos, não o seu próprio ficheiro, o relatório de verificação ou o terminal seal.
 
-Limites obrigatórios: deadline global do trial, timeout finito por origem, máximo de ficheiros, máximo de bytes por origem e quota agregada declarada no plano. Não há retry automático da recolha; uma tentativa repetida exige sequência/evento explícito e permanece não-PASS quando a primeira recolha foi ambígua.
+Limites obrigatórios: deadline global do trial, timeout finito por origem, máximo de ficheiros, máximo de bytes por origem e quota agregada declarada no plano. `max_bytes_total` limita estritamente os bytes consumidos pela inventariação das origens, incluindo leituras parciais que terminam em erro; quando o saldo chega a zero, nenhuma origem subsequente pode iniciar leitura. A cópia local de preservação é uma segunda operação bounded por `max_bytes_per_origin` e é contabilizada separadamente, para não confundir bytes de payload observado com a duplicação interna do bundle. Os deadlines deste incremento são cooperativos: cada enumeração, abertura, `fstat`, leitura, escrita e `fsync` é precedido e seguido por verificação monotónica; uma chamada de sistema pode terminar depois do prazo, mas a operação deve então ser classificada como incompleta e nunca como PASS. Não há retry automático da recolha; uma tentativa repetida exige sequência/evento explícito e permanece não-PASS quando a primeira recolha foi ambígua.
 
 Falha de SCP/SSH, timeout, quota, leitura instável, origem ausente ou hash inconsistente MUST produzir a matriz de resultado R05, nunca PASS. A preservação MUST escrever um checkpoint objectivo antes de qualquer temporary cleanup; se o checkpoint falhar, a única cópia restante não pode ser removida.
 

@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from payload_evidence import PayloadContractError, _copy_bounded_file, _write_json, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
+from payload_evidence import PayloadContractError, _copy_bounded_file, _open_absolute_directory, _write_json, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
 import ng_remote_executor as executor
 
 
@@ -213,6 +213,31 @@ def test_zero_length_observed_file_is_incomplete_not_unexpected_exception(tmp_pa
     assert "invalid-observed-size:photo-01.jpg" in result["errors"]
 
 
+def test_inventory_rejects_symlinked_source_ancestor(tmp_path: Path):
+    real_parent = tmp_path / "real-parent"
+    real_root = real_parent / "source"
+    real_root.mkdir(parents=True)
+    (real_root / "photo-01.jpg").write_bytes(b"payload")
+    linked_parent = tmp_path / "linked-parent"
+    linked_parent.symlink_to(real_parent, target_is_directory=True)
+
+    result = inventory_payload_origin(linked_parent / "source", max_files=10, max_bytes=1024)
+
+    assert result["status"] == "INCOMPLETE"
+    assert result["map"] == {}
+    assert any("root-unavailable" in error for error in result["errors"])
+
+
+def test_open_absolute_directory_accepts_root_directory():
+    fd = _open_absolute_directory(Path("/"), create=False, deadline=None)
+    try:
+        assert fd >= 0
+    finally:
+        import os
+
+        os.close(fd)
+
+
 @pytest.mark.parametrize(
     "relative",
     (
@@ -285,6 +310,31 @@ def test_preservation_enforces_aggregate_origin_quota(tmp_path: Path):
     assert result["status"] == "INCOMPLETE"
     assert result["accepted"] is False
     assert any("aggregate-byte-bound-exceeded" in error for error in result["origins"]["repository"]["errors"])
+
+
+def test_preservation_does_not_read_after_aggregate_quota_is_exhausted(tmp_path: Path):
+    roots: dict[str, Path] = {}
+    expected = {"photo-01.jpg": {"size": 1, "sha256": hashlib.sha256(b"x").hexdigest()}}
+    for origin in ("source", "nrncs", "repository"):
+        root = tmp_path / f"{origin}-root"
+        root.mkdir()
+        roots[origin] = root
+        (root / "photo-01.jpg").write_bytes(b"x")
+
+    result = preserve_payload_origins(
+        tmp_path / "bundle",
+        roots,
+        expected=expected,
+        max_files=10,
+        max_bytes=1024,
+        max_bytes_total=1,
+    )
+
+    assert result["aggregate_bytes"] == 1
+    assert result["origins"]["source"]["source"]["bytes"] == 1
+    assert result["origins"]["nrncs"]["source"]["bytes"] == 0
+    assert result["origins"]["repository"]["source"]["bytes"] == 0
+    assert result["accepted"] is False
 
 
 def test_remote_marker_result_never_grants_normal_payload_acceptance():
