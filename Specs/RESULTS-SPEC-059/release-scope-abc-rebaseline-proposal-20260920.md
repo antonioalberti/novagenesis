@@ -2,7 +2,7 @@
 
 **Data:** 2026-09-20<br>
 **Branch:** `AIOPT3`<br>
-**HEAD documental/código:** `9670e53`<br>
+**HEAD documental/código:** `303acbf`<br>
 **Estado:** `PROPOSTA — não aprovada para trial`
 
 ## 1. Objetivo
@@ -32,11 +32,11 @@ Nenhuma parte deste documento autoriza VM, QGA, SSH real, `clean.sh`, reboot, tr
 
 ### Claims permitidos
 
-A pode demonstrar apenas o caminho normal local definido pelo plano e pelo oráculo. Não demonstra automaticamente:
+A pode demonstrar apenas o caminho normal local definido pelo plano e pelo oráculo. Um mapa independente Source/Repository prova apenas presença, nome, tamanho e bytes nos roots declarados; não prova por si só readback através da interface/protocolo do Repository, persistência independente no NRNCS ou subscription semantics. Cada uma dessas claims exige oráculo e gate próprios. A não demonstra automaticamente:
 
 - QGA-loss resilience;
 - multi-VM deployment ou remote-v1;
-- persistência independente de NRNCS, subscription semantics ou Repository readback, salvo se for acrescentado um terceiro mapa/oráculo explícito;
+- persistência independente de NRNCS, subscription semantics ou Repository readback, mesmo que seja acrescentado um terceiro mapa: cada claim continua a exigir a evidência semântica correspondente;
 - M1-R, M2-R, M3 ou a release pública `v1.0.0`.
 
 ### Falha durante A
@@ -69,7 +69,7 @@ B não é pré-requisito de A quando A declara continuidade normal do transporte
 **Estado:** `BLOCKED / OPEN`<br>
 **Escopo:** M0 → M1-R → M2-R → M3, incluindo deployment remoto, multi-VM lifecycle/teardown, PGCS/NRNCS/Repository, subscription/readback, hygiene, release review e tag.
 
-Para um candidato A isolado, estes gates são `N/A por perfil`, não `PASS`. Continuam requisitos da release pública C:
+Para um candidato A isolado, estes gates podem ser `N/A por perfil`, nunca `PASS`, apenas depois de uma matriz de aplicabilidade rastreável ligar cada row ao perfil, ao plano, ao SPEC governante e à claim explicitamente fora do escopo. `N/A` não dispensa requisitos de C nem converte uma ausência de evidência em aceitação. Continuam requisitos da release pública C:
 
 - SPEC-009, SPEC-044–054 e NG-046/047/048/049/050/051/052/053/054;
 - deployment SSH multi-VM, teardown remoto e payload/readback distribuído;
@@ -78,21 +78,40 @@ Para um candidato A isolado, estes gates são `N/A por perfil`, não `PASS`. Con
 
 A não pode ser chamado `v1.0.0` sem decisão explícita que redefina C e sem fechar os gates retidos.
 
-## 5. Pré-condições propostas para um A futuro
+## 5. Preparação, execução e saída de um A futuro
 
-Antes de preparar ou executar um candidato A, todos os pontos seguintes devem ser verificados e ligados ao SHA exacto que será usado:
+### 5.1 Requisitos de entrada — antes de qualquer operação
+
+Todos os pontos seguintes devem ser verificados e ligados ao SHA exacto que será usado:
 
 - decisão A/B/C commitada e reconciliada em Plano Mestre, NG-050, NG-056, Dashboard, handoff e SPECs afectadas;
-- checkout limpo e SHA imutável, separado de commits documentais posteriores;
+- matriz de aplicabilidade que identifica `PASS`, `OPEN`, `BLOCKED` e `N/A por perfil`, sem tratar `N/A` como aceitação;
+- checkout limpo e SHA funcional imutável, separado de commits documentais posteriores;
 - build fora da source tree com receipt, manifest bruto/normalizado e hashes dos quatro aliases/roles lançados;
 - `mode=local`, `local_profile=native-privileged` no plano e CLI, EUID 0 e paths absolutos confiáveis;
-- baseline zero de processos, SysV IPC e POSIX semáforos, seguida do cleanup aprovado pelo perfil;
-- IO novo, Repository vazio e workload novo de cinco JPEGs com mapa expected nome/tamanho/SHA-256;
-- launch PGCS → NRNCS → Repository → Source, PTY/stream/captura bounded e markers de readiness;
-- oracle independente Source/Repository; claims NRNCS/subscription só com oráculo separado;
-- teardown reverse-order identity-safe, sem recursos residuais ou estado desconhecido;
-- manifest/seal schema-v2, `verify_bundle` com `NGELC-VALID`, `integrity=true`, `accepted=true`;
+- baseline zero de processos, SysV IPC e POSIX semáforos, seguido do cleanup aprovado pelo perfil;
+- IO novo e workload novo de cinco JPEGs com mapa expected nome/tamanho/SHA-256;
+- oráculos declarados separadamente para Source/Repository file-map, Repository readback, NRNCS persistence e subscription semantics;
 - revisão Astra do candidato exact-SHA e autorização operacional separada.
+
+Estes itens são pré-condições; não incluem resultados que só podem existir depois da execução.
+
+### 5.2 Acções da execução — não são pré-condições
+
+- launch PGCS → NRNCS → Repository → Source, PTY/stream/captura bounded e markers de readiness;
+- recolha das origens declaradas após stop/quiescence, preservação independente e checkpoint antes de cleanup;
+- teardown reverse-order identity-safe, com reconciliação de processos/IPC e sem fallback não aprovado;
+- construção do manifest, verificação offline e seal terminal.
+
+### 5.3 Critérios de saída
+
+- completion normal confirmado; qualquer perda de transporte ou completion desconhecido permanece não aceite;
+- mapas esperados e observados completos, comparáveis e coerentes com o oráculo aplicável;
+- divergência comprovada com evidência completa: `runtime=FAIL`, `evidence=COMPLETE`, `accepted=false`;
+- recolha ausente, instável, truncada ou insuficiente: `runtime=INCONCLUSIVE`, `evidence=INCOMPLETE`, `accepted=false`, salvo `FAIL` sticky anterior;
+- teardown ambíguo, ausência de seal ou falha de cobertura/hash: nunca `accepted=true`;
+- manifest/seal schema-v2, `verify_bundle` com `NGELC-VALID`, `integrity=true` e `accepted=true` apenas quando ligados às claims do perfil A;
+- resultado final, inventories e artefactos preservados lidos de volta e ligados ao SHA funcional exacto.
 
 A packetização anterior baseada em `1b21ae7` é apenas desenho histórico: não deve ser executada sem novo freeze, porque a branch contém commits posteriores de documentação e hardening.
 
