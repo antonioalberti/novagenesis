@@ -3,7 +3,7 @@
 **Data:** 2026-09-20<br>
 **Branch:** `AIOPT3`<br>
 **Candidato funcional:** `f1bf3bc`<br>
-**Documento de escopo baseado em:** `b6fbcef`<br>
+**Documento de escopo baseado em:** `03a9e14`<br>
 **Estado:** `PROPOSTA — não aprovada para trial`
 
 ## 1. Objetivo
