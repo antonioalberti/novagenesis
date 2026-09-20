@@ -48,6 +48,7 @@ from local_provenance import (
     validate_build_linkage,
 )
 from proxmox_qga_channel import QGAChannel, QGAChannelError, persist_channel_evidence
+from payload_evidence import PayloadContractError, validate_payload_plan
 
 
 class ConfigError(ValueError):
@@ -524,6 +525,15 @@ def validate_plan(plan: dict[str, Any], mode: str = "remote") -> None:
         raise ValueError("log_quota_bytes outside bounded range")
     if not isinstance(plan.get("diagnostic_only", False), bool):
         raise ValueError("diagnostic_only must be boolean")
+    acceptance_profile = plan.get("acceptance_profile")
+    if acceptance_profile == "normal-payload":
+        try:
+            validate_payload_plan(plan)
+        except PayloadContractError as exc:
+            raise ValueError(str(exc)) from exc
+    elif acceptance_profile is not None or "payload_evidence" in plan:
+        if acceptance_profile != "diagnostic-marker" or plan.get("diagnostic_only") is not True:
+            raise ValueError("payload acceptance profile is incomplete or contradictory")
     profile = plan.get("local_profile", "unprivileged")
     if mode == "local" and profile not in {"unprivileged", "native-privileged"}:
         raise ValueError("local_profile must be unprivileged or native-privileged")
@@ -880,7 +890,7 @@ def _durable_atomic_write(path: Path, data: bytes, *, publication_artifact: bool
         raise
 
 
-def _local_manifest_entries(evidence_dir: Path) -> tuple[list[dict[str, Any]], list[str]]:
+def _local_manifest_entries(evidence_dir: Path, *, require_payload: bool = False) -> tuple[list[dict[str, Any]], list[str]]:
     """Hash a stable v2 tree and enforce verifier-required coverage."""
     excluded = {"manifest.json", "manifest.sha256", "terminal-seal.json"}
     entries: list[dict[str, Any]] = []
@@ -916,6 +926,19 @@ def _local_manifest_entries(evidence_dir: Path) -> tuple[list[dict[str, Any]], l
     for prefix in ("plan/", "artifacts/source/", "artifacts/repository/", "roles/", "inventory/"):
         if not any(name.startswith(prefix) for name in listed):
             errors.append(f"required evidence area is not covered: {prefix}")
+    if require_payload:
+        for name in ("payload/expected.json", "payload/preservation-checkpoint.json"):
+            if name not in listed:
+                errors.append(f"required payload evidence file is not covered: {name}")
+        for prefix in (
+            "payload/origins/source/",
+            "payload/origins/nrncs/",
+            "payload/origins/repository/",
+            "payload/maps/",
+            "payload/metadata/",
+        ):
+            if not any(name.startswith(prefix) for name in listed):
+                errors.append(f"required payload evidence area is not covered: {prefix}")
     return entries, errors
 
 
@@ -925,6 +948,9 @@ def _write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schem
     if effective_schema not in {1, 2}:
         raise ValueError("unsupported evidence schema version")
     evidence_dir = Path(evidence_dir)
+    require_payload = effective_schema == 2 and (
+        metadata.get("payload_evidence_required") is True or metadata.get("acceptance_profile") == "normal-payload"
+    )
     existing: dict[str, Any] = {}
     blockers: list[str] = []
     metadata_secrets: set[str] = set()
@@ -1002,7 +1028,7 @@ def _write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schem
             metadata = {**metadata, "protected_input_blockers": blockers}
             abort_publication("sanitization or protected-input scan reported a blocker")
 
-    entries, entry_errors = _local_manifest_entries(evidence_dir) if effective_schema == 2 else ([], [])
+    entries, entry_errors = _local_manifest_entries(evidence_dir, require_payload=require_payload) if effective_schema == 2 else ([], [])
     if entry_errors and effective_schema == 2:
         blockers.extend(entry_errors)
         metadata = {**metadata, "protected_input_blockers": blockers}
@@ -1022,7 +1048,7 @@ def _write_evidence_manifest(evidence_dir: Path, metadata: dict[str, Any], schem
 
     final_safety = sanitize_evidence_tree(evidence_dir, _LOCAL_SECRET_VALUES | metadata_secrets)
     final_blockers = [str(item) for item in final_safety.get("blockers", [])]
-    final_entries, final_errors = _local_manifest_entries(evidence_dir)
+    final_entries, final_errors = _local_manifest_entries(evidence_dir, require_payload=require_payload)
     if final_blockers or final_errors or final_entries != entries:
         blockers.extend(final_blockers)
         blockers.extend(final_errors)

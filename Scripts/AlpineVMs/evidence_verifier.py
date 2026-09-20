@@ -54,6 +54,14 @@ _REQUIRED_PREFIXES = (
     "roles/",
     "inventory/",
 )
+_PAYLOAD_REQUIRED_FILES = frozenset(("payload/expected.json", "payload/preservation-checkpoint.json"))
+_PAYLOAD_REQUIRED_PREFIXES = (
+    "payload/origins/source/",
+    "payload/origins/nrncs/",
+    "payload/origins/repository/",
+    "payload/maps/",
+    "payload/metadata/",
+)
 
 
 class _VerificationError(Exception):
@@ -204,7 +212,7 @@ def _manifest_entries(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return normalized
 
 
-def _check_coverage(actual: set[str], listed: set[str]) -> list[str]:
+def _check_coverage(actual: set[str], listed: set[str], *, require_payload: bool = False) -> list[str]:
     errors: list[str] = []
     missing = sorted(listed - actual)
     extra = sorted(actual - listed - {_MANIFEST_NAME, _TERMINAL_SEAL_NAME})
@@ -219,6 +227,13 @@ def _check_coverage(actual: set[str], listed: set[str]) -> list[str]:
     for prefix in _REQUIRED_PREFIXES:
         if not any(path.startswith(prefix) for path in listed):
             errors.append(f"required evidence area is not covered: {prefix}")
+    if require_payload:
+        for required in sorted(_PAYLOAD_REQUIRED_FILES):
+            if required not in listed:
+                errors.append(f"required payload evidence file is not covered: {required}")
+        for prefix in _PAYLOAD_REQUIRED_PREFIXES:
+            if not any(path.startswith(prefix) for path in listed):
+                errors.append(f"required payload evidence area is not covered: {prefix}")
     return errors
 
 
@@ -331,6 +346,10 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
         return _report(CODE_SCHEMA_OLD, bundle=bundle, schema_version=manifest_version, errors=tree_errors)
     if manifest_version != SCHEMA_VERSION:
         return _report(CODE_TAMPERED, bundle=bundle, errors=["manifest schema_version is not 2"] + tree_errors)
+    payload_required_values = [manifest[field] for field in ("payload_evidence_required",) if field in manifest]
+    payload_required = any(value is True for value in payload_required_values) or manifest.get("acceptance_profile") == "normal-payload"
+    if any(not isinstance(value, bool) for value in payload_required_values):
+        return _report(CODE_TAMPERED, bundle=bundle, schema_version=SCHEMA_VERSION, errors=["payload_evidence_required must be boolean"] + tree_errors)
     if tree_errors:
         return _report(CODE_TAMPERED, bundle=bundle, schema_version=SCHEMA_VERSION, errors=tree_errors)
 
@@ -348,7 +367,7 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
         if seal_hash != actual_manifest_hash:
             raise _VerificationError("terminal seal does not match manifest.json")
         listed = _manifest_entries(manifest)
-        coverage_errors = _check_coverage(actual, set(listed))
+        coverage_errors = _check_coverage(actual, set(listed), require_payload=payload_required)
         if coverage_errors:
             raise _VerificationError("; ".join(coverage_errors))
 
@@ -370,7 +389,7 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
         final_actual, final_tree_errors = _scan_tree(bundle)
         if final_tree_errors:
             raise _VerificationError("; ".join(final_tree_errors))
-        final_coverage_errors = _check_coverage(final_actual, set(listed))
+        final_coverage_errors = _check_coverage(final_actual, set(listed), require_payload=payload_required)
         if final_coverage_errors:
             raise _VerificationError("; ".join(final_coverage_errors))
 

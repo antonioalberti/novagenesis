@@ -88,11 +88,11 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 |---|---|---|---|---|---|---|---|
 | M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md` | BLOCKED | Fechar runtime normal e revisão SPEC-054; a decisão fixture-only e a higiene documental do perfil já estão registadas |
 | M1-R | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049 | SPEC-009, SPEC-046, SPEC-052, SPEC-054 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; receipt/build remoto e bundle candidato | HOLD | Fixar SHA, receipt ligado aos binários e procedimento remoto fail-closed |
-| M2-R | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050 | M1-R | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/` | OPEN | Preparar um único trial candidato normal remoto com critérios congelados |
+| M2-R | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054, NG-058 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050, SPEC-060 | M1-R | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/`; SPEC-060 payload contract | OPEN | Aprovar/implementar o oráculo independente e preparar um único trial candidato normal remoto |
 | M1-L | Perfil local/native-privileged, QGA e QGA-loss → reconciliação → teardown → seal | NG-055, NG-056 | SPEC-055, SPEC-056, SPEC-058, SPEC-059 | linha v1.1+ | resultados locais históricos e `Specs/RESULTS-SPEC-059/` | DEFERRED / OPEN | Implementar seam C+D e rever separadamente; não bloqueia v1.0 remoto |
 | M3 | Revisão final, notas, tag e leitura de volta do perfil remoto | NG-050 | SPEC-054, release criteria | M0, M1-R, M2-R | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
 
-M2-R mantém os subcritérios técnicos de G4–G8, mas a v1.0.0 certifica apenas o caminho normal remoto suportado. O workload de cinco JPEGs é o contrato mínimo; 100/1000 fotos, stress, matrizes completas de erro, modo local/native-privileged e resiliência QGA-loss ficam para v1.1+.
+M2-R mantém os subcritérios técnicos de G4–G8, mas a v1.0.0 certifica apenas o caminho normal remoto suportado. O workload de cinco JPEGs é o contrato mínimo; 100/1000 fotos, stress, matrizes completas de erro, modo local/native-privileged e resiliência QGA-loss ficam para v1.1+. SPEC-060 está em `Proposal — Astra GO` para o incremento controller-only; a implementação, o diff/testes e a promoção de M2-R continuam abertos.
 
 ## 5. Ordem de execução
 
@@ -113,6 +113,7 @@ M2-R pode preparar os seus oráculos em paralelo, mas a aceitação depende de M
 | SPEC-056 / NG-056 | `N/A — contrato local de evidência fora do perfil remoto` | Provenance, build linkage, bundle durável, manifest, seal e verificação exigidos pelo remoto permanecem em M1-R | M1-L / v1.1+ |
 | SPEC-058 | `N/A — native-privileged local não certificado na v1.0` | Nenhum fallback local/QGA pode ser usado para certificar o perfil remoto | M1-L / v1.1+ |
 | SPEC-059 | `N/A — Proxmox/QGA não é dependência operacional do perfil remoto` | Perda SSH/teardown remoto deve ser tratada fail-closed no procedimento remoto declarado | M1-L / v1.1+ |
+| SPEC-060 | `Aplicável — contrato de evidência do payload remoto M2-R` | Mapas independentes Source/NRNCS/Repository, cópias re-hashable, manifest, seal e verificação offline | M2-R / v1.0 |
 
 `N/A` é relativo ao perfil v1.0.0; não fecha nem abandona as SPECs/tarefas diferidas.
 
