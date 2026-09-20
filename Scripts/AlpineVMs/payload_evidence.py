@@ -38,6 +38,20 @@ _DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 _SAFE_TEXT_RE = re.compile(r"^[A-Za-z0-9_.:-]+$")
 
 
+def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise PayloadContractError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def loads_rejecting_duplicate_keys(text: str) -> Any:
+    """Load JSON without silently accepting duplicate object keys."""
+    return json.loads(text, object_pairs_hook=_reject_duplicate_pairs)
+
+
 def _object(value: Any, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise PayloadContractError(f"{label} must be an object")

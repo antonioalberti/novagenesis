@@ -48,7 +48,7 @@ from local_provenance import (
     validate_build_linkage,
 )
 from proxmox_qga_channel import QGAChannel, QGAChannelError, persist_channel_evidence
-from payload_evidence import PayloadContractError, validate_payload_plan
+from payload_evidence import PayloadContractError, loads_rejecting_duplicate_keys, validate_payload_plan
 
 
 class ConfigError(ValueError):
@@ -526,12 +526,12 @@ def validate_plan(plan: dict[str, Any], mode: str = "remote") -> None:
     if not isinstance(plan.get("diagnostic_only", False), bool):
         raise ValueError("diagnostic_only must be boolean")
     acceptance_profile = plan.get("acceptance_profile")
-    if acceptance_profile == "normal-payload":
+    if mode == "remote" and acceptance_profile == "normal-payload":
         try:
             validate_payload_plan(plan)
         except PayloadContractError as exc:
             raise ValueError(str(exc)) from exc
-    elif acceptance_profile is not None or "payload_evidence" in plan:
+    elif mode == "remote" and (acceptance_profile is not None or "payload_evidence" in plan or ("diagnostic_only" in plan and plan.get("diagnostic_only") is False)):
         if acceptance_profile != "diagnostic-marker" or plan.get("diagnostic_only") is not True:
             raise ValueError("payload acceptance profile is incomplete or contradictory")
     profile = plan.get("local_profile", "unprivileged")
@@ -737,7 +737,7 @@ def wait_for_guest_preflight(config: Mapping[str, str], host: str, roles: list[d
 
 
 def load_plan(path: Path, mode: str = "remote") -> dict[str, Any]:
-    plan = json.loads(path.read_text(encoding="utf-8"))
+    plan = loads_rejecting_duplicate_keys(path.read_text(encoding="utf-8"))
     validate_plan(plan, mode=mode)
     return plan
 

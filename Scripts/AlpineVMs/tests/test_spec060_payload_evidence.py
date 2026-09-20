@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from payload_evidence import PayloadContractError, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, preserve_payload_origins, validate_payload_plan
+from payload_evidence import PayloadContractError, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, preserve_payload_origins, validate_payload_plan
 import ng_remote_executor as executor
 
 
@@ -97,6 +97,19 @@ def test_legacy_marker_only_plan_remains_valid_but_is_not_payload_acceptance():
     plan = _remote_marker_plan()
 
     executor.validate_plan(plan)
+
+
+def test_explicit_non_diagnostic_plan_without_profile_is_rejected():
+    plan = _remote_marker_plan()
+    plan["diagnostic_only"] = False
+
+    with pytest.raises(ValueError, match="payload acceptance profile"):
+        executor.validate_plan(plan)
+
+
+def test_duplicate_json_keys_are_rejected_before_payload_validation():
+    with pytest.raises(PayloadContractError, match="duplicate JSON key"):
+        loads_rejecting_duplicate_keys('{"payload_evidence":{"schema_version":1,"schema_version":1}}')
 
 
 def test_identical_payload_maps_are_complete_and_accepted():
