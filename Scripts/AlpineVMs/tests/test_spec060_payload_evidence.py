@@ -615,6 +615,10 @@ def test_normal_payload_acceptance_requires_complete_payload_result():
             "payload evidence offline verification is invalid",
         ),
         (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"integrity": True, "accepted": True, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
             {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-TAMPERED", "integrity": True, "accepted": True, "schema_version": 2}},
             "payload evidence offline verification is invalid",
         ),
@@ -623,7 +627,15 @@ def test_normal_payload_acceptance_requires_complete_payload_result():
             "payload evidence offline verification is invalid",
         ),
         (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": False, "accepted": True, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
             {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": 1, "schema_version": 2}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": False, "schema_version": 2}},
             "payload evidence offline verification is invalid",
         ),
         (
@@ -631,8 +643,20 @@ def test_normal_payload_acceptance_requires_complete_payload_result():
             "payload evidence offline verification is invalid",
         ),
         (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True, "schema_version": True}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
             {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True, "schema_version": 2.0}},
             "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": True, "offline_verification": {"code": "NGELC-VALID", "integrity": True, "accepted": True, "schema_version": 3}},
+            "payload evidence offline verification is invalid",
+        ),
+        (
+            {"status": "COMPLETE", "accepted": 1, "offline_verification": _verified_payload_result()["offline_verification"]},
+            "payload evidence is incomplete or not accepted",
         ),
         (
             {"status": "INCOMPLETE", "accepted": False, "offline_verification": _verified_payload_result()["offline_verification"]},
@@ -679,6 +703,35 @@ def test_valid_attestation_does_not_mask_nonzero_runtime_code():
     )
 
     assert code == 10
+    assert eligibility == {
+        "eligible": False,
+        "blockers": ["runtime, teardown, or evidence is not acceptance-eligible"],
+    }
+
+
+@pytest.mark.parametrize(
+    ("runtime", "teardown", "evidence", "expected_code"),
+    (
+        ("PASS", "FAIL", "COMPLETE", 20),
+        ("PASS", "PASS", "INCOMPLETE", 20),
+        ("INCONCLUSIVE", "PASS", "COMPLETE", 11),
+    ),
+)
+def test_valid_attestation_cannot_override_runtime_teardown_or_evidence(
+    runtime: str,
+    teardown: str,
+    evidence: str,
+    expected_code: int,
+):
+    code, eligibility = executor.evaluate_remote_acceptance(
+        _valid_normal_plan(),
+        runtime=runtime,
+        teardown=teardown,
+        evidence=evidence,
+        payload_result=_verified_payload_result(),
+    )
+
+    assert code == expected_code
     assert eligibility == {
         "eligible": False,
         "blockers": ["runtime, teardown, or evidence is not acceptance-eligible"],
