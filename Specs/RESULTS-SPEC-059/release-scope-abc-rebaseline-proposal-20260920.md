@@ -2,7 +2,8 @@
 
 **Data:** 2026-09-20<br>
 **Branch:** `AIOPT3`<br>
-**HEAD documental/código:** `303acbf`<br>
+**Candidato funcional:** `f1bf3bc`<br>
+**Documento de escopo baseado em:** `b6fbcef`<br>
 **Estado:** `PROPOSTA — não aprovada para trial`
 
 ## 1. Objetivo
@@ -80,30 +81,35 @@ A não pode ser chamado `v1.0.0` sem decisão explícita que redefina C e sem fe
 
 ## 5. Preparação, execução e saída de um A futuro
 
-### 5.1 Requisitos de entrada — antes de qualquer operação
+### 5.1 Aprovação e autorização — antes de qualquer operação
 
-Todos os pontos seguintes devem ser verificados e ligados ao SHA exacto que será usado:
+Antes de qualquer preparação, launch ou cleanup, devem existir:
 
 - decisão A/B/C commitada e reconciliada em Plano Mestre, NG-050, NG-056, Dashboard, handoff e SPECs afectadas;
 - matriz de aplicabilidade que identifica `PASS`, `OPEN`, `BLOCKED` e `N/A por perfil`, sem tratar `N/A` como aceitação;
-- checkout limpo e SHA funcional imutável, separado de commits documentais posteriores;
+- revisão Astra do candidato funcional exact-SHA;
+- autorização operacional explícita e separada para a preparação, sem autorização implícita de trial ou release.
+
+### 5.2 Preparação autorizada — antes do launch
+
+Depois da autorização, e ainda antes do launch, devem ser verificados:
+
+- checkout limpo no SHA funcional imutável; o commit documental da proposta permanece separado;
 - build fora da source tree com receipt, manifest bruto/normalizado e hashes dos quatro aliases/roles lançados;
 - `mode=local`, `local_profile=native-privileged` no plano e CLI, EUID 0 e paths absolutos confiáveis;
-- baseline zero de processos, SysV IPC e POSIX semáforos, seguido do cleanup aprovado pelo perfil;
+- inventário baseline de processos, SysV IPC e POSIX semáforos; `clean.sh` só pode ser executado se a baseline não estiver zero, com novo inventário obrigatório e scope fail-closed;
 - IO novo e workload novo de cinco JPEGs com mapa expected nome/tamanho/SHA-256;
-- oráculos declarados separadamente para Source/Repository file-map, Repository readback, NRNCS persistence e subscription semantics;
-- revisão Astra do candidato exact-SHA e autorização operacional separada.
+- Repository vazio ou namespace de Repository exclusivamente isolado, com condição e inventário equivalentes explicitamente ligados à claim;
+- oráculo file-map Source/Repository obrigatório para A; readback do Repository, persistence NRNCS e subscription semantics só são obrigatórios quando reclamados, e devem aparecer na matriz quando excluídos.
 
-Estes itens são pré-condições; não incluem resultados que só podem existir depois da execução.
-
-### 5.2 Acções da execução — não são pré-condições
+### 5.3 Acções da execução — não são pré-condições
 
 - launch PGCS → NRNCS → Repository → Source, PTY/stream/captura bounded e markers de readiness;
 - recolha das origens declaradas após stop/quiescence, preservação independente e checkpoint antes de cleanup;
 - teardown reverse-order identity-safe, com reconciliação de processos/IPC e sem fallback não aprovado;
 - construção do manifest, verificação offline e seal terminal.
 
-### 5.3 Critérios de saída
+### 5.4 Critérios de saída
 
 - completion normal confirmado; qualquer perda de transporte ou completion desconhecido permanece não aceite;
 - mapas esperados e observados completos, comparáveis e coerentes com o oráculo aplicável;
