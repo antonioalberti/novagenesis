@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from payload_evidence import PayloadContractError, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, preserve_payload_origins, validate_payload_plan
+from payload_evidence import PayloadContractError, _copy_bounded_file, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
 import ng_remote_executor as executor
 
 
@@ -112,6 +112,28 @@ def test_duplicate_json_keys_are_rejected_before_payload_validation():
         loads_rejecting_duplicate_keys('{"payload_evidence":{"schema_version":1,"schema_version":1}}')
 
 
+def test_payload_contract_rejects_bool_float_and_non_normalized_paths():
+    plan = _valid_normal_plan()
+    plan["payload_evidence"]["schema_version"] = True
+    with pytest.raises(PayloadContractError, match="schema_version"):
+        validate_payload_plan(plan)
+
+    plan = _valid_normal_plan()
+    plan["payload_evidence"]["expected"]["count"] = 5.0
+    with pytest.raises(PayloadContractError, match="count"):
+        validate_payload_plan(plan)
+
+    plan = _valid_normal_plan()
+    plan["payload_evidence"]["origins"]["source"]["path"] = "/var/ng/./source"
+    with pytest.raises(PayloadContractError, match="absolute, normalized"):
+        validate_payload_plan(plan)
+
+
+def test_legacy_marker_plan_is_explicitly_not_payload_acceptance_eligible():
+    assert payload_acceptance_eligible(_remote_marker_plan()) is False
+    assert payload_acceptance_eligible(_valid_normal_plan()) is True
+
+
 def test_identical_payload_maps_are_complete_and_accepted():
     expected = _valid_normal_plan()["payload_evidence"]["expected"]["map"]
 
@@ -124,6 +146,20 @@ def test_identical_payload_maps_are_complete_and_accepted():
         "mismatched": [],
         "accepted": True,
     }
+
+
+def test_compare_payload_maps_rejects_empty_expected_map():
+    with pytest.raises(PayloadContractError, match="expected payload map"):
+        compare_payload_maps({}, {})
+
+
+def test_compare_payload_maps_rejects_malformed_observed_record():
+    expected = _valid_normal_plan()["payload_evidence"]["expected"]["map"]
+    observed = dict(expected)
+    observed["photo-01.jpg"] = {"size": 0, "sha256": "not-a-digest"}
+
+    with pytest.raises(PayloadContractError, match="payload map"):
+        compare_payload_maps(expected, observed)
 
 
 def test_payload_origin_inventory_hashes_a_bounded_jpeg_root(tmp_path: Path):
@@ -142,6 +178,30 @@ def test_payload_origin_inventory_hashes_a_bounded_jpeg_root(tmp_path: Path):
     assert result["map"] == expected
     assert result["identity"]["st_dev"] == root.stat().st_dev
     assert result["identity"]["st_ino"] == root.stat().st_ino
+
+
+def test_payload_origin_inventory_honors_explicit_deadline(tmp_path: Path):
+    root = tmp_path / "source"
+    root.mkdir()
+    (root / "photo-01.jpg").write_bytes(b"bytes")
+
+    result = inventory_payload_origin(root, max_files=10, max_bytes=1024, timeout_s=0)
+
+    assert result["status"] == "INCOMPLETE"
+    assert "deadline-expired" in result["errors"]
+
+
+def test_bounded_copy_refuses_to_write_past_byte_budget(tmp_path: Path):
+    source = tmp_path / "source.jpg"
+    destination = tmp_path / "destination.jpg"
+    source.write_bytes(b"x" * 32)
+
+    copied, error, written = _copy_bounded_file(source, destination, budget=8, deadline=None)
+
+    assert copied is False
+    assert error == "byte-bound-exceeded"
+    assert written <= 8
+    assert destination.exists() is False
 
 
 def test_three_origins_are_preserved_in_canonical_namespaces_and_checkpointed(tmp_path: Path):
@@ -166,6 +226,57 @@ def test_three_origins_are_preserved_in_canonical_namespaces_and_checkpointed(tm
         assert (bundle / "payload" / "origins" / origin / "files" / "photo-01.jpg").is_file()
         assert (bundle / "payload" / "maps" / f"{origin}.json").is_file()
         assert (bundle / "payload" / "metadata" / f"{origin}.json").is_file()
+
+
+def test_complete_divergence_is_fail_complete_not_inconclusive(tmp_path: Path):
+    roots: dict[str, Path] = {}
+    expected: dict[str, dict[str, object]] = {}
+    for origin in ("source", "nrncs", "repository"):
+        root = tmp_path / f"{origin}-root"
+        root.mkdir()
+        roots[origin] = root
+        for number in range(1, 6):
+            data = f"synthetic-jpeg-{number}".encode("ascii")
+            if origin == "repository" and number == 3:
+                data = b"divergent-bytes"
+            (root / f"photo-{number:02d}.jpg").write_bytes(data)
+        if origin == "source":
+            expected = inventory_payload_origin(root, max_files=10, max_bytes=4096)["map"]
+
+    result = preserve_payload_origins(bundle := tmp_path / "bundle", roots, expected=expected, max_files=10, max_bytes=4096)
+    evaluated = evaluate_payload_result(result["origins"])
+
+    assert result["status"] == "COMPLETE"
+    assert result["accepted"] is False
+    assert result["origins"]["repository"]["status"] == "COMPLETE"
+    assert evaluated == {"runtime": "FAIL", "evidence": "COMPLETE", "accepted": False}
+
+
+def test_preservation_does_not_follow_pending_destination_symlink(tmp_path: Path):
+    roots: dict[str, Path] = {}
+    expected: dict[str, dict[str, object]] = {}
+    for origin in ("source", "nrncs", "repository"):
+        root = tmp_path / f"{origin}-root"
+        root.mkdir()
+        roots[origin] = root
+        for number in range(1, 6):
+            data = f"synthetic-jpeg-{number}".encode("ascii")
+            (root / f"photo-{number:02d}.jpg").write_bytes(data)
+        if origin == "source":
+            expected = inventory_payload_origin(root, max_files=10, max_bytes=4096)["map"]
+
+    bundle = tmp_path / "bundle"
+    destination = bundle / "payload" / "origins" / "source" / "files"
+    destination.mkdir(parents=True)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    escape = outside / "escaped.jpg"
+    (destination / "photo-01.jpg").symlink_to(escape)
+
+    result = preserve_payload_origins(bundle, roots, expected=expected, max_files=10, max_bytes=4096)
+
+    assert escape.exists() is False
+    assert result["accepted"] is False
 
 
 def test_incomplete_origin_is_inconclusive_and_never_accepted():

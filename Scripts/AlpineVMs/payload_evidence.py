@@ -4,8 +4,11 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
+import os
 import re
-import shutil
+import stat
+import time
 from collections.abc import Mapping
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -87,8 +90,11 @@ def _positive_int(value: Any, label: str) -> int:
 
 def _absolute_path(value: Any, label: str) -> str:
     path = _text(value, label)
+    raw_parts = path.split("/")
+    if not path.startswith("/") or any(part in {"", ".", ".."} for part in raw_parts[1:]):
+        raise PayloadContractError(f"{label} must be an absolute, normalized path")
     parsed = PurePosixPath(path)
-    if not parsed.is_absolute() or any(part in {".", ".."} for part in parsed.parts):
+    if not parsed.is_absolute() or parsed.as_posix() != path:
         raise PayloadContractError(f"{label} must be an absolute, normalized path")
     return path
 
@@ -96,12 +102,12 @@ def _absolute_path(value: Any, label: str) -> str:
 def _validate_payload_block(block: Any) -> dict[str, Any]:
     payload = _object(block, "payload_evidence")
     _exact_keys(payload, _PAYLOAD_KEYS, "payload_evidence")
-    if payload["schema_version"] != _SCHEMA_VERSION:
+    if isinstance(payload["schema_version"], bool) or not isinstance(payload["schema_version"], int) or payload["schema_version"] != _SCHEMA_VERSION:
         raise PayloadContractError("payload_evidence.schema_version must be 1")
 
     expected = _object(payload["expected"], "payload_evidence.expected")
     _exact_keys(expected, _EXPECTED_KEYS, "payload_evidence.expected")
-    if expected["count"] != 5 or isinstance(expected["count"], bool):
+    if isinstance(expected["count"], bool) or not isinstance(expected["count"], int) or expected["count"] != 5:
         raise PayloadContractError("payload_evidence.expected.count must be 5")
     if expected["pattern"] != "*.jpg":
         raise PayloadContractError("payload_evidence.expected.pattern must be *.jpg")
@@ -196,18 +202,27 @@ def validate_payload_plan(plan: Mapping[str, Any]) -> dict[str, Any]:
     return copy.deepcopy(normalized | {"acceptance_profile": _ACCEPTANCE_PROFILE})
 
 
+def payload_acceptance_eligible(plan: Mapping[str, Any]) -> bool:
+    """Return whether a plan is explicitly eligible for normal payload acceptance."""
+    try:
+        validate_payload_plan(plan)
+    except (PayloadContractError, TypeError):
+        return False
+    return True
+
+
 def compare_payload_maps(expected: Mapping[str, Any], observed: Mapping[str, Any]) -> dict[str, Any]:
     """Compare name/size/digest maps without treating absence as success."""
-    if not isinstance(expected, Mapping) or not isinstance(observed, Mapping):
-        raise PayloadContractError("payload maps must be objects")
-    expected_names = set(expected)
-    observed_names = set(observed)
+    expected_map = _validate_map_records(expected, "expected payload map", allow_empty=False)
+    observed_map = _validate_map_records(observed, "observed payload map", allow_empty=True)
+    expected_names = set(expected_map)
+    observed_names = set(observed_map)
     missing = sorted(str(name) for name in expected_names - observed_names)
     extra = sorted(str(name) for name in observed_names - expected_names)
     mismatched = sorted(
         str(name)
         for name in expected_names & observed_names
-        if expected[name] != observed[name]
+        if expected_map[name] != observed_map[name]
     )
     accepted = not missing and not extra and not mismatched
     return {
@@ -219,12 +234,68 @@ def compare_payload_maps(expected: Mapping[str, Any], observed: Mapping[str, Any
     }
 
 
-def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int) -> dict[str, Any]:
+def _validate_map_records(value: Mapping[str, Any], label: str, *, allow_empty: bool) -> dict[str, dict[str, int | str]]:
+    if not isinstance(value, Mapping):
+        raise PayloadContractError(f"{label} must be an object")
+    if not value and not allow_empty:
+        raise PayloadContractError(f"{label} must not be empty")
+    normalized: dict[str, dict[str, int | str]] = {}
+    for name, record in value.items():
+        if not isinstance(name, str) or not _NAME_RE.fullmatch(name) or "/" in name or "\\" in name:
+            raise PayloadContractError(f"{label} contains an unsafe filename")
+        item = _object(record, f"{label}[{name}]")
+        _exact_keys(item, frozenset(("size", "sha256")), f"{label}[{name}]")
+        size = _positive_int(item["size"], f"{label}[{name}].size")
+        digest = _text(item["sha256"], f"{label}[{name}].sha256", pattern=_DIGEST_RE)
+        normalized[name] = {"size": size, "sha256": digest}
+    return dict(sorted(normalized.items()))
+
+
+def _read_bounded_file(path: Path, budget: int, deadline: float | None) -> tuple[bytes, str | None]:
+    if budget <= 0:
+        return b"", "byte-bound-exceeded"
+    if deadline is not None and time.monotonic() >= deadline:
+        return b"", "deadline-expired"
+    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        fd = os.open(path, flags)
+    except OSError as exc:
+        return b"", f"read-failed:{type(exc).__name__}"
+    try:
+        before = os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode):
+            return b"", "unsafe-source-entry"
+        chunks: list[bytes] = []
+        total = 0
+        while True:
+            if deadline is not None and time.monotonic() >= deadline:
+                return b"", "deadline-expired"
+            chunk = os.read(fd, min(65536, budget - total + 1))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            total += len(chunk)
+            if total > budget:
+                return b"", "byte-bound-exceeded"
+        after = os.fstat(fd)
+        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or total != after.st_size:
+            return b"", "read-race"
+        return b"".join(chunks), None
+    except OSError as exc:
+        return b"", f"read-failed:{type(exc).__name__}"
+    finally:
+        os.close(fd)
+
+
+def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int, timeout_s: float | None = None) -> dict[str, Any]:
     """Hash one exclusive payload root with bounded, fail-closed reads."""
     if isinstance(max_files, bool) or not isinstance(max_files, int) or max_files <= 0:
         raise PayloadContractError("max_files must be a positive integer")
     if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
         raise PayloadContractError("max_bytes must be a positive integer")
+    if timeout_s is not None and (isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)) or timeout_s < 0 or not math.isfinite(timeout_s)):
+        raise PayloadContractError("timeout_s must be a finite non-negative number")
+    deadline = None if timeout_s is None else time.monotonic() + float(timeout_s)
     root_path = Path(root)
     errors: list[str] = []
     payload_map: dict[str, dict[str, Any]] = {}
@@ -248,34 +319,31 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
             "errors": ["root-is-not-exclusive-directory"],
         }
 
+    children: list[Path] = []
     try:
-        children = sorted(root_path.iterdir(), key=lambda item: item.name)
+        with os.scandir(root_path) as iterator:
+            for entry in iterator:
+                children.append(Path(entry.path))
+                if len(children) > max_files:
+                    errors.append("file-count-bound-exceeded")
+                    break
     except OSError as exc:
-        children = []
         errors.append(f"enumeration-failed:{type(exc).__name__}")
-    if len(children) > max_files:
-        errors.append("file-count-bound-exceeded")
+    children.sort(key=lambda item: item.name)
     for child in children[:max_files]:
+        if deadline is not None and time.monotonic() >= deadline:
+            errors.append("deadline-expired")
+            break
         if child.is_symlink() or not child.is_file() or not _NAME_RE.fullmatch(child.name):
             errors.append(f"unsafe-or-unexpected-entry:{child.name}")
             continue
-        try:
-            before = child.stat()
-            remaining = max_bytes - total_bytes
-            if remaining <= 0:
-                errors.append("byte-bound-exceeded")
-                continue
-            with child.open("rb") as handle:
-                data = handle.read(remaining + 1)
-            after = child.stat()
-        except (OSError, RuntimeError) as exc:
-            errors.append(f"read-failed:{child.name}:{type(exc).__name__}")
-            continue
-        if len(data) > remaining:
-            errors.append("byte-bound-exceeded")
-            continue
-        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or len(data) != after.st_size:
-            errors.append(f"read-race:{child.name}")
+        remaining = max_bytes - total_bytes
+        data, error = _read_bounded_file(child, remaining, deadline)
+        if error is not None:
+            errors.append(f"{error}:{child.name}" if error not in {"byte-bound-exceeded", "deadline-expired", "read-race"} else error)
+            if error in {"byte-bound-exceeded", "deadline-expired"}:
+                total_bytes = max_bytes if error == "byte-bound-exceeded" else total_bytes
+                break
             continue
         total_bytes += len(data)
         payload_map[child.name] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
@@ -293,6 +361,46 @@ def _write_json(path: Path, value: Mapping[str, Any]) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
+def _ensure_directory_tree_safe(path: Path) -> None:
+    current = path
+    while True:
+        if os.path.lexists(current):
+            if current.is_symlink() or not current.is_dir():
+                raise PayloadContractError(f"unsafe preservation directory: {current.name}")
+        if current == current.parent:
+            return
+        current = current.parent
+
+
+def _copy_bounded_file(source: Path, destination: Path, *, budget: int, deadline: float | None) -> tuple[bool, str | None, int]:
+    data, error = _read_bounded_file(source, budget, deadline)
+    if error is not None:
+        return False, error, min(len(data), budget)
+    try:
+        _ensure_directory_tree_safe(destination.parent)
+        if os.path.lexists(destination):
+            return False, "unsafe-or-stale-destination", 0
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(destination, flags, 0o600)
+        try:
+            written = 0
+            while written < len(data):
+                if deadline is not None and time.monotonic() >= deadline:
+                    return False, "deadline-expired", written
+                written += os.write(fd, data[written:])
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        return True, None, len(data)
+    except OSError as exc:
+        try:
+            if os.path.lexists(destination) and not destination.is_symlink():
+                destination.unlink()
+        except OSError:
+            pass
+        return False, f"copy-failed:{type(exc).__name__}", 0
+
+
 def preserve_payload_origins(
     bundle: str | Path,
     roots: Mapping[str, str | Path],
@@ -300,45 +408,50 @@ def preserve_payload_origins(
     expected: Mapping[str, Any],
     max_files: int,
     max_bytes: int,
+    timeout_s: float | None = None,
 ) -> dict[str, Any]:
     """Preserve three fake/fixture origins under the SPEC-060 canonical layout."""
     if set(roots) != set(_ORIGIN_NAMES):
         raise PayloadContractError("payload origins must be exactly source, nrncs, repository")
-    if not isinstance(expected, Mapping) or not expected:
-        raise PayloadContractError("expected payload map must be a non-empty object")
+    expected = _validate_map_records(expected, "expected payload map", allow_empty=False)
+    if timeout_s is not None and (isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)) or timeout_s < 0 or not math.isfinite(timeout_s)):
+        raise PayloadContractError("timeout_s must be a finite non-negative number")
+    deadline = None if timeout_s is None else time.monotonic() + float(timeout_s)
     bundle_path = Path(bundle)
     payload_root = bundle_path / "payload"
     origins_root = payload_root / "origins"
     maps_root = payload_root / "maps"
     metadata_root = payload_root / "metadata"
     for directory in (origins_root, maps_root, metadata_root):
+        _ensure_directory_tree_safe(directory)
         directory.mkdir(parents=True, exist_ok=True)
     _write_json(payload_root / "expected.json", {"count": len(expected), "hash": "sha256", "map": dict(sorted(expected.items()))})
 
     origin_results: dict[str, dict[str, Any]] = {}
     for name in _ORIGIN_NAMES:
         source_root = Path(roots[name])
-        source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=max_bytes)
+        remaining_timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
+        source_result = inventory_payload_origin(source_root, max_files=max_files, max_bytes=max_bytes, timeout_s=remaining_timeout)
         comparison = compare_payload_maps(expected, source_result["map"])
         destination = origins_root / name / "files"
+        _ensure_directory_tree_safe(destination)
         destination.mkdir(parents=True, exist_ok=True)
         errors = list(source_result["errors"])
+        copied_bytes = 0
         for filename in sorted(source_result["map"]):
             source_file = source_root / filename
             destination_file = destination / filename
-            try:
-                if source_file.is_symlink() or destination_file.exists():
-                    raise OSError("unsafe or stale preservation target")
-                shutil.copyfile(source_file, destination_file)
-            except (OSError, RuntimeError) as exc:
-                errors.append(f"preservation-failed:{type(exc).__name__}")
-        preserved_result = inventory_payload_origin(destination, max_files=max_files, max_bytes=max_bytes)
+            copied, copy_error, written = _copy_bounded_file(source_file, destination_file, budget=max_bytes - copied_bytes, deadline=deadline)
+            copied_bytes += written
+            if not copied:
+                errors.append(f"preservation-failed:{copy_error}")
+                break
+        remaining_timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
+        preserved_result = inventory_payload_origin(destination, max_files=max_files, max_bytes=max_bytes, timeout_s=remaining_timeout)
         preserved_comparison = compare_payload_maps(expected, preserved_result["map"])
         if preserved_result["status"] != "COMPLETE":
             errors.extend(preserved_result["errors"])
-        if not preserved_comparison["accepted"]:
-            errors.append("preserved-map-divergence")
-        complete = not errors and source_result["status"] == "COMPLETE" and comparison["accepted"] and preserved_result["status"] == "COMPLETE" and preserved_comparison["accepted"]
+        complete = not errors and source_result["status"] == "COMPLETE" and preserved_result["status"] == "COMPLETE"
         status = "COMPLETE" if complete else "INCOMPLETE"
         _write_json(maps_root / f"{name}.json", preserved_result["map"])
         _write_json(
@@ -364,17 +477,23 @@ def preserve_payload_origins(
             "errors": sorted(set(errors)),
         }
 
-    accepted = all(result["status"] == "COMPLETE" for result in origin_results.values())
+    accepted = all(
+        result["status"] == "COMPLETE"
+        and result["comparison"]["accepted"]
+        and result["preserved_comparison"]["accepted"]
+        for result in origin_results.values()
+    )
+    complete = all(result["status"] == "COMPLETE" for result in origin_results.values())
     checkpoint = {
         "schema_version": 1,
         "kind": "payload-preservation-checkpoint",
-        "complete": accepted,
+        "complete": complete,
         "origins": {name: result["status"] for name, result in origin_results.items()},
     }
     checkpoint_path = payload_root / "preservation-checkpoint.json"
     _write_json(checkpoint_path, checkpoint)
     return {
-        "status": "COMPLETE" if accepted else "INCOMPLETE",
+        "status": "COMPLETE" if complete else "INCOMPLETE",
         "accepted": accepted,
         "origins": origin_results,
         "checkpoint": str(checkpoint_path.relative_to(bundle_path)),
