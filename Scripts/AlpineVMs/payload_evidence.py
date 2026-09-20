@@ -276,17 +276,25 @@ def _open_absolute_directory(path: str | Path, *, create: bool, deadline: float 
         _check_deadline(deadline, "open-directory-root")
         for component in (part for part in raw.split("/")[1:] if part):
             _check_deadline(deadline, f"open-directory:{component}")
+            child: int | None = None
             try:
-                child = os.open(component, directory_flags, dir_fd=current)
-            except FileNotFoundError:
-                if not create:
-                    raise
-                os.mkdir(component, 0o700, dir_fd=current)
-                _check_deadline(deadline, f"open-directory:{component}")
-                child = os.open(component, directory_flags, dir_fd=current)
-            _check_deadline(deadline, f"opened-directory:{component}")
-            os.close(current)
-            current = child
+                try:
+                    child = os.open(component, directory_flags, dir_fd=current)
+                except FileNotFoundError:
+                    if not create:
+                        raise
+                    os.mkdir(component, 0o700, dir_fd=current)
+                    _check_deadline(deadline, f"open-directory:{component}")
+                    child = os.open(component, directory_flags, dir_fd=current)
+                _check_deadline(deadline, f"opened-directory:{component}")
+                previous = current
+                current = child
+                child = None
+                os.close(previous)
+            except BaseException:
+                if child is not None:
+                    os.close(child)
+                raise
         return current
     except TimeoutError:
         os.close(current)

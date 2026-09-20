@@ -266,6 +266,40 @@ def test_open_absolute_directory_rechecks_deadline_after_root_open(monkeypatch: 
                 pass
 
 
+@pytest.mark.parametrize("create", [False, True])
+def test_open_absolute_directory_closes_child_on_post_open_deadline(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, create: bool):
+    target = tmp_path / ("existing" if not create else "created")
+    if not create:
+        target.mkdir()
+    clock = [0.0]
+    child_fd: list[int | None] = [None]
+    real_open = payload_module.os.open
+    real_close = payload_module.os.close
+
+    def advancing_open(path: str, flags: int, *args: object, **kwargs: object) -> int:
+        fd = real_open(path, flags, *args, **kwargs)
+        if kwargs.get("dir_fd") is not None and path in {"existing", "created"}:
+            child_fd[0] = fd
+            clock[0] = 2.0
+        return fd
+
+    monkeypatch.setattr(payload_module.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(payload_module.os, "open", advancing_open)
+
+    with pytest.raises(TimeoutError, match="deadline-expired"):
+        _open_absolute_directory(target, create=create, deadline=1.0)
+
+    assert child_fd[0] is not None
+    try:
+        payload_module.os.fstat(child_fd[0])
+    except OSError:
+        leaked = False
+    else:
+        leaked = True
+        real_close(child_fd[0])
+    assert leaked is False
+
+
 def test_partial_read_error_reports_consumed_bytes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     source = tmp_path / "photo-01.jpg"
     source.write_bytes(b"abcdef")
@@ -334,6 +368,71 @@ def test_json_write_deadline_after_fsync_is_not_success(tmp_path: Path, monkeypa
         _write_json(destination, {"safe": True}, deadline=1.0)
 
     assert destination.exists() is False
+
+
+def test_json_write_closes_fd_if_deadline_expires_after_open(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    clock = [0.0]
+    target_fd: list[int | None] = [None]
+    real_open = payload_module.os.open
+    real_close = payload_module.os.close
+
+    def advancing_open(path: str, flags: int, *args: object, **kwargs: object) -> int:
+        fd = real_open(path, flags, *args, **kwargs)
+        if flags & payload_module.os.O_WRONLY:
+            target_fd[0] = fd
+            clock[0] = 2.0
+        return fd
+
+    monkeypatch.setattr(payload_module.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(payload_module.os, "open", advancing_open)
+
+    with pytest.raises(TimeoutError, match="deadline-expired"):
+        _write_json(tmp_path / "bundle" / "payload.json", {"safe": True}, deadline=1.0)
+
+    assert target_fd[0] is not None
+    try:
+        payload_module.os.fstat(target_fd[0])
+    except OSError:
+        leaked = False
+    else:
+        leaked = True
+        real_close(target_fd[0])
+    assert leaked is False
+
+
+def test_copy_closes_fd_if_deadline_expires_after_destination_open(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    source = tmp_path / "source.jpg"
+    destination = tmp_path / "bundle" / "destination.jpg"
+    source.write_bytes(b"payload")
+    clock = [0.0]
+    target_fd: list[int | None] = [None]
+    real_open = payload_module.os.open
+    real_close = payload_module.os.close
+
+    def advancing_open(path: str, flags: int, *args: object, **kwargs: object) -> int:
+        fd = real_open(path, flags, *args, **kwargs)
+        if flags & payload_module.os.O_WRONLY:
+            target_fd[0] = fd
+            clock[0] = 2.0
+        return fd
+
+    monkeypatch.setattr(payload_module.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(payload_module.os, "open", advancing_open)
+
+    copied, error, written = _copy_bounded_file(source, destination, budget=1024, deadline=1.0)
+
+    assert copied is False
+    assert error == "deadline-expired"
+    assert written == 0
+    assert target_fd[0] is not None
+    try:
+        payload_module.os.fstat(target_fd[0])
+    except OSError:
+        leaked = False
+    else:
+        leaked = True
+        real_close(target_fd[0])
+    assert leaked is False
 
 
 @pytest.mark.parametrize(
