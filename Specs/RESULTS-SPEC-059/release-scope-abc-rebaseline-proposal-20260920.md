@@ -2,8 +2,11 @@
 
 **Data:** 2026-09-20<br>
 **Branch:** `AIOPT3`<br>
+**Baseline documental da revisão Astra:** `b6fbcef`<br>
+**Base declarada da proposta:** `03a9e14`<br>
+**Candidato documental:** `0f410ca`<br>
 **Candidato funcional:** `f1bf3bc`<br>
-**Documento de escopo baseado em:** `03a9e14`<br>
+**Última revisão Astra:** `CONDITIONAL GO` controller-only; proposta documental condicional<br>
 **Estado:** `PROPOSTA — não aprovada para trial`
 
 ## 1. Objetivo

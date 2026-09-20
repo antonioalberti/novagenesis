@@ -10,6 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import payload_evidence as payload_module
 from payload_evidence import PayloadContractError, _copy_bounded_file, _open_absolute_directory, _write_json, compare_payload_maps, evaluate_payload_result, inventory_payload_origin, loads_rejecting_duplicate_keys, payload_acceptance_eligible, preserve_payload_origins, validate_payload_plan
 import ng_remote_executor as executor
 
@@ -236,6 +237,28 @@ def test_open_absolute_directory_accepts_root_directory():
         import os
 
         os.close(fd)
+
+
+def test_partial_read_error_reports_consumed_bytes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    source = tmp_path / "photo-01.jpg"
+    source.write_bytes(b"abcdef")
+    real_read = payload_module.os.read
+    calls = 0
+
+    def flaky_read(fd: int, size: int) -> bytes:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return real_read(fd, min(size, 3))
+        raise OSError("synthetic read failure")
+
+    monkeypatch.setattr(payload_module.os, "read", flaky_read)
+
+    data, error, consumed = payload_module._read_bounded_file(source, budget=1024, deadline=None)
+
+    assert data == b"abc"
+    assert error == "read-failed:OSError"
+    assert consumed == 3
 
 
 @pytest.mark.parametrize(
