@@ -16,7 +16,22 @@ from evidence_verifier import (
 )
 
 
+_MISSING = object()
+
+
 class EvidenceVerifierTests(unittest.TestCase):
+    _BLOCKER_SOURCES = (
+        ("result.blockers", "NGELC-ACCEPTANCE-BLOCKER", "result.blockers"),
+        ("result.acceptance_blockers", "NGELC-ACCEPTANCE-BLOCKER", "result.acceptance_blockers"),
+        (
+            "result.acceptance_eligibility.blockers",
+            "NGELC-ACCEPTANCE-BLOCKER",
+            "result.acceptance_eligibility.blockers",
+        ),
+        ("result.protected_input_blockers", "NGELC-PROTECTED-INPUT-BLOCKER", "result.protected_input_blockers"),
+        ("manifest.protected_input_blockers", "NGELC-PROTECTED-INPUT-BLOCKER", "manifest.protected_input_blockers"),
+    )
+
     def _write_json(self, path: Path, value: object) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
@@ -28,6 +43,7 @@ class EvidenceVerifierTests(unittest.TestCase):
         accepted: bool = True,
         result_updates: dict[str, object] | None = None,
         manifest_updates: dict[str, object] | None = None,
+        result_removals: set[str] | None = None,
     ) -> Path:
         bundle = root / "bundle"
         files = {
@@ -57,6 +73,8 @@ class EvidenceVerifierTests(unittest.TestCase):
         }
         if result_updates:
             files["result.json"].update(result_updates)
+        for field in result_removals or set():
+            files["result.json"].pop(field, None)
         for relative, value in files.items():
             path = bundle / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,6 +99,40 @@ class EvidenceVerifierTests(unittest.TestCase):
         self._write_json(bundle / "terminal-seal.json", {"schema_version": 2, "manifest_sha256": manifest_hash})
         return bundle
 
+    def _make_blocker_control_bundle(self, root: Path, source: str, value: object = _MISSING) -> Path:
+        result_updates: dict[str, object] = {}
+        manifest_updates: dict[str, object] = {}
+        result_removals: set[str] = set()
+
+        if source == "result.blockers":
+            if value is _MISSING:
+                result_removals.add("blockers")
+            else:
+                result_updates["blockers"] = value
+        elif source == "result.acceptance_blockers":
+            if value is not _MISSING:
+                result_updates["acceptance_blockers"] = value
+        elif source == "result.acceptance_eligibility.blockers":
+            eligibility: dict[str, object] = {"eligible": True}
+            if value is not _MISSING:
+                eligibility["blockers"] = value
+            result_updates["acceptance_eligibility"] = eligibility
+        elif source == "result.protected_input_blockers":
+            if value is not _MISSING:
+                result_updates["protected_input_blockers"] = value
+        elif source == "manifest.protected_input_blockers":
+            if value is not _MISSING:
+                manifest_updates["protected_input_blockers"] = value
+        else:
+            raise AssertionError(f"unknown blocker source: {source}")
+
+        return self._make_bundle(
+            root,
+            result_updates=result_updates,
+            manifest_updates=manifest_updates,
+            result_removals=result_removals,
+        )
+
     def test_minimum_schema_v2_bundle_is_valid_and_accepted(self):
         with tempfile.TemporaryDirectory() as td:
             report = verify_bundle(self._make_bundle(Path(td)))
@@ -88,6 +140,61 @@ class EvidenceVerifierTests(unittest.TestCase):
             self.assertTrue(report["integrity"])
             self.assertTrue(report["accepted"])
             self.assertEqual(report["schema_version"], 2)
+
+    def test_each_blocker_source_independently_vetoes_an_acceptance_eligible_bundle(self):
+        for source, reason_code, source_label in self._BLOCKER_SOURCES:
+            raw_value = f"raw-{source}"
+            with self.subTest(source=source):
+                with tempfile.TemporaryDirectory() as td:
+                    report = verify_bundle(self._make_blocker_control_bundle(Path(td), source, [raw_value]))
+                    self.assertEqual(report["code"], CODE_VALID)
+                    self.assertTrue(report["integrity"])
+                    self.assertFalse(report["accepted"])
+                    self.assertEqual(
+                        report["errors"],
+                        [
+                            "NGELC-ACCEPTANCE-INELIGIBLE: bundle is intact but not acceptance-eligible",
+                            f"{reason_code}: "
+                            f"{'acceptance blocker present' if reason_code == 'NGELC-ACCEPTANCE-BLOCKER' else 'protected input blocker present'} "
+                            f"({source_label})",
+                        ],
+                    )
+                    self.assertNotIn(raw_value, "\n".join(report["errors"]))
+
+    def test_malformed_scalar_and_object_blockers_fail_closed_without_raw_values(self):
+        for source, reason_code, source_label in self._BLOCKER_SOURCES:
+            for value in (False, 0, "", {}):
+                with self.subTest(source=source, value=repr(value)):
+                    with tempfile.TemporaryDirectory() as td:
+                        report = verify_bundle(self._make_blocker_control_bundle(Path(td), source, value))
+                        self.assertEqual(report["code"], CODE_VALID)
+                        self.assertTrue(report["integrity"])
+                        self.assertFalse(report["accepted"])
+                        expected_message = (
+                            "acceptance blocker present"
+                            if reason_code == "NGELC-ACCEPTANCE-BLOCKER"
+                            else "protected input blocker present"
+                        )
+                        self.assertEqual(
+                            report["errors"],
+                            [
+                                "NGELC-ACCEPTANCE-INELIGIBLE: bundle is intact but not acceptance-eligible",
+                                f"{reason_code}: {expected_message} ({source_label})",
+                            ],
+                        )
+                        if value != "":
+                            self.assertNotIn(str(value), "\n".join(report["errors"]))
+
+    def test_missing_none_and_empty_blocker_controls_remain_non_blocking(self):
+        for source, _reason_code, _source_label in self._BLOCKER_SOURCES:
+            for control_name, value in (("missing", _MISSING), ("none", None), ("empty-list", [])):
+                with self.subTest(source=source, control=control_name):
+                    with tempfile.TemporaryDirectory() as td:
+                        report = verify_bundle(self._make_blocker_control_bundle(Path(td), source, value))
+                        self.assertEqual(report["code"], CODE_VALID)
+                        self.assertTrue(report["integrity"])
+                        self.assertTrue(report["accepted"])
+                        self.assertEqual(report["errors"], [])
 
     def test_missing_bundle_has_distinct_code_and_is_not_accepted(self):
         with tempfile.TemporaryDirectory() as td:
