@@ -5,6 +5,7 @@ import sys
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -239,6 +240,32 @@ def test_open_absolute_directory_accepts_root_directory():
         os.close(fd)
 
 
+def test_open_absolute_directory_rechecks_deadline_after_root_open(monkeypatch: pytest.MonkeyPatch):
+    clock = [0.0]
+    opened: list[int] = []
+    real_open = payload_module.os.open
+
+    def advancing_open(path: str, flags: int, *args: object, **kwargs: object) -> int:
+        fd = real_open(path, flags, *args, **kwargs)
+        opened.append(fd)
+        if path == "/":
+            clock[0] = 2.0
+        return fd
+
+    monkeypatch.setattr(payload_module.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(payload_module.os, "open", advancing_open)
+
+    try:
+        with pytest.raises(TimeoutError, match="deadline-expired"):
+            _open_absolute_directory(Path("/"), create=False, deadline=1.0)
+    finally:
+        for fd in opened:
+            try:
+                payload_module.os.close(fd)
+            except OSError:
+                pass
+
+
 def test_partial_read_error_reports_consumed_bytes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     source = tmp_path / "photo-01.jpg"
     source.write_bytes(b"abcdef")
@@ -259,6 +286,54 @@ def test_partial_read_error_reports_consumed_bytes(tmp_path: Path, monkeypatch: 
     assert data == b"abc"
     assert error == "read-failed:OSError"
     assert consumed == 3
+
+
+def test_inventory_marks_root_mutation_during_collection_incomplete(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    root = tmp_path / "source"
+    root.mkdir()
+    (root / "photo-01.jpg").write_bytes(b"payload")
+    real_fstat = payload_module.os.fstat
+    root_calls = 0
+
+    def mutating_fstat(fd: int):
+        nonlocal root_calls
+        result = real_fstat(fd)
+        if payload_module.stat.S_ISDIR(result.st_mode):
+            root_calls += 1
+            if root_calls == 2:
+                return SimpleNamespace(
+                    st_dev=result.st_dev,
+                    st_ino=result.st_ino,
+                    st_mode=result.st_mode,
+                    st_mtime_ns=result.st_mtime_ns + 1,
+                    st_ctime_ns=result.st_ctime_ns,
+                )
+        return result
+
+    monkeypatch.setattr(payload_module.os, "fstat", mutating_fstat)
+
+    result = inventory_payload_origin(root, max_files=10, max_bytes=1024)
+
+    assert result["status"] == "INCOMPLETE"
+    assert "root-contents-changed" in result["errors"]
+
+
+def test_json_write_deadline_after_fsync_is_not_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    clock = [0.0]
+    real_fsync = payload_module.os.fsync
+
+    def expiring_fsync(fd: int) -> None:
+        real_fsync(fd)
+        clock[0] = 2.0
+
+    monkeypatch.setattr(payload_module.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(payload_module.os, "fsync", expiring_fsync)
+    destination = tmp_path / "bundle" / "payload.json"
+
+    with pytest.raises(TimeoutError, match="deadline-expired"):
+        _write_json(destination, {"safe": True}, deadline=1.0)
+
+    assert destination.exists() is False
 
 
 @pytest.mark.parametrize(

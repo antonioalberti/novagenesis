@@ -273,6 +273,7 @@ def _open_absolute_directory(path: str | Path, *, create: bool, deadline: float 
     directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
     current = os.open("/", directory_flags)
     try:
+        _check_deadline(deadline, "open-directory-root")
         for component in (part for part in raw.split("/")[1:] if part):
             _check_deadline(deadline, f"open-directory:{component}")
             try:
@@ -283,6 +284,7 @@ def _open_absolute_directory(path: str | Path, *, create: bool, deadline: float 
                 os.mkdir(component, 0o700, dir_fd=current)
                 _check_deadline(deadline, f"open-directory:{component}")
                 child = os.open(component, directory_flags, dir_fd=current)
+            _check_deadline(deadline, f"opened-directory:{component}")
             os.close(current)
             current = child
         return current
@@ -326,6 +328,7 @@ def _read_bounded_file(path: str | Path, budget: int, deadline: float | None, *,
     try:
         _check_deadline(deadline, "stat-source")
         before = os.fstat(fd)
+        _check_deadline(deadline, "after-stat-source")
         if not stat.S_ISREG(before.st_mode):
             return b"", "unsafe-source-entry", 0
         if before.st_size > budget:
@@ -346,6 +349,7 @@ def _read_bounded_file(path: str | Path, budget: int, deadline: float | None, *,
                 return b"".join(chunks), "byte-bound-exceeded", consumed
         _check_deadline(deadline, "restat-source")
         after = os.fstat(fd)
+        _check_deadline(deadline, "after-restat-source")
         before_identity = (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
         after_identity = (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
         if before_identity != after_identity or consumed != after.st_size:
@@ -434,6 +438,7 @@ def inventory_payload_origin(root: str | Path, *, max_files: int, max_bytes: int
                 break
             try:
                 child_stat = os.stat(child_name, dir_fd=root_fd, follow_symlinks=False)
+                _check_deadline(deadline, "after-stat-entry")
             except OSError as exc:
                 errors.append(f"stat-failed:{child_name}:{type(exc).__name__}")
                 continue
@@ -489,6 +494,7 @@ def _write_json(path: Path, value: Mapping[str, Any], *, deadline: float | None 
         try:
             file_fd = os.open(file_name, flags, 0o600, dir_fd=parent_fd)
             created = True
+            _check_deadline(deadline, "opened-json")
         except FileExistsError as exc:
             raise PayloadContractError(f"refusing stale or symlink destination: {path}") from exc
         try:
@@ -554,6 +560,7 @@ def _copy_bounded_file(
         try:
             file_fd = os.open(file_name, flags, 0o600, dir_fd=parent_fd)
             created = True
+            _check_deadline(deadline, "opened-preserved-file")
         except FileExistsError:
             return False, "unsafe-or-stale-destination", 0
         written = 0
@@ -647,8 +654,11 @@ def preserve_payload_origins(
         source_fd: int | None = None
         try:
             if source_result.get("identity") is not None:
+                _check_deadline(deadline, "open-source-copy-root")
                 source_fd = _open_absolute_directory(source_root, create=False, deadline=deadline)
+                _check_deadline(deadline, "stat-source-copy-root")
                 source_fd_stat = os.fstat(source_fd)
+                _check_deadline(deadline, "after-stat-source-copy-root")
                 source_identity = source_result["identity"]
                 if (source_fd_stat.st_dev, source_fd_stat.st_ino) != (source_identity.get("st_dev"), source_identity.get("st_ino")):
                     errors.append("source-root-identity-changed")
