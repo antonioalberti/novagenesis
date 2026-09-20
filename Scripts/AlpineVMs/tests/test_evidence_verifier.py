@@ -21,7 +21,14 @@ class EvidenceVerifierTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 
-    def _make_bundle(self, root: Path, *, accepted: bool = True) -> Path:
+    def _make_bundle(
+        self,
+        root: Path,
+        *,
+        accepted: bool = True,
+        result_updates: dict[str, object] | None = None,
+        manifest_updates: dict[str, object] | None = None,
+    ) -> Path:
         bundle = root / "bundle"
         files = {
             "result.json": {
@@ -48,6 +55,8 @@ class EvidenceVerifierTests(unittest.TestCase):
             "artifacts/source/photo.jpg": b"payload",
             "artifacts/repository/photo.jpg": b"payload",
         }
+        if result_updates:
+            files["result.json"].update(result_updates)
         for relative, value in files.items():
             path = bundle / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,6 +73,8 @@ class EvidenceVerifierTests(unittest.TestCase):
             data = path.read_bytes()
             entries.append({"path": relative, "size": len(data), "sha256": hashlib.sha256(data).hexdigest()})
         manifest = {"schema_version": 2, "files": entries}
+        if manifest_updates:
+            manifest.update(manifest_updates)
         manifest_path = bundle / "manifest.json"
         self._write_json(manifest_path, manifest)
         manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
@@ -123,10 +134,124 @@ class EvidenceVerifierTests(unittest.TestCase):
             self.assertEqual(
                 report["errors"],
                 [
-                    "bundle is intact but not acceptance-eligible",
-                    "acceptance blocker: example-blocker",
+                    "NGELC-ACCEPTANCE-INELIGIBLE: bundle is intact but not acceptance-eligible",
+                    "NGELC-ACCEPTANCE-BLOCKER: acceptance blocker present (result.blockers)",
                 ],
             )
+
+    def test_acceptance_blocker_aliases_are_all_reported_without_precedence_loss(self):
+        with tempfile.TemporaryDirectory() as td:
+            report = verify_bundle(
+                self._make_bundle(
+                    Path(td),
+                    result_updates={
+                        "local_acceptance_eligible": False,
+                        "blockers": [],
+                        "acceptance_blockers": ["top-level alias"],
+                        "acceptance_eligibility": {"eligible": False, "blockers": ["nested alias"]},
+                    },
+                )
+            )
+            self.assertEqual(report["code"], CODE_VALID)
+            self.assertTrue(report["integrity"])
+            self.assertFalse(report["accepted"])
+            self.assertEqual(
+                report["errors"],
+                [
+                    "NGELC-ACCEPTANCE-INELIGIBLE: bundle is intact but not acceptance-eligible",
+                    "NGELC-ACCEPTANCE-BLOCKER: acceptance blocker present (result.acceptance_blockers)",
+                    "NGELC-ACCEPTANCE-BLOCKER: acceptance blocker present (result.acceptance_eligibility.blockers)",
+                ],
+            )
+
+    def test_protected_input_blockers_from_result_and_manifest_are_safe_and_aggregated(self):
+        secret = "token=super-secret /srv/private/input.txt"
+        with tempfile.TemporaryDirectory() as td:
+            report = verify_bundle(
+                self._make_bundle(
+                    Path(td),
+                    result_updates={
+                        "local_acceptance_eligible": False,
+                        "blockers": [],
+                        "acceptance_blockers": [],
+                        "acceptance_eligibility": {"eligible": False, "blockers": []},
+                        "protected_input_blockers": [secret],
+                    },
+                    manifest_updates={"protected_input_blockers": ["/etc/shadow was captured"]},
+                )
+            )
+            self.assertEqual(report["code"], CODE_VALID)
+            self.assertTrue(report["integrity"])
+            self.assertFalse(report["accepted"])
+            self.assertEqual(
+                report["errors"],
+                [
+                    "NGELC-ACCEPTANCE-INELIGIBLE: bundle is intact but not acceptance-eligible",
+                    "NGELC-PROTECTED-INPUT-BLOCKER: protected input blocker present (result.protected_input_blockers)",
+                    "NGELC-PROTECTED-INPUT-BLOCKER: protected input blocker present (manifest.protected_input_blockers)",
+                ],
+            )
+            self.assertNotIn(secret, "\n".join(report["errors"]))
+            self.assertNotIn("/etc/shadow", "\n".join(report["errors"]))
+
+    def test_hostile_non_string_control_and_long_blockers_do_not_leak(self):
+        hostile = "secret=abc /private/path\x00\n\r\t" + ("x" * 10_000)
+        with tempfile.TemporaryDirectory() as td:
+            report = verify_bundle(
+                self._make_bundle(
+                    Path(td),
+                    result_updates={
+                        "local_acceptance_eligible": False,
+                        "blockers": [hostile, 42, None, {"secret": hostile}],
+                        "acceptance_blockers": [hostile],
+                        "acceptance_eligibility": {"eligible": False, "blockers": [False, [hostile]]},
+                        "protected_input_blockers": [hostile, {"path": "/private/path"}],
+                    },
+                    manifest_updates={"protected_input_blockers": [hostile, 7]},
+                )
+            )
+            self.assertEqual(report["code"], CODE_VALID)
+            self.assertTrue(report["integrity"])
+            self.assertFalse(report["accepted"])
+            self.assertTrue(report["errors"])
+            self.assertTrue(all(isinstance(error, str) for error in report["errors"]))
+            self.assertTrue(all(len(error) <= 200 for error in report["errors"]))
+            self.assertTrue(all(not any(ord(char) < 32 for char in error) for error in report["errors"]))
+            rendered = "\n".join(report["errors"])
+            self.assertNotIn("secret=abc", rendered)
+            self.assertNotIn("/private/path", rendered)
+            self.assertNotIn(hostile, rendered)
+
+    def test_duplicate_blockers_produce_deterministic_deduplicated_reasons(self):
+        updates = {
+            "local_acceptance_eligible": False,
+            "blockers": ["duplicate", "duplicate"],
+            "acceptance_blockers": ["duplicate", "duplicate"],
+            "acceptance_eligibility": {"eligible": False, "blockers": ["duplicate", "duplicate"]},
+            "protected_input_blockers": ["duplicate", "duplicate"],
+        }
+        with tempfile.TemporaryDirectory() as td:
+            bundle = self._make_bundle(Path(td), result_updates=updates, manifest_updates={"protected_input_blockers": ["duplicate", "duplicate"]})
+            first = verify_bundle(bundle)
+            second = verify_bundle(bundle)
+            self.assertEqual(first["errors"], second["errors"])
+            self.assertEqual(first["errors"], list(dict.fromkeys(first["errors"])))
+
+    def test_consumer_distinguishes_intact_nonaccepted_bundle_from_tampering(self):
+        def classify(report):
+            if report["code"] == CODE_VALID and report["integrity"] and not report["accepted"]:
+                return "valid-nonaccepted"
+            if report["code"] == CODE_TAMPERED and not report["integrity"]:
+                return "tampered"
+            return "other"
+
+        with tempfile.TemporaryDirectory() as valid_td, tempfile.TemporaryDirectory() as tampered_td:
+            valid = verify_bundle(self._make_bundle(Path(valid_td), accepted=False))
+            tampered_bundle = self._make_bundle(Path(tampered_td))
+            (tampered_bundle / "artifacts/source/photo.jpg").write_bytes(b"changed")
+            tampered = verify_bundle(tampered_bundle)
+            self.assertEqual(classify(valid), "valid-nonaccepted")
+            self.assertEqual(classify(tampered), "tampered")
 
     def test_corrupted_manifest_reports_stable_integrity_failure_reason(self):
         with tempfile.TemporaryDirectory() as td:

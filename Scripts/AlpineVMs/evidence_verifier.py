@@ -22,6 +22,15 @@ CODE_BUNDLE_MISSING = "NGELC-BUNDLE-MISSING"
 CODE_TAMPERED = "NGELC-TAMPERED"
 CODE_SCHEMA_OLD = "NGELC-SCHEMA-OLD"
 CODE_TERMINAL_SEAL_MISSING = "NGELC-TERMINAL-SEAL-MISSING"
+_REASON_ACCEPTANCE_INELIGIBLE = "NGELC-ACCEPTANCE-INELIGIBLE"
+_REASON_ACCEPTANCE_BLOCKER = "NGELC-ACCEPTANCE-BLOCKER"
+_REASON_PROTECTED_INPUT_BLOCKER = "NGELC-PROTECTED-INPUT-BLOCKER"
+
+_REJECTION_REASON_MESSAGES = {
+    _REASON_ACCEPTANCE_INELIGIBLE: "bundle is intact but not acceptance-eligible",
+    _REASON_ACCEPTANCE_BLOCKER: "acceptance blocker present",
+    _REASON_PROTECTED_INPUT_BLOCKER: "protected input blocker present",
+}
 
 _MANIFEST_NAME = "manifest.json"
 _TERMINAL_SEAL_NAME = "terminal-seal.json"
@@ -215,8 +224,7 @@ def _check_coverage(actual: set[str], listed: set[str]) -> list[str]:
 
 def _accepted_from_result(result: dict[str, Any]) -> bool:
     """Derive acceptance eligibility from result content, never from integrity."""
-    protected = result.get("protected_input_blockers")
-    if protected not in (None, []):
+    if _has_blocker_value(result.get("protected_input_blockers")):
         return False
     eligible = result.get("local_acceptance_eligibility", result.get("local_acceptance_eligible"))
     eligibility_record = result.get("acceptance_eligibility")
@@ -226,13 +234,15 @@ def _accepted_from_result(result: dict[str, Any]) -> bool:
         return False
     if result.get("exit_code") != 0:
         return False
-    blockers = result.get("blockers", result.get("acceptance_blockers"))
-    if blockers is not None and blockers != []:
+    if any(
+        _has_blocker_value(value)
+        for value in (
+            result.get("blockers"),
+            result.get("acceptance_blockers"),
+            eligibility_record.get("blockers") if isinstance(eligibility_record, dict) else None,
+        )
+    ):
         return False
-    if blockers is None and isinstance(eligibility_record, dict):
-        blockers = eligibility_record.get("blockers")
-        if blockers not in ([], None):
-            return False
     components = result.get("component_verdicts")
     if isinstance(components, dict):
         runtime = components.get("runtime")
@@ -245,21 +255,43 @@ def _accepted_from_result(result: dict[str, Any]) -> bool:
     return runtime == "PASS" and teardown == "PASS" and evidence == "COMPLETE"
 
 
+def _has_blocker_value(value: Any) -> bool:
+    """Treat non-empty or malformed blocker fields as semantic blockers."""
+    if value is None:
+        return False
+    if isinstance(value, list):
+        return bool(value)
+    return True
+
+
+def _acceptance_blocker_sources(result: dict[str, Any], manifest: dict[str, Any]) -> list[tuple[str, str]]:
+    """Return present blocker sources in a fixed, non-sensitive order."""
+    sources: list[tuple[str, str]] = []
+    acceptance_sources = (
+        ("blockers", "result.blockers"),
+        ("acceptance_blockers", "result.acceptance_blockers"),
+    )
+    for field, label in acceptance_sources:
+        if field in result and _has_blocker_value(result.get(field)):
+            sources.append((_REASON_ACCEPTANCE_BLOCKER, label))
+    eligibility_record = result.get("acceptance_eligibility")
+    if isinstance(eligibility_record, dict) and _has_blocker_value(eligibility_record.get("blockers")):
+        sources.append((_REASON_ACCEPTANCE_BLOCKER, "result.acceptance_eligibility.blockers"))
+    if _has_blocker_value(result.get("protected_input_blockers")):
+        sources.append((_REASON_PROTECTED_INPUT_BLOCKER, "result.protected_input_blockers"))
+    if _has_blocker_value(manifest.get("protected_input_blockers")):
+        sources.append((_REASON_PROTECTED_INPUT_BLOCKER, "manifest.protected_input_blockers"))
+    return sources
+
+
 def _acceptance_rejection_reasons(result: dict[str, Any], manifest: dict[str, Any]) -> list[str]:
     """Explain semantic non-acceptance after bundle integrity has passed."""
-    reasons = ["bundle is intact but not acceptance-eligible"]
-    blockers = result.get("blockers", result.get("acceptance_blockers"))
-    eligibility_record = result.get("acceptance_eligibility")
-    if blockers is None and isinstance(eligibility_record, dict):
-        blockers = eligibility_record.get("blockers")
-    if isinstance(blockers, list):
-        reasons.extend(f"acceptance blocker: {blocker}" for blocker in blockers)
-    protected = result.get("protected_input_blockers")
-    if isinstance(protected, list):
-        reasons.extend(f"protected input blocker: {blocker}" for blocker in protected)
-    manifest_protected = manifest.get("protected_input_blockers")
-    if isinstance(manifest_protected, list):
-        reasons.extend(f"protected input blocker: {blocker}" for blocker in manifest_protected)
+    reasons = [
+        f"{_REASON_ACCEPTANCE_INELIGIBLE}: "
+        f"{_REJECTION_REASON_MESSAGES[_REASON_ACCEPTANCE_INELIGIBLE]}"
+    ]
+    for code, source in _acceptance_blocker_sources(result, manifest):
+        reasons.append(f"{code}: {_REJECTION_REASON_MESSAGES[code]} ({source})")
     return list(dict.fromkeys(reasons))
 
 
@@ -346,7 +378,7 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
         if result.get("schema_version") != SCHEMA_VERSION:
             raise _VerificationError("result.json schema_version is not 2")
         accepted = _accepted_from_result(result)
-        if manifest.get("protected_input_blockers"):
+        if _has_blocker_value(manifest.get("protected_input_blockers")):
             accepted = False
         return _report(
             CODE_VALID,
