@@ -762,6 +762,76 @@ def test_three_origins_are_preserved_in_canonical_namespaces_and_checkpointed(tm
         assert (bundle / "payload" / "metadata" / f"{origin}.json").is_file()
 
 
+def test_complete_payload_fixture_seals_and_verifies_as_accepted(tmp_path: Path):
+    roots: dict[str, Path] = {}
+    expected: dict[str, dict[str, object]] = {}
+    for origin in ("source", "nrncs", "repository"):
+        root = tmp_path / f"{origin}-root"
+        root.mkdir()
+        roots[origin] = root
+        for number in range(1, 6):
+            data = f"synthetic-jpeg-{number}".encode("ascii")
+            (root / f"photo-{number:02d}.jpg").write_bytes(data)
+        if origin == "source":
+            expected = inventory_payload_origin(root, max_files=10, max_bytes=4096)["map"]
+
+    bundle = tmp_path / "bundle"
+    payload_result = preserve_payload_origins(bundle, roots, expected=expected, max_files=10, max_bytes=4096)
+    assert payload_result["status"] == "COMPLETE"
+    assert payload_result["accepted"] is True
+
+    files = {
+        "result.json": {
+            "schema_version": 2,
+            "runtime_result": "PASS",
+            "teardown_result": "PASS",
+            "evidence_result": "COMPLETE",
+            "local_acceptance_eligible": True,
+            "acceptance_blockers": [],
+            "protected_input_blockers": [],
+            "exit_code": 0,
+        },
+        "controller-events.jsonl": '{"event":"payload-sealed"}\n',
+        "provenance.json": {"schema_version": 2, "capture_complete": True},
+        "workload.json": {"schema_version": 2, "verified": True},
+        "oracle.json": {"schema_version": 2, "preservation_verified": True},
+        "ownership.json": {"schema_version": 2, "anchor": {"verified": True}},
+        "cleanup.json": {"schema_version": 2, "result": "PASS"},
+        "preservation.json": {"schema_version": 2, "verified": True},
+        "plan/effective.json": {"schema_version": 1, "acceptance_profile": "normal-payload"},
+        "inventory/final.json": {"processes": [], "ipc": {}},
+        "roles/source/exit.json": {"exit_code": 0},
+    }
+    for relative, value in files.items():
+        path = bundle / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if relative.endswith(".jsonl"):
+            path.write_text(value, encoding="utf-8")
+        else:
+            path.write_text(json.dumps(value) + "\n", encoding="utf-8")
+    for relative in ("artifacts/source/photo-01.jpg", "artifacts/repository/photo-01.jpg"):
+        path = bundle / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"synthetic-jpeg-1")
+
+    executor.write_evidence_manifest(
+        bundle,
+        {
+            "mode": "remote",
+            "trial_id": "TRIAL-EXACT-SHA",
+            "acceptance_profile": "normal-payload",
+            "payload_evidence_required": True,
+        },
+        schema_version=2,
+    )
+
+    report = executor.verify_bundle(bundle)
+
+    assert report["code"] == "NGELC-VALID"
+    assert report["integrity"] is True
+    assert report["accepted"] is True
+
+
 def test_complete_divergence_is_fail_complete_not_inconclusive(tmp_path: Path):
     roots: dict[str, Path] = {}
     expected: dict[str, dict[str, object]] = {}
