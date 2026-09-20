@@ -1,10 +1,10 @@
 # NovaGenesis — Plano Mestre da Release v1.0.0
 
 **Plano:** `RELEASE-MASTER-PLAN-v1.0.0`  
-**Versão:** 4 — escopo rebaseado
-**Data de criação:** 2026-09-13  
+**Versão:** 5 — normal path remoto separado do perfil local/QGA
+**Data de criação:** 2026-09-13; rebaseline documental 2026-09-20<br>
 **Branch candidata:** `AIOPT3`  
-**Estado:** `BLOCKED — rebaseline v1.0.0 em execução`
+**Estado:** `BLOCKED — rebaseline documental aprovada condicionalmente; gates operacionais em HOLD`
 **Tarefa guarda-chuva:** [[NG-050-release-master-control-v1-20260913]]  
 **SPEC do método:** `Specs/SPEC-054-release-master-plan-and-audit.md`
 
@@ -56,6 +56,7 @@ Para evitar que a primeira release pública misture todas as linhas históricas 
 - perfil normal NRNCS, uma subscription normal e o caminho Source → PGCS → NRNCS → Repository;
 - workload novo de cinco JPEGs determinísticos, com mapas independentes nome → tamanho → SHA-256;
 - lifecycle bounded, provenance/build receipt, bundle durável, teardown por identidade e revisão final.
+- o perfil local/native-privileged, o adaptador Proxmox/QGA e a resiliência QGA-loss ficam explicitamente fora do perfil certificado v1.0.0 e são preservados como linha v1.1+;
 
 O perfil mínimo não anuncia suporte genérico ao modo local, todos os caminhos de erro de subscriptions, performance/soak, 100/1000 fotos, multiplataforma ou equivalência completa dos perfis legacy. Essas claims permanecem rastreadas no Apêndice A para v1.1+.
 - revisão Astra, release notes e tag verificável.
@@ -81,27 +82,39 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 `concluída` numa tarefa e `Implemented` numa SPEC não fecham automaticamente um gate.
 
-## 4. Gate register — perfil v1.0.0 rebaseado
+## 4. Gate register — perfil v1.0.0 remoto rebaseado
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
 | M0 | Contrato suportado, higiene, baseline e freeze | NG-050, NG-038 | SPEC-038, SPEC-054 | — | `Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-hygiene-validation-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-build-v4-20260914.md`; `Specs/RESULTS-SPEC-038/g1-historical-classification-v4-20260914.md` | BLOCKED | Fechar runtime normal e revisão SPEC-054; a decisão fixture-only e a higiene documental do perfil já estão registadas |
-| M1 | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049, NG-055, NG-056 | SPEC-009, SPEC-046, SPEC-055, SPEC-056, SPEC-058, SPEC-059 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; `Specs/RESULTS-SPEC-056/` | OPEN | Fechar receipt/build real, bundle durável, ownership C01 e trial local/remote retido |
-| M2 | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050 | M1 | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/` | OPEN | Executar um trial candidato normal com os subcritérios observáveis e hashes independentes |
-| M3 | Revisão final, notas, tag e leitura de volta | NG-050 | SPEC-054, release criteria | M0–M2 | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
+| M1-R | Deployment, lifecycle, observabilidade e teardown do perfil remoto suportado | NG-046, NG-049 | SPEC-009, SPEC-046, SPEC-052, SPEC-054 | M0 | `Specs/RESULTS-SPEC-054/g2-e7-canonical-20260914.md`; receipt/build remoto e bundle candidato | HOLD | Fixar SHA, receipt ligado aos binários e procedimento remoto fail-closed |
+| M2-R | Caminho normal end-to-end: PGCS, NRNCS, Repository, subscription e cinco JPEGs | NG-047, NG-048, NG-051, NG-052, NG-053, NG-054 | SPEC-044, SPEC-045, SPEC-047, SPEC-048, SPEC-049, SPEC-050 | M1-R | `Specs/RESULTS-SPEC-047/`; `Specs/RESULTS-SPEC-048/`; `Specs/RESULTS-SPEC-049/`; `Specs/RESULTS-SPEC-050/` | OPEN | Preparar um único trial candidato normal remoto com critérios congelados |
+| M1-L | Perfil local/native-privileged, QGA e QGA-loss → reconciliação → teardown → seal | NG-055, NG-056 | SPEC-055, SPEC-056, SPEC-058, SPEC-059 | linha v1.1+ | resultados locais históricos e `Specs/RESULTS-SPEC-059/` | DEFERRED / OPEN | Implementar seam C+D e rever separadamente; não bloqueia v1.0 remoto |
+| M3 | Revisão final, notas, tag e leitura de volta do perfil remoto | NG-050 | SPEC-054, release criteria | M0, M1-R, M2-R | tag, manifest final e release notes | BLOCKED | Astra final, auditoria sem drift e tag `v1.0.0-AIOPT3` |
 
-M2 mantém os subcritérios técnicos de G4–G8, mas a v1.0.0 certifica apenas o caminho normal suportado. O workload de cinco JPEGs é o contrato mínimo; 100/1000 fotos, stress e matrizes completas de erro ficam para v1.1+.
+M2-R mantém os subcritérios técnicos de G4–G8, mas a v1.0.0 certifica apenas o caminho normal remoto suportado. O workload de cinco JPEGs é o contrato mínimo; 100/1000 fotos, stress, matrizes completas de erro, modo local/native-privileged e resiliência QGA-loss ficam para v1.1+.
 
 ## 5. Ordem de execução
 
 ```text
 M0 contrato/higiene/freeze
-  → M1 deployment/lifecycle/teardown
-  → M2 caminho normal end-to-end
-  → M3 revisão/tag
+ → M1-R deployment/lifecycle/teardown remoto
+ → M2-R caminho normal remoto end-to-end
+ → M3 revisão/tag
 ```
 
-M2 pode preparar os seus oráculos em paralelo, mas a aceitação depende de M1. Nenhum subcritério histórico é promovido a PASS por narrativa; claims adiadas são marcadas N/A para o perfil v1.0.0 e preservadas no Apêndice A.
+M2-R pode preparar os seus oráculos em paralelo, mas a aceitação depende de M1-R. M1-L é uma linha diferida e não bloqueia a v1.0 remoto. Nenhum subcritério histórico é promovido a PASS por narrativa; claims adiadas são marcadas N/A para o perfil v1.0.0 e preservadas no Apêndice A.
+
+### 5.1 Matriz de aplicabilidade da rebaseline
+
+| Item diferido | Aplicabilidade v1.0.0 | Obrigações transversais mantidas | Destino |
+|---|---|---|---|
+| SPEC-055 / NG-055 | `N/A — perfil local fora do mínimo certificado` | O executor remoto continua canónico e deve ter lifecycle/teardown próprios | M1-L / v1.1+ |
+| SPEC-056 / NG-056 | `N/A — contrato local de evidência fora do perfil remoto` | Provenance, build linkage, bundle durável, manifest, seal e verificação exigidos pelo remoto permanecem em M1-R | M1-L / v1.1+ |
+| SPEC-058 | `N/A — native-privileged local não certificado na v1.0` | Nenhum fallback local/QGA pode ser usado para certificar o perfil remoto | M1-L / v1.1+ |
+| SPEC-059 | `N/A — Proxmox/QGA não é dependência operacional do perfil remoto` | Perda SSH/teardown remoto deve ser tratada fail-closed no procedimento remoto declarado | M1-L / v1.1+ |
+
+`N/A` é relativo ao perfil v1.0.0; não fecha nem abandona as SPECs/tarefas diferidas.
 
 ## Apêndice A — mapa completo G0–G10 para v1.1+
 
@@ -155,8 +168,10 @@ Verificação realizada em 2026-09-13:
 - A árvore de `4b01e5e` estava limpa, os seis binários foram recompilados no Linux/VM 100 e os seus hashes foram verificados contra o receipt.
 - A suite do NG-ELC passou `85/85`; isso não substitui o ensaio `native-privileged`, o bundle runtime selado ou a revisão Astra de aceitação.
 - A integração SPEC-059 adicionou o adaptador Proxmox/QEMU Guest Agent, `channel-check` no NG-ELC e persistência de prova; a suite Alpine actual passou `172/172` com 7 subtestes.
-- M0/G0 permanece `BLOCKED` até a reconciliação formal do freeze e a conclusão dos gates de SPEC-058. M1/M2 continuam abertos; M3 continua bloqueado.
-- O mapa G0–G10 é histórico/apêndice; os gates operacionais da release mínima são M0–M3.
+- M0/G0 permanece `BLOCKED` até a reconciliação formal do freeze. M1-R/M2-R continuam em HOLD/OPEN; M3 continua bloqueado. SPEC-058 pertence à linha M1-L/v1.1+ e não é requisito do perfil remoto v1.0.
+- O mapa G0–G10 é histórico/apêndice; os gates operacionais da release mínima são M0, M1-R, M2-R e M3, com M1-L diferido.
+- Rebaseline documental de 2026-09-20: M1-R/M2-R são o caminho crítico da v1.0 remoto; M1-L preserva SPEC-055/056/058/059 e QGA-loss como linha v1.1+, sem promover resultados históricos a PASS.
+- Astra deu `CONDITIONAL GO` apenas para esta alteração documental; execução de trial, VM, QGA, `clean.sh`, reboot, push, tag e release continuam em `HOLD`.
 
 ## 7. Regras para novos agentes
 
@@ -197,9 +212,9 @@ AIOPT3 permanecerá como branch de release/manutenção. NG-041, NG-043, NG-044 
 
 ## 9. Critério de Go/No-Go
 
-A release só pode avançar quando:
+A release v1.0 remoto só pode avançar quando:
 
-- todos os gates obrigatórios G0–G10 estão `PASS` ou `N/A` justificado;
+- M0, M1-R, M2-R e M3 estão `PASS`, e quaisquer critérios fora do perfil estão `N/A` com justificação explícita;
 - não existe drift de task/SPEC/código/evidência sem decisão registada;
 - o commit candidato está congelado e reproduzível;
 - builds normal e Sanitizer foram repetidos a partir do candidato;
@@ -244,3 +259,5 @@ A ferramenta não altera tarefas, SPECs, código, commits ou configuração.
 | v1 | 2026-09-13 | Criação do plano mestre e do gate register para a Release 1.0.0 |
 | v2 | 2026-09-13 | Registo da validação operacional do G2 e separação do hash mismatch para G9; freeze G0 continua pendente |
 | v3 | 2026-09-13 | Hardening RED→GREEN dos launchers/builder e reconciliação de SPEC-009; novo build/smoke canónico ainda pendente |
+| v4 | 2026-09-14 | Rebaseline do perfil mínimo Linux/AIOPT3, dois guests, cinco JPEGs e macro-gates M0–M3; G0–G10 preservados como Apêndice A |
+| v5 | 2026-09-20 | Separação documental M1-R/M2-R (perfil remoto v1.0) de M1-L (local/native-privileged/QGA v1.1+), com matriz de aplicabilidade e Astra `CONDITIONAL GO` |

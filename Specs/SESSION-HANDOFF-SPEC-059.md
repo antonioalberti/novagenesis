@@ -82,4 +82,12 @@ Qualquer novo trial deve ser apenas diagnóstico, com baseline zero verificada, 
 - Skills: `novagenesis-evidence-hardening` §7 recebeu a regra 9 (terminalizar timeout com saída parcial em vez de levantar).
 - Obsidian: NG-056 e Dashboard actualizados (data 2026-09-19, incremento `aa5621b`, próximo passo Astra).
 - Memória: nenhuma alteração (estado transitório em Obsidian/repo, conforme regras L1/L2/L3); avisos preexistentes do audit de 2026-09-18 permanecem para revisão com `hermes-memory-architecture`.
-- Próximo reinício: rever com Astra o diff `aa5621b`; classificar `Agent error: PID ld does not exist`; teardown automático/seal final; Source→Repository. Sem novo trial automático.
+- Próximo reinício: rever com Astra o diff `aa5621b`; classificar/reconciliar `Agent error: PID ld does not exist`; teardown automático/seal final; Source→Repository. Sem novo trial automático.
+
+## Rebaseline de release — 2026-09-20
+
+- O Plano Mestre v5 separa o perfil remoto v1.0 (`M0 → M1-R → M2-R → M3`) da linha local/native-privileged/QGA (`M1-L`, v1.1+).
+- SPEC-055/056/058/059, NG-055/056 e o seam QGA-loss permanecem `OPEN`/`BLOCKED` na linha local; não são promovidos a PASS nem fechados por esta rebaseline.
+- A revisão Astra da separação documental foi `CONDITIONAL GO`; o gate operacional continua `HOLD`.
+- Nenhum trial, VM, QGA, `clean.sh`, reboot, push, tag ou release foi autorizado por esta decisão.
+- Próximo gate v1.0: preparar, sem executar, um único pacote de trial normal remoto ligado a SHA/build/configuração exactos, com critérios de readiness, payload, teardown e seal definidos antes da execução.
