@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import errno
 import hashlib
 import json
 from pathlib import Path
@@ -273,13 +274,16 @@ def test_open_absolute_directory_closes_child_on_post_open_deadline(monkeypatch:
         target.mkdir()
     clock = [0.0]
     child_fd: list[int | None] = [None]
+    parent_fd: list[int | None] = [None]
     real_open = payload_module.os.open
     real_close = payload_module.os.close
 
     def advancing_open(path: str, flags: int, *args: object, **kwargs: object) -> int:
         fd = real_open(path, flags, *args, **kwargs)
-        if kwargs.get("dir_fd") is not None and path in {"existing", "created"}:
+        dir_fd = kwargs.get("dir_fd")
+        if isinstance(dir_fd, int) and path in {"existing", "created"}:
             child_fd[0] = fd
+            parent_fd[0] = dir_fd
             clock[0] = 2.0
         return fd
 
@@ -290,14 +294,15 @@ def test_open_absolute_directory_closes_child_on_post_open_deadline(monkeypatch:
         _open_absolute_directory(target, create=create, deadline=1.0)
 
     assert child_fd[0] is not None
-    try:
-        payload_module.os.fstat(child_fd[0])
-    except OSError:
-        leaked = False
-    else:
-        leaked = True
-        real_close(child_fd[0])
-    assert leaked is False
+    assert parent_fd[0] is not None
+    for fd in (child_fd[0], parent_fd[0]):
+        try:
+            payload_module.os.fstat(fd)
+        except OSError as exc:
+            assert exc.errno == errno.EBADF
+        else:
+            real_close(fd)
+            pytest.fail(f"descriptor {fd} remained open")
 
 
 def test_partial_read_error_reports_consumed_bytes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -392,12 +397,11 @@ def test_json_write_closes_fd_if_deadline_expires_after_open(tmp_path: Path, mon
     assert target_fd[0] is not None
     try:
         payload_module.os.fstat(target_fd[0])
-    except OSError:
-        leaked = False
+    except OSError as exc:
+        assert exc.errno == errno.EBADF
     else:
-        leaked = True
         real_close(target_fd[0])
-    assert leaked is False
+        pytest.fail(f"descriptor {target_fd[0]} remained open")
 
 
 def test_copy_closes_fd_if_deadline_expires_after_destination_open(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -427,12 +431,11 @@ def test_copy_closes_fd_if_deadline_expires_after_destination_open(tmp_path: Pat
     assert target_fd[0] is not None
     try:
         payload_module.os.fstat(target_fd[0])
-    except OSError:
-        leaked = False
+    except OSError as exc:
+        assert exc.errno == errno.EBADF
     else:
-        leaked = True
         real_close(target_fd[0])
-    assert leaked is False
+        pytest.fail(f"descriptor {target_fd[0]} remained open")
 
 
 @pytest.mark.parametrize(
