@@ -245,6 +245,24 @@ def _accepted_from_result(result: dict[str, Any]) -> bool:
     return runtime == "PASS" and teardown == "PASS" and evidence == "COMPLETE"
 
 
+def _acceptance_rejection_reasons(result: dict[str, Any], manifest: dict[str, Any]) -> list[str]:
+    """Explain semantic non-acceptance after bundle integrity has passed."""
+    reasons = ["bundle is intact but not acceptance-eligible"]
+    blockers = result.get("blockers", result.get("acceptance_blockers"))
+    eligibility_record = result.get("acceptance_eligibility")
+    if blockers is None and isinstance(eligibility_record, dict):
+        blockers = eligibility_record.get("blockers")
+    if isinstance(blockers, list):
+        reasons.extend(f"acceptance blocker: {blocker}" for blocker in blockers)
+    protected = result.get("protected_input_blockers")
+    if isinstance(protected, list):
+        reasons.extend(f"protected input blocker: {blocker}" for blocker in protected)
+    manifest_protected = manifest.get("protected_input_blockers")
+    if isinstance(manifest_protected, list):
+        reasons.extend(f"protected input blocker: {blocker}" for blocker in manifest_protected)
+    return list(dict.fromkeys(reasons))
+
+
 def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
     """Verify one NG-ELC schema-v2 bundle without modifying or leaving it.
 
@@ -336,6 +354,7 @@ def verify_bundle(path: str | os.PathLike[str]) -> dict[str, Any]:
             accepted=accepted,
             bundle=bundle,
             schema_version=SCHEMA_VERSION,
+            errors=_acceptance_rejection_reasons(result, manifest) if not accepted else (),
             checked_files=len(listed),
         )
     except _VerificationError as exc:

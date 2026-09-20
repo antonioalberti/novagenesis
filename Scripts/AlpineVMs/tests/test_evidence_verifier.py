@@ -114,12 +114,52 @@ class EvidenceVerifierTests(unittest.TestCase):
             self.assertFalse(report["integrity"])
             self.assertFalse(report["accepted"])
 
-    def test_unaccepted_result_does_not_make_an_intact_bundle_untrusted(self):
+    def test_unaccepted_result_reports_explicit_blocker_without_losing_integrity(self):
         with tempfile.TemporaryDirectory() as td:
             report = verify_bundle(self._make_bundle(Path(td), accepted=False))
             self.assertEqual(report["code"], CODE_VALID)
             self.assertTrue(report["integrity"])
             self.assertFalse(report["accepted"])
+            self.assertEqual(
+                report["errors"],
+                [
+                    "bundle is intact but not acceptance-eligible",
+                    "acceptance blocker: example-blocker",
+                ],
+            )
+
+    def test_corrupted_manifest_reports_stable_integrity_failure_reason(self):
+        with tempfile.TemporaryDirectory() as td:
+            bundle = self._make_bundle(Path(td))
+            manifest_path = bundle / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            for entry in manifest["files"]:
+                if entry["path"] == "artifacts/source/photo.jpg":
+                    entry["sha256"] = "0" * 64
+                    break
+            self._write_json(manifest_path, manifest)
+            self._write_json(
+                bundle / "terminal-seal.json",
+                {"schema_version": 2, "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest()},
+            )
+            report = verify_bundle(bundle)
+            self.assertEqual(report["code"], CODE_TAMPERED)
+            self.assertFalse(report["integrity"])
+            self.assertFalse(report["accepted"])
+            self.assertEqual(report["errors"], ["sha256 mismatch: artifacts/source/photo.jpg"])
+
+    def test_corrupted_terminal_seal_reports_stable_integrity_failure_reason(self):
+        with tempfile.TemporaryDirectory() as td:
+            bundle = self._make_bundle(Path(td))
+            seal_path = bundle / "terminal-seal.json"
+            seal = json.loads(seal_path.read_text(encoding="utf-8"))
+            seal["manifest_sha256"] = "0" * 64
+            self._write_json(seal_path, seal)
+            report = verify_bundle(bundle)
+            self.assertEqual(report["code"], CODE_TAMPERED)
+            self.assertFalse(report["integrity"])
+            self.assertFalse(report["accepted"])
+            self.assertEqual(report["errors"], ["terminal seal does not match manifest.json"])
 
     def test_unlisted_file_and_symlink_fail_exact_coverage(self):
         with tempfile.TemporaryDirectory() as td:
