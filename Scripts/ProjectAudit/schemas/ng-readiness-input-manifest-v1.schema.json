@@ -300,6 +300,7 @@
             "spec061-canonical-record-v1",
             "spec061-fixture-record-v1",
             "spec061-git-directory-observation-v1",
+            "spec061-payload-directory-observation-v1",
             "spec061-git-preflight-v1",
             "spec061-missing-json-v1"
           ],

@@ -792,6 +792,9 @@
           },
           "then": {
             "properties": {
+              "directory_role": {
+                "const": null
+              },
               "expected": {
                 "$ref": "#/$defs/expected_missing"
               },
@@ -823,6 +826,7 @@
             "spec061-canonical-record-v1",
             "spec061-fixture-record-v1",
             "spec061-git-directory-observation-v1",
+            "spec061-payload-directory-observation-v1",
             "spec061-git-preflight-v1",
             "spec061-missing-json-v1"
           ],
@@ -1065,6 +1069,91 @@
       ],
       "type": "object"
     },
+    "git_probe_result": {
+      "additionalProperties": false,
+      "properties": {
+        "exit_code": {
+          "enum": [
+            0,
+            1
+          ],
+          "type": "integer"
+        },
+        "stderr_empty": {
+          "type": "boolean"
+        },
+        "resolved_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "object_type": {
+          "enum": [
+            "commit",
+            "absent",
+            "non-commit",
+            null
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "present": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "exit_code",
+        "stderr_empty"
+      ],
+      "type": "object"
+    },
+    "git_probe": {
+      "additionalProperties": false,
+      "properties": {
+        "cat_file_presence": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "cat_file_type": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "network": {
+          "const": "DENY"
+        },
+        "rev_parse_candidate": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "rev_parse_head": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "rev_parse_local_ref": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "status": {
+          "$ref": "#/$defs/git_probe_result"
+        },
+        "ls_tree": {
+          "$ref": "#/$defs/git_probe_result"
+        }
+      },
+      "required": [
+        "rev_parse_candidate",
+        "cat_file_type",
+        "cat_file_presence",
+        "network",
+        "rev_parse_head",
+        "rev_parse_local_ref",
+        "status",
+        "ls_tree"
+      ],
+      "type": "object"
+    },
     "observed": {
       "additionalProperties": false,
       "oneOf": [
@@ -1219,6 +1308,9 @@
             "object",
             "null"
           ]
+        },
+        "git_probe": {
+          "$ref": "#/$defs/git_probe"
         },
         "file_type": {
           "enum": [

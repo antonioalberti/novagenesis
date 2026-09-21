@@ -36,7 +36,7 @@
       "name": "refs/remotes/origin/AIOPT3",
       "target_sha": "24a3851e1d5a90f039b9e148a1af38dd03c4d925"
     },
-    "review_head": null,
+    "review_head": "65b431cf16959f1d653db69bd4bdd17570ce6aca",
     "workload_expected_ref": null
   },
   "phase": "PRE_TRIAL_READINESS",
@@ -50,7 +50,7 @@
     "algorithm": "SHA-256",
     "canonicalization": "RFC8785-JCS",
     "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
-    "sha256": "98c90222aab87946440b5974bd322ed7003507f06bfdc8bd410cc67234bebce9"
+    "sha256": "273a8bf33f1f95d702bb265736e710b97d614364494203aacef1b4b37c64acba"
   },
   "record_id": "freeze.current",
   "record_kind": "freeze-r0-r2",

@@ -58,7 +58,7 @@
     "schema_id": "ng-readiness-adapter-registry-v1.schema",
     "schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json",
     "schema_sha256": "8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f",
-    "sha256": "12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981",
+    "sha256": "28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c",
     "source_schema_mismatch": "UNSUPPORTED_SCHEMA_VERSION",
     "trusted_current_adapter_id": null,
     "trusted_current_adapter_status": "EXTERNAL_ONLY_NOT_IN_V1",
@@ -67,7 +67,7 @@
   },
   "adapter_registry_id": "ng-readiness-adapter-registry-v1",
   "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-  "adapter_registry_sha256": "12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981",
+  "adapter_registry_sha256": "28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c",
   "check_registry": [
     {
       "depends_on": [],
@@ -90,7 +90,7 @@
             "observed": "NULL",
             "reason_code": "IDENTITY_MISMATCH",
             "state": "ERROR",
-            "when": "CLI and manifest candidates differ"
+            "when": "One candidate is null/omitted while the other is non-null, or both non-null candidates differ"
           },
           {
             "observed": "NULL",
@@ -108,7 +108,7 @@
             "observed": "NON_NULL",
             "reason_code": "DECISION_SATISFIED",
             "state": "SATISFIED",
-            "when": "A valid manifest candidate is bound and CLI is omitted or equal"
+            "when": "Both candidate declarations are non-null, valid and byte-for-byte equal; null in both is UNKNOWN/MISSING_INPUT and one-sided null is IDENTITY_MISMATCH."
           }
         ],
         "input_roles": [
@@ -118,10 +118,10 @@
             "evidence_classes": [
               "MANIFEST"
             ],
-            "null_means": "NO_CANDIDATE",
+            "null_means": "MISSING_INPUT",
             "nullable": true,
             "record_kinds": [],
-            "required_for_success": false,
+            "required_for_success": true,
             "role": "manifest_candidate",
             "selector": "/candidate_sha",
             "source": "MANIFEST"
@@ -132,10 +132,10 @@
             "evidence_classes": [
               "CLI"
             ],
-            "null_means": "OMITTED_EQUALS_MANIFEST",
+            "null_means": "MISSING_INPUT",
             "nullable": true,
             "record_kinds": [],
-            "required_for_success": false,
+            "required_for_success": true,
             "role": "cli_candidate",
             "selector": "--candidate-sha",
             "source": "CLI"
@@ -148,11 +148,11 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "manifest candidate is a non-null lowercase 40-hex SHA and CLI candidate is omitted or byte-for-byte equal",
-          "Both candidate declarations are evaluated before any record evidence; null in both is UNKNOWN/MISSING_INPUT."
+          "manifest candidate and CLI candidate are both non-null lowercase 40-hex values and byte-for-byte equal",
+          "Both candidate declarations are evaluated before any record evidence; null in both is UNKNOWN/MISSING_INPUT, while a one-sided null is IDENTITY_MISMATCH."
         ],
         "success": {
-          "expected": "manifest candidate is a non-null lowercase 40-hex SHA and CLI candidate is omitted or byte-for-byte equal",
+          "expected": "manifest candidate and CLI candidate are both non-null lowercase 40-hex values and byte-for-byte equal",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
@@ -291,20 +291,20 @@
           "reason_code": "DECISION_SATISFIED",
           "selectors": [
             "derived.candidate_sha",
-            "git_probe.rev_parse_candidate",
-            "git_probe.cat_file_type",
-            "git_probe.cat_file_presence",
-            "git_probe.network"
+            "observed.git_probe.rev_parse_candidate",
+            "observed.git_probe.cat_file_type",
+            "observed.git_probe.cat_file_presence",
+            "observed.git_probe.network"
           ],
           "state": "SATISFIED",
           "when": "The probe runs in the exact allowlisted Git sandbox against the manifest repository; a missing object is UNKNOWN/MISSING_INPUT and any sandbox/probe integrity failure is ERROR."
         },
         "success_selectors": [
           "derived.candidate_sha",
-          "git_probe.rev_parse_candidate",
-          "git_probe.cat_file_type",
-          "git_probe.cat_file_presence",
-          "git_probe.network"
+          "observed.git_probe.rev_parse_candidate",
+          "observed.git_probe.cat_file_type",
+          "observed.git_probe.cat_file_presence",
+          "observed.git_probe.network"
         ]
       },
       "required": true
@@ -826,11 +826,11 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "build_source_sha equals candidate SHA, build_linkage is LINKED, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
+          "build_source_sha equals candidate SHA, build_linkage is PROVEN, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
           "An UNPROVEN linkage or empty reference closure is UNSATISFIED."
         ],
         "success": {
-          "expected": "build_source_sha equals candidate SHA, build_linkage is LINKED, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
+          "expected": "build_source_sha equals candidate SHA, build_linkage is PROVEN, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
@@ -1086,7 +1086,7 @@
         },
         "direct_incidents": [
           {
-            "observed": "NON_NULL",
+            "observed": "NULL",
             "reason_code": "REQUIRED_MAPPING_MISSING",
             "state": "UNKNOWN",
             "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
@@ -1190,7 +1190,7 @@
         },
         "direct_incidents": [
           {
-            "observed": "NON_NULL",
+            "observed": "NULL",
             "reason_code": "REQUIRED_MAPPING_MISSING",
             "state": "UNKNOWN",
             "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
@@ -1296,7 +1296,7 @@
         },
         "direct_incidents": [
           {
-            "observed": "NON_NULL",
+            "observed": "NULL",
             "reason_code": "REQUIRED_MAPPING_MISSING",
             "state": "UNKNOWN",
             "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
@@ -1683,11 +1683,11 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, and review_head is the current manifest review head",
+          "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, effective_config_sha256 equals the current effective-config digest, review_head equals the current manifest review head, and the map is fresh for this review",
           "A historical map with a valid digest is not current evidence."
         ],
         "success": {
-          "expected": "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, and review_head is the current manifest review head",
+          "expected": "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, effective_config_sha256 equals the current effective-config digest, review_head equals the current manifest review head, and the map is fresh for this review",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
@@ -1866,22 +1866,26 @@
             ],
             "required_for_success": true,
             "role": "source_root",
+            "directory_role": "SOURCE_ROOT",
             "selector": "/payload",
             "source": "RECORD"
           },
           {
             "cardinality": "EXACTLY_ONE",
-            "constraint": "selected, schema-valid and policy-bound",
+            "constraint": "selected, schema-valid and policy-bound; path and root identity must differ from source_root, aliases are rejected, and containment is allowed only for the explicitly adapter-bound PAYLOAD_ROOT role",
+            "directory_role": "PAYLOAD_ROOT",
             "evidence_classes": [
-              "MANIFEST"
+              "INDEPENDENTLY_CHECKED"
             ],
             "null_means": "MISSING_INPUT",
             "nullable": false,
-            "record_kinds": [],
+            "record_kinds": [
+              "directory-observation"
+            ],
             "required_for_success": true,
-            "role": "repository_root",
-            "selector": "/repo_record_id",
-            "source": "MANIFEST"
+            "role": "payload_repository_root",
+            "selector": "/payload",
+            "source": "RECORD"
           }
         ],
         "reason_order": [
@@ -1891,36 +1895,40 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "source and repository roots are non-null stable directory observations, have matching path/identity bindings to the manifest, are not aliases or unsafe descendants, and their enumerations are complete",
+          "source and payload Repository roots are non-null stable directory observations selected as distinct SOURCE_ROOT and PAYLOAD_ROOT records, have matching path/identity bindings to their selected records, are not aliases or unsafe descendants, and their enumerations are complete",
           "Null identity, empty source path, unstable read or unresolved root record is UNSATISFIED/UNKNOWN according to the direct incident."
         ],
         "success": {
-          "expected": "source and repository roots are non-null stable directory observations, have matching path/identity bindings to the manifest, are not aliases or unsafe descendants, and their enumerations are complete",
+          "expected": "source and payload Repository roots are non-null stable directory observations selected as distinct SOURCE_ROOT and PAYLOAD_ROOT records, have matching path/identity bindings to their selected records, are not aliases or unsafe descendants, and their enumerations are complete",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
           "selectors": [
+            "record[payload_repository_root].payload.path",
+            "record[payload_repository_root].payload.directory_role",
+            "record[payload_repository_root].payload.directory_identity",
+            "record[payload_repository_root].payload.entries_sha256",
+            "record[payload_repository_root].payload.stable_read",
             "record[source_root].payload.path",
             "record[source_root].payload.directory_role",
             "record[source_root].payload.directory_identity",
             "record[source_root].payload.entries_sha256",
-            "record[source_root].payload.stable_read",
-            "manifest.repo_record_id",
-            "manifest.repo_path",
-            "manifest.records[id=repo-root.current].expected.identity"
+            "record[source_root].payload.stable_read"
           ],
           "state": "SATISFIED",
           "when": "Null identity, empty source path, unstable read or unresolved root record is UNSATISFIED/UNKNOWN according to the direct incident."
         },
         "success_selectors": [
+          "record[payload_repository_root].payload.path",
+          "record[payload_repository_root].payload.directory_role",
+          "record[payload_repository_root].payload.directory_identity",
+          "record[payload_repository_root].payload.entries_sha256",
+          "record[payload_repository_root].payload.stable_read",
           "record[source_root].payload.path",
           "record[source_root].payload.directory_role",
           "record[source_root].payload.directory_identity",
           "record[source_root].payload.entries_sha256",
-          "record[source_root].payload.stable_read",
-          "manifest.repo_record_id",
-          "manifest.repo_path",
-          "manifest.records[id=repo-root.current].expected.identity"
+          "record[source_root].payload.stable_read"
         ]
       },
       "required": true
@@ -1994,11 +2002,11 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "captured_before_trial is true, root identity resolves to the repository observation, baseline_status is PRE_TRIAL_EMPTY or COMPLETE as applicable, and entries_sha256 recomputes over the complete sorted entry table",
+          "captured_before_trial is true, root identity resolves to the explicitly selected payload Repository root, baseline_status is EMPTY, and entries_sha256 recomputes over the complete sorted entry table",
           "A post-trial or partial baseline cannot satisfy this check."
         ],
         "success": {
-          "expected": "captured_before_trial is true, root identity resolves to the repository observation, baseline_status is PRE_TRIAL_EMPTY or COMPLETE as applicable, and entries_sha256 recomputes over the complete sorted entry table",
+          "expected": "captured_before_trial is true, root identity resolves to the explicitly selected payload Repository root, baseline_status is EMPTY, and entries_sha256 recomputes over the complete sorted entry table",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
@@ -2193,11 +2201,11 @@
           "DECISION_SATISFIED"
         ],
         "semantic_requirements": [
-          "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status VERIFIED",
+          "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status IMMUTABLE_REFERENCE plus explicit descriptor-held rehash equality",
           "A copy count or filename match without byte identity is insufficient."
         ],
         "success": {
-          "expected": "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status VERIFIED",
+          "expected": "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status IMMUTABLE_REFERENCE plus explicit descriptor-held rehash equality",
           "observed": "NON_NULL",
           "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
@@ -2325,6 +2333,16 @@
       "-C",
       "<absolute-repo>",
       "cat-file",
+      "-t",
+      "<40-lowercase-hex>"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "cat-file",
       "-e",
       "<40-lowercase-hex>^{commit}"
     ],
@@ -2426,6 +2444,74 @@
         "id": "candidate_cat_file_presence",
         "stderr": "empty",
         "stdout": "empty"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "rev-parse",
+          "--verify",
+          "HEAD^{commit}"
+        ],
+        "expected_exit": 0,
+        "id": "head_rev_parse",
+        "stderr": "empty",
+        "stdout": "exactly HEAD SHA plus one LF"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "rev-parse",
+          "--verify",
+          "<full-local-ref>^{commit}"
+        ],
+        "expected_exit": 0,
+        "id": "local_ref_rev_parse",
+        "stderr": "empty",
+        "stdout": "exactly local-ref target SHA plus one LF"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "status",
+          "--porcelain=v1",
+          "-z",
+          "--untracked-files=all",
+          "--ignore-submodules=all"
+        ],
+        "expected_exit": 0,
+        "id": "status",
+        "stderr": "empty",
+        "stdout": "NUL-delimited status bytes"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "ls-tree",
+          "-r",
+          "-z",
+          "--full-tree",
+          "<40-lowercase-hex>"
+        ],
+        "expected_exit": 0,
+        "id": "ls_tree",
+        "stderr": "empty",
+        "stdout": "NUL-delimited tree entries"
       }
     ],
     "environment": "exactly git_environment",
@@ -2439,6 +2525,16 @@
     "local_presence_rule": "The candidate object MUST be present in the selected repository object store; no fetch, alternates, promisor, worktree or external commondir is permitted.",
     "network": "DENY",
     "object_type": "commit",
+    "report_projection": {
+      "cat_file_presence": "observed.git_probe.cat_file_presence",
+      "cat_file_type": "observed.git_probe.cat_file_type",
+      "ls_tree": "observed.git_probe.ls_tree",
+      "network": "observed.git_probe.network",
+      "rev_parse_candidate": "observed.git_probe.rev_parse_candidate",
+      "rev_parse_head": "observed.git_probe.rev_parse_head",
+      "rev_parse_local_ref": "observed.git_probe.rev_parse_local_ref",
+      "status": "observed.git_probe.status"
+    },
     "shell": "REJECT"
   },
   "git_repository_modes": {
@@ -2465,7 +2561,7 @@
   "input_manifest_schema": {
     "id": "ng-readiness-input-manifest-v1",
     "path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json",
-    "sha256": "eacf683fb4c9542f08d9ebe9882f01a3ed1e8fc7fb2f56a5af76d68aa53568d6"
+    "sha256": "aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014"
   },
   "limits": {
     "artifact_bytes": 134217728,
@@ -2484,6 +2580,17 @@
     "symlink_follow": "REJECT"
   },
   "phase": "PRE_TRIAL_READINESS",
+  "predicate_value_contract": {
+    "R1.BUILD_SOURCE_BINDING": {
+      "build_linkage": "PROVEN"
+    },
+    "R2.REPOSITORY_BASELINE": {
+      "baseline_status": "EMPTY"
+    },
+    "R2.PRESERVED_COPIES": {
+      "copy_preservation": "IMMUTABLE_REFERENCE"
+    }
+  },
   "predicate_registry_contract": {
     "cardinality_values": [
       "EXACTLY_ONE",
@@ -2515,6 +2622,22 @@
     "reason_order_rule": "reason_order is descending first-match precedence; DECISION_SATISFIED is considered only after all required conditions pass.",
     "record_success_rule": "Every record role used to satisfy a v1 predicate requires effective_evidence_class=INDEPENDENTLY_CHECKED; other classes are diagnostic only.",
     "semantic_rule": "A check is SATISFIED only when every listed success selector is present, type-valid, bound to the selected candidate/phase, and satisfies the listed operator and expected relation; authentication or digest validity alone is never sufficient.",
+    "duplicate_key_rule": "Reject duplicate object keys before schema validation or canonicalization.",
+    "dependency_graph_rule": "Reject unknown IDs, self-edges, duplicate edges and cycles before evaluating any predicate.",
+    "input_role_fields": [
+      "role",
+      "source",
+      "selector",
+      "record_kinds",
+      "directory_role",
+      "cardinality",
+      "nullable",
+      "null_means",
+      "required_for_success",
+      "evidence_classes",
+      "constraint"
+    ],
+    "report_projection_rule": "Every non-record selector used by a predicate MUST resolve to a closed report-schema property or a declared derived value.",
     "success_contract_fields": [
       "selectors",
       "operator",
@@ -3077,7 +3200,7 @@
   "report_schema": {
     "id": "ng-readiness-report-v1",
     "path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json",
-    "sha256": "ecfe485db6e40e978872891cd190af7438b258ccd1f432fe8c3b6051f081f333"
+    "sha256": "6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2"
   },
   "sandbox_profile": {
     "child_process_group_termination": true,

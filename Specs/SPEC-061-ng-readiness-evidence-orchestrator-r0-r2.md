@@ -2,13 +2,13 @@
 
 **Author:** Antonio Alberti / Hermes Agent
 **Date:** 2026-09-21
-**Revision:** 7
+**Revision:** 8
 **Status:** Draft
 **Branch:** AIOPT3
 **Component:** `Scripts/ProjectAudit`; release-readiness evidence inspection
 **Implementation Commit:** pending
 **Related:** `SPEC-054-release-master-plan-and-audit.md`; `SPEC-055-ng-elc-local-mode.md`; `SPEC-056-ng-elc-evidence-provenance-hardening.md`; `SPEC-057-ng-elc-canonical-entrypoint-rename.md`; `SPEC-060-ng-elc-remote-payload-evidence.md`; `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json`; `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json`; `Scripts/ProjectAudit/validate_spec061_contract.py`; `Specs/SPEC-061-ng-readiness-policy-v1.json`; `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json`
-**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `2f7866f029c1e25041090b12e360e5f71efbda1fdf649bad48c355b6ddc71358`)
+**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637`)
 **Task linkage:** pending explicit task creation after SPEC review
 
 ---
@@ -67,7 +67,7 @@ review HEAD
 ≠ checker identity
 ```
 
-The current documentation commit `a2c0fe6994bf114f48b98400e3ec76d6d4fc8fab` is not a functional candidate. The historical receipt-backed source `4b01e5e258b7228958e027eb1df963048f6629c3` is not automatically the NG-060 candidate.
+The current review commit `65b431cf16959f1d653db69bd4bdd17570ce6aca` is not a functional candidate. The historical receipt-backed source `4b01e5e258b7228958e027eb1df963048f6623c9` is not automatically the NG-060 candidate.
 
 ### 2.4 Current audit output does not distinguish all strategic blockers
 
@@ -138,7 +138,7 @@ The `identities` object MUST use explicit status slots rather than naked nullabl
 
 ```text
 identity_slot_40/64 = {status: PRESENT|UNAVAILABLE, value: SHA|null, reason_code: CODE|null}
-remote_ref = {status: PRESENT|UNAVAILABLE, name: ref|null, target_sha: SHA|null, reason_code: CODE|null}
+remote_ref_slot = {status: PRESENT|UNAVAILABLE, name: ref|null, target_sha: SHA|null, reason_code: CODE|null}
 functional_sha_display = NO-SHA when functional_sha.status=UNAVAILABLE and value=null;
 ```
 
@@ -215,7 +215,7 @@ Any unsupported or unsafe reuse becomes an explicit blocker, not a silently omit
 
 ### 3.6 Supported evidence records and trust classification
 
-Version 1 MUST consume only explicitly selected canonical JSON record files or explicitly selected directory observations. A directory observation is selected directly by a manifest entry with `path_kind=DIRECTORY`; a JSON wrapper with the same identity is not an alternative source of truth. Each canonical record MUST be one top-level object with no duplicate keys, `schema_version: 1`, no unknown fields, deterministic arrays and a `record_digest`. The checked-in closed contracts are `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json` (SHA-256 `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`), `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json` (SHA-256 `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`) and `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json` (SHA-256 `12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981`). The registry defines canonical source bytes, payload-branch validation, namespace resolution and the external producer-attestation contract. An input manifest selects records and adapters; the checker MUST NOT discover arbitrary files by filename or accept an adapter not present in that registry.
+Version 1 MUST consume only explicitly selected canonical JSON record files or explicitly selected directory observations. A directory observation is selected directly by a manifest entry with `path_kind=DIRECTORY`; a JSON wrapper with the same identity is not an alternative source of truth. Each canonical record MUST be one top-level object with no duplicate keys, `schema_version: 1`, no unknown fields, deterministic arrays and a `record_digest`. The checked-in closed contracts are `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json` (SHA-256 `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`), `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json` (SHA-256 `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`) and `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json` (SHA-256 `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`). The registry defines canonical source bytes, payload-branch validation, namespace resolution and the external producer-attestation contract. An input manifest selects records and adapters; the checker MUST NOT discover arbitrary files by filename or accept an adapter not present in that registry.
 
 Every canonical record uses this common envelope; manifest selections additionally carry adapter metadata (`adapter_id`, `adapter_version`, `source_format`, `source_version`, `path_kind`, `input_format` and `availability_expectation`).
 
@@ -350,7 +350,7 @@ Every selected record, payload and binding MUST resolve to `PRE_TRIAL_READINESS`
 
 ### 5.1 JSON report shape
 
-The following is a non-normative shape sketch only; it is not a report instance and MUST NOT be validated as one. The complete conforming contract is the checked-in JSON Schema `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json` (SHA-256 `ecfe485db6e40e978872891cd190af7438b258ccd1f432fe8c3b6051f081f333`) plus the policy registry.
+The following is a non-normative shape sketch only; it is not a report instance and MUST NOT be validated as one. The complete conforming contract is the checked-in JSON Schema `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json` (SHA-256 `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`) plus the policy registry.
 
 ```json
 {
@@ -361,12 +361,12 @@ The following is a non-normative shape sketch only; it is not a report instance 
   "input_manifest": {"path": "<absolute-input-manifest>", "sha256": "<64-hex>", "policy_bytes_sha256": "<64-hex>", "adapter_registry_sha256": "<64-hex>"},
   "phase": "PRE_TRIAL_READINESS",
   "identities": {
-    "review_head": "<40-hex-or-null>",
-    "remote_ref": {"name": "refs/remotes/origin/AIOPT3", "target_sha": "<40-hex-or-null>"},
-    "functional_sha": null,
+    "review_head": {"status": "UNAVAILABLE", "value": null, "reason_code": "MISSING_INPUT"},
+    "remote_ref": {"status": "PRESENT", "name": "refs/remotes/origin/AIOPT3", "target_sha": "<40-hex>", "reason_code": null},
+    "functional_sha": {"status": "UNAVAILABLE", "value": null, "reason_code": "MISSING_INPUT"},
     "functional_sha_display": "NO-SHA",
-    "build_source_sha": "<40-hex-or-null>",
-    "receipt_publication_sha": "<40-hex-or-null>",
+    "build_source_sha": {"status": "UNAVAILABLE", "value": null, "reason_code": "MISSING_INPUT"},
+    "receipt_publication_sha": {"status": "UNAVAILABLE", "value": null, "reason_code": "MISSING_INPUT"},
     "checker_identity": "<64-hex>"
   },
   "inputs": [],
@@ -446,7 +446,7 @@ ng060-trusted-launcher-v1 \
 
 The command above is a launcher interface contract, not an executable command: the launcher is not provisioned in this Draft and the checker does not exist yet. The launcher MUST verify its own immutable identity, the checker bytes, the pinned Python bytes, `/usr/bin/git`, the trusted execution profile and the externally provisioned producer trust anchor before spawning Python.
 
-The selected manifest, `--repo`, `--plan`, `--candidate-sha`, `--phase`, policy path/digest, raw policy-file digest and adapter-registry path/digest MUST agree exactly with the manifest and trusted launcher pins. Any disagreement is `IDENTITY_MISMATCH` with exit code `30`; no precedence, merge or default is permitted. The report MUST identify the exact input-manifest path and both policy digest domains. `--candidate-sha` omitted means manifest `candidate_sha: null`; an explicit CLI candidate cannot override a null or different manifest value.
+The selected manifest, `--repo`, `--plan-source-path`, `--plan-record-path`, `--candidate-sha`, `--phase`, policy path/digest, raw policy-file digest and adapter-registry path/digest MUST agree exactly with the manifest and trusted launcher pins. Any disagreement is `IDENTITY_MISMATCH` with exit code `30`; no precedence, merge or default is permitted. The report MUST identify the exact input-manifest path and both policy digest domains. In v1, a satisfiable assessment requires explicit non-null `candidate_sha` in the manifest and explicit non-null `--candidate-sha` with exact equality; both omitted/null is `MISSING_INPUT`, and one-sided omission is `IDENTITY_MISMATCH`.
 
 No implicit environment-file loading, shell evaluation, network access, runtime-controller invocation, output overwrite, or evidence-root discovery is allowed. `--report-stdout` may be supported only when stdout is the sole caller-owned output and is not treated as an inspected evidence path; `--report` and `--report-stdout` are mutually exclusive.
 
@@ -526,9 +526,9 @@ release_authorized = false
 
 | Fixture ID | Manifest | Manifest SHA-256 | Expected assessment |
 |---|---|---|---|
-| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `2f7866f029c1e25041090b12e360e5f71efbda1fdf649bad48c355b6ddc71358` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
+| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
 
-The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `13127e8080b65c16fef0b372d07aa237e3c8925f9174cac3819a427274cda7fd` and raw-file SHA-256 `5a37a813a0b818a5129b2c330a399b577093f54b69de480e05f033b1b537708a`. The report schema is `ecfe485db6e40e978872891cd190af7438b258ccd1f432fe8c3b6051f081f333`; the input-manifest schema is `eacf683fb4c9542f08d9ebe9882f01a3ed1e8fc7fb2f56a5af76d68aa53568d6`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
+The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73` and raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. The report schema is `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`; the input-manifest schema is `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
 ## 8. Decisions Log
 
 | # | Decision | Date | Reason |
@@ -561,7 +561,7 @@ The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` wit
 2. Decide whether a separate NG-061 task is created after final SPEC review or whether NG-050 coordinates the draft until implementation approval.
 3. Resolve interaction with the future `SPEC-057` entrypoint rename without changing that SPEC's scope.
 
-The report schema, exit-code table, supported record kinds, cross-source policy, gate aggregation, subprocess boundary and test-write policy are normative in Revision 7 and are no longer open design questions.
+The report schema, exit-code table, supported record kinds, cross-source policy, gate aggregation, subprocess boundary, root-role separation, Git probe projection, predicate-value contract and test-write policy are normative in Revision 8 and are no longer open design questions.
 
 ## 11. Normative v1 schemas, policy and execution profiles
 
@@ -578,8 +578,8 @@ The report is a closed object with exactly these top-level fields:
 | Field | Type | Required | Constraints |
 |---|---|---:|---|
 | `schema_version` | integer | yes | exactly `1` |
-| `checker` | object | yes | exactly `{path,sha256,pre_exec_verified}`; absolute regular-file path, 64-hex digest and trusted-launcher boolean |
-| `policy` | object | yes | exactly `{id,sha256}`; policy ID `ng060-r0-r2-read-only-v1` and 64-hex digest |
+| `checker` | object | yes | exactly `{path,sha256,pre_exec_verified,launcher_id,launcher_sha256,python_path,python_sha256,sandbox_profile_id,sandbox_profile_sha256,trust_anchor_id,trust_anchor_sha256}`; all paths absolute, all digests 64-hex and launcher/trust bindings closed |
+| `policy` | object | yes | exactly `{adapter_registry_id,adapter_registry_sha256,bytes_sha256,id,sha256}`; policy ID `ng060-r0-r2-read-only-v1` and all digest pins 64-hex |
 | `phase` | string | yes | exactly `PRE_TRIAL_READINESS` |
 | `identities` | object | yes | exact fields in the identity table below |
 | `inputs` | array | yes | zero or more unique input records, sorted by `id` |
@@ -589,17 +589,18 @@ The report is a closed object with exactly these top-level fields:
 | `summary` | object | yes | exact fields below |
 | `runtime_authorized` | boolean | yes | constant `false` |
 | `release_authorized` | boolean | yes | constant `false` |
+| `trust_anchor` | object | yes | exactly `{id,sha256,verified_by_launcher}`; fixed trust-anchor ID, 64-hex provisioned digest and launcher verification `true` |
 
 The `identities` object has exactly these fields:
 
 | Field | Type | Nullable | Constraint |
 |---|---|---:|---|
-| `review_head` | string | yes | null or full 40-lowercase-hex Git commit SHA |
-| `remote_ref` | object | yes | null or `{name: full-local-ref,target_sha: full-40-hex-or-null}`; only `target_sha` is the projected Git target identity |
-| `functional_sha` | string | yes | null or full 40-lowercase-hex supplied candidate; never inferred |
-| `functional_sha_display` | string | no | exactly `functional_sha` when non-null, otherwise exactly `NO-SHA` |
-| `build_source_sha` | string | yes | null or full 40-lowercase-hex source SHA attested by build evidence |
-| `receipt_publication_sha` | string | yes | null or full 40-lowercase-hex publication location identity |
+| `review_head` | object | yes | exact `identity_slot_40`: `{status,value,reason_code}`; `PRESENT` requires a 40-lowercase-hex value and null reason; `UNAVAILABLE` requires null value and non-null reason |
+| `remote_ref` | object | yes | exact `remote_ref_slot`: `{status,name,target_sha,reason_code}`; `PRESENT` requires ref name and 40-lowercase-hex target, null reason |
+| `functional_sha` | object | yes | exact `identity_slot_40`; never inferred |
+| `functional_sha_display` | string | no | exactly `functional_sha.value` when present, otherwise exactly `NO-SHA` |
+| `build_source_sha` | object | yes | exact `identity_slot_40` attested by build evidence |
+| `receipt_publication_sha` | object | yes | exact `identity_slot_40` for publication location identity |
 | `checker_identity` | string | no | 64-lowercase-hex SHA-256 of the checker file |
 
 Each `inputs[]` record has exactly these fields:
@@ -612,13 +613,13 @@ Each `inputs[]` record has exactly these fields:
 | `path` | string | no | absolute path selected by the manifest |
 | `required` | boolean | no | requiredness from the policy |
 | `expected` | object | no | exactly `{size,sha256}`; each may be null when not supplied |
-| `observed` | object | no | exactly `{availability,file_type,size,sha256}`; size/hash MUST be null when unavailable |
+| `observed` | object | no | exactly `{availability,file_type,size,sha256,directory_observation}` plus optional `git_probe`; `git_probe` is present only for a Git probe projection and is the closed `{rev_parse_candidate,cat_file_type,cat_file_presence,rev_parse_head,rev_parse_local_ref,status,ls_tree,network}` object |
 | `stable_read` | object | no | exactly `{status,before,after,fd_before,fd_after}` |
 | `candidate_binding` | object | no | exact fields from §3.6; nulls are explicit |
 | `evidence_class_claim` | enum string | no | claim from the selected record |
 | `effective_evidence_class` | enum string | no | derived by the checker, never copied blindly |
 
-`observed.availability` is one of `PRESENT`, `UNAVAILABLE`, `UNREADABLE`, `UNSAFE`; `observed.file_type` is one of `REGULAR`, `MISSING`, `SYMLINK`, `SPECIAL`, `DIRECTORY`, `UNKNOWN`. `stable_read.status` is one of `STABLE`, `UNSTABLE`, `UNAVAILABLE`, `NOT_ATTEMPTED`. Each of `before`, `after`, `fd_before` and `fd_after` is either null or an exact identity object `{st_dev,st_ino,st_size,st_mtime_ns,st_ctime_ns}` with integer fields. An unavailable input MUST retain its expected identity separately while observed size, digest and stable-read identities remain null.
+`observed.availability` is one of `PRESENT`, `UNAVAILABLE`, `UNREADABLE`, `UNSAFE`; `observed.file_type` is one of `REGULAR`, `MISSING`, `SYMLINK`, `SPECIAL`, `DIRECTORY`, `UNKNOWN`. `observed.git_probe` is optional and, when present, has exactly `rev_parse_candidate`, `cat_file_type`, `cat_file_presence`, `rev_parse_head`, `rev_parse_local_ref`, `status`, `ls_tree` and `network`; the seven probe results retain closed exit/stderr and resolved-object fields, while `network` is exactly `DENY`. `stable_read.status` is one of `STABLE`, `UNSTABLE`, `UNAVAILABLE`, `NOT_ATTEMPTED`. Each of `before`, `after`, `fd_before` and `fd_after` is either null or an exact identity object `{st_dev,st_ino,st_size,st_mtime_ns,st_ctime_ns}` with integer fields. An unavailable input MUST retain its expected identity separately while observed size, digest and stable-read identities remain null.
 
 Each `checks[]` record has exactly:
 
@@ -638,7 +639,7 @@ id: stable check ID from §11.4
 
 If `applicability.applicable` is false, `basis` MUST be `POLICY_NOT_APPLICABLE` and `justification` MUST be non-null; otherwise `basis` MUST be `REQUIRED` and `justification` MUST be null. A required check with unavailable evidence has `observed: null`, reason `MISSING_INPUT` or `DEPENDENCY_BLOCKED`, never an omitted field.
 
-Each `dependencies[]` record has exactly `{check_id,depends_on,dependency_effect}` where `check_id` is one stable check ID, `depends_on` is a sorted unique array of stable check IDs, and `dependency_effect` is `BLOCKING` or `INFORMATIONAL`. The set of `dependencies[]` edges MUST equal the union of every check's `depends_on` list; unresolved IDs and cycles are `CHECKER_ERROR`.
+Each `dependencies[]` record has exactly `{check_id,depends_on,dependency_effect}` where `check_id` is one stable check ID, `depends_on` is a sorted unique array of stable check IDs, and `dependency_effect` is exactly `BLOCKING` in v1. The set of `dependencies[]` edges MUST equal the union of every check's `depends_on` list; unresolved IDs and cycles are `CHECKER_ERROR`.
 
 Each `gates.R*` object has exactly `{state,required_check_ids,depends_on,source_document_state,blocking_reasons}`. `state` is `SATISFIED`, `OPEN`, `BLOCKED`, `ERROR` or `NOT_APPLICABLE`; `required_check_ids` is sorted and unique; `depends_on` is a sorted unique array of gate IDs; `source_document_state` is `{source:string,value:PASS|OPEN|BLOCKED|COMPLETE|UNKNOWN|NOT_RECORDED|OTHER,raw:string}` with `raw` required for `OTHER`; and `blocking_reasons` is a sorted array of v1 reason codes.
 
@@ -646,7 +647,7 @@ Each `gates.R*` object has exactly `{state,required_check_ids,depends_on,source_
 
 ### 11.2.1 Complete report-v1 JSON Schema
 
-The normative machine-readable report schema is `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json`, SHA-256 `ecfe485db6e40e978872891cd190af7438b258ccd1f432fe8c3b6051f081f333`. It is a closed Draft 2020-12 schema with `additionalProperties: false` at every object, explicit `$defs`, closed enums, array uniqueness and all nested field types. The policy registry supplies the fixed check IDs, dependency edges, deterministic ordering and predicate applicability; the schema alone does not grant evidence trust.
+The normative machine-readable report schema is `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json`, SHA-256 `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`. It is a closed Draft 2020-12 schema with `additionalProperties: false` at every object, explicit `$defs`, closed enums, array uniqueness and all nested field types. The policy registry supplies the fixed check IDs, dependency edges, deterministic ordering and predicate applicability; the schema alone does not grant evidence trust.
 
 ### 11.2.2 Unavailable-input and nullability matrix
 
@@ -690,22 +691,22 @@ path: absolute string
 path_kind: REGULAR_FILE or DIRECTORY
 input_format: UTF8_JSON, MARKDOWN, DIRECTORY_ENUMERATION or ABSENT
 availability_expectation: PRESENT or MISSING_ALLOWED
-directory_role: required only for directory-observation; otherwise null
+directory_role: required for PRESENT directory-observation records and for explicit MISSING_ALLOWED directory-observation role selectors; null for other records
 required: boolean
 expected: present regular file `{size: non-negative integer,sha256: 64-lowercase-hex}`, missing-allowed `{size:null,sha256:null}`, or directory identity object
 candidate_binding: exact §3.6 binding object
 accepted_evidence_class_claim: §3.6 evidence-class enum
 ```
 
-`records[]` is sorted by `id`; IDs are unique across the manifest and report. `candidate_sha` null means no supplied candidate and MUST yield `functional_sha: null`/`NO-SHA`; the literal string `NO-SHA` is invalid in the manifest. The manifest MUST enumerate the plan and every record consumed by a check. A selected but missing path remains a manifest entry with null observed values in the report. No defaults, environment-file expansion, globbing, directory scans or filename-based evidence discovery are permitted.
+`records[]` is sorted by `id`; IDs are unique across the manifest and report. `candidate_sha` is explicit in v1: a valid readiness assessment requires a non-null manifest candidate and a non-null CLI `--candidate-sha` with exact equality; both absent/null is `MISSING_INPUT`, while one-sided omission is `IDENTITY_MISMATCH`. The manifest MUST enumerate the plan, both distinct `SOURCE_ROOT` and `PAYLOAD_ROOT` directory-observation role selections, and every record consumed by a check. A selected but missing path remains a manifest entry with null observed values in the report. No defaults, environment-file expansion, globbing, directory scans or filename-based evidence discovery are permitted.
 
 ### 11.3.1 Complete input-manifest-v1 JSON Schema
 
-The normative machine-readable input-manifest schema is `Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json`, SHA-256 `eacf683fb4c9542f08d9ebe9882f01a3ed1e8fc7fb2f56a5af76d68aa53568d6`. It rejects unknown members and duplicate keys and defines the closed record-selection envelope, separate plan source/record paths, absolute paths, expected identities, nullable bindings and evidence-class claim enum.
+The normative machine-readable input-manifest schema is `Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json`, SHA-256 `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`. It rejects unknown members and duplicate keys and defines the closed record-selection envelope, separate plan source/record paths, absolute paths, expected identities, nullable bindings and evidence-class claim enum.
 
 ### 11.3.2 Manifest/CLI identity binding
 
-The selected manifest, policy artifact, adapter registry, trusted execution profile and CLI values are one identity tuple. `repo_path` MUST equal `--repo`, `plan_source_path` MUST equal `--plan-source-path`, `plan_record_path` MUST equal the selected record file named by `plan_record_id`, `candidate_sha` MUST equal the explicit `--candidate-sha` or both be absent/null, `phase` MUST equal `--phase`, `policy_id`/canonical `policy_sha256`/raw `policy_bytes_sha256` MUST equal the selected policy artifact, and registry/profile paths and digests MUST equal the launcher pins. The selected governing-plan record payload path MUST equal `plan_source_path`; the record file path MUST equal `plan_record_path`. `repo_record_id` MUST resolve to the direct directory observation whose path equals `repo_path`; no JSON wrapper with the same ID is accepted. Any disagreement is `IDENTITY_MISMATCH`/30; no source has precedence and no merge is allowed. The report records the manifest path and observed bytes digest, so the exact manifest bytes are part of every assessment.
+The selected manifest, policy artifact, adapter registry, trusted execution profile and CLI values are one identity tuple. `repo_path` MUST equal `--repo`, `plan_source_path` MUST equal `--plan-source-path`, `plan_record_path` MUST equal the selected record file named by `plan_record_id`, `candidate_sha` MUST be non-null and equal the explicit `--candidate-sha` for a satisfiable assessment; both absent/null is `MISSING_INPUT`, one-sided omission is `IDENTITY_MISMATCH`, `phase` MUST equal `--phase`, `policy_id`/canonical `policy_sha256`/raw `policy_bytes_sha256` MUST equal the selected policy artifact, and registry/profile paths and digests MUST equal the launcher pins. The selected governing-plan record payload path MUST equal `plan_source_path`; the record file path MUST equal `plan_record_path`. `R2.ROOT_ISOLATION` selects separate `SOURCE_ROOT` and `PAYLOAD_ROOT` directory-observation records; neither role is inferred from `repo_record_id`, and equal paths are rejected. A descendant path is admissible only when it is explicitly selected and adapter-bound as `PAYLOAD_ROOT`; any other alias or unsafe containment is rejected. Any disagreement is `IDENTITY_MISMATCH`/30; no source has precedence and no merge is allowed. The report records the manifest path and observed bytes digest, so the exact manifest bytes are part of every assessment.
 
 ### 11.4 Stable checks and gate assignment
 
@@ -741,7 +742,7 @@ Gate dependencies are `R1 -> R0` and `R2 -> R0`. The implementation MUST emit ev
 The checker validates two separate DAGs before evaluation: check-level edges and gate-level edges. It rejects self-edges, duplicate edges, unresolved check/gate IDs, check records whose `depends_on` differs from `dependencies[]`, required-check IDs missing from a gate, checks assigned to the wrong gate, cross-layer cycles and any `INFORMATIONAL` edge in v1. A graph failure emits no partial gate result and returns `DEPENDENCY_REFERENCE_ERROR` or `DEPENDENCY_CYCLE` with exit class `CHECKER_ERROR`/30. Every stable check is emitted exactly once; `required` and policy applicability must agree.
 
 
-The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `13127e8080b65c16fef0b372d07aa237e3c8925f9174cac3819a427274cda7fd`, raw-file SHA-256 `5a37a813a0b818a5129b2c330a399b577093f54b69de480e05f033b1b537708a`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
+The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73`, raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
 
 ### 11.5.1 Complete v1 reason-code and predicate registry
 
@@ -751,11 +752,11 @@ The policy artifact's `check_registry`, `gate_dependencies`, workload, decoder, 
 
 ### 11.5.2 Policy artifact and RFC 8785 digest procedure
 
-The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `5a37a813a0b818a5129b2c330a399b577093f54b69de480e05f033b1b537708a`; its canonical policy digest is `13127e8080b65c16fef0b372d07aa237e3c8925f9174cac3819a427274cda7fd`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
+The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`; its canonical policy digest is `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
 
 ### 11.5.3 Record-kind schemas, trust and admissibility
 
-The canonical evidence-record schema is `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json`; the adapter registry is `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json`. The input-manifest schema validates selections, while the evidence-record schema validates the common envelope and all 19 closed payload branches. The adapter registry defines source format/version, path kind, exact field mappings, reference namespaces, digest domain, information loss and failure classification. Each `*_ref` is typed as a record, artifact, commit, policy or role reference; raw paths cannot appear as references. A selected Markdown, provenance-v2 or directory source is admissible only through its named adapter, and its maximum effective evidence class is enforced. Positive current canonical records use `spec061-trusted-record-v1`; the fixture deliberately uses `spec061-fixture-record-v1` with a historical-only cap. A record claiming `INDEPENDENTLY_CHECKED` without exactly one producer attestation verified against the independently provisioned trust anchor is downgraded and produces `PRODUCER_AUTHENTICATION_MISSING` or `PRODUCER_UNTRUSTED`.
+The canonical evidence-record schema is `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json`; the adapter registry is `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json`. The input-manifest schema validates selections, while the evidence-record schema validates the common envelope and all 19 closed payload branches. The adapter registry defines source format/version, path kind, exact field mappings, reference namespaces, digest domain, information loss and failure classification. Each `*_ref` is typed as a record, artifact, commit, policy or role reference; raw paths cannot appear as references. A selected Markdown, provenance-v2 or directory source is admissible only through its named adapter, and its maximum effective evidence class is enforced. Directory observations are role-bound: `SOURCE_ROOT` and `PAYLOAD_ROOT` use distinct adapter declarations and must be selected as distinct records; the removed generic trusted-record adapter is not permitted. The fixture uses `spec061-fixture-record-v1` with a historical-only cap. A record claiming `INDEPENDENTLY_CHECKED` without exactly one producer attestation verified against the independently provisioned trust anchor is downgraded and produces `PRODUCER_AUTHENTICATION_MISSING` or `PRODUCER_UNTRUSTED`.
 
 ### 11.5.4 Cross-source SHA reconciliation
 
@@ -763,7 +764,7 @@ For a non-null candidate, the equality set is explicit: manifest `candidate_sha`
 
 ### 11.5.5 Named fixture and expected-report matrix
 
-The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `2f7866f029c1e25041090b12e360e5f71efbda1fdf649bad48c355b6ddc71358`, policy canonical SHA-256 `13127e8080b65c16fef0b372d07aa237e3c8925f9174cac3819a427274cda7fd` and policy raw-file SHA-256 `5a37a813a0b818a5129b2c330a399b577093f54b69de480e05f033b1b537708a`. Its expected projection is:
+The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637`, policy canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73` and policy raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. Its expected projection is:
 
 ```text
 functional_sha = null / NO-SHA
@@ -778,7 +779,7 @@ runtime_authorized = false
 release_authorized = false
 ```
 
-The fixture selects canonical JSON wrappers for the historical Markdown/provenance/Git evidence, an explicit governing-plan record and a directory-observation wrapper. Missing current evidence, including `toolchain.current`, uses `spec061-missing-json-v1` with `availability_expectation=MISSING_ALLOWED` and `UNVERIFIED` claim. The implementation-derived checker identity and final report hash are intentionally not pre-existing inputs; acceptance computes them only after the implementation is reviewed. Any other manifest has its own assessment and MUST NOT inherit this projection.
+The fixture selects canonical JSON records for the historical Markdown/provenance/Git evidence, an explicit governing-plan record, a direct `SOURCE_ROOT` directory observation and a distinct `PAYLOAD_ROOT` directory observation using its role-specific adapter. The two roots are present but historical-only, so they cannot satisfy the independent-trust requirement; no JSON directory wrapper is authoritative. Missing current evidence, including `toolchain.current`, uses `spec061-missing-json-v1` with `availability_expectation=MISSING_ALLOWED` and `UNVERIFIED` claim. The implementation-derived checker identity and final report hash are intentionally not pre-existing inputs; acceptance computes them only after the implementation is reviewed. Any other manifest has its own assessment and MUST NOT inherit this projection.
 
 ### 11.6 Closed execution, Git and filesystem profile
 
@@ -816,4 +817,4 @@ The post-implementation gate is mandatory: before this checker supports any R0�
 
 ## 12. Review Boundary
 
-This is a **Draft** SPEC. It authorizes no implementation, build, runtime, staging, payload generation, push, tag, publication or release. Revision 7 closes the record, adapter, predicate, aggregation, schema and fixture contracts, but Proposal remains blocked until the trusted launcher, sandbox and producer trust anchor are provisioned with immutable identities. The next action is Astra review of this Revision 7 document and all referenced artifacts. After implementation, Astra MUST review the complete implementation diff, actual tests/results, actual report and side-effect evidence before any gate use.
+This is a **Draft** SPEC. It authorizes no implementation, build, runtime, staging, payload generation, push, tag, publication or release. Revision 8 closes the record, adapter, predicate-value, root-role, Git-projection, aggregation, schema, validator and fixture contracts, but Proposal remains blocked until the trusted launcher, sandbox and producer trust anchor are provisioned with immutable identities. The next action is Astra review of this Revision 8 document and all referenced artifacts. After implementation, Astra MUST review the complete implementation diff, actual tests/results, actual report and side-effect evidence before any gate use.

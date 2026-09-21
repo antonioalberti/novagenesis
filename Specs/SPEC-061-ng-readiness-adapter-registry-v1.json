@@ -426,7 +426,7 @@
     },
     {
       "digest_coverage": "DIRECTORY_TREE",
-      "directory_role": "REPOSITORY_ROOT",
+      "directory_role": "SOURCE_ROOT",
       "field_mappings": [
         {
           "failure_if_absent": "BINDING_MISSING",
@@ -466,6 +466,50 @@
       "side_effects": "NONE",
       "source_format": "directory-enumeration",
       "source_version": "GIT-METADATA-V1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "DIRECTORY_TREE",
+      "directory_role": "PAYLOAD_ROOT",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "directory descriptor",
+          "target_pointer": "/payload/directory_identity",
+          "transform": "DIRECTORY_IDENTITY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "sorted child tuple table",
+          "target_pointer": "/payload/entries_sha256",
+          "transform": "DIRECTORY_TREE_DIGEST"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "sorted child tuple table",
+          "target_pointer": "/payload/entry_count",
+          "transform": "DIRECTORY_ENTRY_COUNT"
+        }
+      ],
+      "id": "spec061-payload-directory-observation-v1",
+      "information_loss": "NONE",
+      "maximum_effective_evidence_class": "RECORDED_CLAIM",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "DIRECTORY",
+      "record_kinds": [
+        "directory-observation"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "directory-enumeration",
+      "source_version": "PAYLOAD-DIRECTORY-V1",
       "version": 1
     },
     {
