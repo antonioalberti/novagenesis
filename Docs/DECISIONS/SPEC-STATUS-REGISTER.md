@@ -118,11 +118,30 @@ As seguintes SPECs referenciam **SPEC-015** e **SPEC-016** que **não existem**:
 
 ---
 
+## Dívida legada do validator global — registada em 2026-09-21
+
+Esta dívida é de higiene documental e consistência histórica do repositório. **Não é um blocker da SPEC-061 Revision 8** e não altera o seu contrato, os seus hashes ou o seu commit aprovado.
+
+O `Scripts/Simple/validate-specs.sh` reporta 24 findings agrupados em quatro classes:
+
+| Classe | Contagem | Escopo |
+|---|---:|---|
+| Referências activas/históricas a `AIOPT2` | 9 | `RELEASE-MASTER-PLAN-v1.0.0.md`, `SPEC-054`, documentos de consolidação e relatórios de auditoria |
+| Referências a `SPEC-015`/`SPEC-016` inexistentes | 8 | plano mestre, `SPEC-054`, documentos de consolidação e relatórios de auditoria |
+| Status fora do vocabulário do validator | 4 | `SPEC-032`, `SPEC-033-R2`, `SPEC-033-R3-C1` e `SPEC-033-R3-caller-safety-amendment` |
+| Grupos de números SPEC duplicados | 3 | `SPEC-001`, `SPEC-022` e `SPEC-033` |
+| **Total** | **24** | **dívida legada fora do pacote SPEC-061** |
+
+O relatório global deve continuar a distinguir estes findings de `SPEC061_VALIDATION=PASS`. A correcção fica pendente como trabalho separado de higiene do repositório; não deve ser absorvida pela Revision 8 nem resolvida através da criação de novas SPECs.
+
+---
+
 ## Histórico de Versões deste Registo
 
 | Data | Versão | Autor | Mudança |
 |------|--------|-------|---------|
 | 2026-07-16 | 1.0 | Hermes Agent | Criação baseada em auditoria 24 SPECs |
+| 2026-09-21 | 1.1 | Hermes Agent | Registo da dívida legada de 24 findings do validator global, separada da SPEC-061 |
 
 ---
 
