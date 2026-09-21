@@ -4,18 +4,21 @@
   "external_provisioning": {
     "launcher": {
       "argv_contract": [
+        "--python",
+        "--checker",
         "--repo",
         "--plan-source-path",
         "--plan-record-path",
         "--candidate-sha",
         "--input-manifest",
+        "--manifest-sha256",
         "--policy",
         "--policy-sha256",
         "--policy-bytes-sha256",
         "--adapter-registry",
         "--adapter-registry-sha256",
-        "--report",
-        "--phase"
+        "--phase",
+        "--report"
       ],
       "failure_behavior": "exit nonzero without starting checker; no report write",
       "network": "DENY",
@@ -134,17 +137,21 @@
   "status": "REQUIRED_BEFORE_PROPOSAL",
   "trusted_launcher": {
     "argv_contract": [
+      "--python",
+      "--checker",
       "--repo",
       "--plan-source-path",
       "--plan-record-path",
       "--candidate-sha",
       "--input-manifest",
+      "--manifest-sha256",
       "--policy",
       "--policy-sha256",
       "--policy-bytes-sha256",
       "--adapter-registry",
-      "--report",
-      "--phase"
+      "--adapter-registry-sha256",
+      "--phase",
+      "--report"
     ],
     "id": "ng060-trusted-launcher-v1",
     "no_network": true,

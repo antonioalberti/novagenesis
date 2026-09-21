@@ -107,6 +107,7 @@ def main() -> int:
         "manifest": load(MANIFEST_SCHEMA),
         "report": load(REPORT_SCHEMA),
     }
+    profile = load(PROFILE)
     for name, schema in schemas.items():
         try:
             Draft202012Validator.check_schema(schema)
@@ -130,6 +131,16 @@ def main() -> int:
         errors.append("policy.adapter_registry_contract.sha256 mismatch")
     if policy["trusted_execution_profile_sha256"] != digest_bytes(PROFILE):
         errors.append("policy.trusted_execution_profile_sha256 mismatch")
+    if policy["sandbox_profile"]["profile_sha256"] != digest_bytes(PROFILE):
+        errors.append("policy.sandbox_profile.profile_sha256 mismatch")
+    if policy["trusted_launcher"]["profile_sha256"] != digest_bytes(PROFILE):
+        errors.append("policy.trusted_launcher.profile_sha256 mismatch")
+    if profile["external_provisioning"]["launcher"]["argv_contract"] != profile["trusted_launcher"]["argv_contract"]:
+        errors.append("trusted execution profile launcher argv contracts mismatch")
+    if policy["adapter_registry_contract"]["trusted_current_adapter_id"] is not None:
+        errors.append("policy still names a v1 trusted-current adapter")
+    if "spec061-trusted-record-v1" in json.dumps(schemas["manifest"], sort_keys=True):
+        errors.append("manifest schema still permits removed trusted adapter")
     if policy["report_schema"]["sha256"] != digest_bytes(REPORT_SCHEMA):
         errors.append("policy.report_schema.sha256 mismatch")
     if policy["input_manifest_schema"]["sha256"] != digest_bytes(MANIFEST_SCHEMA):

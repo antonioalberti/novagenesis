@@ -301,8 +301,7 @@
             "spec061-fixture-record-v1",
             "spec061-git-directory-observation-v1",
             "spec061-git-preflight-v1",
-            "spec061-missing-json-v1",
-            "spec061-trusted-record-v1"
+            "spec061-missing-json-v1"
           ],
           "type": "string"
         },

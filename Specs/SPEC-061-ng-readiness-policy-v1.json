@@ -2465,7 +2465,7 @@
   "input_manifest_schema": {
     "id": "ng-readiness-input-manifest-v1",
     "path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json",
-    "sha256": "6e980d1762cdbf75e747e43def493db8a18ea50116757cbdc014fd0bf518ddfe"
+    "sha256": "eacf683fb4c9542f08d9ebe9882f01a3ed1e8fc7fb2f56a5af76d68aa53568d6"
   },
   "limits": {
     "artifact_bytes": 134217728,
@@ -3089,7 +3089,7 @@
     "no_new_privs": true,
     "process_execution": "ALLOWLISTED_GIT_ONLY",
     "profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
-    "profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+    "profile_sha256": "8d260812358ce116f7c6d363f7e63c6867ffc5476d7a3e4f86273fcc5cf84b11",
     "sha256": null,
     "status": "REQUIRED_BEFORE_PROPOSAL",
     "timeout_s": 10
@@ -3186,7 +3186,7 @@
   },
   "trusted_execution_profile_id": "ng060-trusted-execution-profile-v1",
   "trusted_execution_profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
-  "trusted_execution_profile_sha256": "0e43540586bf7258e720a5683a8d95f2ed327c7d3edac8058afd5cbfa708e0cb",
+  "trusted_execution_profile_sha256": "8d260812358ce116f7c6d363f7e63c6867ffc5476d7a3e4f86273fcc5cf84b11",
   "trusted_launcher": {
     "failure": "CHECKER_IDENTITY_UNVERIFIED or UNSAFE_STARTUP",
     "id": "ng060-trusted-launcher-v1",
@@ -3202,7 +3202,7 @@
     "no_unbounded_child_processes": true,
     "path": null,
     "profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
-    "profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+    "profile_sha256": "8d260812358ce116f7c6d363f7e63c6867ffc5476d7a3e4f86273fcc5cf84b11",
     "sha256": null,
     "status": "REQUIRED_BEFORE_PROPOSAL",
     "timeout_s": 60

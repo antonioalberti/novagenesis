@@ -8,10 +8,10 @@
   "plan_record_id": "plan.current",
   "plan_record_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/plan.current.json",
   "plan_source_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
-  "policy_bytes_sha256": "8fe289c8ea744424569605ce396b66b4f487eb26024bd9b76695c68f94239939",
+  "policy_bytes_sha256": "5a37a813a0b818a5129b2c330a399b577093f54b69de480e05f033b1b537708a",
   "policy_id": "ng060-r0-r2-read-only-v1",
   "policy_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-policy-v1.json",
-  "policy_sha256": "4ab73c6c00bce32a59526e6334bf38db3bc1586e478ef4f7d647d0114e64aeb1",
+  "policy_sha256": "13127e8080b65c16fef0b372d07aa237e3c8925f9174cac3819a427274cda7fd",
   "records": [
     {
       "accepted_evidence_class_claim": "HISTORICAL_ONLY",
