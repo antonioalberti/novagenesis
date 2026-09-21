@@ -1,16 +1,17 @@
 {
   "adapter_registry_id": "ng-readiness-adapter-registry-v1",
   "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-  "adapter_registry_sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+  "adapter_registry_sha256": "12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981",
   "candidate_sha": null,
   "manifest_id": "current-ng060-blocked",
   "phase": "PRE_TRIAL_READINESS",
-  "plan_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
   "plan_record_id": "plan.current",
-  "policy_bytes_sha256": "e65b0d8fd4353136153a15d85297379e3512ffa56f737014ec4fc0f7e52a2b24",
+  "plan_record_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/plan.current.json",
+  "plan_source_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+  "policy_bytes_sha256": "8fe289c8ea744424569605ce396b66b4f487eb26024bd9b76695c68f94239939",
   "policy_id": "ng060-r0-r2-read-only-v1",
   "policy_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-policy-v1.json",
-  "policy_sha256": "cf106724dfc7dd3f96fc0600114660d77765265c8eec0ff712a1e9fe300085c6",
+  "policy_sha256": "4ab73c6c00bce32a59526e6334bf38db3bc1586e478ef4f7d647d0114e64aeb1",
   "records": [
     {
       "accepted_evidence_class_claim": "HISTORICAL_ONLY",
@@ -162,8 +163,8 @@
       },
       "directory_role": null,
       "expected": {
-        "sha256": "68dee1dd6991f43b363c3646dc835bae74d5ca8e2278f6d4b593a2308d1c1f66",
-        "size": 1643
+        "sha256": "635ec8fa147572739e102c45b1b1cb709d54e875f130087a36a4b25c2ad923f4",
+        "size": 1861
       },
       "id": "git-repository.current",
       "input_format": "UTF8_JSON",
@@ -297,9 +298,17 @@
       },
       "directory_role": "REPOSITORY_ROOT",
       "expected": {
-        "entries_sha256": null,
-        "entry_count": null,
-        "identity": null
+        "entries_sha256": "c74fcbcf59fe951599e6fe9bc46dc710213776fa8c861ced3d6b8366562b0259",
+        "entry_count": 1691,
+        "identity": {
+          "st_ctime_ns": 1789633346329412122,
+          "st_dev": 64512,
+          "st_ino": 678972,
+          "st_mode": 16893,
+          "st_mtime_ns": 1789633346329412122,
+          "st_nlink": 27,
+          "st_size": 4096
+        }
       },
       "id": "repo-root.current",
       "input_format": "DIRECTORY_ENUMERATION",

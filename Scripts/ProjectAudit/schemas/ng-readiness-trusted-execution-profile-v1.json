@@ -1,6 +1,86 @@
 {
   "$id": "ng-readiness-trusted-execution-profile-v1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "external_provisioning": {
+    "launcher": {
+      "argv_contract": [
+        "--repo",
+        "--plan-source-path",
+        "--plan-record-path",
+        "--candidate-sha",
+        "--input-manifest",
+        "--policy",
+        "--policy-sha256",
+        "--policy-bytes-sha256",
+        "--adapter-registry",
+        "--adapter-registry-sha256",
+        "--report",
+        "--phase"
+      ],
+      "failure_behavior": "exit nonzero without starting checker; no report write",
+      "network": "DENY",
+      "path": "/usr/local/libexec/ng060-trusted-launcher-v1",
+      "path_binding": "launcher path and bytes are supplied by the external provisioning record, never discovered by the checker",
+      "pre_exec_checks": [
+        "no symlink",
+        "root owner",
+        "mode 0555 or stricter",
+        "digest verified from held descriptor",
+        "TOCTOU identity rechecked before exec",
+        "absolute checker and interpreter paths",
+        "external trust anchor and sandbox profile verified"
+      ],
+      "required_identity_fields": [
+        "st_dev",
+        "st_ino",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns"
+      ]
+    },
+    "owner": "OUT_OF_BAND_ROOT_CONTROLLED_PROVISIONING",
+    "sandbox": {
+      "failure_behavior": "GIT_SANDBOX_UNAVAILABLE or CHECKER_IDENTITY_UNVERIFIED before checker evaluation",
+      "path_binding": "sandbox is established by launcher before Python starts",
+      "required_controls": [
+        "network deny",
+        "filesystem write deny except caller-owned report and external scratch",
+        "allowlisted /usr/bin/git only",
+        "no_new_privs",
+        "process-group timeout kill",
+        "no inherited environment"
+      ],
+      "required_identity_fields": [
+        "profile_id",
+        "profile_sha256",
+        "enforcement_backend",
+        "enforcement_digest"
+      ]
+    },
+    "status": "REQUIRED_BEFORE_PROPOSAL",
+    "trust_anchor": {
+      "failure_behavior": "PRODUCER_AUTHENTICATION_MISSING or CHECKER_IDENTITY_UNVERIFIED; no promotion to independently checked",
+      "key_source": "out-of-band only; selected evidence cannot provide authority",
+      "path": "/etc/novagenesis/spec061/producer-trust-anchor-v1.json",
+      "required_controls": [
+        "root-owned",
+        "regular file",
+        "no symlink",
+        "single hard link",
+        "mode 0444",
+        "descriptor held during verification",
+        "identity rechecked before use"
+      ],
+      "required_identity_fields": [
+        "st_dev",
+        "st_ino",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns",
+        "sha256"
+      ]
+    }
+  },
   "git": {
     "mode": "SANDBOXED_GIT_ONLY",
     "path": "/usr/bin/git",
@@ -10,7 +90,7 @@
   "id": "ng060-trusted-execution-profile-v1",
   "limits": {
     "artifact_bytes": 134217728,
-    "directory_entries": 10000,
+    "directory_entries": 20000,
     "git_stdout_stderr_bytes": 1048576,
     "json_depth": 32,
     "manifest_bytes": 1048576,
@@ -55,7 +135,8 @@
   "trusted_launcher": {
     "argv_contract": [
       "--repo",
-      "--plan",
+      "--plan-source-path",
+      "--plan-record-path",
       "--candidate-sha",
       "--input-manifest",
       "--policy",

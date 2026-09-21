@@ -26,7 +26,15 @@
     "git_dir": "/home/gandalf/workspace/novagenesis/.git",
     "metadata_closure": [],
     "root": {
-      "identity": null,
+      "identity": {
+        "st_ctime_ns": 1789633346329412122,
+        "st_dev": 64512,
+        "st_ino": 678972,
+        "st_mode": 16893,
+        "st_mtime_ns": 1789633346329412122,
+        "st_nlink": 27,
+        "st_size": 4096
+      },
       "path": "/home/gandalf/workspace/novagenesis"
     },
     "sandbox_profile": "UNVERIFIED",
@@ -45,7 +53,7 @@
     "algorithm": "SHA-256",
     "canonicalization": "RFC8785-JCS",
     "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
-    "sha256": "ed7595461eb7126d46b7f6ac3d3d4f57e8429a7765fa93f0901d45dd3d8973ad"
+    "sha256": "6949dcdd6432f852125e416cdb658ab5d94db3bed5cb3288bede62788ddfe779"
   },
   "record_id": "git-repository.current",
   "record_kind": "git-repository",

@@ -111,7 +111,7 @@
           "type": "string"
         },
         "size": {
-          "minimum": 1,
+          "minimum": 0,
           "type": "integer"
         }
       },
@@ -525,12 +525,16 @@
     "phase": {
       "const": "PRE_TRIAL_READINESS"
     },
-    "plan_path": {
+    "plan_record_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "plan_record_path": {
       "pattern": "^/[^\\u0000]*$",
       "type": "string"
     },
-    "plan_record_id": {
-      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+    "plan_source_path": {
+      "pattern": "^/[^\\u0000]*$",
       "type": "string"
     },
     "policy_bytes_sha256": {
@@ -610,7 +614,8 @@
     "policy_sha256",
     "phase",
     "repo_path",
-    "plan_path",
+    "plan_source_path",
+    "plan_record_path",
     "review_head",
     "remote_ref",
     "candidate_sha",

@@ -546,73 +546,34 @@
       "source_format": "absent",
       "source_version": "ABSENT-V1",
       "version": 1
-    },
-    {
-      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
-      "field_mappings": [
-        {
-          "failure_if_absent": "BINDING_MISSING",
-          "loss": "NONE",
-          "required": true,
-          "source_selector": "/schema_version",
-          "target_pointer": "/schema_version",
-          "transform": "COPY"
-        },
-        {
-          "failure_if_absent": "BINDING_MISSING",
-          "loss": "NONE",
-          "required": true,
-          "source_selector": "/record_kind",
-          "target_pointer": "/record_kind",
-          "transform": "COPY"
-        },
-        {
-          "failure_if_absent": "BINDING_MISSING",
-          "loss": "NONE",
-          "required": true,
-          "source_selector": "/payload",
-          "target_pointer": "/payload",
-          "transform": "COPY"
-        }
-      ],
-      "id": "spec061-trusted-record-v1",
-      "information_loss": "NONE",
-      "maximum_effective_evidence_class": "INDEPENDENTLY_CHECKED",
-      "missing_allowed": false,
-      "normalized_schema_version": 1,
-      "path_kind": "REGULAR_FILE",
-      "record_kinds": [
-        "freeze-r0-r2",
-        "effective-config",
-        "build-manifest",
-        "build-receipt",
-        "toolchain",
-        "helper-identity",
-        "executable-identity",
-        "workload-expected",
-        "workload-source",
-        "repository-baseline",
-        "jpeg-qualification",
-        "payload-copy",
-        "git-repository",
-        "producer-attestation",
-        "capture-attestation",
-        "release-audit",
-        "bundle-verification",
-        "governing-plan",
-        "directory-observation"
-      ],
-      "review_status": "REVIEWED",
-      "side_effects": "NONE",
-      "source_format": "canonical-json",
-      "source_version": "1",
-      "version": 1
     }
   ],
+  "canonical_record_contract": {
+    "attestation_contract_id": "spec061-producer-attestation-v1-external",
+    "canonicalization": "RFC8785-JCS",
+    "encoding": "UTF-8 JSON text; duplicate object keys rejected before parsing",
+    "maximum_effective_evidence_class": "UNVERIFIED",
+    "payload_schema_selector": "record_kind selects exactly one closed branch under the evidence-record schema $defs/payload_*; unknown branch is UNSUPPORTED_RECORD_KIND",
+    "promotion_to_independently_checked": "DISABLED_IN_V1_UNTIL_EXTERNAL_TRUST_AND_ATTESTATION",
+    "record_binding": {
+      "candidate_binding": "/candidate_binding.phase must equal PRE_TRIAL_READINESS and all non-null identities must equal manifest/policy bindings",
+      "record_id": "/record_id must equal manifest selection id",
+      "record_kind": "/record_kind must equal manifest record_kind and registry coverage",
+      "source_artifact": "/source/artifact_ref resolves only within record-local artifact_refs"
+    },
+    "record_digest": "SHA-256 over canonical record excluding /record_digest",
+    "record_schema_id": "ng-readiness-evidence-record-v1",
+    "record_schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json",
+    "record_schema_sha256": "080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0",
+    "reference_resolution": "Every *_ref is typed by namespace and resolves to the selected record set, record-local artifact set, policy, role or full lowercase 40-hex commit as declared; path strings are never reference identities",
+    "source_bytes_digest": "SHA-256 over exact UTF-8 source bytes before normalization",
+    "source_format": "canonical-json",
+    "source_version": "1"
+  },
   "digest_domains": {
     "artifact_bytes": "SHA-256 of selected regular-file bytes",
     "canonical_record": "SHA-256 of RFC8785-JCS canonical record bytes excluding record_digest",
-    "directory_tree": "SHA-256 of sorted directory observation tuples; never a byte hash of a directory",
+    "directory_tree": "SHA-256 of canonical compact UTF-8 JSON array of sorted recursive no-follow lstat tuples [relative_path,kind,st_dev,st_ino,st_mode,st_nlink,st_size,st_mtime_ns,st_ctime_ns], with the policy exclusions applied",
     "source_bytes": "SHA-256 of observed source bytes before normalization"
   },
   "failure_classes": {
@@ -635,6 +596,26 @@
     "unknown_source_member": "REJECT_IF_DECISION_RELEVANT",
     "unsupported_format": "CHECKER_ERROR"
   },
+  "producer_attestation_contract": {
+    "algorithm": "Ed25519",
+    "id": "spec061-producer-attestation-v1-external",
+    "key_delegation": "REJECT",
+    "key_rotation": "REJECT",
+    "positive_verification": "NOT_ENABLED_IN_V1",
+    "signed_statement_fields": [
+      "trust_anchor_id",
+      "trust_anchor_key_id",
+      "producer_id",
+      "producer_identity_sha256",
+      "subject_ref",
+      "subject_sha256",
+      "policy_sha256",
+      "statement_sha256"
+    ],
+    "statement_digest": "SHA-256 of canonical attestation statement bytes with domain separation NG-SPEC061-ATTEST-V1",
+    "subject_digest": "SHA-256 of canonical evidence record bytes excluding record_digest and attestation_ref",
+    "trust_source": "out-of-band trust anchor only; a subject record cannot authorize its own key"
+  },
   "record_schema_id": "ng-readiness-evidence-record-v1",
   "reference_namespaces": {
     "artifact": "record-local artifact_refs[].id; never a record_id",
@@ -643,5 +624,18 @@
     "record": "selected canonical record_id; never a path",
     "role": "fixed logical role identifier"
   },
-  "schema_version": 1
+  "schema_version": 1,
+  "trusted_current_contract": {
+    "adapter_id": null,
+    "positive_fixture": null,
+    "reason": "The v1 registry intentionally contains no adapter capable of promoting a record to INDEPENDENTLY_CHECKED.",
+    "required_before_enablement": [
+      "trusted launcher identity",
+      "sandbox identity and enforcement profile",
+      "external Ed25519 trust anchor",
+      "per-kind attested positive fixture",
+      "Astra review of the enabled packet"
+    ],
+    "status": "EXTERNAL_ONLY_NOT_IN_V1"
+  }
 }

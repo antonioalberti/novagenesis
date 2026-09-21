@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://novagenesis.local/schemas/ng-readiness-adapter-registry-v1.schema.json",
+  "title": "NovaGenesis SPEC-061 adapter registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "record_schema_id",
+    "adapters",
+    "digest_domains",
+    "failure_classes",
+    "information_loss_policy",
+    "reference_namespaces",
+    "canonical_record_contract",
+    "producer_attestation_contract",
+    "trusted_current_contract"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"const": "ng-readiness-adapter-registry-v1"},
+    "record_schema_id": {"const": "ng-readiness-evidence-record-v1"},
+    "adapters": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/adapter"}
+    },
+    "digest_domains": {"$ref": "#/$defs/string_map"},
+    "failure_classes": {"$ref": "#/$defs/string_map"},
+    "information_loss_policy": {"$ref": "#/$defs/string_map"},
+    "reference_namespaces": {"$ref": "#/$defs/string_map"},
+    "canonical_record_contract": {"$ref": "#/$defs/canonical_record_contract"},
+    "producer_attestation_contract": {"$ref": "#/$defs/producer_attestation_contract"},
+    "trusted_current_contract": {"$ref": "#/$defs/trusted_current_contract"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "string_map": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "field_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_selector", "target_pointer", "transform", "required", "failure_if_absent", "loss"],
+      "properties": {
+        "source_selector": {"type": "string", "minLength": 1},
+        "target_pointer": {"type": "string", "minLength": 1},
+        "transform": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "failure_if_absent": {"type": "string", "minLength": 1},
+        "loss": {"type": "string", "minLength": 1}
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "version", "source_format", "source_version", "path_kind",
+        "record_kinds", "normalized_schema_version", "field_mappings",
+        "digest_coverage", "information_loss", "maximum_effective_evidence_class",
+        "missing_allowed", "side_effects", "review_status"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{2,63}$"},
+        "version": {"type": "integer", "minimum": 1},
+        "source_format": {"type": "string", "minLength": 1},
+        "source_version": {"type": "string", "minLength": 1},
+        "path_kind": {"enum": ["REGULAR_FILE", "DIRECTORY"]},
+        "directory_role": {"enum": ["REPOSITORY_ROOT", "GIT_METADATA_CLOSURE", "SOURCE_ROOT", "PAYLOAD_ROOT"]},
+        "record_kinds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "normalized_schema_version": {"const": 1},
+        "field_mappings": {"type": "array", "items": {"$ref": "#/$defs/field_mapping"}},
+        "digest_coverage": {"type": "string", "minLength": 1},
+        "information_loss": {"type": "string", "minLength": 1},
+        "maximum_effective_evidence_class": {"enum": ["RECORDED_CLAIM", "HISTORICAL_ONLY", "UNVERIFIED", "INDEPENDENTLY_CHECKED"]},
+        "missing_allowed": {"type": "boolean"},
+        "side_effects": {"const": "NONE"},
+        "review_status": {"enum": ["REVIEWED", "CONTRACT_ONLY_NOT_REACHABLE"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"missing_allowed": {"const": false}}, "required": ["missing_allowed"]},
+          "then": {"properties": {"field_mappings": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"path_kind": {"const": "DIRECTORY"}}, "required": ["path_kind"]},
+          "then": {"required": ["directory_role"]}
+        }
+      ]
+    },
+    "canonical_record_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_format", "source_version", "encoding", "canonicalization",
+        "source_bytes_digest", "record_digest", "record_schema_id",
+        "record_schema_path", "record_schema_sha256", "record_binding",
+        "payload_schema_selector", "reference_resolution",
+        "promotion_to_independently_checked", "attestation_contract_id",
+        "maximum_effective_evidence_class"
+      ],
+      "properties": {
+        "source_format": {"const": "canonical-json"},
+        "source_version": {"const": "1"},
+        "encoding": {"type": "string", "minLength": 1},
+        "canonicalization": {"const": "RFC8785-JCS"},
+        "source_bytes_digest": {"type": "string", "minLength": 1},
+        "record_digest": {"type": "string", "minLength": 1},
+        "record_schema_id": {"const": "ng-readiness-evidence-record-v1"},
+        "record_schema_path": {"type": "string", "pattern": "^/[^\\u0000]*$"},
+        "record_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "record_binding": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1}},
+        "payload_schema_selector": {"type": "string", "minLength": 1},
+        "reference_resolution": {"type": "string", "minLength": 1},
+        "promotion_to_independently_checked": {"const": "DISABLED_IN_V1_UNTIL_EXTERNAL_TRUST_AND_ATTESTATION"},
+        "attestation_contract_id": {"const": "spec061-producer-attestation-v1-external"},
+        "maximum_effective_evidence_class": {"enum": ["UNVERIFIED", "HISTORICAL_ONLY", "RECORDED_CLAIM"]}
+      }
+    },
+    "producer_attestation_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "algorithm", "trust_source", "signed_statement_fields", "subject_digest", "statement_digest", "key_delegation", "key_rotation", "positive_verification"],
+      "properties": {
+        "id": {"const": "spec061-producer-attestation-v1-external"},
+        "algorithm": {"const": "Ed25519"},
+        "trust_source": {"type": "string", "minLength": 1},
+        "signed_statement_fields": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "subject_digest": {"type": "string", "minLength": 1},
+        "statement_digest": {"type": "string", "minLength": 1},
+        "key_delegation": {"const": "REJECT"},
+        "key_rotation": {"const": "REJECT"},
+        "positive_verification": {"const": "NOT_ENABLED_IN_V1"}
+      }
+    },
+    "trusted_current_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "adapter_id", "positive_fixture", "required_before_enablement", "reason"],
+      "properties": {
+        "status": {"const": "EXTERNAL_ONLY_NOT_IN_V1"},
+        "adapter_id": {"type": "null"},
+        "positive_fixture": {"type": "null"},
+        "required_before_enablement": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -377,7 +377,7 @@
           "type": "string"
         },
         "size": {
-          "minimum": 1,
+          "minimum": 0,
           "type": "integer"
         }
       },
@@ -626,6 +626,62 @@
     },
     "identity_slot_64": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PRESENT"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "type": "null"
+              },
+              "value": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "reason_code"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "UNAVAILABLE"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "value": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "value",
+              "reason_code"
+            ]
+          }
+        }
+      ],
       "properties": {
         "reason_code": {
           "pattern": "^[A-Z][A-Z0-9_]+$",
@@ -768,8 +824,7 @@
             "spec061-fixture-record-v1",
             "spec061-git-directory-observation-v1",
             "spec061-git-preflight-v1",
-            "spec061-missing-json-v1",
-            "spec061-trusted-record-v1"
+            "spec061-missing-json-v1"
           ],
           "type": "string"
         },

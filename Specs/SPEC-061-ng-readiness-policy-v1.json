@@ -8,53 +8,66 @@
   "accepted_producers": [
     {
       "authentication": "TRUST_ANCHORED_ED25519",
+      "enablement_status": "EXTERNAL_TRUST_PROVISIONING_REQUIRED",
       "id": "local-provenance-v1",
       "maximum_effective_class": "INDEPENDENTLY_CHECKED",
       "trust_anchor_id": null,
-      "trust_anchor_key_id": null
+      "trust_anchor_key_id": null,
+      "v1_enabled": false
     },
     {
       "authentication": "TRUST_ANCHORED_ED25519",
+      "enablement_status": "EXTERNAL_TRUST_PROVISIONING_REQUIRED",
       "id": "payload-evidence-v1",
       "maximum_effective_class": "INDEPENDENTLY_CHECKED",
       "trust_anchor_id": null,
-      "trust_anchor_key_id": null
+      "trust_anchor_key_id": null,
+      "v1_enabled": false
     },
     {
       "authentication": "TRUST_ANCHORED_ED25519",
+      "enablement_status": "EXTERNAL_TRUST_PROVISIONING_REQUIRED",
       "id": "release-audit-v1",
       "maximum_effective_class": "INDEPENDENTLY_CHECKED",
       "trust_anchor_id": null,
-      "trust_anchor_key_id": null
+      "trust_anchor_key_id": null,
+      "v1_enabled": false
     },
     {
       "authentication": "TRUST_ANCHORED_ED25519",
+      "enablement_status": "EXTERNAL_TRUST_PROVISIONING_REQUIRED",
       "id": "spec061-fixture-v1",
       "maximum_effective_class": "INDEPENDENTLY_CHECKED",
       "trust_anchor_id": null,
-      "trust_anchor_key_id": null
+      "trust_anchor_key_id": null,
+      "v1_enabled": false
     },
     {
       "authentication": "NONE_FOR_RECORDED_CLAIM",
       "id": "manual-review-v1",
       "maximum_effective_class": "RECORDED_CLAIM",
       "trust_anchor_id": null,
-      "trust_anchor_key_id": null
+      "trust_anchor_key_id": null,
+      "v1_enabled": true
     }
   ],
   "adapter_registry_contract": {
     "decision_relevant_loss": "REQUIRED_MAPPING_MISSING",
     "id": "ng-readiness-adapter-registry-v1",
     "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-    "sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+    "schema_id": "ng-readiness-adapter-registry-v1.schema",
+    "schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json",
+    "schema_sha256": "8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f",
+    "sha256": "12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981",
     "source_schema_mismatch": "UNSUPPORTED_SCHEMA_VERSION",
-    "trusted_current_adapter_id": "spec061-trusted-record-v1",
+    "trusted_current_adapter_id": null,
+    "trusted_current_adapter_status": "EXTERNAL_ONLY_NOT_IN_V1",
     "unknown_adapter": "UNSUPPORTED_ADAPTER",
     "unreviewed_adapter": "ADAPTER_UNREVIEWED"
   },
   "adapter_registry_id": "ng-readiness-adapter-registry-v1",
   "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-  "adapter_registry_sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+  "adapter_registry_sha256": "12bbaa2994af209519d56b8da47fb3746a0afc56063ba67e359786a9ca7fa981",
   "check_registry": [
     {
       "depends_on": [],
@@ -134,12 +147,26 @@
           "MISSING_INPUT",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "manifest candidate is a non-null lowercase 40-hex SHA and CLI candidate is omitted or byte-for-byte equal",
+          "Both candidate declarations are evaluated before any record evidence; null in both is UNKNOWN/MISSING_INPUT."
+        ],
         "success": {
+          "expected": "manifest candidate is a non-null lowercase 40-hex SHA and CLI candidate is omitted or byte-for-byte equal",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "/candidate_sha",
+            "--candidate-sha"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "Both candidate declarations are evaluated before any record evidence; null in both is UNKNOWN/MISSING_INPUT."
+        },
+        "success_selectors": [
+          "/candidate_sha",
+          "--candidate-sha"
+        ]
       },
       "required": true
     },
@@ -253,12 +280,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "candidate is exactly 40 lowercase hex, rev-parse --verify <sha>^{commit} exits 0 with exactly candidate SHA, cat-file -t returns commit, cat-file -e exits 0, and no fetch/network occurs",
+          "The probe runs in the exact allowlisted Git sandbox against the manifest repository; a missing object is UNKNOWN/MISSING_INPUT and any sandbox/probe integrity failure is ERROR."
+        ],
         "success": {
+          "expected": "candidate is exactly 40 lowercase hex, rev-parse --verify <sha>^{commit} exits 0 with exactly candidate SHA, cat-file -t returns commit, cat-file -e exits 0, and no fetch/network occurs",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "derived.candidate_sha",
+            "git_probe.rev_parse_candidate",
+            "git_probe.cat_file_type",
+            "git_probe.cat_file_presence",
+            "git_probe.network"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "The probe runs in the exact allowlisted Git sandbox against the manifest repository; a missing object is UNKNOWN/MISSING_INPUT and any sandbox/probe integrity failure is ERROR."
+        },
+        "success_selectors": [
+          "derived.candidate_sha",
+          "git_probe.rev_parse_candidate",
+          "git_probe.cat_file_type",
+          "git_probe.cat_file_presence",
+          "git_probe.network"
+        ]
       },
       "required": true
     },
@@ -344,12 +391,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "freeze phase is PRE_TRIAL_READINESS, freeze functional_sha equals the derived candidate SHA, freeze review_head equals manifest review_head, and report identity projection copies these values without substitution",
+          "A historical or null freeze field cannot satisfy this check."
+        ],
         "success": {
+          "expected": "freeze phase is PRE_TRIAL_READINESS, freeze functional_sha equals the derived candidate SHA, freeze review_head equals manifest review_head, and report identity projection copies these values without substitution",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[freeze_record].payload.functional_sha",
+            "record[freeze_record].payload.review_head",
+            "record[freeze_record].payload.phase",
+            "manifest.review_head",
+            "report.identities.functional_sha"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A historical or null freeze field cannot satisfy this check."
+        },
+        "success_selectors": [
+          "record[freeze_record].payload.functional_sha",
+          "record[freeze_record].payload.review_head",
+          "record[freeze_record].payload.phase",
+          "manifest.review_head",
+          "report.identities.functional_sha"
+        ]
       },
       "required": true
     },
@@ -425,7 +492,7 @@
             "record_kinds": [],
             "required_for_success": true,
             "role": "manifest_plan",
-            "selector": "/plan_path",
+            "selector": "/plan_source_path",
             "source": "MANIFEST"
           },
           {
@@ -449,12 +516,34 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "plan_record_id resolves to exactly one selected governing-plan record; its input record path equals plan_record_path, its payload source path equals plan_source_path, its payload digest equals the manifest binding and its candidate_binding.plan_sha256",
+          "Record path and source plan path are distinct fields and are never compared interchangeably."
+        ],
         "success": {
+          "expected": "plan_record_id resolves to exactly one selected governing-plan record; its input record path equals plan_record_path, its payload source path equals plan_source_path, its payload digest equals the manifest binding and its candidate_binding.plan_sha256",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "manifest.plan_record_id",
+            "manifest.plan_record_path",
+            "manifest.plan_source_path",
+            "record[plan_record].payload.path",
+            "record[plan_record].payload.sha256",
+            "record[plan_record].candidate_binding.plan_sha256"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "Record path and source plan path are distinct fields and are never compared interchangeably."
+        },
+        "success_selectors": [
+          "manifest.plan_record_id",
+          "manifest.plan_record_path",
+          "manifest.plan_source_path",
+          "record[plan_record].payload.path",
+          "record[plan_record].payload.sha256",
+          "record[plan_record].candidate_binding.plan_sha256"
+        ]
       },
       "required": true
     },
@@ -526,12 +615,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "values is non-empty, values_sha256 is recomputed over canonical values, profile and recorded context are present, and every source_ref resolves to a selected policy-bound record",
+          "A claimed configuration digest without the canonical values and source closure is not sufficient."
+        ],
         "success": {
+          "expected": "values is non-empty, values_sha256 is recomputed over canonical values, profile and recorded context are present, and every source_ref resolves to a selected policy-bound record",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[effective_config].payload.values",
+            "record[effective_config].payload.values_sha256",
+            "record[effective_config].payload.profile",
+            "record[effective_config].payload.recorded_context",
+            "record[effective_config].payload.source_refs"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A claimed configuration digest without the canonical values and source closure is not sufficient."
+        },
+        "success_selectors": [
+          "record[effective_config].payload.values",
+          "record[effective_config].payload.values_sha256",
+          "record[effective_config].payload.profile",
+          "record[effective_config].payload.recorded_context",
+          "record[effective_config].payload.source_refs"
+        ]
       },
       "required": true
     },
@@ -603,12 +712,34 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "phase is PRE_TRIAL_READINESS, functional_sha is the candidate SHA, all three binding refs resolve to the selected records, and recorded_context is complete and stable",
+          "NO-SHA or an absent binding ref blocks satisfaction."
+        ],
         "success": {
+          "expected": "phase is PRE_TRIAL_READINESS, functional_sha is the candidate SHA, all three binding refs resolve to the selected records, and recorded_context is complete and stable",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[freeze_record].payload.phase",
+            "record[freeze_record].payload.functional_sha",
+            "record[freeze_record].payload.governing_plan_ref",
+            "record[freeze_record].payload.effective_config_ref",
+            "record[freeze_record].payload.workload_expected_ref",
+            "record[freeze_record].payload.recorded_context"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "NO-SHA or an absent binding ref blocks satisfaction."
+        },
+        "success_selectors": [
+          "record[freeze_record].payload.phase",
+          "record[freeze_record].payload.functional_sha",
+          "record[freeze_record].payload.governing_plan_ref",
+          "record[freeze_record].payload.effective_config_ref",
+          "record[freeze_record].payload.workload_expected_ref",
+          "record[freeze_record].payload.recorded_context"
+        ]
       },
       "required": true
     },
@@ -694,12 +825,36 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "build_source_sha equals candidate SHA, build_linkage is LINKED, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
+          "An UNPROVEN linkage or empty reference closure is UNSATISFIED."
+        ],
         "success": {
+          "expected": "build_source_sha equals candidate SHA, build_linkage is LINKED, receipt/toolchain/recipe refs are non-null and resolve, and helper/executable ref arrays are complete for the build manifest",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[build_manifest].payload.build_source_sha",
+            "record[build_manifest].payload.build_linkage",
+            "record[build_manifest].payload.receipt_ref",
+            "record[build_manifest].payload.toolchain_ref",
+            "record[build_manifest].payload.helper_identity_refs",
+            "record[build_manifest].payload.executable_identity_refs",
+            "record[build_manifest].payload.recipe_ref"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "An UNPROVEN linkage or empty reference closure is UNSATISFIED."
+        },
+        "success_selectors": [
+          "record[build_manifest].payload.build_source_sha",
+          "record[build_manifest].payload.build_linkage",
+          "record[build_manifest].payload.receipt_ref",
+          "record[build_manifest].payload.toolchain_ref",
+          "record[build_manifest].payload.helper_identity_refs",
+          "record[build_manifest].payload.executable_identity_refs",
+          "record[build_manifest].payload.recipe_ref"
+        ]
       },
       "required": true
     },
@@ -771,12 +926,36 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "receipt_status is SUCCESS, recipe.executed is true, commands is non-empty, every command has an explicit successful return code, source_sha equals candidate SHA, toolchain_ref resolves, and every binary_ref resolves to a selected executable identity",
+          "INCOMPLETE, failed, empty or historical receipts cannot satisfy R1.RECEIPT."
+        ],
         "success": {
+          "expected": "receipt_status is SUCCESS, recipe.executed is true, commands is non-empty, every command has an explicit successful return code, source_sha equals candidate SHA, toolchain_ref resolves, and every binary_ref resolves to a selected executable identity",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[build_receipt].payload.receipt_status",
+            "record[build_receipt].payload.recipe.executed",
+            "record[build_receipt].payload.recipe.commands",
+            "record[build_receipt].payload.return_codes",
+            "record[build_receipt].payload.source_sha",
+            "record[build_receipt].payload.toolchain_ref",
+            "record[build_receipt].payload.binary_refs"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "INCOMPLETE, failed, empty or historical receipts cannot satisfy R1.RECEIPT."
+        },
+        "success_selectors": [
+          "record[build_receipt].payload.receipt_status",
+          "record[build_receipt].payload.recipe.executed",
+          "record[build_receipt].payload.recipe.commands",
+          "record[build_receipt].payload.return_codes",
+          "record[build_receipt].payload.source_sha",
+          "record[build_receipt].payload.toolchain_ref",
+          "record[build_receipt].payload.binary_refs"
+        ]
       },
       "required": true
     },
@@ -848,12 +1027,42 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "all ten toolchain fields are non-null; compiler, linker and build-system identities match the policy-pinned versions/bytes and all executable paths are absolute regular files",
+          "MISSING_ALLOWED or a partial toolchain is diagnostic only and cannot satisfy the check."
+        ],
         "success": {
+          "expected": "all ten toolchain fields are non-null; compiler, linker and build-system identities match the policy-pinned versions/bytes and all executable paths are absolute regular files",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[toolchain].payload.compiler_id",
+            "record[toolchain].payload.compiler_version",
+            "record[toolchain].payload.compiler_path",
+            "record[toolchain].payload.compiler_sha256",
+            "record[toolchain].payload.linker_id",
+            "record[toolchain].payload.linker_version",
+            "record[toolchain].payload.linker_path",
+            "record[toolchain].payload.linker_sha256",
+            "record[toolchain].payload.build_system_id",
+            "record[toolchain].payload.build_system_version"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "MISSING_ALLOWED or a partial toolchain is diagnostic only and cannot satisfy the check."
+        },
+        "success_selectors": [
+          "record[toolchain].payload.compiler_id",
+          "record[toolchain].payload.compiler_version",
+          "record[toolchain].payload.compiler_path",
+          "record[toolchain].payload.compiler_sha256",
+          "record[toolchain].payload.linker_id",
+          "record[toolchain].payload.linker_version",
+          "record[toolchain].payload.linker_path",
+          "record[toolchain].payload.linker_sha256",
+          "record[toolchain].payload.build_system_id",
+          "record[toolchain].payload.build_system_version"
+        ]
       },
       "required": true
     },
@@ -932,12 +1141,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "every helper ref from the build manifest resolves exactly once, every module path/source digest is present, transitive/imported closure is complete, and side_effect_review is PURE_READ_ONLY",
+          "An empty or unresolved helper map produces REQUIRED_MAPPING_MISSING."
+        ],
         "success": {
+          "expected": "every helper ref from the build manifest resolves exactly once, every module path/source digest is present, transitive/imported closure is complete, and side_effect_review is PURE_READ_ONLY",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[helper_identities].payload",
+            "record[helper_identities].payload.module_path",
+            "record[helper_identities].payload.source_sha256",
+            "record[helper_identities].payload.side_effect_review",
+            "record[build_manifest].payload.helper_identity_refs"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "An empty or unresolved helper map produces REQUIRED_MAPPING_MISSING."
+        },
+        "success_selectors": [
+          "record[helper_identities].payload",
+          "record[helper_identities].payload.module_path",
+          "record[helper_identities].payload.source_sha256",
+          "record[helper_identities].payload.side_effect_review",
+          "record[build_manifest].payload.helper_identity_refs"
+        ]
       },
       "required": true
     },
@@ -1016,12 +1245,34 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "every executable ref resolves exactly once, path/size/sha256 are present, identity_status is MATCHED, aliases are explicit and no unsafe alias/symlink is accepted",
+          "An unverified or mismatched executable identity cannot satisfy the check."
+        ],
         "success": {
+          "expected": "every executable ref resolves exactly once, path/size/sha256 are present, identity_status is MATCHED, aliases are explicit and no unsafe alias/symlink is accepted",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[executable_identities].payload",
+            "record[executable_identities].payload.role",
+            "record[executable_identities].payload.path",
+            "record[executable_identities].payload.sha256",
+            "record[executable_identities].payload.identity_status",
+            "record[build_manifest].payload.executable_identity_refs"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "An unverified or mismatched executable identity cannot satisfy the check."
+        },
+        "success_selectors": [
+          "record[executable_identities].payload",
+          "record[executable_identities].payload.role",
+          "record[executable_identities].payload.path",
+          "record[executable_identities].payload.sha256",
+          "record[executable_identities].payload.identity_status",
+          "record[build_manifest].payload.executable_identity_refs"
+        ]
       },
       "required": true
     },
@@ -1116,12 +1367,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "the build manifest reference graph resolves with no missing, duplicate or extra role; every referenced record has the expected record_kind and candidate binding",
+          "Reference existence without role-kind equality is insufficient."
+        ],
         "success": {
+          "expected": "the build manifest reference graph resolves with no missing, duplicate or extra role; every referenced record has the expected record_kind and candidate binding",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[build_manifest].payload.helper_identity_refs",
+            "record[build_manifest].payload.executable_identity_refs",
+            "record[build_manifest].payload.receipt_ref",
+            "record[build_manifest].payload.toolchain_ref",
+            "record[build_manifest].payload.recipe_ref"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "Reference existence without role-kind equality is insufficient."
+        },
+        "success_selectors": [
+          "record[build_manifest].payload.helper_identity_refs",
+          "record[build_manifest].payload.executable_identity_refs",
+          "record[build_manifest].payload.receipt_ref",
+          "record[build_manifest].payload.toolchain_ref",
+          "record[build_manifest].payload.recipe_ref"
+        ]
       },
       "required": true
     },
@@ -1205,12 +1476,32 @@
           "UNSUPPORTED_RECONCILIATION",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "the explicit non-null equality set contains only lowercase 40-hex SHAs and every member equals candidate SHA; null required bindings yield BINDING_MISSING",
+          "No equivalence, normalization or generic reconciliation is permitted."
+        ],
         "success": {
+          "expected": "the explicit non-null equality set contains only lowercase 40-hex SHAs and every member equals candidate SHA; null required bindings yield BINDING_MISSING",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "derived.source_sha_set",
+            "derived.candidate_sha",
+            "record[build_manifest].payload.build_source_sha",
+            "record[build_receipt].payload.source_sha",
+            "record[freeze_record].payload.functional_sha"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "No equivalence, normalization or generic reconciliation is permitted."
+        },
+        "success_selectors": [
+          "derived.source_sha_set",
+          "derived.candidate_sha",
+          "record[build_manifest].payload.build_source_sha",
+          "record[build_receipt].payload.source_sha",
+          "record[freeze_record].payload.functional_sha"
+        ]
       },
       "required": true
     },
@@ -1280,12 +1571,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "items are exactly the five policy names with unique paths and expected identities, map_sha256 recomputes over canonical items, and generator seed/version/count/size equal policy",
+          "A count-only or name-only expected map cannot satisfy the check."
+        ],
         "success": {
+          "expected": "items are exactly the five policy names with unique paths and expected identities, map_sha256 recomputes over canonical items, and generator seed/version/count/size equal policy",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[expected_map].payload.map_id",
+            "record[expected_map].payload.items",
+            "record[expected_map].payload.map_sha256",
+            "record[expected_map].payload.generator",
+            "policy.workload"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A count-only or name-only expected map cannot satisfy the check."
+        },
+        "success_selectors": [
+          "record[expected_map].payload.map_id",
+          "record[expected_map].payload.items",
+          "record[expected_map].payload.map_sha256",
+          "record[expected_map].payload.generator",
+          "policy.workload"
+        ]
       },
       "required": true
     },
@@ -1371,12 +1682,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, and review_head is the current manifest review head",
+          "A historical map with a valid digest is not current evidence."
+        ],
         "success": {
+          "expected": "expected-map candidate binding equals the current candidate/phase, workload_expected_sha256 equals the canonical map digest, and review_head is the current manifest review head",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[expected_map].candidate_binding.functional_sha",
+            "record[expected_map].candidate_binding.workload_expected_sha256",
+            "record[expected_map].candidate_binding.phase",
+            "derived.candidate_sha",
+            "manifest.review_head"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A historical map with a valid digest is not current evidence."
+        },
+        "success_selectors": [
+          "record[expected_map].candidate_binding.functional_sha",
+          "record[expected_map].candidate_binding.workload_expected_sha256",
+          "record[expected_map].candidate_binding.phase",
+          "derived.candidate_sha",
+          "manifest.review_head"
+        ]
       },
       "required": true
     },
@@ -1448,12 +1779,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "source_status is PRESERVED, source_ref and generator_ref resolve, source items are one-to-one with the expected map and each source identity matches its expected identity",
+          "Missing or transformed source items block satisfaction."
+        ],
         "success": {
+          "expected": "source_status is PRESERVED, source_ref and generator_ref resolve, source items are one-to-one with the expected map and each source identity matches its expected identity",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[workload_source].payload.source_ref",
+            "record[workload_source].payload.items",
+            "record[workload_source].payload.generator_ref",
+            "record[workload_source].payload.source_status",
+            "record[expected_map].payload.items"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "Missing or transformed source items block satisfaction."
+        },
+        "success_selectors": [
+          "record[workload_source].payload.source_ref",
+          "record[workload_source].payload.items",
+          "record[workload_source].payload.generator_ref",
+          "record[workload_source].payload.source_status",
+          "record[expected_map].payload.items"
+        ]
       },
       "required": true
     },
@@ -1539,12 +1890,38 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "source and repository roots are non-null stable directory observations, have matching path/identity bindings to the manifest, are not aliases or unsafe descendants, and their enumerations are complete",
+          "Null identity, empty source path, unstable read or unresolved root record is UNSATISFIED/UNKNOWN according to the direct incident."
+        ],
         "success": {
+          "expected": "source and repository roots are non-null stable directory observations, have matching path/identity bindings to the manifest, are not aliases or unsafe descendants, and their enumerations are complete",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[source_root].payload.path",
+            "record[source_root].payload.directory_role",
+            "record[source_root].payload.directory_identity",
+            "record[source_root].payload.entries_sha256",
+            "record[source_root].payload.stable_read",
+            "manifest.repo_record_id",
+            "manifest.repo_path",
+            "manifest.records[id=repo-root.current].expected.identity"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "Null identity, empty source path, unstable read or unresolved root record is UNSATISFIED/UNKNOWN according to the direct incident."
+        },
+        "success_selectors": [
+          "record[source_root].payload.path",
+          "record[source_root].payload.directory_role",
+          "record[source_root].payload.directory_identity",
+          "record[source_root].payload.entries_sha256",
+          "record[source_root].payload.stable_read",
+          "manifest.repo_record_id",
+          "manifest.repo_path",
+          "manifest.records[id=repo-root.current].expected.identity"
+        ]
       },
       "required": true
     },
@@ -1616,12 +1993,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "captured_before_trial is true, root identity resolves to the repository observation, baseline_status is PRE_TRIAL_EMPTY or COMPLETE as applicable, and entries_sha256 recomputes over the complete sorted entry table",
+          "A post-trial or partial baseline cannot satisfy this check."
+        ],
         "success": {
+          "expected": "captured_before_trial is true, root identity resolves to the repository observation, baseline_status is PRE_TRIAL_EMPTY or COMPLETE as applicable, and entries_sha256 recomputes over the complete sorted entry table",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[repository_baseline].payload.captured_before_trial",
+            "record[repository_baseline].payload.root",
+            "record[repository_baseline].payload.baseline_status",
+            "record[repository_baseline].payload.entries",
+            "record[repository_baseline].payload.entries_sha256"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A post-trial or partial baseline cannot satisfy this check."
+        },
+        "success_selectors": [
+          "record[repository_baseline].payload.captured_before_trial",
+          "record[repository_baseline].payload.root",
+          "record[repository_baseline].payload.baseline_status",
+          "record[repository_baseline].payload.entries",
+          "record[repository_baseline].payload.entries_sha256"
+        ]
       },
       "required": true
     },
@@ -1700,12 +2097,30 @@
           "HASH_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "decoder name/version/identity_sha256 exactly equal policy, full decode and dimensions are recorded, and items are exactly the five policy workload names with verified byte identities",
+          "A decoder claim or item count without full decode evidence is insufficient."
+        ],
         "success": {
+          "expected": "decoder name/version/identity_sha256 exactly equal policy, full decode and dimensions are recorded, and items are exactly the five policy workload names with verified byte identities",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[jpeg_qualification].payload.decoder",
+            "record[jpeg_qualification].payload.criteria",
+            "record[jpeg_qualification].payload.items",
+            "policy.decoder"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A decoder claim or item count without full decode evidence is insufficient."
+        },
+        "success_selectors": [
+          "record[jpeg_qualification].payload.decoder",
+          "record[jpeg_qualification].payload.criteria",
+          "record[jpeg_qualification].payload.items",
+          "policy.decoder"
+        ]
       },
       "required": true
     },
@@ -1777,12 +2192,32 @@
           "BINDING_MISMATCH",
           "DECISION_SATISFIED"
         ],
+        "semantic_requirements": [
+          "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status VERIFIED",
+          "A copy count or filename match without byte identity is insufficient."
+        ],
         "success": {
+          "expected": "copy root is isolated, source_ref resolves, copy items are one-to-one with source items, and every copied identity/hash is byte-equal with preservation status VERIFIED",
           "observed": "NON_NULL",
+          "operator": "ALL",
           "reason_code": "DECISION_SATISFIED",
+          "selectors": [
+            "record[payload_copy].payload.root",
+            "record[payload_copy].payload.items",
+            "record[payload_copy].payload.source_ref",
+            "record[payload_copy].payload.copy_preservation",
+            "record[workload_source].payload.items"
+          ],
           "state": "SATISFIED",
-          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
-        }
+          "when": "A copy count or filename match without byte identity is insufficient."
+        },
+        "success_selectors": [
+          "record[payload_copy].payload.root",
+          "record[payload_copy].payload.items",
+          "record[payload_copy].payload.source_ref",
+          "record[payload_copy].payload.copy_preservation",
+          "record[workload_source].payload.items"
+        ]
       },
       "required": true
     }
@@ -1796,6 +2231,45 @@
     "name": "Pillow",
     "version": "12.3.0",
     "version_required": true
+  },
+  "directory_observation_contract": {
+    "algorithm": "recursive no-follow lstat enumeration",
+    "digest": "SHA-256 of the encoded tuple array",
+    "exclusions": [
+      ".git",
+      ".pytest_cache",
+      "Scripts",
+      "Specs",
+      "Logs",
+      "Plots",
+      "build",
+      "build-rollback-8e92e29",
+      "cmake-build-debug",
+      "cmake-build-performance",
+      "cmake-build-sanitizer",
+      "cmake-build-sanitizer-debug"
+    ],
+    "generated_artifact_patterns": [
+      "**/__pycache__/**",
+      "**/*.pyc",
+      "**/*.pyo",
+      "**/.pytest_cache/**"
+    ],
+    "purpose": "break self-reference between the repository-root isolation observation and the evidence packet; excluded paths are not evidence for source/root isolation",
+    "stable_read": "capture root identity before and after enumeration; reject any identity change or child tuple change",
+    "symlink_policy": "record symlinks as SYMLINK and never follow them",
+    "tuple_encoding": "sorted UTF-8 JSON array with ensure_ascii=false, sort_keys=true, separators=(,,:,) applied to the row array",
+    "tuple_fields": [
+      "relative_path",
+      "kind",
+      "st_dev",
+      "st_ino",
+      "st_mode",
+      "st_nlink",
+      "st_size",
+      "st_mtime_ns",
+      "st_ctime_ns"
+    ]
   },
   "duplicate_keys": "REJECT",
   "exit_precedence": [
@@ -1902,6 +2376,71 @@
     "sha256": "2a8c18fbf43da9f692d75474c72bea9dfd796c260b0f3dfe456376abc3bbd668",
     "version": "2.43.0"
   },
+  "git_probe_contract": {
+    "candidate_sha_pattern": "^[0-9a-f]{40}$",
+    "commands": [
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "rev-parse",
+          "--verify",
+          "<candidate-sha>^{commit}"
+        ],
+        "expected_exit": 0,
+        "id": "candidate_rev_parse",
+        "stderr": "empty",
+        "stdout": "exactly <candidate-sha> plus one LF"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "cat-file",
+          "-t",
+          "<candidate-sha>"
+        ],
+        "expected_exit": 0,
+        "id": "candidate_cat_file_type",
+        "stderr": "empty",
+        "stdout": "exactly commit plus one LF"
+      },
+      {
+        "argv": [
+          "/usr/bin/git",
+          "--no-pager",
+          "--no-optional-locks",
+          "-C",
+          "<absolute-repo>",
+          "cat-file",
+          "-e",
+          "<candidate-sha>^{commit}"
+        ],
+        "expected_exit": 0,
+        "id": "candidate_cat_file_presence",
+        "stderr": "empty",
+        "stdout": "empty"
+      }
+    ],
+    "environment": "exactly git_environment",
+    "failure_classification": {
+      "malformed_candidate": "ERROR/INVALID_INPUT",
+      "object_absent": "UNKNOWN/MISSING_INPUT",
+      "probe_nonzero": "ERROR/CHECKER_ERROR",
+      "sandbox_unavailable": "ERROR/GIT_SANDBOX_UNAVAILABLE"
+    },
+    "fetch": "REJECT",
+    "local_presence_rule": "The candidate object MUST be present in the selected repository object store; no fetch, alternates, promisor, worktree or external commondir is permitted.",
+    "network": "DENY",
+    "object_type": "commit",
+    "shell": "REJECT"
+  },
   "git_repository_modes": {
     "config_worktree": "REJECT",
     "external_commondir": "REJECT",
@@ -1916,9 +2455,21 @@
     "submodules": "REJECT"
   },
   "id": "ng060-r0-r2-read-only-v1",
+  "independent_evidence_reachability": {
+    "enabled_adapter_id": null,
+    "implementation_must_emit_independently_checked": false,
+    "positive_fixture": null,
+    "reason": "No adapter in this v1 registry may promote evidence to INDEPENDENTLY_CHECKED; that class requires a future externally provisioned launcher, sandbox, trust anchor and positive attested fixture.",
+    "status": "NOT_REACHABLE_IN_V1_EXTERNAL_PROVISIONING_REQUIRED"
+  },
+  "input_manifest_schema": {
+    "id": "ng-readiness-input-manifest-v1",
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json",
+    "sha256": "6e980d1762cdbf75e747e43def493db8a18ea50116757cbdc014fd0bf518ddfe"
+  },
   "limits": {
     "artifact_bytes": 134217728,
-    "directory_entries": 10000,
+    "directory_entries": 20000,
     "git_stdout_stderr_bytes": 1048576,
     "json_depth": 32,
     "manifest_bytes": 1048576,
@@ -1957,10 +2508,19 @@
       "corroboration",
       "direct_incidents",
       "success",
+      "success_selectors",
+      "semantic_requirements",
       "reason_order"
     ],
     "reason_order_rule": "reason_order is descending first-match precedence; DECISION_SATISFIED is considered only after all required conditions pass.",
-    "record_success_rule": "Every record role used to satisfy a v1 predicate requires effective_evidence_class=INDEPENDENTLY_CHECKED; other classes are diagnostic only."
+    "record_success_rule": "Every record role used to satisfy a v1 predicate requires effective_evidence_class=INDEPENDENTLY_CHECKED; other classes are diagnostic only.",
+    "semantic_rule": "A check is SATISFIED only when every listed success selector is present, type-valid, bound to the selected candidate/phase, and satisfies the listed operator and expected relation; authentication or digest validity alone is never sufficient.",
+    "success_contract_fields": [
+      "selectors",
+      "operator",
+      "expected",
+      "when"
+    ]
   },
   "producer_attestation": {
     "algorithm": "Ed25519",
@@ -2509,11 +3069,16 @@
     ],
     "schema_id": "ng-readiness-evidence-record-v1",
     "schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json",
-    "schema_sha256": "8379172d3bf8aa327db4153ef89bb9590a35b17600a4386f6d16a3e423a24040"
+    "schema_sha256": "080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0"
   },
   "record_schema_id": "ng-readiness-evidence-record-v1",
   "record_schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json",
   "record_schema_sha256": "080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0",
+  "report_schema": {
+    "id": "ng-readiness-report-v1",
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json",
+    "sha256": "ecfe485db6e40e978872891cd190af7438b258ccd1f432fe8c3b6051f081f333"
+  },
   "sandbox_profile": {
     "child_process_group_termination": true,
     "failure": "GIT_SANDBOX_UNAVAILABLE",
@@ -2617,11 +3182,11 @@
     },
     "sha256": null,
     "source": "TRUSTED_LAUNCHER_ONLY",
-    "status": "REQUIRED_BEFORE_PROPOSAL"
+    "status": "REQUIRED_BEFORE_PROPOSAL_EXTERNAL_PROVISIONING"
   },
   "trusted_execution_profile_id": "ng060-trusted-execution-profile-v1",
   "trusted_execution_profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
-  "trusted_execution_profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+  "trusted_execution_profile_sha256": "0e43540586bf7258e720a5683a8d95f2ed327c7d3edac8058afd5cbfa708e0cb",
   "trusted_launcher": {
     "failure": "CHECKER_IDENTITY_UNVERIFIED or UNSAFE_STARTUP",
     "id": "ng060-trusted-launcher-v1",
@@ -2632,7 +3197,7 @@
       "st_mtime_ns",
       "st_ctime_ns"
     ],
-    "interface": "executes checker only after verifying checker/Python/Git/sandbox/trust-anchor identities",
+    "interface": "external provisioning contract in trusted execution profile; launcher must verify all identities and establish sandbox before exec",
     "no_network": true,
     "no_unbounded_child_processes": true,
     "path": null,
