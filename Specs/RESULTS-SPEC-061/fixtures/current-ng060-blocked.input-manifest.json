@@ -1,0 +1,430 @@
+{
+  "adapter_registry_id": "ng-readiness-adapter-registry-v1",
+  "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
+  "adapter_registry_sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+  "candidate_sha": null,
+  "manifest_id": "current-ng060-blocked",
+  "phase": "PRE_TRIAL_READINESS",
+  "plan_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+  "plan_record_id": "plan.current",
+  "policy_bytes_sha256": "e65b0d8fd4353136153a15d85297379e3512ffa56f737014ec4fc0f7e52a2b24",
+  "policy_id": "ng060-r0-r2-read-only-v1",
+  "policy_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-policy-v1.json",
+  "policy_sha256": "cf106724dfc7dd3f96fc0600114660d77765265c8eec0ff712a1e9fe300085c6",
+  "records": [
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-fixture-record-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": "4a7a568f6a1cf2c30a82cb59532e2bf54fdc44bfebd0f8c339407ac75e8a54ca",
+        "size": 1703
+      },
+      "id": "build-manifest.current",
+      "input_format": "UTF8_JSON",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/build-manifest.current.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "build-manifest",
+      "required": true,
+      "source_format": "canonical-json",
+      "source_version": "1"
+    },
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-fixture-record-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": "fd633af020fecc992539a01520702365ded7f8dfa3c656ede34762bbd88172e1",
+        "size": 1682
+      },
+      "id": "build-receipt.current",
+      "input_format": "UTF8_JSON",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/build-receipt.current.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "build-receipt",
+      "required": true,
+      "source_format": "canonical-json",
+      "source_version": "1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "effective-config.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-effective-config.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "effective-config",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "executable-identities.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-executable-identities.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "executable-identity",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-fixture-record-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": "4d9b05feea96cec86d771e020ca095226dd4cd60256352363de371c65378dd66",
+        "size": 1871
+      },
+      "id": "freeze.current",
+      "input_format": "UTF8_JSON",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/freeze.current.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "freeze-r0-r2",
+      "required": true,
+      "source_format": "canonical-json",
+      "source_version": "1"
+    },
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-fixture-record-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": "68dee1dd6991f43b363c3646dc835bae74d5ca8e2278f6d4b593a2308d1c1f66",
+        "size": 1643
+      },
+      "id": "git-repository.current",
+      "input_format": "UTF8_JSON",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/git-repository.current.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "git-repository",
+      "required": true,
+      "source_format": "canonical-json",
+      "source_version": "1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "helper-identity.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-helper-identities.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "helper-identity",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "jpeg-qualification.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-jpeg-qualification.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "jpeg-qualification",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "payload-copies.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-payload-copies.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "payload-copy",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-fixture-record-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": "1a210d849b6f50878c488796eaa9e702dfcc5ff085e9dc32134fe2ae1d4da556",
+        "size": 1630
+      },
+      "id": "plan.current",
+      "input_format": "UTF8_JSON",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/plan.current.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "governing-plan",
+      "required": true,
+      "source_format": "canonical-json",
+      "source_version": "1"
+    },
+    {
+      "accepted_evidence_class_claim": "HISTORICAL_ONLY",
+      "adapter_id": "spec061-git-directory-observation-v1",
+      "adapter_version": 1,
+      "availability_expectation": "PRESENT",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": "REPOSITORY_ROOT",
+      "expected": {
+        "entries_sha256": null,
+        "entry_count": null,
+        "identity": null
+      },
+      "id": "repo-root.current",
+      "input_format": "DIRECTORY_ENUMERATION",
+      "path": "/home/gandalf/workspace/novagenesis",
+      "path_kind": "DIRECTORY",
+      "record_kind": "directory-observation",
+      "required": true,
+      "source_format": "directory-enumeration",
+      "source_version": "GIT-METADATA-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "repository-baseline.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-repository-baseline.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "repository-baseline",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "toolchain.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/.ng-evidence/local-intra-os-v4-20379ec/m0-runtime-v4/toolchain.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "toolchain",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "workload-expected.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-workload-expected.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "workload-expected",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    },
+    {
+      "accepted_evidence_class_claim": "UNVERIFIED",
+      "adapter_id": "spec061-missing-json-v1",
+      "adapter_version": 1,
+      "availability_expectation": "MISSING_ALLOWED",
+      "candidate_binding": {
+        "build_source_sha": null,
+        "effective_config_sha256": null,
+        "functional_sha": null,
+        "phase": "PRE_TRIAL_READINESS",
+        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "workload_expected_sha256": null
+      },
+      "directory_role": null,
+      "expected": {
+        "sha256": null,
+        "size": null
+      },
+      "id": "workload-source.current",
+      "input_format": "ABSENT",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/missing-workload-source.json",
+      "path_kind": "REGULAR_FILE",
+      "record_kind": "workload-source",
+      "required": true,
+      "source_format": "absent",
+      "source_version": "ABSENT-V1"
+    }
+  ],
+  "remote_ref": {
+    "name": "refs/remotes/origin/AIOPT3",
+    "target_sha": "24a3851e1d5a90f039b9e148a1af38dd03c4d925"
+  },
+  "repo_path": "/home/gandalf/workspace/novagenesis",
+  "repo_record_id": "repo-root.current",
+  "review_head": "a2c0fe6994bf114f48b98400e3ec76d6d4fc8fab",
+  "schema_version": 1
+}

@@ -1,0 +1,53 @@
+{
+  "artifact_refs": [
+    {
+      "digest_coverage": "RAW_BYTES",
+      "id": "source",
+      "kind": "REGULAR_FILE",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+      "required": true,
+      "role": "PLAN",
+      "sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+      "size": 21969,
+      "tree_sha256": null
+    }
+  ],
+  "candidate_binding": {
+    "build_source_sha": null,
+    "effective_config_sha256": null,
+    "functional_sha": null,
+    "phase": "PRE_TRIAL_READINESS",
+    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "workload_expected_sha256": null
+  },
+  "evidence_class_claim": "HISTORICAL_ONLY",
+  "payload": {
+    "path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
+    "sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "size": 21969,
+    "source_status": "HISTORICAL_ONLY"
+  },
+  "phase": "PRE_TRIAL_READINESS",
+  "producer": {
+    "attestation_ref": null,
+    "id": "manual-review-v1",
+    "identity_sha256": null,
+    "version": "1"
+  },
+  "record_digest": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785-JCS",
+    "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
+    "sha256": "39b1a78f172af718141d0ed129aa8481ccaebb19efef3865f6b7392ab9c31d21"
+  },
+  "record_id": "plan.current",
+  "record_kind": "governing-plan",
+  "schema_version": 1,
+  "source": {
+    "adapter_id": "spec061-fixture-record-v1",
+    "adapter_version": 1,
+    "artifact_ref": "source",
+    "format": "canonical-json",
+    "version": "1"
+  }
+}

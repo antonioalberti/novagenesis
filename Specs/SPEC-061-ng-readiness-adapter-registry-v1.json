@@ -1,0 +1,647 @@
+{
+  "adapters": [
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "heading:Build linkage",
+          "target_pointer": "/payload/receipt_status",
+          "transform": "CONSTANT_RECORD_ONLY"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "MISSING_SOURCE_SHA",
+          "required": false,
+          "source_selector": "heading:source",
+          "target_pointer": "/payload/source_sha",
+          "transform": "REGEX_SHA_OR_NULL"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "MISSING_INPUT",
+          "required": false,
+          "source_selector": "heading:commands",
+          "target_pointer": "/payload/recipe/commands",
+          "transform": "MARKDOWN_TABLE_TO_COMMANDS"
+        }
+      ],
+      "id": "legacy-build-linkage-md-v1",
+      "information_loss": "DECISION_FIELDS_MAY_BE_UNREPRESENTED",
+      "maximum_effective_evidence_class": "HISTORICAL_ONLY",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "build-receipt"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "markdown",
+      "source_version": "SPEC-054-G0-BUILD-LINKAGE-V5",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "MISSING_INPUT",
+          "required": false,
+          "source_selector": "heading:review",
+          "target_pointer": "/payload/review_head",
+          "transform": "REGEX_SHA_OR_NULL"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "MISSING_INPUT",
+          "required": false,
+          "source_selector": "heading:functional_sha",
+          "target_pointer": "/payload/functional_sha",
+          "transform": "REGEX_SHA_OR_NULL"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "heading:phase",
+          "target_pointer": "/payload/phase",
+          "transform": "CONSTANT_PRE_TRIAL"
+        }
+      ],
+      "id": "legacy-freeze-md-v1",
+      "information_loss": "DECISION_FIELDS_MAY_BE_UNREPRESENTED",
+      "maximum_effective_evidence_class": "HISTORICAL_ONLY",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "freeze-r0-r2"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "markdown",
+      "source_version": "M0-FREEZE-1.0.0-PROFILE-4",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/schema_version",
+          "target_pointer": "/source/version",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "MISSING_SOURCE_SHA",
+          "required": false,
+          "source_selector": "/source_sha",
+          "target_pointer": "/payload/build_source_sha",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "HISTORICAL_REFERENCE_ONLY",
+          "required": false,
+          "source_selector": "/receipt",
+          "target_pointer": "/payload/receipt_ref",
+          "transform": "REFERENCE_RESOLUTION"
+        },
+        {
+          "failure_if_absent": "EXPLICIT_NULL",
+          "loss": "HISTORICAL_REFERENCE_ONLY",
+          "required": false,
+          "source_selector": "/toolchain",
+          "target_pointer": "/payload/toolchain_ref",
+          "transform": "REFERENCE_RESOLUTION"
+        }
+      ],
+      "id": "legacy-local-provenance-v2",
+      "information_loss": "DECISION_FIELDS_MAY_BE_UNREPRESENTED",
+      "maximum_effective_evidence_class": "HISTORICAL_ONLY",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "build-manifest"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "provenance-json",
+      "source_version": "2",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "source bytes",
+          "target_pointer": "/payload/sha256",
+          "transform": "RAW_SOURCE_DIGEST"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "source bytes",
+          "target_pointer": "/payload/size",
+          "transform": "RAW_SOURCE_SIZE"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "path",
+          "target_pointer": "/payload/path",
+          "transform": "SELECTED_PATH"
+        }
+      ],
+      "id": "legacy-plan-md-v1",
+      "information_loss": "DECISION_FIELDS_MAY_BE_UNREPRESENTED",
+      "maximum_effective_evidence_class": "HISTORICAL_ONLY",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "governing-plan"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "markdown",
+      "source_version": "RELEASE-MASTER-PLAN-V1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-effective-config-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "effective-config"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-executable-map-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "executable-identity"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-helper-map-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "helper-identity"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-jpeg-qualification-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "jpeg-qualification"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-payload-copy-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "payload-copy"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-repository-baseline-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "repository-baseline"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-workload-source-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "workload-source"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "ng060-workload-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "workload-expected"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/schema_version",
+          "target_pointer": "/schema_version",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/record_kind",
+          "target_pointer": "/record_kind",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload",
+          "target_pointer": "/payload",
+          "transform": "COPY"
+        }
+      ],
+      "id": "spec061-canonical-record-v1",
+      "information_loss": "NONE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "freeze-r0-r2",
+        "effective-config",
+        "build-manifest",
+        "build-receipt",
+        "toolchain",
+        "helper-identity",
+        "executable-identity",
+        "workload-expected",
+        "workload-source",
+        "repository-baseline",
+        "jpeg-qualification",
+        "payload-copy",
+        "git-repository",
+        "producer-attestation",
+        "capture-attestation",
+        "release-audit",
+        "bundle-verification",
+        "governing-plan",
+        "directory-observation"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/record_kind",
+          "target_pointer": "/record_kind",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload",
+          "target_pointer": "/payload",
+          "transform": "COPY"
+        }
+      ],
+      "id": "spec061-fixture-record-v1",
+      "information_loss": "FIXTURE_WRAPPER_NO_TRUST_PROMOTION",
+      "maximum_effective_evidence_class": "HISTORICAL_ONLY",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "build-manifest",
+        "build-receipt",
+        "freeze-r0-r2",
+        "git-repository",
+        "governing-plan"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "DIRECTORY_TREE",
+      "directory_role": "REPOSITORY_ROOT",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "directory descriptor",
+          "target_pointer": "/payload/directory_identity",
+          "transform": "DIRECTORY_IDENTITY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "sorted child tuple table",
+          "target_pointer": "/payload/entries_sha256",
+          "transform": "DIRECTORY_TREE_DIGEST"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "sorted child tuple table",
+          "target_pointer": "/payload/entry_count",
+          "transform": "DIRECTORY_ENTRY_COUNT"
+        }
+      ],
+      "id": "spec061-git-directory-observation-v1",
+      "information_loss": "NONE",
+      "maximum_effective_evidence_class": "RECORDED_CLAIM",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "DIRECTORY",
+      "record_kinds": [
+        "directory-observation"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "directory-enumeration",
+      "source_version": "GIT-METADATA-V1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload/root",
+          "target_pointer": "/payload/root",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload/metadata_closure",
+          "target_pointer": "/payload/metadata_closure",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload/sandbox_profile",
+          "target_pointer": "/payload/sandbox_profile",
+          "transform": "COPY"
+        }
+      ],
+      "id": "spec061-git-preflight-v1",
+      "information_loss": "NONE",
+      "maximum_effective_evidence_class": "RECORDED_CLAIM",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "git-repository"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [],
+      "id": "spec061-missing-json-v1",
+      "information_loss": "NO_PAYLOAD_AVAILABLE",
+      "maximum_effective_evidence_class": "UNVERIFIED",
+      "missing_allowed": true,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "freeze-r0-r2",
+        "effective-config",
+        "build-manifest",
+        "build-receipt",
+        "toolchain",
+        "helper-identity",
+        "executable-identity",
+        "workload-expected",
+        "workload-source",
+        "repository-baseline",
+        "jpeg-qualification",
+        "payload-copy",
+        "git-repository",
+        "producer-attestation",
+        "capture-attestation",
+        "release-audit",
+        "bundle-verification",
+        "governing-plan",
+        "directory-observation"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "absent",
+      "source_version": "ABSENT-V1",
+      "version": 1
+    },
+    {
+      "digest_coverage": "SOURCE_BYTES_AND_CANONICAL_RECORD",
+      "field_mappings": [
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/schema_version",
+          "target_pointer": "/schema_version",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/record_kind",
+          "target_pointer": "/record_kind",
+          "transform": "COPY"
+        },
+        {
+          "failure_if_absent": "BINDING_MISSING",
+          "loss": "NONE",
+          "required": true,
+          "source_selector": "/payload",
+          "target_pointer": "/payload",
+          "transform": "COPY"
+        }
+      ],
+      "id": "spec061-trusted-record-v1",
+      "information_loss": "NONE",
+      "maximum_effective_evidence_class": "INDEPENDENTLY_CHECKED",
+      "missing_allowed": false,
+      "normalized_schema_version": 1,
+      "path_kind": "REGULAR_FILE",
+      "record_kinds": [
+        "freeze-r0-r2",
+        "effective-config",
+        "build-manifest",
+        "build-receipt",
+        "toolchain",
+        "helper-identity",
+        "executable-identity",
+        "workload-expected",
+        "workload-source",
+        "repository-baseline",
+        "jpeg-qualification",
+        "payload-copy",
+        "git-repository",
+        "producer-attestation",
+        "capture-attestation",
+        "release-audit",
+        "bundle-verification",
+        "governing-plan",
+        "directory-observation"
+      ],
+      "review_status": "REVIEWED",
+      "side_effects": "NONE",
+      "source_format": "canonical-json",
+      "source_version": "1",
+      "version": 1
+    }
+  ],
+  "digest_domains": {
+    "artifact_bytes": "SHA-256 of selected regular-file bytes",
+    "canonical_record": "SHA-256 of RFC8785-JCS canonical record bytes excluding record_digest",
+    "directory_tree": "SHA-256 of sorted directory observation tuples; never a byte hash of a directory",
+    "source_bytes": "SHA-256 of observed source bytes before normalization"
+  },
+  "failure_classes": {
+    "digest_mismatch": "HASH_MISMATCH",
+    "mapping_ambiguous": "INVALID_INPUT",
+    "mapping_missing": "BINDING_MISSING",
+    "missing_source": "MISSING_INPUT",
+    "source_schema_mismatch": "UNSUPPORTED_SCHEMA_VERSION",
+    "unavailable_source": "MISSING_INPUT",
+    "unregistered_adapter": "UNSUPPORTED_ADAPTER",
+    "unsafe_source": "UNSAFE_PATH",
+    "unstable_source": "UNSTABLE_INPUT"
+  },
+  "id": "ng-readiness-adapter-registry-v1",
+  "information_loss_policy": {
+    "ambiguous_mapping": "BLOCKED",
+    "decision_relevant_unmapped": "BLOCKED",
+    "historical_normalization": "CAP_AT_HISTORICAL_ONLY",
+    "source_version_mismatch": "CHECKER_ERROR",
+    "unknown_source_member": "REJECT_IF_DECISION_RELEVANT",
+    "unsupported_format": "CHECKER_ERROR"
+  },
+  "record_schema_id": "ng-readiness-evidence-record-v1",
+  "reference_namespaces": {
+    "artifact": "record-local artifact_refs[].id; never a record_id",
+    "commit": "full lowercase 40-hex commit identity",
+    "policy": "policy artifact or policy-definition identity",
+    "record": "selected canonical record_id; never a path",
+    "role": "fixed logical role identifier"
+  },
+  "schema_version": 1
+}

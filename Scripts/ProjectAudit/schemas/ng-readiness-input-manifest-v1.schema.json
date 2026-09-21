@@ -1,0 +1,627 @@
+{
+  "$defs": {
+    "binding": {
+      "additionalProperties": false,
+      "properties": {
+        "build_source_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effective_config_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "functional_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase": {
+          "const": "PRE_TRIAL_READINESS"
+        },
+        "plan_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workload_expected_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "functional_sha",
+        "build_source_sha",
+        "plan_sha256",
+        "effective_config_sha256",
+        "workload_expected_sha256",
+        "phase"
+      ],
+      "type": "object"
+    },
+    "expected_directory": {
+      "additionalProperties": false,
+      "properties": {
+        "entries_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entry_count": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        }
+      },
+      "required": [
+        "identity",
+        "entry_count",
+        "entries_sha256"
+      ],
+      "type": "object"
+    },
+    "expected_missing": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "type": "null"
+        },
+        "size": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "size",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "expected_present": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "size",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "fs_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "st_ctime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_dev": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_ino": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mode": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mtime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_nlink": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_size": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "st_dev",
+        "st_ino",
+        "st_mode",
+        "st_nlink",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns"
+      ],
+      "type": "object"
+    },
+    "record": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "availability_expectation": {
+                    "const": "PRESENT"
+                  },
+                  "path_kind": {
+                    "const": "REGULAR_FILE"
+                  }
+                },
+                "required": [
+                  "availability_expectation",
+                  "path_kind"
+                ]
+              },
+              {
+                "not": {
+                  "properties": {
+                    "record_kind": {
+                      "const": "directory-observation"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "directory_role": {
+                "const": null
+              },
+              "expected": {
+                "$ref": "#/$defs/expected_present"
+              },
+              "input_format": {
+                "enum": [
+                  "UTF8_JSON",
+                  "MARKDOWN"
+                ]
+              }
+            },
+            "required": [
+              "expected"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "availability_expectation": {
+                "const": "MISSING_ALLOWED"
+              }
+            },
+            "required": [
+              "availability_expectation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "directory_role": {
+                "const": null
+              },
+              "expected": {
+                "$ref": "#/$defs/expected_missing"
+              },
+              "input_format": {
+                "const": "ABSENT"
+              },
+              "path_kind": {
+                "const": "REGULAR_FILE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "path_kind": {
+                "const": "DIRECTORY"
+              }
+            },
+            "required": [
+              "path_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "directory_role": {
+                "type": "string"
+              },
+              "expected": {
+                "$ref": "#/$defs/expected_directory"
+              },
+              "input_format": {
+                "const": "DIRECTORY_ENUMERATION"
+              }
+            },
+            "required": [
+              "directory_role",
+              "expected",
+              "input_format"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "accepted_evidence_class_claim": {
+          "enum": [
+            "RECORDED_CLAIM",
+            "INDEPENDENTLY_CHECKED",
+            "HISTORICAL_ONLY",
+            "UNVERIFIED"
+          ]
+        },
+        "adapter_id": {
+          "enum": [
+            "legacy-build-linkage-md-v1",
+            "legacy-freeze-md-v1",
+            "legacy-local-provenance-v2",
+            "legacy-plan-md-v1",
+            "ng060-effective-config-v1",
+            "ng060-executable-map-v1",
+            "ng060-helper-map-v1",
+            "ng060-jpeg-qualification-v1",
+            "ng060-payload-copy-v1",
+            "ng060-repository-baseline-v1",
+            "ng060-workload-source-v1",
+            "ng060-workload-v1",
+            "spec061-canonical-record-v1",
+            "spec061-fixture-record-v1",
+            "spec061-git-directory-observation-v1",
+            "spec061-git-preflight-v1",
+            "spec061-missing-json-v1",
+            "spec061-trusted-record-v1"
+          ],
+          "type": "string"
+        },
+        "adapter_version": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "availability_expectation": {
+          "enum": [
+            "PRESENT",
+            "MISSING_ALLOWED"
+          ]
+        },
+        "candidate_binding": {
+          "additionalProperties": false,
+          "properties": {
+            "build_source_sha": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effective_config_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "functional_sha": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "phase": {
+              "const": "PRE_TRIAL_READINESS"
+            },
+            "plan_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "workload_expected_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "functional_sha",
+            "build_source_sha",
+            "plan_sha256",
+            "effective_config_sha256",
+            "workload_expected_sha256",
+            "phase"
+          ],
+          "type": "object"
+        },
+        "directory_role": {
+          "enum": [
+            "REPOSITORY_ROOT",
+            "GIT_METADATA_CLOSURE",
+            "SOURCE_ROOT",
+            "PAYLOAD_ROOT",
+            null
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expected": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/expected_present"
+            },
+            {
+              "$ref": "#/$defs/expected_missing"
+            },
+            {
+              "$ref": "#/$defs/expected_directory"
+            }
+          ]
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "input_format": {
+          "enum": [
+            "UTF8_JSON",
+            "MARKDOWN",
+            "DIRECTORY_ENUMERATION",
+            "ABSENT"
+          ]
+        },
+        "path": {
+          "pattern": "^/[^\\u0000]*$",
+          "type": "string"
+        },
+        "path_kind": {
+          "enum": [
+            "REGULAR_FILE",
+            "DIRECTORY"
+          ]
+        },
+        "record_kind": {
+          "enum": [
+            "freeze-r0-r2",
+            "effective-config",
+            "build-manifest",
+            "build-receipt",
+            "toolchain",
+            "helper-identity",
+            "executable-identity",
+            "workload-expected",
+            "workload-source",
+            "repository-baseline",
+            "jpeg-qualification",
+            "payload-copy",
+            "git-repository",
+            "producer-attestation",
+            "capture-attestation",
+            "release-audit",
+            "bundle-verification",
+            "governing-plan",
+            "directory-observation"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "source_format": {
+          "enum": [
+            "canonical-json",
+            "provenance-json",
+            "markdown",
+            "directory-enumeration",
+            "git-metadata-directory",
+            "workload-json",
+            "config-json",
+            "helper-map-json",
+            "executable-map-json",
+            "inventory-json",
+            "jpeg-set-json",
+            "payload-copy-json",
+            "attestation-json",
+            "release-audit-json",
+            "bundle-verification-json",
+            "absent"
+          ]
+        },
+        "source_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "record_kind",
+        "adapter_id",
+        "path",
+        "required",
+        "expected",
+        "candidate_binding",
+        "accepted_evidence_class_claim",
+        "path_kind",
+        "input_format",
+        "availability_expectation",
+        "directory_role",
+        "adapter_version",
+        "source_format",
+        "source_version"
+      ],
+      "type": "object"
+    },
+    "sha40": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "sha64": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "ng-readiness-input-manifest-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_registry_id": {
+      "const": "ng-readiness-adapter-registry-v1"
+    },
+    "adapter_registry_path": {
+      "pattern": "^/[^\\u0000]*$",
+      "type": "string"
+    },
+    "adapter_registry_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "candidate_sha": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "manifest_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "phase": {
+      "const": "PRE_TRIAL_READINESS"
+    },
+    "plan_path": {
+      "pattern": "^/[^\\u0000]*$",
+      "type": "string"
+    },
+    "plan_record_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "policy_bytes_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_id": {
+      "const": "ng060-r0-r2-read-only-v1"
+    },
+    "policy_path": {
+      "pattern": "^/[^\\u0000]*$",
+      "type": "string"
+    },
+    "policy_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/record"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "remote_ref": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^refs/[A-Za-z0-9._/-]+$",
+              "type": "string"
+            },
+            "target_sha": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "target_sha"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "repo_path": {
+      "pattern": "^/[^\\u0000]*$",
+      "type": "string"
+    },
+    "repo_record_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+      "type": "string"
+    },
+    "review_head": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "policy_id",
+    "policy_path",
+    "policy_sha256",
+    "phase",
+    "repo_path",
+    "plan_path",
+    "review_head",
+    "remote_ref",
+    "candidate_sha",
+    "records",
+    "adapter_registry_id",
+    "adapter_registry_path",
+    "adapter_registry_sha256",
+    "plan_record_id",
+    "repo_record_id",
+    "policy_bytes_sha256"
+  ],
+  "title": "NovaGenesis read-only R0-R2 input manifest v1 with closed adapter/path contract",
+  "type": "object"
+}

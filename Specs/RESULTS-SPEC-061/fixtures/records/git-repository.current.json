@@ -1,0 +1,60 @@
+{
+  "artifact_refs": [
+    {
+      "digest_coverage": "CANONICAL_TREE_MANIFEST",
+      "id": "source",
+      "kind": "GIT_REPOSITORY",
+      "path": "/home/gandalf/workspace/novagenesis/.git",
+      "required": true,
+      "role": "GIT_METADATA",
+      "sha256": null,
+      "size": null,
+      "tree_sha256": null
+    }
+  ],
+  "candidate_binding": {
+    "build_source_sha": null,
+    "effective_config_sha256": null,
+    "functional_sha": null,
+    "phase": "PRE_TRIAL_READINESS",
+    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "workload_expected_sha256": null
+  },
+  "evidence_class_claim": "HISTORICAL_ONLY",
+  "payload": {
+    "config_digest": null,
+    "git_dir": "/home/gandalf/workspace/novagenesis/.git",
+    "metadata_closure": [],
+    "root": {
+      "identity": null,
+      "path": "/home/gandalf/workspace/novagenesis"
+    },
+    "sandbox_profile": "UNVERIFIED",
+    "unsupported_modes": [
+      "UNVERIFIED"
+    ]
+  },
+  "phase": "PRE_TRIAL_READINESS",
+  "producer": {
+    "attestation_ref": null,
+    "id": "manual-review-v1",
+    "identity_sha256": null,
+    "version": "1"
+  },
+  "record_digest": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785-JCS",
+    "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
+    "sha256": "ed7595461eb7126d46b7f6ac3d3d4f57e8429a7765fa93f0901d45dd3d8973ad"
+  },
+  "record_id": "git-repository.current",
+  "record_kind": "git-repository",
+  "schema_version": 1,
+  "source": {
+    "adapter_id": "spec061-fixture-record-v1",
+    "adapter_version": 1,
+    "artifact_ref": "source",
+    "format": "canonical-json",
+    "version": "1"
+  }
+}

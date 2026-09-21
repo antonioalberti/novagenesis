@@ -1,0 +1,65 @@
+{
+  "artifact_refs": [
+    {
+      "digest_coverage": "RAW_BYTES",
+      "id": "source",
+      "kind": "REGULAR_FILE",
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-054/g0-freeze-v4-20260914.md",
+      "required": true,
+      "role": "OTHER",
+      "sha256": "f0c618d8cad70abe2447e8c3e75cdca16fc53a271d4e08918e1e5cb32f9cda7a",
+      "size": 2639,
+      "tree_sha256": null
+    }
+  ],
+  "candidate_binding": {
+    "build_source_sha": null,
+    "effective_config_sha256": null,
+    "functional_sha": null,
+    "phase": "PRE_TRIAL_READINESS",
+    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "workload_expected_sha256": null
+  },
+  "evidence_class_claim": "HISTORICAL_ONLY",
+  "payload": {
+    "effective_config_ref": null,
+    "functional_sha": null,
+    "governing_plan_ref": null,
+    "phase": "PRE_TRIAL_READINESS",
+    "profile": "native-privileged",
+    "recorded_context": {
+      "cwd": null,
+      "env_digest": null,
+      "euid": null
+    },
+    "remote_ref": {
+      "name": "refs/remotes/origin/AIOPT3",
+      "target_sha": "24a3851e1d5a90f039b9e148a1af38dd03c4d925"
+    },
+    "review_head": null,
+    "workload_expected_ref": null
+  },
+  "phase": "PRE_TRIAL_READINESS",
+  "producer": {
+    "attestation_ref": null,
+    "id": "manual-review-v1",
+    "identity_sha256": null,
+    "version": "1"
+  },
+  "record_digest": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785-JCS",
+    "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
+    "sha256": "98c90222aab87946440b5974bd322ed7003507f06bfdc8bd410cc67234bebce9"
+  },
+  "record_id": "freeze.current",
+  "record_kind": "freeze-r0-r2",
+  "schema_version": 1,
+  "source": {
+    "adapter_id": "spec061-fixture-record-v1",
+    "adapter_version": 1,
+    "artifact_ref": "source",
+    "format": "canonical-json",
+    "version": "1"
+  }
+}

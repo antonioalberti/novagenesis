@@ -1,0 +1,2661 @@
+{
+  "accepted_evidence_classes": [
+    "RECORDED_CLAIM",
+    "INDEPENDENTLY_CHECKED",
+    "HISTORICAL_ONLY",
+    "UNVERIFIED"
+  ],
+  "accepted_producers": [
+    {
+      "authentication": "TRUST_ANCHORED_ED25519",
+      "id": "local-provenance-v1",
+      "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+      "trust_anchor_id": null,
+      "trust_anchor_key_id": null
+    },
+    {
+      "authentication": "TRUST_ANCHORED_ED25519",
+      "id": "payload-evidence-v1",
+      "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+      "trust_anchor_id": null,
+      "trust_anchor_key_id": null
+    },
+    {
+      "authentication": "TRUST_ANCHORED_ED25519",
+      "id": "release-audit-v1",
+      "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+      "trust_anchor_id": null,
+      "trust_anchor_key_id": null
+    },
+    {
+      "authentication": "TRUST_ANCHORED_ED25519",
+      "id": "spec061-fixture-v1",
+      "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+      "trust_anchor_id": null,
+      "trust_anchor_key_id": null
+    },
+    {
+      "authentication": "NONE_FOR_RECORDED_CLAIM",
+      "id": "manual-review-v1",
+      "maximum_effective_class": "RECORDED_CLAIM",
+      "trust_anchor_id": null,
+      "trust_anchor_key_id": null
+    }
+  ],
+  "adapter_registry_contract": {
+    "decision_relevant_loss": "REQUIRED_MAPPING_MISSING",
+    "id": "ng-readiness-adapter-registry-v1",
+    "path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
+    "sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+    "source_schema_mismatch": "UNSUPPORTED_SCHEMA_VERSION",
+    "trusted_current_adapter_id": "spec061-trusted-record-v1",
+    "unknown_adapter": "UNSUPPORTED_ADAPTER",
+    "unreviewed_adapter": "ADAPTER_UNREVIEWED"
+  },
+  "adapter_registry_id": "ng-readiness-adapter-registry-v1",
+  "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
+  "adapter_registry_sha256": "e5527bc5e1d11f553f9585fcef69a9e56c53850d4efa5e1cc12c220b1b1b8d3b",
+  "check_registry": [
+    {
+      "depends_on": [],
+      "gate": "R0",
+      "id": "R0.CANDIDATE_EXPLICIT",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 0,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "IDENTITY_MISMATCH",
+            "state": "ERROR",
+            "when": "CLI and manifest candidates differ"
+          },
+          {
+            "observed": "NULL",
+            "reason_code": "INVALID_INPUT",
+            "state": "ERROR",
+            "when": "Either supplied candidate is malformed"
+          },
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Both candidate values are null"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "A valid manifest candidate is bound and CLI is omitted or equal"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "MANIFEST"
+            ],
+            "null_means": "NO_CANDIDATE",
+            "nullable": true,
+            "record_kinds": [],
+            "required_for_success": false,
+            "role": "manifest_candidate",
+            "selector": "/candidate_sha",
+            "source": "MANIFEST"
+          },
+          {
+            "cardinality": "ZERO_OR_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "CLI"
+            ],
+            "null_means": "OMITTED_EQUALS_MANIFEST",
+            "nullable": true,
+            "record_kinds": [],
+            "required_for_success": false,
+            "role": "cli_candidate",
+            "selector": "--candidate-sha",
+            "source": "CLI"
+          }
+        ],
+        "reason_order": [
+          "IDENTITY_MISMATCH",
+          "INVALID_INPUT",
+          "MISSING_INPUT",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.CANDIDATE_EXPLICIT"
+      ],
+      "gate": "R0",
+      "id": "R0.CANDIDATE_COMMIT",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "DERIVED"
+            ],
+            "null_means": "DEPENDENCY_DEFERRED",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "candidate_sha",
+            "selector": "R0.CANDIDATE_EXPLICIT",
+            "source": "DERIVED"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "git-repository"
+            ],
+            "required_for_success": true,
+            "role": "git_repository",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "GIT_SANDBOX"
+            ],
+            "null_means": "SANDBOX_OR_READ_FAILURE",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "commit_probe",
+            "selector": "rev-parse/cat-file",
+            "source": "GIT_SANDBOX"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "TRUSTED_LAUNCHER"
+            ],
+            "null_means": "GIT_SANDBOX_UNAVAILABLE",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "sandbox_attestation",
+            "selector": "/sandbox_profile",
+            "source": "TRUSTED_LAUNCHER"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.CANDIDATE_EXPLICIT"
+      ],
+      "gate": "R0",
+      "id": "R0.IDENTITY_SEPARATION",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "freeze-r0-r2"
+            ],
+            "required_for_success": true,
+            "role": "freeze_record",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "REPORT"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "identity_projection",
+            "selector": "/identities",
+            "source": "REPORT"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.CANDIDATE_EXPLICIT"
+      ],
+      "gate": "R0",
+      "id": "R0.PLAN_BINDING",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "governing-plan"
+            ],
+            "required_for_success": true,
+            "role": "plan_record",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "MANIFEST"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "manifest_plan",
+            "selector": "/plan_path",
+            "source": "MANIFEST"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "MANIFEST"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "plan_record_id",
+            "selector": "/plan_record_id",
+            "source": "MANIFEST"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.PLAN_BINDING"
+      ],
+      "gate": "R0",
+      "id": "R0.EFFECTIVE_CONFIG",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "effective-config"
+            ],
+            "required_for_success": true,
+            "role": "effective_config",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.PLAN_BINDING"
+      ],
+      "gate": "R0",
+      "id": "R0.FREEZE",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "freeze-r0-r2"
+            ],
+            "required_for_success": true,
+            "role": "freeze_record",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R0.CANDIDATE_COMMIT"
+      ],
+      "gate": "R1",
+      "id": "R1.BUILD_SOURCE_BINDING",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "build-manifest"
+            ],
+            "required_for_success": true,
+            "role": "build_manifest",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "DERIVED"
+            ],
+            "null_means": "DEPENDENCY_DEFERRED",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "candidate_binding",
+            "selector": "R0.CANDIDATE_COMMIT",
+            "source": "DERIVED"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.BUILD_SOURCE_BINDING"
+      ],
+      "gate": "R1",
+      "id": "R1.RECEIPT",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "build-receipt"
+            ],
+            "required_for_success": true,
+            "role": "build_receipt",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.RECEIPT"
+      ],
+      "gate": "R1",
+      "id": "R1.TOOLCHAIN",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "toolchain"
+            ],
+            "required_for_success": true,
+            "role": "toolchain",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.BUILD_SOURCE_BINDING"
+      ],
+      "gate": "R1",
+      "id": "R1.HELPER_IDENTITIES",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NON_NULL",
+            "reason_code": "REQUIRED_MAPPING_MISSING",
+            "state": "UNKNOWN",
+            "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
+          },
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "ALL_DECLARED_NON_NULL",
+            "constraint": "at least one declared non-null reference; every reference resolves to exactly one selected record",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "helper-identity"
+            ],
+            "required_for_success": true,
+            "role": "helper_identities",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "REQUIRED_MAPPING_MISSING",
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.RECEIPT"
+      ],
+      "gate": "R1",
+      "id": "R1.EXECUTABLE_IDENTITIES",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NON_NULL",
+            "reason_code": "REQUIRED_MAPPING_MISSING",
+            "state": "UNKNOWN",
+            "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
+          },
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "ALL_DECLARED_NON_NULL",
+            "constraint": "at least one declared non-null reference; every reference resolves to exactly one selected record",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "executable-identity"
+            ],
+            "required_for_success": true,
+            "role": "executable_identities",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "REQUIRED_MAPPING_MISSING",
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.EXECUTABLE_IDENTITIES"
+      ],
+      "gate": "R1",
+      "id": "R1.ROLE_LINKAGE",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NON_NULL",
+            "reason_code": "REQUIRED_MAPPING_MISSING",
+            "state": "UNKNOWN",
+            "when": "A required declared-reference role is empty, null or does not resolve to at least one selected record"
+          },
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "build-manifest"
+            ],
+            "required_for_success": true,
+            "role": "build_manifest",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "ALL_DECLARED_NON_NULL",
+            "constraint": "at least one declared non-null reference; every reference resolves to exactly one selected record",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "executable-identity"
+            ],
+            "required_for_success": true,
+            "role": "executable_identities",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "REQUIRED_MAPPING_MISSING",
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R1.BUILD_SOURCE_BINDING"
+      ],
+      "gate": "R1",
+      "id": "R1.SHA_RECONCILIATION",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 0,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Candidate is null"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "CROSS_SOURCE_SHA_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "Two non-null members of the explicit equality set differ"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "UNSUPPORTED_RECONCILIATION",
+            "state": "UNSATISFIED",
+            "when": "No reviewed comparison applies"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "All non-null members equal candidate"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "ALL_DECLARED_NON_NULL",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "DERIVED"
+            ],
+            "null_means": "NO_CANDIDATE",
+            "nullable": true,
+            "record_kinds": [],
+            "required_for_success": false,
+            "role": "source_sha_set",
+            "selector": "§11.5.4",
+            "source": "DERIVED"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "MANIFEST"
+            ],
+            "null_means": "NO_CANDIDATE",
+            "nullable": true,
+            "record_kinds": [],
+            "required_for_success": false,
+            "role": "candidate_sha",
+            "selector": "/candidate_sha",
+            "source": "MANIFEST"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "CROSS_SOURCE_SHA_MISMATCH",
+          "UNSUPPORTED_RECONCILIATION",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [],
+      "gate": "R2",
+      "id": "R2.WORKLOAD_EXPECTED",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "workload-expected"
+            ],
+            "required_for_success": true,
+            "role": "expected_map",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.WORKLOAD_EXPECTED"
+      ],
+      "gate": "R2",
+      "id": "R2.WORKLOAD_FRESHNESS",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "workload-expected"
+            ],
+            "required_for_success": true,
+            "role": "expected_map",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "DERIVED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "candidate_binding",
+            "selector": "candidate_binding",
+            "source": "DERIVED"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.WORKLOAD_EXPECTED"
+      ],
+      "gate": "R2",
+      "id": "R2.SOURCE_PRESERVED",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "workload-source"
+            ],
+            "required_for_success": true,
+            "role": "workload_source",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.SOURCE_PRESERVED"
+      ],
+      "gate": "R2",
+      "id": "R2.ROOT_ISOLATION",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "directory-observation"
+            ],
+            "required_for_success": true,
+            "role": "source_root",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "MANIFEST"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "repository_root",
+            "selector": "/repo_record_id",
+            "source": "MANIFEST"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.ROOT_ISOLATION"
+      ],
+      "gate": "R2",
+      "id": "R2.REPOSITORY_BASELINE",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "repository-baseline"
+            ],
+            "required_for_success": true,
+            "role": "repository_baseline",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.WORKLOAD_EXPECTED"
+      ],
+      "gate": "R2",
+      "id": "R2.JPEG_QUALIFICATION",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "QUALIFICATION_MISSING",
+            "state": "UNKNOWN",
+            "when": "Qualification record unavailable"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HASH_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "Decoder or item identity differs from policy"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "Exactly five items and decoder identity satisfy policy"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "jpeg-qualification"
+            ],
+            "required_for_success": true,
+            "role": "jpeg_qualification",
+            "selector": "/payload",
+            "source": "RECORD"
+          },
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "POLICY"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [],
+            "required_for_success": true,
+            "role": "decoder_policy",
+            "selector": "/decoder",
+            "source": "POLICY"
+          }
+        ],
+        "reason_order": [
+          "QUALIFICATION_MISSING",
+          "HASH_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    },
+    {
+      "depends_on": [
+        "R2.SOURCE_PRESERVED"
+      ],
+      "gate": "R2",
+      "id": "R2.PRESERVED_COPIES",
+      "not_applicable": false,
+      "predicate": {
+        "corroboration": {
+          "allow_same_producer": false,
+          "independent_producers_min": 1,
+          "mode": "ALL_DECLARED_ROLES_AND_POLICY",
+          "required_relations": [
+            "All required role cardinalities resolve exactly",
+            "All record-backed roles have effective_evidence_class=INDEPENDENTLY_CHECKED",
+            "All declared bindings and digest equalities hold"
+          ]
+        },
+        "direct_incidents": [
+          {
+            "observed": "NULL",
+            "reason_code": "MISSING_INPUT",
+            "state": "UNKNOWN",
+            "when": "Any required role is unavailable or absent"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "HISTORICAL_ONLY",
+            "state": "UNSATISFIED",
+            "when": "A selected record is historical-only or lacks admissible trust"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "BINDING_MISMATCH",
+            "state": "UNSATISFIED",
+            "when": "A required binding or equality relation differs"
+          },
+          {
+            "observed": "NON_NULL",
+            "reason_code": "DECISION_SATISFIED",
+            "state": "SATISFIED",
+            "when": "The predicate-specific success relation holds"
+          }
+        ],
+        "input_roles": [
+          {
+            "cardinality": "EXACTLY_ONE",
+            "constraint": "selected, schema-valid and policy-bound",
+            "evidence_classes": [
+              "INDEPENDENTLY_CHECKED"
+            ],
+            "null_means": "MISSING_INPUT",
+            "nullable": false,
+            "record_kinds": [
+              "payload-copy"
+            ],
+            "required_for_success": true,
+            "role": "payload_copy",
+            "selector": "/payload",
+            "source": "RECORD"
+          }
+        ],
+        "reason_order": [
+          "MISSING_INPUT",
+          "HISTORICAL_ONLY",
+          "BINDING_MISMATCH",
+          "DECISION_SATISFIED"
+        ],
+        "success": {
+          "observed": "NON_NULL",
+          "reason_code": "DECISION_SATISFIED",
+          "state": "SATISFIED",
+          "when": "All required roles, bindings, evidence classes and corroboration relations pass"
+        }
+      },
+      "required": true
+    }
+  ],
+  "cross_source_reconciliation": "STRICT_EQUALITY_NO_EQUIVALENCE",
+  "decoder": {
+    "dimensions_required": true,
+    "full_decode_required": true,
+    "identity_sha256": "7361b6ad3878589affe5956e4a4da24d71398b0891fd3a8c15e9362217b4ca01",
+    "identity_sha256_required": true,
+    "name": "Pillow",
+    "version": "12.3.0",
+    "version_required": true
+  },
+  "duplicate_keys": "REJECT",
+  "exit_precedence": [
+    40,
+    30,
+    20,
+    0
+  ],
+  "gate_dependencies": {
+    "R0": [],
+    "R1": [
+      "R0"
+    ],
+    "R2": [
+      "R0"
+    ]
+  },
+  "git_argv_templates": [
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "rev-parse",
+      "--verify",
+      "<40-lowercase-hex>^{commit}"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "rev-parse",
+      "--verify",
+      "HEAD^{commit}"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "rev-parse",
+      "--verify",
+      "<full-local-ref>^{commit}"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "cat-file",
+      "-e",
+      "<40-lowercase-hex>^{commit}"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "-c",
+      "core.fsmonitor=false",
+      "-c",
+      "core.untrackedCache=false",
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all",
+      "--ignore-submodules=all"
+    ],
+    [
+      "/usr/bin/git",
+      "--no-pager",
+      "--no-optional-locks",
+      "-C",
+      "<absolute-repo>",
+      "ls-tree",
+      "-r",
+      "-z",
+      "--full-tree",
+      "<40-lowercase-hex>"
+    ]
+  ],
+  "git_environment": {
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_SYSTEM": "/dev/null",
+    "GIT_NO_LAZY_FETCH": "1",
+    "GIT_OPTIONAL_LOCKS": "0",
+    "GIT_TERMINAL_PROMPT": "0",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "PATH": "/usr/bin:/bin",
+    "inherit": "REJECT"
+  },
+  "git_executable": {
+    "no_lazy_fetch": "REQUIRED",
+    "path": "/usr/bin/git",
+    "sandbox": "REQUIRED",
+    "sha256": "2a8c18fbf43da9f692d75474c72bea9dfd796c260b0f3dfe456376abc3bbd668",
+    "version": "2.43.0"
+  },
+  "git_repository_modes": {
+    "config_worktree": "REJECT",
+    "external_commondir": "REJECT",
+    "external_worktree": "REJECT",
+    "helper_execution": "REJECT",
+    "http_alternates": "REJECT",
+    "local_config_includes": "REJECT",
+    "nested_repositories": "REJECT",
+    "network": "REJECT",
+    "object_alternates": "REJECT",
+    "promisor_repositories": "REJECT",
+    "submodules": "REJECT"
+  },
+  "id": "ng060-r0-r2-read-only-v1",
+  "limits": {
+    "artifact_bytes": 134217728,
+    "directory_entries": 10000,
+    "git_stdout_stderr_bytes": 1048576,
+    "json_depth": 32,
+    "manifest_bytes": 1048576,
+    "record_bytes": 4194304,
+    "subprocess_timeout_s": 10,
+    "total_runtime_s": 60
+  },
+  "output": {
+    "overwrite": "REJECT",
+    "parent_creation": "REJECT",
+    "stdout_redirect": "CALLER_OWNED_NOT_EVIDENCE",
+    "symlink_follow": "REJECT"
+  },
+  "phase": "PRE_TRIAL_READINESS",
+  "predicate_registry_contract": {
+    "cardinality_values": [
+      "EXACTLY_ONE",
+      "ZERO_OR_ONE",
+      "ALL_DECLARED_REFS",
+      "EXACTLY_ONE_PER_ROLE",
+      "EXACTLY_FIVE_ITEMS",
+      "ALL_DECLARED_NON_NULL"
+    ],
+    "entry_fields": [
+      "id",
+      "gate",
+      "required",
+      "not_applicable",
+      "depends_on",
+      "predicate"
+    ],
+    "not_applicable_rule": "All 20 v1 checks have not_applicable=false.",
+    "nullability_rule": "Explicit null is permitted only when the role declares nullable=true and null_means; null cannot satisfy unless success explicitly says so.",
+    "predicate_fields": [
+      "input_roles",
+      "corroboration",
+      "direct_incidents",
+      "success",
+      "reason_order"
+    ],
+    "reason_order_rule": "reason_order is descending first-match precedence; DECISION_SATISFIED is considered only after all required conditions pass.",
+    "record_success_rule": "Every record role used to satisfy a v1 predicate requires effective_evidence_class=INDEPENDENTLY_CHECKED; other classes are diagnostic only."
+  },
+  "producer_attestation": {
+    "algorithm": "Ed25519",
+    "allow_key_delegation": false,
+    "allow_key_rotation": false,
+    "attestation_cardinality": "EXACTLY_ONE_PER_SUBJECT",
+    "authentication_result_values": [
+      "TRUST_ANCHORED",
+      "UNAUTHENTICATED",
+      "UNTRUSTED",
+      "NOT_REQUIRED_FOR_RECORDED_CLAIM"
+    ],
+    "policy_binding_required": true,
+    "producer_id_must_be_allowlisted": true,
+    "public_key_source": "TRUST_ANCHOR_ONLY",
+    "record_public_key_must_equal_anchor": true,
+    "record_public_key_role": "OPTIONAL_ECHO",
+    "reject_self_supplied_key": true,
+    "signature_required_for_independently_checked": true,
+    "signature_statement_fields": [
+      "trust_anchor_id",
+      "trust_anchor_key_id",
+      "producer_id",
+      "producer_identity_sha256",
+      "subject_ref",
+      "subject_sha256",
+      "policy_sha256",
+      "statement_sha256"
+    ],
+    "statement_digest": "SHA256_OF_CANONICAL_ATTESTATION_STATEMENT",
+    "subject_digest": "SHA256_OF_CANONICAL_SUBJECT_RECORD_BYTES",
+    "trust_anchor_id": "ng060-producer-trust-anchor-v1",
+    "trust_anchor_key_id_required": true
+  },
+  "python_interpreter": {
+    "argv": [
+      "-I",
+      "-B",
+      "-S"
+    ],
+    "bytecode_disabled": true,
+    "path": "/home/gandalf/.hermes/hermes-agent/venv/bin/python3",
+    "sha256": "572cfa2a8597e2f431c785613539b1d219fa99eecf5ffb5765731a2ebc3e692a",
+    "site_disabled": true,
+    "startup_imports": [
+      "sys"
+    ],
+    "version": "3.11.15"
+  },
+  "reason_codes": [
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "MISSING_INPUT",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "INVALID_INPUT",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "SCHEMA_MISMATCH",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "IDENTITY_MISMATCH",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "HISTORICAL_ONLY",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "SIDE_EFFECT_BOUNDARY",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "HASH_MISMATCH",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "ids": [
+          "R1.SHA_RECONCILIATION"
+        ],
+        "kind": "CHECK_IDS"
+      },
+      "code": "CROSS_SOURCE_SHA_MISMATCH",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "ids": [
+          "R1.SHA_RECONCILIATION"
+        ],
+        "kind": "CHECK_IDS"
+      },
+      "code": "UNSUPPORTED_RECONCILIATION",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSUPPORTED_RECORD_KIND",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSUPPORTED_SCHEMA_VERSION",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "DUPLICATE_KEY",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "READ_FAILURE",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN",
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "PRODUCER_UNTRUSTED",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "PRODUCER_AUTHENTICATION_MISSING",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "BINDING_MISSING",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "BINDING_MISMATCH",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "PHASE_MISMATCH",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "UNSATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "POST_TRIAL_EVIDENCE",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "DEPENDENCY_REFERENCE_ERROR",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "DEPENDENCY_CYCLE",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "DEPENDENCY_BLOCKED",
+      "exit_class": "BLOCKED",
+      "gate_effect": "OPEN_OR_BLOCKED",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "IMPORT_SIDE_EFFECT",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "gate": "R0",
+        "kind": "GATE"
+      },
+      "code": "UNSAFE_REPOSITORY",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSAFE_PATH",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "gate": "R2",
+        "kind": "GATE"
+      },
+      "code": "UNSAFE_ALIAS",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSTABLE_INPUT",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "OUTPUT_PATH_CONFLICT",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "LIMIT_EXCEEDED",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSAFE_STARTUP",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "CHECKER_IDENTITY_UNVERIFIED",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "ids": [
+          "R0.CANDIDATE_COMMIT"
+        ],
+        "kind": "CHECK_IDS"
+      },
+      "code": "GIT_SANDBOX_UNAVAILABLE",
+      "exit_class": "UNSAFE_INCOMPLETE",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "ids": [
+          "R2.JPEG_QUALIFICATION"
+        ],
+        "kind": "CHECK_IDS"
+      },
+      "code": "QUALIFICATION_MISSING",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "SATISFIED"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "DECISION_SATISFIED",
+      "exit_class": "SCOPED_SATISFIED",
+      "gate_effect": "SATISFIED",
+      "observed": "NON_NULL"
+    },
+    {
+      "allowed_states": [
+        "NOT_APPLICABLE"
+      ],
+      "applies_to": {
+        "kind": "POLICY_SCOPE"
+      },
+      "code": "NOT_APPLICABLE_JUSTIFIED",
+      "exit_class": "NOT_APPLICABLE",
+      "gate_effect": "NOT_APPLICABLE",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "CHECKER_ERROR",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "UNSUPPORTED_ADAPTER",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "ERROR"
+      ],
+      "applies_to": {
+        "kind": "ALL_CHECKS"
+      },
+      "code": "ADAPTER_UNREVIEWED",
+      "exit_class": "CHECKER_ERROR",
+      "gate_effect": "ERROR",
+      "observed": "NULL"
+    },
+    {
+      "allowed_states": [
+        "UNKNOWN"
+      ],
+      "applies_to": {
+        "kind": "ALL_REQUIRED_CHECKS"
+      },
+      "code": "REQUIRED_MAPPING_MISSING",
+      "exit_class": "BLOCKED",
+      "gate_effect": "BLOCKED",
+      "observed": "NULL"
+    }
+  ],
+  "record_contract": {
+    "canonicalization": "RFC8785-JCS",
+    "record_digest_excludes": [
+      "record_digest"
+    ],
+    "reference_namespaces": [
+      "record",
+      "artifact",
+      "commit",
+      "policy",
+      "role"
+    ],
+    "schema_id": "ng-readiness-evidence-record-v1",
+    "schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json",
+    "schema_sha256": "8379172d3bf8aa327db4153ef89bb9590a35b17600a4386f6d16a3e423a24040"
+  },
+  "record_schema_id": "ng-readiness-evidence-record-v1",
+  "record_schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json",
+  "record_schema_sha256": "080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0",
+  "sandbox_profile": {
+    "child_process_group_termination": true,
+    "failure": "GIT_SANDBOX_UNAVAILABLE",
+    "filesystem_writes": "DENY_EXCEPT_CALLER_OWNED_REPORT_AND_EXTERNAL_TEST_SCRATCH",
+    "git_mount": "READ_ONLY",
+    "id": "ng060-sandbox-v1",
+    "network": "DENY",
+    "no_new_privs": true,
+    "process_execution": "ALLOWLISTED_GIT_ONLY",
+    "profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
+    "profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+    "sha256": null,
+    "status": "REQUIRED_BEFORE_PROPOSAL",
+    "timeout_s": 10
+  },
+  "schema_version": 1,
+  "supported_record_kinds": [
+    "freeze-r0-r2",
+    "effective-config",
+    "build-manifest",
+    "build-receipt",
+    "toolchain",
+    "helper-identity",
+    "executable-identity",
+    "workload-expected",
+    "workload-source",
+    "repository-baseline",
+    "jpeg-qualification",
+    "payload-copy",
+    "git-repository",
+    "producer-attestation",
+    "capture-attestation",
+    "release-audit",
+    "bundle-verification",
+    "governing-plan",
+    "directory-observation"
+  ],
+  "trust_anchor": {
+    "file_constraints": {
+      "descriptor_held_during_verification": true,
+      "identity_fields": [
+        "st_dev",
+        "st_ino",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns"
+      ],
+      "identity_must_match_before_after_read": true,
+      "mode": "0444",
+      "no_symlink": true,
+      "open_read_only": true,
+      "owner_gid": 0,
+      "owner_uid": 0,
+      "regular_file": true,
+      "single_hard_link": true
+    },
+    "format": "ED25519_PRODUCER_KEYSET_V1",
+    "id": "ng060-producer-trust-anchor-v1",
+    "path": "/etc/novagenesis/spec061/producer-trust-anchor-v1.json",
+    "producer_bindings": [
+      {
+        "authentication": "TRUST_ANCHORED_ED25519",
+        "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+        "producer_id": "local-provenance-v1",
+        "trust_anchor_key_id": null
+      },
+      {
+        "authentication": "TRUST_ANCHORED_ED25519",
+        "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+        "producer_id": "payload-evidence-v1",
+        "trust_anchor_key_id": null
+      },
+      {
+        "authentication": "TRUST_ANCHORED_ED25519",
+        "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+        "producer_id": "release-audit-v1",
+        "trust_anchor_key_id": null
+      },
+      {
+        "authentication": "TRUST_ANCHORED_ED25519",
+        "maximum_effective_class": "INDEPENDENTLY_CHECKED",
+        "producer_id": "spec061-fixture-v1",
+        "trust_anchor_key_id": null
+      },
+      {
+        "authentication": "NONE_FOR_RECORDED_CLAIM",
+        "maximum_effective_class": "RECORDED_CLAIM",
+        "producer_id": "manual-review-v1",
+        "trust_anchor_key_id": null
+      }
+    ],
+    "provisioning": "OUT_OF_BAND_IMMUTABLE",
+    "selected_record_policy": {
+      "delegated_key_chains": "REJECT",
+      "key_rotation_from_evidence": "REJECT",
+      "manifest_selection": "REJECT",
+      "record_public_key": "OPTIONAL_ECHO_ONLY",
+      "record_public_key_must_equal_anchor": true,
+      "record_supplied_key": "NEVER_TRUST",
+      "self_supplied_key": "REJECT"
+    },
+    "sha256": null,
+    "source": "TRUSTED_LAUNCHER_ONLY",
+    "status": "REQUIRED_BEFORE_PROPOSAL"
+  },
+  "trusted_execution_profile_id": "ng060-trusted-execution-profile-v1",
+  "trusted_execution_profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
+  "trusted_execution_profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+  "trusted_launcher": {
+    "failure": "CHECKER_IDENTITY_UNVERIFIED or UNSAFE_STARTUP",
+    "id": "ng060-trusted-launcher-v1",
+    "identity_fields": [
+      "st_dev",
+      "st_ino",
+      "st_size",
+      "st_mtime_ns",
+      "st_ctime_ns"
+    ],
+    "interface": "executes checker only after verifying checker/Python/Git/sandbox/trust-anchor identities",
+    "no_network": true,
+    "no_unbounded_child_processes": true,
+    "path": null,
+    "profile_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json",
+    "profile_sha256": "484776f0be30297d3215f7ecf9c0a197d5f36d5bece1c506e5bba5990b207707",
+    "sha256": null,
+    "status": "REQUIRED_BEFORE_PROPOSAL",
+    "timeout_s": 60
+  },
+  "unknown_fields": "REJECT",
+  "workload": {
+    "count": 5,
+    "generator_id": "synthetic-jpeg",
+    "generator_version": "1.0",
+    "names": [
+      "spec056-photo-01.jpg",
+      "spec056-photo-02.jpg",
+      "spec056-photo-03.jpg",
+      "spec056-photo-04.jpg",
+      "spec056-photo-05.jpg"
+    ],
+    "prefix": "spec056-photo",
+    "seed": 56002,
+    "size_bytes": 4096
+  }
+}

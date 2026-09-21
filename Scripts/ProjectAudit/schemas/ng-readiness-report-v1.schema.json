@@ -1,0 +1,2203 @@
+{
+  "$defs": {
+    "binding": {
+      "additionalProperties": false,
+      "properties": {
+        "build_source_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effective_config_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "functional_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase": {
+          "const": "PRE_TRIAL_READINESS"
+        },
+        "plan_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "workload_expected_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "functional_sha",
+        "build_source_sha",
+        "plan_sha256",
+        "effective_config_sha256",
+        "workload_expected_sha256",
+        "phase"
+      ],
+      "type": "object"
+    },
+    "check": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "properties": {
+                  "applicable": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "applicability": {
+                "properties": {
+                  "basis": {
+                    "const": "REQUIRED"
+                  },
+                  "justification": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "properties": {
+                  "applicable": {
+                    "const": false
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "applicability": {
+                "properties": {
+                  "basis": {
+                    "const": "POLICY_NOT_APPLICABLE"
+                  },
+                  "justification": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "applicability": {
+          "additionalProperties": false,
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "basis": {
+              "enum": [
+                "REQUIRED",
+                "POLICY_NOT_APPLICABLE"
+              ]
+            },
+            "justification": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "applicable",
+            "basis",
+            "justification"
+          ],
+          "type": "object"
+        },
+        "depends_on": {
+          "items": {
+            "pattern": "^R[012]\\.[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "expected": {
+          "$ref": "#/$defs/check_value"
+        },
+        "gate": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2"
+          ]
+        },
+        "id": {
+          "pattern": "^R[012]\\.[A-Z0-9_]+$",
+          "type": "string"
+        },
+        "observed": {
+          "$ref": "#/$defs/check_value"
+        },
+        "reason_code": {
+          "pattern": "^[A-Z][A-Z0-9_]+$",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]+$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "state": {
+          "enum": [
+            "SATISFIED",
+            "UNSATISFIED",
+            "UNKNOWN",
+            "ERROR",
+            "NOT_APPLICABLE"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "gate",
+        "required",
+        "state",
+        "reason_code",
+        "expected",
+        "observed",
+        "evidence_refs",
+        "depends_on",
+        "applicability",
+        "reason_codes"
+      ],
+      "type": "object"
+    },
+    "check_value": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/check_value"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "items": {
+              "items": {
+                "$ref": "#/$defs/check_value"
+              },
+              "type": "array"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "reason_code": {
+              "type": "string"
+            },
+            "refs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "sha40": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            "size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "value": {
+              "$ref": "#/$defs/check_value"
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "dependency": {
+      "additionalProperties": false,
+      "properties": {
+        "check_id": {
+          "pattern": "^R[012]\\.[A-Z0-9_]+$",
+          "type": "string"
+        },
+        "dependency_effect": {
+          "const": "BLOCKING"
+        },
+        "depends_on": {
+          "items": {
+            "pattern": "^R[012]\\.[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "check_id",
+        "depends_on",
+        "dependency_effect"
+      ],
+      "type": "object"
+    },
+    "expected_directory": {
+      "additionalProperties": false,
+      "properties": {
+        "entries_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entry_count": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        }
+      },
+      "required": [
+        "identity",
+        "entry_count",
+        "entries_sha256"
+      ],
+      "type": "object"
+    },
+    "expected_missing": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "type": "null"
+        },
+        "size": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "size",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "expected_present": {
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "size",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "fs_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "st_ctime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_dev": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_ino": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mode": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mtime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_nlink": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_size": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "st_dev",
+        "st_ino",
+        "st_mode",
+        "st_nlink",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns"
+      ],
+      "type": "object"
+    },
+    "gate": {
+      "additionalProperties": false,
+      "properties": {
+        "blocking_reasons": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]+$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "depends_on": {
+          "items": {
+            "enum": [
+              "R0",
+              "R1",
+              "R2"
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "required_check_ids": {
+          "items": {
+            "pattern": "^R[012]\\.[A-Z0-9_]+$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_document_state": {
+          "additionalProperties": false,
+          "properties": {
+            "raw": {
+              "type": "string"
+            },
+            "source": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "value": {
+              "enum": [
+                "PASS",
+                "OPEN",
+                "BLOCKED",
+                "COMPLETE",
+                "UNKNOWN",
+                "NOT_RECORDED",
+                "OTHER"
+              ]
+            }
+          },
+          "required": [
+            "source",
+            "value",
+            "raw"
+          ],
+          "type": "object"
+        },
+        "state": {
+          "enum": [
+            "SATISFIED",
+            "OPEN",
+            "BLOCKED",
+            "ERROR",
+            "NOT_APPLICABLE"
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "required_check_ids",
+        "depends_on",
+        "source_document_state",
+        "blocking_reasons"
+      ],
+      "type": "object"
+    },
+    "identity": {
+      "additionalProperties": false,
+      "properties": {
+        "st_ctime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_dev": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_ino": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mode": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_mtime_ns": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_nlink": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "st_size": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "st_dev",
+        "st_ino",
+        "st_mode",
+        "st_nlink",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns"
+      ],
+      "type": "object"
+    },
+    "identity_slot_40": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PRESENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "type": "null"
+              },
+              "value": {
+                "pattern": "^[0-9a-f]{40}$",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "UNAVAILABLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "reason_code": {
+          "pattern": "^[A-Z][A-Z0-9_]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PRESENT",
+            "UNAVAILABLE"
+          ]
+        },
+        "value": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "value",
+        "reason_code"
+      ],
+      "type": "object"
+    },
+    "identity_slot_64": {
+      "additionalProperties": false,
+      "properties": {
+        "reason_code": {
+          "pattern": "^[A-Z][A-Z0-9_]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PRESENT",
+            "UNAVAILABLE"
+          ]
+        },
+        "value": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "value",
+        "reason_code"
+      ],
+      "type": "object"
+    },
+    "input": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "path_kind": {
+                "const": "DIRECTORY"
+              }
+            },
+            "required": [
+              "path_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "availability_expectation": {
+                "const": "PRESENT"
+              },
+              "expected": {
+                "$ref": "#/$defs/expected_directory"
+              },
+              "input_format": {
+                "const": "DIRECTORY_ENUMERATION"
+              }
+            },
+            "required": [
+              "directory_role",
+              "expected",
+              "input_format"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "required": [
+                  "path_kind",
+                  "availability_expectation"
+                ]
+              },
+              {
+                "properties": {
+                  "availability_expectation": {
+                    "const": "PRESENT"
+                  },
+                  "path_kind": {
+                    "const": "REGULAR_FILE"
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "directory_role": {
+                "const": null
+              },
+              "expected": {
+                "$ref": "#/$defs/expected_present"
+              }
+            },
+            "required": [
+              "expected"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "availability_expectation": {
+                "const": "MISSING_ALLOWED"
+              }
+            },
+            "required": [
+              "availability_expectation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "expected": {
+                "$ref": "#/$defs/expected_missing"
+              },
+              "input_format": {
+                "const": "ABSENT"
+              },
+              "path_kind": {
+                "const": "REGULAR_FILE"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "adapter_id": {
+          "enum": [
+            "legacy-build-linkage-md-v1",
+            "legacy-freeze-md-v1",
+            "legacy-local-provenance-v2",
+            "legacy-plan-md-v1",
+            "ng060-effective-config-v1",
+            "ng060-executable-map-v1",
+            "ng060-helper-map-v1",
+            "ng060-jpeg-qualification-v1",
+            "ng060-payload-copy-v1",
+            "ng060-repository-baseline-v1",
+            "ng060-workload-source-v1",
+            "ng060-workload-v1",
+            "spec061-canonical-record-v1",
+            "spec061-fixture-record-v1",
+            "spec061-git-directory-observation-v1",
+            "spec061-git-preflight-v1",
+            "spec061-missing-json-v1",
+            "spec061-trusted-record-v1"
+          ],
+          "type": "string"
+        },
+        "adapter_version": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "availability_expectation": {
+          "enum": [
+            "PRESENT",
+            "MISSING_ALLOWED"
+          ]
+        },
+        "candidate_binding": {
+          "additionalProperties": false,
+          "properties": {
+            "build_source_sha": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effective_config_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "functional_sha": {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "phase": {
+              "const": "PRE_TRIAL_READINESS"
+            },
+            "plan_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "workload_expected_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "functional_sha",
+            "build_source_sha",
+            "plan_sha256",
+            "effective_config_sha256",
+            "workload_expected_sha256",
+            "phase"
+          ],
+          "type": "object"
+        },
+        "directory_role": {
+          "enum": [
+            "REPOSITORY_ROOT",
+            "GIT_METADATA_CLOSURE",
+            "SOURCE_ROOT",
+            "PAYLOAD_ROOT",
+            null
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effective_evidence_class": {
+          "enum": [
+            "RECORDED_CLAIM",
+            "INDEPENDENTLY_CHECKED",
+            "HISTORICAL_ONLY",
+            "UNVERIFIED"
+          ]
+        },
+        "evidence_class_claim": {
+          "enum": [
+            "RECORDED_CLAIM",
+            "INDEPENDENTLY_CHECKED",
+            "HISTORICAL_ONLY",
+            "UNVERIFIED"
+          ]
+        },
+        "expected": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/expected_present"
+            },
+            {
+              "$ref": "#/$defs/expected_missing"
+            },
+            {
+              "$ref": "#/$defs/expected_directory"
+            }
+          ]
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+          "type": "string"
+        },
+        "input_format": {
+          "enum": [
+            "UTF8_JSON",
+            "MARKDOWN",
+            "DIRECTORY_ENUMERATION",
+            "ABSENT"
+          ]
+        },
+        "observed": {
+          "$ref": "#/$defs/observed"
+        },
+        "path": {
+          "pattern": "^/[^\\u0000]*$",
+          "type": "string"
+        },
+        "path_kind": {
+          "enum": [
+            "REGULAR_FILE",
+            "DIRECTORY"
+          ]
+        },
+        "producer_authentication": {
+          "$ref": "#/$defs/producer_authentication"
+        },
+        "record_kind": {
+          "enum": [
+            "freeze-r0-r2",
+            "effective-config",
+            "build-manifest",
+            "build-receipt",
+            "toolchain",
+            "helper-identity",
+            "executable-identity",
+            "workload-expected",
+            "workload-source",
+            "repository-baseline",
+            "jpeg-qualification",
+            "payload-copy",
+            "git-repository",
+            "producer-attestation",
+            "capture-attestation",
+            "release-audit",
+            "bundle-verification",
+            "governing-plan",
+            "directory-observation"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "source_format": {
+          "enum": [
+            "canonical-json",
+            "provenance-json",
+            "markdown",
+            "directory-enumeration",
+            "git-metadata-directory",
+            "workload-json",
+            "config-json",
+            "helper-map-json",
+            "executable-map-json",
+            "inventory-json",
+            "jpeg-set-json",
+            "payload-copy-json",
+            "attestation-json",
+            "release-audit-json",
+            "bundle-verification-json",
+            "absent"
+          ]
+        },
+        "source_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "stable_read": {
+          "$ref": "#/$defs/stable_read"
+        }
+      },
+      "required": [
+        "id",
+        "record_kind",
+        "schema_version",
+        "path",
+        "required",
+        "expected",
+        "observed",
+        "stable_read",
+        "candidate_binding",
+        "evidence_class_claim",
+        "effective_evidence_class",
+        "adapter_id",
+        "path_kind",
+        "input_format",
+        "availability_expectation",
+        "directory_role",
+        "producer_authentication",
+        "adapter_version",
+        "source_format",
+        "source_version"
+      ],
+      "type": "object"
+    },
+    "item": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "pattern": "^[A-Za-z0-9_.-]+\\.jpg$",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "size": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "size",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "observed": {
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "properties": {
+                "availability": {
+                  "const": "PRESENT"
+                },
+                "directory_observation": {
+                  "type": "null"
+                },
+                "file_type": {
+                  "const": "REGULAR"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "properties": {
+                "availability": {
+                  "const": "UNAVAILABLE"
+                },
+                "directory_observation": {
+                  "type": "null"
+                },
+                "file_type": {
+                  "const": "MISSING"
+                },
+                "sha256": {
+                  "type": "null"
+                },
+                "size": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "properties": {
+                "availability": {
+                  "const": "UNREADABLE"
+                },
+                "directory_observation": {
+                  "type": "null"
+                },
+                "file_type": {
+                  "const": "REGULAR"
+                },
+                "sha256": {
+                  "type": "null"
+                },
+                "size": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "properties": {
+                "availability": {
+                  "const": "UNSAFE"
+                },
+                "directory_observation": {
+                  "type": "null"
+                },
+                "file_type": {
+                  "const": "UNKNOWN"
+                },
+                "sha256": {
+                  "type": "null"
+                },
+                "size": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "properties": {
+                "availability": {
+                  "const": "PRESENT"
+                },
+                "directory_observation": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "entries_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "entry_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "root_identity": {
+                      "$ref": "#/$defs/fs_identity"
+                    }
+                  },
+                  "required": [
+                    "root_identity",
+                    "entry_count",
+                    "entries_sha256"
+                  ],
+                  "type": "object"
+                },
+                "file_type": {
+                  "const": "DIRECTORY"
+                },
+                "sha256": {
+                  "type": "null"
+                },
+                "size": {
+                  "type": "null"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "availability": {
+          "enum": [
+            "PRESENT",
+            "UNAVAILABLE",
+            "UNREADABLE",
+            "UNSAFE"
+          ]
+        },
+        "directory_observation": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "file_type": {
+          "enum": [
+            "REGULAR",
+            "MISSING",
+            "SYMLINK",
+            "SPECIAL",
+            "DIRECTORY",
+            "UNKNOWN"
+          ]
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "availability",
+        "file_type",
+        "size",
+        "sha256",
+        "directory_observation"
+      ],
+      "type": "object"
+    },
+    "producer_authentication": {
+      "additionalProperties": false,
+      "properties": {
+        "attestation_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "producer_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "producer_identity_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "TRUST_ANCHORED",
+            "UNAUTHENTICATED",
+            "UNTRUSTED",
+            "NOT_REQUIRED_FOR_RECORDED_CLAIM"
+          ]
+        },
+        "subject_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trust_anchor_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trust_anchor_key_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "producer_id",
+        "producer_identity_sha256",
+        "attestation_ref",
+        "trust_anchor_id",
+        "trust_anchor_key_id",
+        "subject_sha256"
+      ],
+      "type": "object"
+    },
+    "remote_ref_slot": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PRESENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "name": {
+                "pattern": "^refs/[A-Za-z0-9._/-]+$",
+                "type": "string"
+              },
+              "reason_code": {
+                "type": "null"
+              },
+              "target_sha": {
+                "pattern": "^[0-9a-f]{40}$",
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "UNAVAILABLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "name": {
+                "type": "null"
+              },
+              "reason_code": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "target_sha": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "name": {
+          "pattern": "^refs/[A-Za-z0-9._/-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason_code": {
+          "pattern": "^[A-Z][A-Z0-9_]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PRESENT",
+            "UNAVAILABLE"
+          ]
+        },
+        "target_sha": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "name",
+        "target_sha",
+        "reason_code"
+      ],
+      "type": "object"
+    },
+    "sha40": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "sha64": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "stable_read": {
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "after": {
+              "$ref": "#/$defs/fs_identity"
+            },
+            "before": {
+              "$ref": "#/$defs/fs_identity"
+            },
+            "fd_after": {
+              "$ref": "#/$defs/fs_identity"
+            },
+            "fd_before": {
+              "$ref": "#/$defs/fs_identity"
+            },
+            "status": {
+              "const": "STABLE"
+            }
+          }
+        },
+        {
+          "properties": {
+            "after": {
+              "type": "null"
+            },
+            "before": {
+              "type": "null"
+            },
+            "fd_after": {
+              "type": "null"
+            },
+            "fd_before": {
+              "type": "null"
+            },
+            "status": {
+              "enum": [
+                "UNAVAILABLE",
+                "NOT_ATTEMPTED"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "status": {
+              "const": "UNSTABLE"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "after": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        },
+        "before": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        },
+        "fd_after": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        },
+        "fd_before": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fs_identity"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "STABLE",
+            "UNSTABLE",
+            "UNAVAILABLE",
+            "NOT_ATTEMPTED"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "before",
+        "after",
+        "fd_before",
+        "fd_after"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "ng-readiness-report-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checker": {
+      "additionalProperties": false,
+      "properties": {
+        "launcher_id": {
+          "const": "ng060-trusted-launcher-v1"
+        },
+        "launcher_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^/[^\\u0000]*$",
+          "type": "string"
+        },
+        "pre_exec_verified": {
+          "type": "boolean"
+        },
+        "python_path": {
+          "pattern": "^/[^\\u0000]*$",
+          "type": "string"
+        },
+        "python_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sandbox_profile_id": {
+          "const": "ng060-sandbox-v1"
+        },
+        "sandbox_profile_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "trust_anchor_id": {
+          "const": "ng060-producer-trust-anchor-v1"
+        },
+        "trust_anchor_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "pre_exec_verified",
+        "launcher_id",
+        "launcher_sha256",
+        "python_path",
+        "python_sha256",
+        "sandbox_profile_id",
+        "sandbox_profile_sha256",
+        "trust_anchor_id",
+        "trust_anchor_sha256"
+      ],
+      "type": "object"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/check"
+      },
+      "maxItems": 20,
+      "minItems": 20,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "gates": {
+      "additionalProperties": false,
+      "properties": {
+        "R0": {
+          "additionalProperties": false,
+          "properties": {
+            "blocking_reasons": {
+              "items": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "depends_on": {
+              "items": {
+                "enum": [
+                  "R0",
+                  "R1",
+                  "R2"
+                ]
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "required_check_ids": {
+              "items": {
+                "pattern": "^R[012]\\.[A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "source_document_state": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            },
+            "state": {
+              "enum": [
+                "SATISFIED",
+                "OPEN",
+                "BLOCKED",
+                "ERROR",
+                "NOT_APPLICABLE"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "required_check_ids",
+            "depends_on",
+            "source_document_state",
+            "blocking_reasons"
+          ],
+          "type": "object"
+        },
+        "R1": {
+          "additionalProperties": false,
+          "properties": {
+            "blocking_reasons": {
+              "items": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "depends_on": {
+              "items": {
+                "enum": [
+                  "R0",
+                  "R1",
+                  "R2"
+                ]
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "required_check_ids": {
+              "items": {
+                "pattern": "^R[012]\\.[A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "source_document_state": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            },
+            "state": {
+              "enum": [
+                "SATISFIED",
+                "OPEN",
+                "BLOCKED",
+                "ERROR",
+                "NOT_APPLICABLE"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "required_check_ids",
+            "depends_on",
+            "source_document_state",
+            "blocking_reasons"
+          ],
+          "type": "object"
+        },
+        "R2": {
+          "additionalProperties": false,
+          "properties": {
+            "blocking_reasons": {
+              "items": {
+                "pattern": "^[A-Z][A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "depends_on": {
+              "items": {
+                "enum": [
+                  "R0",
+                  "R1",
+                  "R2"
+                ]
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "required_check_ids": {
+              "items": {
+                "pattern": "^R[012]\\.[A-Z0-9_]+$",
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "source_document_state": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            },
+            "state": {
+              "enum": [
+                "SATISFIED",
+                "OPEN",
+                "BLOCKED",
+                "ERROR",
+                "NOT_APPLICABLE"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "required_check_ids",
+            "depends_on",
+            "source_document_state",
+            "blocking_reasons"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "R0",
+        "R1",
+        "R2"
+      ],
+      "type": "object"
+    },
+    "identities": {
+      "additionalProperties": false,
+      "properties": {
+        "build_source_sha": {
+          "$ref": "#/$defs/identity_slot_40"
+        },
+        "checker_identity": {
+          "$ref": "#/$defs/identity_slot_64"
+        },
+        "functional_sha": {
+          "$ref": "#/$defs/identity_slot_40"
+        },
+        "functional_sha_display": {
+          "pattern": "^(NO-SHA|[0-9a-f]{40})$",
+          "type": "string"
+        },
+        "receipt_publication_sha": {
+          "$ref": "#/$defs/identity_slot_40"
+        },
+        "remote_ref": {
+          "$ref": "#/$defs/remote_ref_slot"
+        },
+        "review_head": {
+          "$ref": "#/$defs/identity_slot_40"
+        }
+      },
+      "required": [
+        "review_head",
+        "remote_ref",
+        "functional_sha",
+        "functional_sha_display",
+        "build_source_sha",
+        "receipt_publication_sha",
+        "checker_identity"
+      ],
+      "type": "object"
+    },
+    "input_manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_registry_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^/[^\\u0000]*$",
+          "type": "string"
+        },
+        "policy_bytes_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter_registry_sha256",
+        "path",
+        "policy_bytes_sha256",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "#/$defs/input"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "phase": {
+      "const": "PRE_TRIAL_READINESS"
+    },
+    "policy": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_registry_id": {
+          "const": "ng-readiness-adapter-registry-v1"
+        },
+        "adapter_registry_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "bytes_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "id": {
+          "const": "ng060-r0-r2-read-only-v1"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter_registry_id",
+        "adapter_registry_sha256",
+        "bytes_sha256",
+        "id",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "release_authorized": {
+      "const": false
+    },
+    "runtime_authorized": {
+      "const": false
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "summary": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "exit_class": {
+                "const": "SCOPED_SATISFIED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assessment": {
+                "const": "SCOPED_SATISFIED"
+              },
+              "blocking_gate_ids": {
+                "maxItems": 0
+              },
+              "exit_code": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "exit_class": {
+                "const": "BLOCKED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assessment": {
+                "const": "BLOCKED"
+              },
+              "blocking_gate_ids": {
+                "minItems": 1
+              },
+              "exit_code": {
+                "const": 20
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "exit_class": {
+                "const": "CHECKER_ERROR"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assessment": {
+                "const": "ERROR"
+              },
+              "exit_code": {
+                "const": 30
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "exit_class": {
+                "const": "UNSAFE_INCOMPLETE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assessment": {
+                "const": "ERROR"
+              },
+              "exit_code": {
+                "const": 40
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "exit_class": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assessment": {
+                "const": "NOT_APPLICABLE"
+              },
+              "blocking_gate_ids": {
+                "maxItems": 0
+              },
+              "exit_code": {
+                "const": 0
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "assessment": {
+          "enum": [
+            "SCOPED_SATISFIED",
+            "BLOCKED",
+            "ERROR",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "blocking_gate_ids": {
+          "items": {
+            "enum": [
+              "R0",
+              "R1",
+              "R2"
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exit_class": {
+          "enum": [
+            "SCOPED_SATISFIED",
+            "BLOCKED",
+            "CHECKER_ERROR",
+            "UNSAFE_INCOMPLETE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "exit_code": {
+          "enum": [
+            0,
+            20,
+            30,
+            40
+          ]
+        },
+        "source_document_states": {
+          "additionalProperties": false,
+          "properties": {
+            "R0": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            },
+            "R1": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            },
+            "R2": {
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string"
+                },
+                "source": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "value": {
+                  "enum": [
+                    "PASS",
+                    "OPEN",
+                    "BLOCKED",
+                    "COMPLETE",
+                    "UNKNOWN",
+                    "NOT_RECORDED",
+                    "OTHER"
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "value",
+                "raw"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "R0",
+            "R1",
+            "R2"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "assessment",
+        "exit_code",
+        "exit_class",
+        "blocking_gate_ids",
+        "source_document_states"
+      ],
+      "type": "object"
+    },
+    "trust_anchor": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "ng060-producer-trust-anchor-v1"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "verified_by_launcher": {
+          "const": true
+        }
+      },
+      "required": [
+        "id",
+        "sha256",
+        "verified_by_launcher"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "checker",
+    "policy",
+    "phase",
+    "input_manifest",
+    "identities",
+    "inputs",
+    "checks",
+    "dependencies",
+    "gates",
+    "summary",
+    "runtime_authorized",
+    "release_authorized",
+    "trust_anchor"
+  ],
+  "title": "NovaGenesis read-only R0-R2 report v1 with typed identities, adapters and trust provenance",
+  "type": "object"
+}

@@ -1,0 +1,76 @@
+{
+  "$id": "ng-readiness-trusted-execution-profile-v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "git": {
+    "mode": "SANDBOXED_GIT_ONLY",
+    "path": "/usr/bin/git",
+    "sha256": "2a8c18fbf43da9f692d75474c72bea9dfd796c260b0f3dfe456376abc3bbd668",
+    "version": "2.43.0"
+  },
+  "id": "ng060-trusted-execution-profile-v1",
+  "limits": {
+    "artifact_bytes": 134217728,
+    "directory_entries": 10000,
+    "git_stdout_stderr_bytes": 1048576,
+    "json_depth": 32,
+    "manifest_bytes": 1048576,
+    "record_bytes": 4194304,
+    "subprocess_timeout_s": 10,
+    "total_runtime_s": 60
+  },
+  "producer_trust_anchor": {
+    "id": "ng060-producer-trust-anchor-v1",
+    "path": "/etc/novagenesis/spec061/producer-trust-anchor-v1.json",
+    "public_keys_from_selected_records": "NEVER_TRUST",
+    "sha256": null,
+    "source": "TRUSTED_LAUNCHER_ONLY",
+    "status": "NOT_PROVISIONED"
+  },
+  "python": {
+    "argv": [
+      "-I",
+      "-B",
+      "-S"
+    ],
+    "bytecode_disabled": true,
+    "path": "/home/gandalf/.hermes/hermes-agent/venv/bin/python3",
+    "sha256": "572cfa2a8597e2f431c785613539b1d219fa99eecf5ffb5765731a2ebc3e692a",
+    "site_disabled": true,
+    "version": "3.11.15"
+  },
+  "sandbox": {
+    "filesystem_writes": "DENY_EXCEPT_CALLER_OWNED_REPORT_AND_EXTERNAL_TEST_SCRATCH",
+    "git_repository_mount": "READ_ONLY",
+    "id": "ng060-sandbox-v1",
+    "kill_process_group_on_timeout": true,
+    "network": "DENY",
+    "no_new_privs": true,
+    "path": null,
+    "process_execution": "ALLOWLISTED_GIT_ONLY",
+    "sha256": null,
+    "status": "NOT_PROVISIONED"
+  },
+  "schema_version": 1,
+  "status": "REQUIRED_BEFORE_PROPOSAL",
+  "trusted_launcher": {
+    "argv_contract": [
+      "--repo",
+      "--plan",
+      "--candidate-sha",
+      "--input-manifest",
+      "--policy",
+      "--policy-sha256",
+      "--policy-bytes-sha256",
+      "--adapter-registry",
+      "--report",
+      "--phase"
+    ],
+    "id": "ng060-trusted-launcher-v1",
+    "no_network": true,
+    "no_unbounded_child_processes": true,
+    "path": null,
+    "sha256": null,
+    "status": "NOT_PROVISIONED",
+    "write_policy": "DENY_EXCEPT_CALLER_OWNED_REPORT_AND_EXTERNAL_TEST_SCRATCH"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "artifact_refs": [
+    {
+      "digest_coverage": "RAW_BYTES",
+      "id": "source",
+      "kind": "REGULAR_FILE",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/.ng-evidence/local-intra-os-v4-20379ec/m0-runtime-v4/provenance.json",
+      "required": true,
+      "role": "BUILD",
+      "sha256": "29dce88b68d47017bfbee0d733e8e5e55986d7c9c43f80bb297bc18a5f4d31e0",
+      "size": 952338,
+      "tree_sha256": null
+    }
+  ],
+  "candidate_binding": {
+    "build_source_sha": null,
+    "effective_config_sha256": null,
+    "functional_sha": null,
+    "phase": "PRE_TRIAL_READINESS",
+    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "workload_expected_sha256": null
+  },
+  "evidence_class_claim": "HISTORICAL_ONLY",
+  "payload": {
+    "build_linkage": "UNPROVEN",
+    "build_source_sha": null,
+    "executable_identity_refs": [],
+    "helper_identity_refs": [],
+    "receipt_ref": null,
+    "recipe_ref": null,
+    "toolchain_ref": null,
+    "working_directory": null
+  },
+  "phase": "PRE_TRIAL_READINESS",
+  "producer": {
+    "attestation_ref": null,
+    "id": "manual-review-v1",
+    "identity_sha256": null,
+    "version": "1"
+  },
+  "record_digest": {
+    "algorithm": "SHA-256",
+    "canonicalization": "RFC8785-JCS",
+    "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
+    "sha256": "7b7fcde87878bd3fcb20a22fe2cd117cff49f3fae605ea83ad28f14c360b66a2"
+  },
+  "record_id": "build-manifest.current",
+  "record_kind": "build-manifest",
+  "schema_version": 1,
+  "source": {
+    "adapter_id": "spec061-fixture-record-v1",
+    "adapter_version": 1,
+    "artifact_ref": "source",
+    "format": "canonical-json",
+    "version": "1"
+  }
+}
