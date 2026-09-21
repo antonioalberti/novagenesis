@@ -595,12 +595,12 @@ The `identities` object has exactly these fields:
 
 | Field | Type | Nullable | Constraint |
 |---|---|---:|---|
-| `review_head` | object | yes | exact `identity_slot_40`: `{status,value,reason_code}`; `PRESENT` requires a 40-lowercase-hex value and null reason; `UNAVAILABLE` requires null value and non-null reason |
-| `remote_ref` | object | yes | exact `remote_ref_slot`: `{status,name,target_sha,reason_code}`; `PRESENT` requires ref name and 40-lowercase-hex target, null reason |
-| `functional_sha` | object | yes | exact `identity_slot_40`; never inferred |
+| `review_head` | object | no | exact `identity_slot_40`: `{status,value,reason_code}`; `PRESENT` requires a 40-lowercase-hex value and null reason; `UNAVAILABLE` requires null value and non-null reason |
+| `remote_ref` | object | no | exact `remote_ref_slot`: `{status,name,target_sha,reason_code}`; `PRESENT` requires ref name and 40-lowercase-hex target, null reason |
+| `functional_sha` | object | no | exact `identity_slot_40`; never inferred |
 | `functional_sha_display` | string | no | exactly `functional_sha.value` when present, otherwise exactly `NO-SHA` |
-| `build_source_sha` | object | yes | exact `identity_slot_40` attested by build evidence |
-| `receipt_publication_sha` | object | yes | exact `identity_slot_40` for publication location identity |
+| `build_source_sha` | object | no | exact `identity_slot_40` attested by build evidence |
+| `receipt_publication_sha` | object | no | exact `identity_slot_40` for publication location identity |
 | `checker_identity` | string | no | 64-lowercase-hex SHA-256 of the checker file |
 
 Each `inputs[]` record has exactly these fields:
@@ -612,12 +612,21 @@ Each `inputs[]` record has exactly these fields:
 | `schema_version` | integer | no | exactly `1` |
 | `path` | string | no | absolute path selected by the manifest |
 | `required` | boolean | no | requiredness from the policy |
-| `expected` | object | no | exactly `{size,sha256}`; each may be null when not supplied |
-| `observed` | object | no | exactly `{availability,file_type,size,sha256,directory_observation}` plus optional `git_probe`; `git_probe` is present only for a Git probe projection and is the closed `{rev_parse_candidate,cat_file_type,cat_file_presence,rev_parse_head,rev_parse_local_ref,status,ls_tree,network}` object |
+| `expected` | object | no | path-kind-specific: `expected_present={size,sha256}`, `expected_missing={size:null,sha256:null}`, or `expected_directory={identity,entry_count,entries_sha256}` |
+| `observed` | object | no | exactly `{availability,file_type,size,sha256,directory_observation}` plus optional `git_probe` |
 | `stable_read` | object | no | exactly `{status,before,after,fd_before,fd_after}` |
 | `candidate_binding` | object | no | exact fields from §3.6; nulls are explicit |
 | `evidence_class_claim` | enum string | no | claim from the selected record |
 | `effective_evidence_class` | enum string | no | derived by the checker, never copied blindly |
+| `adapter_id` | enum string | no | closed adapter-registry ID |
+| `adapter_version` | integer | no | positive registry version |
+| `source_format` | enum string | no | adapter-declared source format |
+| `source_version` | string | no | adapter-declared source version |
+| `path_kind` | enum string | no | `REGULAR_FILE` or `DIRECTORY` |
+| `input_format` | enum string | no | `UTF8_JSON`, `MARKDOWN`, `DIRECTORY_ENUMERATION` or `ABSENT` |
+| `availability_expectation` | enum string | no | `PRESENT` or `MISSING_ALLOWED` |
+| `directory_role` | enum string/null | no | explicit role or null |
+| `producer_authentication` | object | no | exact producer-authentication contract |
 
 `observed.availability` is one of `PRESENT`, `UNAVAILABLE`, `UNREADABLE`, `UNSAFE`; `observed.file_type` is one of `REGULAR`, `MISSING`, `SYMLINK`, `SPECIAL`, `DIRECTORY`, `UNKNOWN`. `observed.git_probe` is optional and, when present, has exactly `rev_parse_candidate`, `cat_file_type`, `cat_file_presence`, `rev_parse_head`, `rev_parse_local_ref`, `status`, `ls_tree` and `network`; the seven probe results retain closed exit/stderr and resolved-object fields, while `network` is exactly `DENY`. `stable_read.status` is one of `STABLE`, `UNSTABLE`, `UNAVAILABLE`, `NOT_ATTEMPTED`. Each of `before`, `after`, `fd_before` and `fd_after` is either null or an exact identity object `{st_dev,st_ino,st_size,st_mtime_ns,st_ctime_ns}` with integer fields. An unavailable input MUST retain its expected identity separately while observed size, digest and stable-read identities remain null.
 
@@ -629,6 +638,7 @@ id: stable check ID from §11.4
  required: boolean
  state: SATISFIED | UNSATISFIED | UNKNOWN | ERROR | NOT_APPLICABLE
  reason_code: v1 reason-code enum from §3.3
+ reason_codes: sorted unique array of v1 reason-code enum values
  expected: deterministic JSON value or null
  observed: deterministic JSON value or null
  evidence_refs: sorted unique array of input IDs
