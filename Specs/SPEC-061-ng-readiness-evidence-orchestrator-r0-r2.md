@@ -3,7 +3,7 @@
 **Author:** Antonio Alberti / Hermes Agent
 **Date:** 2026-09-21
 **Revision:** 8
-**Status:** Draft
+**Status:** Proposal
 **Branch:** AIOPT3
 **Component:** `Scripts/ProjectAudit`; release-readiness evidence inspection
 **Implementation Commit:** pending
