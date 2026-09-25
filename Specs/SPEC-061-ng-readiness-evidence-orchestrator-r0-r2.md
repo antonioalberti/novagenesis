@@ -1,15 +1,15 @@
 # SPEC-061: Read-Only Release-Readiness Evidence Orchestrator — R0–R2
 
 **Author:** Antonio Alberti / Hermes Agent
-**Date:** 2026-09-21
-**Revision:** 8
-**Status:** Proposal
+**Date:** 2026-09-25
+**Revision:** 9
+**Status:** Draft
 **Branch:** AIOPT3
 **Component:** `Scripts/ProjectAudit`; release-readiness evidence inspection
 **Implementation Commit:** pending
 **Related:** `SPEC-054-release-master-plan-and-audit.md`; `SPEC-055-ng-elc-local-mode.md`; `SPEC-056-ng-elc-evidence-provenance-hardening.md`; `SPEC-057-ng-elc-canonical-entrypoint-rename.md`; `SPEC-060-ng-elc-remote-payload-evidence.md`; `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json`; `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json`; `Scripts/ProjectAudit/validate_spec061_contract.py`; `Specs/SPEC-061-ng-readiness-policy-v1.json`; `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json`
-**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf`)
-**Task linkage:** pending explicit task creation after SPEC review
+**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `71f2033288accd67680a9bd3e6b7277b6e77a5b8df707e9ccaf4803366227cc2`)
+**Task linkage:** `NG-060-rdemo-local-normal-path-v0-1-20260920.md` (child of `NG-050-release-master-control-v1-20260913.md`)
 
 ---
 
@@ -67,7 +67,7 @@ review HEAD
 ≠ checker identity
 ```
 
-The current review commit `65b431cf16959f1d653db69bd4bdd17570ce6aca` is not a functional candidate. The historical receipt-backed source `4b01e5e258b7228958e027eb1df963048f6623c9` is not automatically the NG-060 candidate.
+The fixture's `review_head` value `65b431cf16959f1d653db69bd4bdd17570ce6aca` is a historical snapshot identity, not the current documentary review baseline or a functional candidate. The historical receipt-backed source `4b01e5e258b7228958e027eb1df963048f6623c9` is also not automatically the NG-060 candidate. Exact documentary review commits are recorded in the corresponding immutable review packets and task history.
 
 ### 2.4 Current audit output does not distinguish all strategic blockers
 
@@ -215,7 +215,7 @@ Any unsupported or unsafe reuse becomes an explicit blocker, not a silently omit
 
 ### 3.6 Supported evidence records and trust classification
 
-Version 1 MUST consume only explicitly selected canonical JSON record files or explicitly selected directory observations. A directory observation is selected directly by a manifest entry with `path_kind=DIRECTORY`; a JSON wrapper with the same identity is not an alternative source of truth. Each canonical record MUST be one top-level object with no duplicate keys, `schema_version: 1`, no unknown fields, deterministic arrays and a `record_digest`. The checked-in closed contracts are `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json` (SHA-256 `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`), `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json` (SHA-256 `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`) and `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json` (SHA-256 `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`). The registry defines canonical source bytes, payload-branch validation, namespace resolution and the external producer-attestation contract. An input manifest selects records and adapters; the checker MUST NOT discover arbitrary files by filename or accept an adapter not present in that registry.
+Version 1 MUST consume only explicitly selected canonical JSON record files or explicitly selected directory observations. A directory observation is selected directly by a manifest entry with `path_kind=DIRECTORY`; a JSON wrapper with the same identity is not an alternative source of truth. Each canonical record MUST be one top-level object with no duplicate keys, `schema_version: 1`, no unknown fields, deterministic arrays and a `record_digest`. The checked-in closed contracts are `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json` (SHA-256 `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`), `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json` (SHA-256 `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`) and `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json` (SHA-256 `26de17b1b9763d74e6be12096dbd2c55b54996d67c25ccaa70744c1368fb607f`). The registry defines canonical source bytes, payload-branch validation, namespace resolution and the external producer-attestation contract. An input manifest selects records and adapters; the checker MUST NOT discover arbitrary files by filename or accept an adapter not present in that registry.
 
 Every canonical record uses this common envelope; manifest selections additionally carry adapter metadata (`adapter_id`, `adapter_version`, `source_format`, `source_version`, `path_kind`, `input_format` and `availability_expectation`).
 
@@ -475,6 +475,7 @@ The producer trust anchor is an out-of-band immutable Ed25519 keyset at `/etc/no
 - [ ] The checker performs no network access, privilege escalation, build, compiler execution, binary execution, manifest-command execution, payload generation, staging or runtime invocation.
 - [ ] Only an audited local Git-inspection subprocess allowlist is permitted, if subprocesses are required.
 - [ ] Unsafe aliases, symlinks, overlaps, mutable inputs and ambiguous executable mappings block the relevant check.
+- [ ] Directory-observation exclusions are selected by `directory_role`; generated-artifact exclusions and `Docs` apply only to `SOURCE_ROOT`, while `PAYLOAD_ROOT` is fully enumerated without exclusions; negative tests prove forbidden payload exclusions are rejected.
 - [ ] Report schema, checker identity, policy identity, input identities and reason codes are present.
 - [ ] `UNKNOWN` and `ERROR` block required R0–R2 predicates; `NOT_APPLICABLE` requires justification.
 - [ ] Exit classes distinguish satisfied scope, blocked/unsatisfied scope, checker/input errors and unsafe/incomplete inspection, with documented precedence and optional-evidence handling.
@@ -502,7 +503,7 @@ The focused suite MUST NOT invoke `ng_release_audit.py` until its transitive Git
 
 ### 7.2.2 SPEC-061-scoped packet validator
 
-The documentation-only packet validator is `Scripts/ProjectAudit/validate_spec061_contract.py`. It is read-only, does not execute Git, runtime, compiler, VM, SSH, QGA or network operations, and validates JSON Schema meta-contracts, registry/manifest coverage, exact policy/schema/record digests, selected file identities, the excluded-scope directory observation, plan source/record separation, explicit predicate selectors, DAG cardinality and the external-only trust boundary. The exact command is:
+The documentation-only packet validator is `Scripts/ProjectAudit/validate_spec061_contract.py`. It is read-only, does not execute Git, runtime, compiler, VM, SSH, QGA or network operations, and validates JSON Schema meta-contracts, registry/manifest coverage, exact policy/schema/record digests, selected file identities, role-scoped directory observations (SOURCE_ROOT exclusions only; PAYLOAD_ROOT fully enumerated, including generated-artifact names), plan source/record separation, explicit predicate selectors, DAG cardinality and the external-only trust boundary. The exact command is:
 
 ```text
 python3 Scripts/ProjectAudit/validate_spec061_contract.py --manifest Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json
@@ -526,9 +527,9 @@ release_authorized = false
 
 | Fixture ID | Manifest | Manifest SHA-256 | Expected assessment |
 |---|---|---|---|
-| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
+| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `71f2033288accd67680a9bd3e6b7277b6e77a5b8df707e9ccaf4803366227cc2` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
 
-The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58` and raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. The report schema is `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`; the input-manifest schema is `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
+The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `eb89702d51cfa4007207e757bfe7f767c9a77d79f7222dab4a567ca307520eaf` and raw-file SHA-256 `072e61963bc5d2872ee75d62ed6f654e447c6f628d0905cb6bb3a5ccb1415b7d`. The report schema is `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`; the input-manifest schema is `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `26de17b1b9763d74e6be12096dbd2c55b54996d67c25ccaa70744c1368fb607f`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
 ## 8. Decisions Log
 
 | # | Decision | Date | Reason |
@@ -541,6 +542,7 @@ The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` wit
 | D6 | Do not reuse side-effecting provenance helpers unchanged | 2026-09-21 | Snapshot capture and compiler execution violate the pure-inspection boundary |
 | D7 | Apply Astra AMEND corrections before implementation | 2026-09-21 | The normative report contract, evidence formats, gate aggregation, execution boundary and test-write policy must be closed before Proposal/implementation |
 | D8 | Require external schema/policy artifacts and named fixture before Proposal | 2026-09-21 | A prose-only contract cannot provide deterministic validation, trust, identity binding or reproducible current-state assessment |
+| D9 | Resolve the exact-SHA AMEND in Revision 9 without advancing trust or execution authority | 2026-09-25 | Role-scoped enumeration, explicit NG-060 linkage and historical review identities close the documentary findings while launcher/sandbox/trust-anchor preconditions remain absent |
 
 ## 9. Pitfalls
 
@@ -557,11 +559,11 @@ The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` wit
 
 ## 10. Open Questions
 
-1. Confirm that `SPEC-061` remains the next unallocated number at implementation time; do not renumber existing SPECs if another branch allocates it.
-2. Decide whether a separate NG-061 task is created after final SPEC review or whether NG-050 coordinates the draft until implementation approval.
-3. Resolve interaction with the future `SPEC-057` entrypoint rename without changing that SPEC's scope.
+- [x] SPEC number: SPEC-061 is the assigned lineage; retain it for this amendment and do not renumber existing SPECs.
+- [x] Task linkage: NG-060 owns R0–R7 readiness and is the accountable child task of NG-050; no separate task is created for this documentary amendment. Any future checker implementation requires its own explicit authorization and task definition; neither exists or is authorized here.
+- [ ] Before any future implementation, reconcile the SPEC-057 canonical-entrypoint rename interaction without changing SPEC-057 scope. This remains outside the current documentary follow-up and does not authorize implementation.
 
-The report schema, exit-code table, supported record kinds, cross-source policy, gate aggregation, subprocess boundary, root-role separation, Git probe projection, predicate-value contract and test-write policy are normative in Revision 8 and are no longer open design questions.
+The report schema, exit-code table, supported record kinds, cross-source policy, gate aggregation, subprocess boundary, root-role separation, Git probe projection, predicate-value contract and test-write policy remain normative in Revision 9; this revision additionally closes the role-scoped directory-observation contract identified by the preceding AMEND.
 
 ## 11. Normative v1 schemas, policy and execution profiles
 
@@ -752,7 +754,7 @@ Gate dependencies are `R1 -> R0` and `R2 -> R0`. The implementation MUST emit ev
 The checker validates two separate DAGs before evaluation: check-level edges and gate-level edges. It rejects self-edges, duplicate edges, unresolved check/gate IDs, check records whose `depends_on` differs from `dependencies[]`, required-check IDs missing from a gate, checks assigned to the wrong gate, cross-layer cycles and any `INFORMATIONAL` edge in v1. A graph failure emits no partial gate result and returns `DEPENDENCY_REFERENCE_ERROR` or `DEPENDENCY_CYCLE` with exit class `CHECKER_ERROR`/30. Every stable check is emitted exactly once; `required` and policy applicability must agree.
 
 
-The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58`, raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
+The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `eb89702d51cfa4007207e757bfe7f767c9a77d79f7222dab4a567ca307520eaf`, raw-file SHA-256 `072e61963bc5d2872ee75d62ed6f654e447c6f628d0905cb6bb3a5ccb1415b7d`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
 
 ### 11.5.1 Complete v1 reason-code and predicate registry
 
@@ -762,7 +764,7 @@ The policy artifact's `check_registry`, `gate_dependencies`, workload, decoder, 
 
 ### 11.5.2 Policy artifact and RFC 8785 digest procedure
 
-The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`; its canonical policy digest is `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
+The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `072e61963bc5d2872ee75d62ed6f654e447c6f628d0905cb6bb3a5ccb1415b7d`; its canonical policy digest is `eb89702d51cfa4007207e757bfe7f767c9a77d79f7222dab4a567ca307520eaf`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
 
 ### 11.5.3 Record-kind schemas, trust and admissibility
 
@@ -774,7 +776,7 @@ For a non-null candidate, the equality set is explicit: manifest `candidate_sha`
 
 ### 11.5.5 Named fixture and expected-report matrix
 
-The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf`, policy canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58` and policy raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. Its expected projection is:
+The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `71f2033288accd67680a9bd3e6b7277b6e77a5b8df707e9ccaf4803366227cc2`, policy canonical SHA-256 `eb89702d51cfa4007207e757bfe7f767c9a77d79f7222dab4a567ca307520eaf` and policy raw-file SHA-256 `072e61963bc5d2872ee75d62ed6f654e447c6f628d0905cb6bb3a5ccb1415b7d`. Its expected projection is:
 
 ```text
 functional_sha = null / NO-SHA
@@ -827,4 +829,4 @@ The post-implementation gate is mandatory: before this checker supports any R0�
 
 ## 12. Review Boundary
 
-This is a **Draft** SPEC. It authorizes no implementation, build, runtime, staging, payload generation, push, tag, publication or release. Revision 8 closes the record, adapter, predicate-value, root-role, Git-projection, aggregation, schema, validator and fixture contracts, but Proposal remains blocked until the trusted launcher, sandbox and producer trust anchor are provisioned with immutable identities. The next action is Astra review of this Revision 8 document and all referenced artifacts. After implementation, Astra MUST review the complete implementation diff, actual tests/results, actual report and side-effect evidence before any gate use.
+This is a **Draft** SPEC. It authorizes no implementation, build, runtime, staging, payload generation, push, tag, publication or release. Revision 9 retains the Revision 8 record, adapter, predicate-value, root-role, Git-projection, aggregation, schema, validator and fixture contracts, and resolves the preceding AMEND by making directory exclusions role-scoped, preserving complete PAYLOAD_ROOT enumeration, correcting task/review identity, and aligning the header with the still-unprovisioned trust boundary. Proposal remains blocked until the trusted launcher, sandbox and producer trust anchor are provisioned with immutable identities. The complete Revision 9 packet requires a fresh Astra documentary review; that review does not authorize implementation. After any later authorized implementation, Astra MUST review the complete implementation diff, actual tests/results, actual report and side-effect evidence before any gate use.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import json
 import os
@@ -93,16 +94,59 @@ def record_digest(record: dict[str, Any]) -> str:
     return hashlib.sha256(canonical(body)).hexdigest()
 
 
-def directory_observation(path: Path, exclusions: list[str]) -> tuple[dict[str, int], int, str]:
-    tuples: list[list[Any]] = []
-    excluded = tuple(x.rstrip("/") for x in exclusions)
+def validate_directory_observation_contract(contract: Any) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(contract, dict):
+        return ["directory observation contract must be an object"]
+    roles = {"SOURCE_ROOT", "PAYLOAD_ROOT"}
+    exclusions = contract.get("exclusions_by_role")
+    generated = contract.get("generated_artifact_patterns_by_role")
+    if not isinstance(exclusions, dict) or set(exclusions) != roles:
+        errors.append("directory exclusions must declare exactly SOURCE_ROOT and PAYLOAD_ROOT")
+        return errors
+    if not isinstance(generated, dict) or set(generated) != roles:
+        errors.append("generated-artifact exclusions must declare exactly SOURCE_ROOT and PAYLOAD_ROOT")
+        return errors
+    if any(not isinstance(items, list) or any(not isinstance(item, str) for item in items) for items in exclusions.values()):
+        errors.append("directory exclusions must be lists of strings")
+    if any(not isinstance(items, list) or any(not isinstance(item, str) for item in items) for items in generated.values()):
+        errors.append("generated-artifact exclusions must be lists of strings")
+    if errors:
+        return errors
+    if "Docs" not in exclusions["SOURCE_ROOT"]:
+        errors.append("SOURCE_ROOT must retain the documented Docs exclusion")
+    if exclusions["PAYLOAD_ROOT"]:
+        errors.append("PAYLOAD_ROOT must be fully enumerated without directory exclusions")
+    if generated["PAYLOAD_ROOT"]:
+        errors.append("PAYLOAD_ROOT must be fully enumerated without generated-artifact exclusions")
+    return errors
+
+
+def directory_observation(path: Path, contract: dict[str, Any], role: str) -> tuple[dict[str, int], int, str]:
+    errors = validate_directory_observation_contract(contract)
+    if errors:
+        raise ValueError("invalid directory observation contract: " + "; ".join(errors))
+    exclusions = contract["exclusions_by_role"][role] if role in contract["exclusions_by_role"] else None
+    if exclusions is None:
+        raise ValueError(f"unknown directory role: {role}")
+    patterns = contract["generated_artifact_patterns_by_role"][role]
 
     def is_excluded(rel: str) -> bool:
-        parts = Path(rel).parts
-        if "__pycache__" in parts or ".pytest_cache" in parts or rel.endswith((".pyc", ".pyo")):
+        if any(rel == item or rel.startswith(item.rstrip("/") + "/") for item in exclusions):
             return True
-        return any(rel == x or rel.startswith(x + "/") for x in excluded)
+        for pattern in patterns:
+            variants = {pattern}
+            if pattern.startswith("**/"):
+                variants.add(pattern[3:])
+            if pattern.endswith("/**"):
+                variants.add(pattern[:-3])
+                if pattern.startswith("**/"):
+                    variants.add(pattern[3:-3])
+            if any(fnmatch.fnmatchcase(rel, candidate) for candidate in variants):
+                return True
+        return False
 
+    tuples: list[list[Any]] = []
     for base, dirs, files in os.walk(path, topdown=True, followlinks=False):
         dirs.sort()
         files.sort()
@@ -492,6 +536,7 @@ def main() -> int:
 
     errors += [f"registry:{x}" for x in errors_for(Draft202012Validator(schemas["registry"]), registry)]
     errors += [f"manifest:{x}" for x in errors_for(Draft202012Validator(schemas["manifest"]), manifest)]
+    errors += validate_directory_observation_contract(policy.get("directory_observation_contract", {}))
     if errors:
         for error in sorted(set(errors)):
             print(f"FAIL {error}", file=sys.stderr)
@@ -648,7 +693,11 @@ def main() -> int:
             if not source.is_dir() or source.is_symlink():
                 errors.append(f"selected directory unavailable/unsafe: {selection_id}")
                 continue
-            identity, count, entries_sha = directory_observation(source, policy["directory_observation_contract"]["exclusions"])
+            identity, count, entries_sha = directory_observation(
+                source,
+                policy["directory_observation_contract"],
+                selection["directory_role"],
+            )
             expected = selection["expected"]
             if expected["identity"] != identity:
                 errors.append(f"directory identity mismatch: {selection_id}")

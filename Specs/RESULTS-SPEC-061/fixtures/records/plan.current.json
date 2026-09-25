@@ -7,8 +7,8 @@
       "path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
       "required": true,
       "role": "PLAN",
-      "sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
-      "size": 21969,
+      "sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
+      "size": 23483,
       "tree_sha256": null
     }
   ],
@@ -17,14 +17,14 @@
     "effective_config_sha256": null,
     "functional_sha": null,
     "phase": "PRE_TRIAL_READINESS",
-    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
     "workload_expected_sha256": null
   },
   "evidence_class_claim": "HISTORICAL_ONLY",
   "payload": {
     "path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
-    "sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
-    "size": 21969,
+    "sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
+    "size": 23483,
     "source_status": "HISTORICAL_ONLY"
   },
   "phase": "PRE_TRIAL_READINESS",
@@ -38,7 +38,7 @@
     "algorithm": "SHA-256",
     "canonicalization": "RFC8785-JCS",
     "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
-    "sha256": "39b1a78f172af718141d0ed129aa8481ccaebb19efef3865f6b7392ab9c31d21"
+    "sha256": "83ac122600fec42383ac254fec46557fa2a04070cd5b135d8289a3b7928ebaae"
   },
   "record_id": "plan.current",
   "record_kind": "governing-plan",

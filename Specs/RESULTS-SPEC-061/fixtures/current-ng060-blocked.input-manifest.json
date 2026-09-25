@@ -1,17 +1,17 @@
 {
   "adapter_registry_id": "ng-readiness-adapter-registry-v1",
   "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-  "adapter_registry_sha256": "28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c",
+  "adapter_registry_sha256": "26de17b1b9763d74e6be12096dbd2c55b54996d67c25ccaa70744c1368fb607f",
   "candidate_sha": null,
   "manifest_id": "current-ng060-blocked",
   "phase": "PRE_TRIAL_READINESS",
   "plan_record_id": "plan.current",
   "plan_record_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/plan.current.json",
   "plan_source_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
-  "policy_bytes_sha256": "6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88",
+  "policy_bytes_sha256": "072e61963bc5d2872ee75d62ed6f654e447c6f628d0905cb6bb3a5ccb1415b7d",
   "policy_id": "ng060-r0-r2-read-only-v1",
   "policy_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-policy-v1.json",
-  "policy_sha256": "16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58",
+  "policy_sha256": "eb89702d51cfa4007207e757bfe7f767c9a77d79f7222dab4a567ca307520eaf",
   "records": [
     {
       "accepted_evidence_class_claim": "HISTORICAL_ONLY",
@@ -23,12 +23,12 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
       "expected": {
-        "sha256": "4a7a568f6a1cf2c30a82cb59532e2bf54fdc44bfebd0f8c339407ac75e8a54ca",
+        "sha256": "0b417f4b3521ea7521abb195a2e2a6a60edb421cdc70f83381a27128d10858b3",
         "size": 1703
       },
       "id": "build-manifest.current",
@@ -50,12 +50,12 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
       "expected": {
-        "sha256": "fd633af020fecc992539a01520702365ded7f8dfa3c656ede34762bbd88172e1",
+        "sha256": "9e97e8ea3b12edda1486c769a3276783c3980e4087c646c78913859492f74576",
         "size": 1682
       },
       "id": "build-receipt.current",
@@ -77,7 +77,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -104,7 +104,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -131,12 +131,12 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
       "expected": {
-        "sha256": "8903c71f388298dbe434aaf5181db89dcd4b35ebeaa5fc5459f770eceed7bb37",
+        "sha256": "3a9171dfddb62fef82308c92748972d1596a142a1f7a5d725277082b4b07d2f8",
         "size": 1909
       },
       "id": "freeze.current",
@@ -158,12 +158,12 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
       "expected": {
-        "sha256": "635ec8fa147572739e102c45b1b1cb709d54e875f130087a36a4b25c2ad923f4",
+        "sha256": "f7666e8a7eabe6239c7b9609355f92c00bfd316e8581a2d8112045a090225b46",
         "size": 1861
       },
       "id": "git-repository.current",
@@ -185,7 +185,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -212,7 +212,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -239,7 +239,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -266,7 +266,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": "PAYLOAD_ROOT",
@@ -302,12 +302,12 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
       "expected": {
-        "sha256": "1a210d849b6f50878c488796eaa9e702dfcc5ff085e9dc32134fe2ae1d4da556",
+        "sha256": "25e9c3c29240218259d98a7ce527e8cbe2542cbbaef604826c4a3b743c0b3de6",
         "size": 1630
       },
       "id": "plan.current",
@@ -329,7 +329,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": "SOURCE_ROOT",
@@ -365,7 +365,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -392,7 +392,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -419,7 +419,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,
@@ -446,7 +446,7 @@
         "effective_config_sha256": null,
         "functional_sha": null,
         "phase": "PRE_TRIAL_READINESS",
-        "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+        "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
         "workload_expected_sha256": null
       },
       "directory_role": null,

@@ -58,7 +58,7 @@
     "schema_id": "ng-readiness-adapter-registry-v1.schema",
     "schema_path": "/home/gandalf/workspace/novagenesis/Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json",
     "schema_sha256": "8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f",
-    "sha256": "28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c",
+    "sha256": "26de17b1b9763d74e6be12096dbd2c55b54996d67c25ccaa70744c1368fb607f",
     "source_schema_mismatch": "UNSUPPORTED_SCHEMA_VERSION",
     "trusted_current_adapter_id": null,
     "trusted_current_adapter_status": "EXTERNAL_ONLY_NOT_IN_V1",
@@ -67,7 +67,7 @@
   },
   "adapter_registry_id": "ng-readiness-adapter-registry-v1",
   "adapter_registry_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-adapter-registry-v1.json",
-  "adapter_registry_sha256": "28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c",
+  "adapter_registry_sha256": "26de17b1b9763d74e6be12096dbd2c55b54996d67c25ccaa70744c1368fb607f",
   "check_registry": [
     {
       "depends_on": [],
@@ -2243,28 +2243,34 @@
   "directory_observation_contract": {
     "algorithm": "recursive no-follow lstat enumeration",
     "digest": "SHA-256 of the encoded tuple array",
-    "exclusions": [
-      ".git",
-      "Docs",
-      ".pytest_cache",
-      "Scripts",
-      "Specs",
-      "Logs",
-      "Plots",
-      "build",
-      "build-rollback-8e92e29",
-      "cmake-build-debug",
-      "cmake-build-performance",
-      "cmake-build-sanitizer",
-      "cmake-build-sanitizer-debug"
-    ],
-    "generated_artifact_patterns": [
-      "**/__pycache__/**",
-      "**/*.pyc",
-      "**/*.pyo",
-      "**/.pytest_cache/**"
-    ],
-    "purpose": "break self-reference between the repository-root isolation observation and the evidence packet; excluded paths are not evidence for source/root isolation",
+    "exclusions_by_role": {
+      "SOURCE_ROOT": [
+        ".git",
+        "Docs",
+        ".pytest_cache",
+        "Scripts",
+        "Specs",
+        "Logs",
+        "Plots",
+        "build",
+        "build-rollback-8e92e29",
+        "cmake-build-debug",
+        "cmake-build-performance",
+        "cmake-build-sanitizer",
+        "cmake-build-sanitizer-debug"
+      ],
+      "PAYLOAD_ROOT": []
+    },
+    "generated_artifact_patterns_by_role": {
+      "SOURCE_ROOT": [
+        "**/__pycache__/**",
+        "**/*.pyc",
+        "**/*.pyo",
+        "**/.pytest_cache/**"
+      ],
+      "PAYLOAD_ROOT": []
+    },
+    "purpose": "break self-reference for SOURCE_ROOT observation only; PAYLOAD_ROOT is fully enumerated and all entries remain visible to isolation checks",
     "stable_read": "capture root identity before and after enumeration; reject any identity change or child tuple change",
     "symlink_policy": "record symlinks as SYMLINK and never follow them",
     "tuple_encoding": "sorted UTF-8 JSON array with ensure_ascii=false, sort_keys=true, separators=(,,:,) applied to the row array",

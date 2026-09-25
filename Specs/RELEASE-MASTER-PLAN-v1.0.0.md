@@ -94,9 +94,9 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
-| R0 | Exact-SHA e plano congelado | NG-060 | SPEC-054, SPEC-055 | — | freeze/plan receipt | OPEN | revisão exact-SHA |
-| R1 | Build receipt e identidade dos binários | NG-060 | SPEC-054, SPEC-056 | R0 | receipt e hashes | OPEN | preparar build ligado |
-| R2 | Cinco JPEGs e isolamento Source/Repository | NG-060 | SPEC-055, SPEC-056 | R0, R1 | mapa expected + roots isolados | OPEN | preparar workload |
+| R0 | Exact-SHA e plano congelado | NG-060 | SPEC-054, SPEC-055, SPEC-061 | — | freeze/plan receipt | BLOCKED | Resolver follow-up documental da SPEC-061; depois seleccionar e congelar SHA funcional/plano |
+| R1 | Build receipt e identidade dos binários | NG-060 | SPEC-054, SPEC-056 | R0 | receipt e hashes | OPEN | Após R0, preparar ligação receipt/build; execução depende de autorização própria |
+| R2 | Cinco JPEGs e isolamento Source/Repository | NG-060 | SPEC-055, SPEC-056, SPEC-061 | R0, R1 | mapa expected + roots isolados | BLOCKED | Após R0/R1, preparar workload e roots; trial exige autorização separada |
 | R3 | Runtime local bounded e completion conhecido | NG-060 | SPEC-055 | R0–R2 | eventos NG-ELC e result | OPEN | autorização para uma experiência |
 | R4 | Mapas independentes e cópias re-hashable | NG-060 | SPEC-056 | R3 | mapas/cópias Source/Repository | OPEN | recolha durante o trial |
 | R5 | Teardown e inventário por identidade | NG-060 | SPEC-055, SPEC-056 | R3, R4 | inventário baseline/final | OPEN | verificar zero resíduos atribuíveis |
@@ -141,8 +141,8 @@ O primeiro marco deve parar depois de uma única experiência local bounded e da
 
 | Item diferido | Aplicabilidade v1.0.0 | Obrigações transversais mantidas | Destino |
 |---|---|---|---|
-| SPEC-055 / NG-055 | `N/A — perfil local fora do mínimo certificado` | O executor remoto continua canónico e deve ter lifecycle/teardown próprios | M1-L / v1.1+ |
-| SPEC-056 / NG-056 | `N/A — contrato local de evidência fora do perfil remoto` | Provenance, build linkage, bundle durável, manifest, seal e verificação exigidos pelo remoto permanecem em M1-R | M1-L / v1.1+ |
+| SPEC-055 / NG-055 | Aplicam-se apenas as capacidades locais bounded/lifecycle/teardown concretamente exigidas por R0–R7; encerramento integral, native-privileged e QGA não são pré-requisitos do RDEMO | Manter execução/teardown local seguro e bounded no limite definido por NG-060 | Fecho integral M1-L / critérios QGA em v1.1+ |
+| SPEC-056 / NG-056 | Aplicam-se apenas as capacidades de provenance, build linkage, mapas/cópias, teardown e seal/verifier exigidas por R0–R7; encerramento integral e critérios QGA não são pré-requisitos do RDEMO | Evidência R0–R7 deve continuar verificável, preservada e fail-closed | Fecho integral M1-L / critérios QGA em v1.1+ |
 | SPEC-058 | `N/A — native-privileged local não certificado na v1.0` | Nenhum fallback local/QGA pode ser usado para certificar o perfil remoto | M1-L / v1.1+ |
 | SPEC-059 | `N/A — Proxmox/QGA não é dependência operacional do perfil remoto` | Perda SSH/teardown remoto deve ser tratada fail-closed no procedimento remoto declarado | M1-L / v1.1+ |
 | SPEC-060 | `N/A no RDEMO; aplicável à engenharia remota M2-R` | No remoto: mapas independentes Source/NRNCS/Repository, cópias re-hashable, manifest, seal e verificação offline | M2-R / v1.0 |
@@ -206,6 +206,14 @@ Verificação realizada em 2026-09-13:
 - Rebaseline documental de 2026-09-20: o primeiro marco passa a ser o RDEMO local R0–R7; M1-R/M2-R/M3 continuam o caminho separado da engenharia remota v1.0; QGA-loss permanece `HOLD/NO-GO`.
 - Astra deu `CONDITIONAL GO` ao replaneamento TRL3→TRL4, não à operação: controller-only e fixtures de SPEC-060 ficam concluídos como evidência de componente; collector remoto, trial remoto, VM, SSH, QGA, `clean.sh`, reboot, push, tag e release continuam não autorizados.
 - A regra anti-loop fica activa: não acrescentar novo hardening remoto, matrizes cosméticas, metas 100/1000, readback, subscriptions completas ou QGA-loss como pré-requisitos do RDEMO; só reabrir implementação perante blocker concreto de R0–R7.
+
+### Reconciliação do caminho RDEMO — 2026-09-25
+
+- A revisão estratégica mantém o Plano Mestre v6 e o RDEMO local R0–R7 como primeiro marco; não exige reavaliação integral das SPECs/tarefas da Release 1.0.0.
+- Estado actual de NG-060: R0 `BLOCKED`, R1 `OPEN` (dependente de R0; não executável por este estado), R2 `BLOCKED`, `functional_sha=NO-SHA`.
+- A revisão documental exact-SHA da SPEC-061 no commit `c28a1061df1296f97bffef1709c4e4a6f65d403a` recebeu `AMEND`. O próximo gate único é corrigir o pacote na mesma linhagem SPEC-061, Revision 9, e submeter follow-up documental Astra.
+- Essa revisão não autoriza implementação do checker, build, selecção/congelamento funcional, staging, trial, VM, SSH, QGA, push, tag ou release; aprovações operacionais permanecem separadas.
+- NG-055/NG-056 são dependências somente para capacidades locais concretamente aplicáveis a R0–R7; o encerramento integral das tarefas e os critérios M1-L/QGA permanecem diferidos.
 
 ## 7. Regras para novos agentes
 

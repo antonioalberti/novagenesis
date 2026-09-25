@@ -617,7 +617,7 @@
   "digest_domains": {
     "artifact_bytes": "SHA-256 of selected regular-file bytes",
     "canonical_record": "SHA-256 of RFC8785-JCS canonical record bytes excluding record_digest",
-    "directory_tree": "SHA-256 of canonical compact UTF-8 JSON array of sorted recursive no-follow lstat tuples [relative_path,kind,st_dev,st_ino,st_mode,st_nlink,st_size,st_mtime_ns,st_ctime_ns], with the policy exclusions applied",
+    "directory_tree": "SHA-256 of canonical compact UTF-8 JSON array of sorted recursive no-follow lstat tuples [relative_path,kind,st_dev,st_ino,st_mode,st_nlink,st_size,st_mtime_ns,st_ctime_ns], using the directory_role-specific policy exclusions; PAYLOAD_ROOT is fully enumerated with no exclusions",
     "source_bytes": "SHA-256 of observed source bytes before normalization"
   },
   "failure_classes": {

@@ -17,7 +17,7 @@
     "effective_config_sha256": null,
     "functional_sha": null,
     "phase": "PRE_TRIAL_READINESS",
-    "plan_sha256": "ef3a4f86d9c458698a39fb4e77dab2a64dcd8382ce27d96896db02340bf471ba",
+    "plan_sha256": "2978674057d5102a28a8242ca3e0b2266c40450ede3086402890f728c9c5acd0",
     "workload_expected_sha256": null
   },
   "evidence_class_claim": "HISTORICAL_ONLY",
@@ -53,7 +53,7 @@
     "algorithm": "SHA-256",
     "canonicalization": "RFC8785-JCS",
     "coverage": "CANONICAL_RECORD_WITHOUT_RECORD_DIGEST",
-    "sha256": "6949dcdd6432f852125e416cdb658ab5d94db3bed5cb3288bede62788ddfe779"
+    "sha256": "a85c93b031d76b416cca9286505ea2791b033e3ad4854017195bef9eb55399fe"
   },
   "record_id": "git-repository.current",
   "record_kind": "git-repository",
