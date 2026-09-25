@@ -2245,6 +2245,7 @@
     "digest": "SHA-256 of the encoded tuple array",
     "exclusions": [
       ".git",
+      "Docs",
       ".pytest_cache",
       "Scripts",
       "Specs",

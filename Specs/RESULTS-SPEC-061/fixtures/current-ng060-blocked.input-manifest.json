@@ -8,10 +8,10 @@
   "plan_record_id": "plan.current",
   "plan_record_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-061/fixtures/records/plan.current.json",
   "plan_source_path": "/home/gandalf/workspace/novagenesis/Specs/RELEASE-MASTER-PLAN-v1.0.0.md",
-  "policy_bytes_sha256": "d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1",
+  "policy_bytes_sha256": "6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88",
   "policy_id": "ng060-r0-r2-read-only-v1",
   "policy_path": "/home/gandalf/workspace/novagenesis/Specs/SPEC-061-ng-readiness-policy-v1.json",
-  "policy_sha256": "cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73",
+  "policy_sha256": "16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58",
   "records": [
     {
       "accepted_evidence_class_claim": "HISTORICAL_ONLY",
@@ -334,8 +334,8 @@
       },
       "directory_role": "SOURCE_ROOT",
       "expected": {
-        "entries_sha256": "c74fcbcf59fe951599e6fe9bc46dc710213776fa8c861ced3d6b8366562b0259",
-        "entry_count": 1691,
+        "entries_sha256": "4ee2152676abbdcc30958b0c9a9b0f969093af97be7d7b3d2c551470cc5b253c",
+        "entry_count": 1650,
         "identity": {
           "st_ctime_ns": 1789633346329412122,
           "st_dev": 64512,

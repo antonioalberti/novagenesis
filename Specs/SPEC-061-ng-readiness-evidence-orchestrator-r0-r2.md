@@ -8,7 +8,7 @@
 **Component:** `Scripts/ProjectAudit`; release-readiness evidence inspection
 **Implementation Commit:** pending
 **Related:** `SPEC-054-release-master-plan-and-audit.md`; `SPEC-055-ng-elc-local-mode.md`; `SPEC-056-ng-elc-evidence-provenance-hardening.md`; `SPEC-057-ng-elc-canonical-entrypoint-rename.md`; `SPEC-060-ng-elc-remote-payload-evidence.md`; `Scripts/ProjectAudit/schemas/ng-readiness-report-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-input-manifest-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-evidence-record-v1.schema.json`; `Scripts/ProjectAudit/schemas/ng-readiness-trusted-execution-profile-v1.json`; `Scripts/ProjectAudit/schemas/ng-readiness-adapter-registry-v1.schema.json`; `Scripts/ProjectAudit/validate_spec061_contract.py`; `Specs/SPEC-061-ng-readiness-policy-v1.json`; `Specs/SPEC-061-ng-readiness-adapter-registry-v1.json`
-**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637`)
+**Fixture:** `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` (SHA-256 `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf`)
 **Task linkage:** pending explicit task creation after SPEC review
 
 ---
@@ -526,9 +526,9 @@ release_authorized = false
 
 | Fixture ID | Manifest | Manifest SHA-256 | Expected assessment |
 |---|---|---|---|
-| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
+| `current-ng060-blocked` | `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json` | `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf` | source-document R0 `BLOCKED`, R1 `OPEN`, R2 `BLOCKED`; computed R0/R1/R2 `BLOCKED`; `functional_sha=null/NO-SHA`; exit `20`; runtime/release authorization `false` |
 
-The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73` and raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. The report schema is `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`; the input-manifest schema is `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
+The policy artifact identity is `Specs/SPEC-061-ng-readiness-policy-v1.json` with canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58` and raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. The report schema is `6ee64aae35079aaa84c99f1f0e4c129416146223cd1c25ce9b14494e93f6d2c2`; the input-manifest schema is `aa3def53ff8a648d5479e5169cb7a9602a29cc462133a7b64af91380ee54d014`; the evidence-record schema is `080e77b8c3883801221129410b754aac300e734d72b1c3d0adbce69376b978d0`; the adapter-registry schema is `8fbb7531489a20808133e3d82c7414e6ca6aea7469883e4fe2e9a73aff48212f`; the adapter registry is `28eb9be670d0c0d999a50198efba1499bf782d9c38c70a7c6f6beffbb86a518c`. The checker identity remains implementation-derived and MUST be supplied by the trusted launcher after implementation; it is not a hidden fixture input.
 ## 8. Decisions Log
 
 | # | Decision | Date | Reason |
@@ -752,7 +752,7 @@ Gate dependencies are `R1 -> R0` and `R2 -> R0`. The implementation MUST emit ev
 The checker validates two separate DAGs before evaluation: check-level edges and gate-level edges. It rejects self-edges, duplicate edges, unresolved check/gate IDs, check records whose `depends_on` differs from `dependencies[]`, required-check IDs missing from a gate, checks assigned to the wrong gate, cross-layer cycles and any `INFORMATIONAL` edge in v1. A graph failure emits no partial gate result and returns `DEPENDENCY_REFERENCE_ERROR` or `DEPENDENCY_CYCLE` with exit class `CHECKER_ERROR`/30. Every stable check is emitted exactly once; `required` and policy applicability must agree.
 
 
-The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73`, raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
+The normative policy artifact is `Specs/SPEC-061-ng-readiness-policy-v1.json`, canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58`, raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. The Markdown text in this SPEC is explanatory; the JSON artifact is the only policy source accepted by an implementation.
 
 ### 11.5.1 Complete v1 reason-code and predicate registry
 
@@ -762,7 +762,7 @@ The policy artifact's `check_registry`, `gate_dependencies`, workload, decoder, 
 
 ### 11.5.2 Policy artifact and RFC 8785 digest procedure
 
-The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`; its canonical policy digest is `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
+The file `Specs/SPEC-061-ng-readiness-policy-v1.json` is the exact UTF-8 policy artifact. Its raw-file digest is `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`; its canonical policy digest is `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58`. It contains no BOM, duplicate keys or non-finite values and is parsed with duplicate-key rejection. The canonical digest removes only an explicitly present report-only top-level `sha256` member, applies RFC 8785 JSON Canonicalization Scheme to the remaining object, encodes those exact bytes as UTF-8 and hashes them with SHA-256. The raw and canonical digests are separate identities selected in the input manifest and repeated in the report; a changed artifact produces `HASH_MISMATCH` or `BINDING_MISMATCH` and cannot be silently accepted.
 
 ### 11.5.3 Record-kind schemas, trust and admissibility
 
@@ -774,7 +774,7 @@ For a non-null candidate, the equality set is explicit: manifest `candidate_sha`
 
 ### 11.5.5 Named fixture and expected-report matrix
 
-The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `162a9e04f0b701ff4feb123cdb744344151bf6e8a89a97dc300199c0784c1637`, policy canonical SHA-256 `cbecbd114bb4bc9a7cc2cea430326483f333960aaedb4ce81033070fa18f3b73` and policy raw-file SHA-256 `d8b1f47f93ffa19ecdc8b038320b696fae5c0596449eb2fa3fa5589f013c3ce1`. Its expected projection is:
+The current fixture is `current-ng060-blocked`, manifest `Specs/RESULTS-SPEC-061/fixtures/current-ng060-blocked.input-manifest.json`, raw SHA-256 `46d8c09f24a820c68f0f0670eb0bd814c22dd8ead5d93e1a1780ba818037a5bf`, policy canonical SHA-256 `16fe1e0666d16b14e3faac95499eabcb44a217313402cfb1c00cac3078bebd58` and policy raw-file SHA-256 `6483af53a88f6dc9d121164de22fea8f5ed9b4d76ede362efe3d5f29ae5cbf88`. Its expected projection is:
 
 ```text
 functional_sha = null / NO-SHA
