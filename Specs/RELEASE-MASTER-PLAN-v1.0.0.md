@@ -94,7 +94,7 @@ NG-040 pode produzir o baseline de performance, sem introduzir alterações no c
 
 | Gate | Objectivo | Tarefas | SPECs | Pré-requisito | Evidência | Estado | Próximo passo |
 |---|---|---|---|---|---|---|---|
-| R0 | Exact-SHA e plano congelado | NG-060 | SPEC-054, SPEC-055, SPEC-061 | — | freeze/plan receipt | BLOCKED | Resolver follow-up documental da SPEC-061; depois seleccionar e congelar SHA funcional/plano |
+| R0 | Exact-SHA e plano congelado | NG-060 | SPEC-054, SPEC-055, SPEC-061 | — | freeze/plan receipt | BLOCKED | Candidato técnico recomendado: `b9396e68eba2140f783927775846cab8e3634a0e`; falta congelar plano/configuração efectivos e emitir receipt R0 |
 | R1 | Build receipt e identidade dos binários | NG-060 | SPEC-054, SPEC-056 | R0 | receipt e hashes | OPEN | Após R0, preparar ligação receipt/build; execução depende de autorização própria |
 | R2 | Cinco JPEGs e isolamento Source/Repository | NG-060 | SPEC-055, SPEC-056, SPEC-061 | R0, R1 | mapa expected + roots isolados | BLOCKED | Após R0/R1, preparar workload e roots; trial exige autorização separada |
 | R3 | Runtime local bounded e completion conhecido | NG-060 | SPEC-055 | R0–R2 | eventos NG-ELC e result | OPEN | autorização para uma experiência |
@@ -211,9 +211,27 @@ Verificação realizada em 2026-09-13:
 
 - A revisão estratégica mantém o Plano Mestre v6 e o RDEMO local R0–R7 como primeiro marco; não exige reavaliação integral das SPECs/tarefas da Release 1.0.0.
 - Estado actual de NG-060: R0 `BLOCKED`, R1 `OPEN` (dependente de R0; não executável por este estado), R2 `BLOCKED`, `functional_sha=NO-SHA`.
-- A revisão documental exact-SHA da SPEC-061 no commit `c28a1061df1296f97bffef1709c4e4a6f65d403a` recebeu `AMEND`. O próximo gate único é corrigir o pacote na mesma linhagem SPEC-061, Revision 9, e submeter follow-up documental Astra.
-- Essa revisão não autoriza implementação do checker, build, selecção/congelamento funcional, staging, trial, VM, SSH, QGA, push, tag ou release; aprovações operacionais permanecem separadas.
+- A SPEC-061 Revision 9 no commit `51ea4c8a127a9c00bf340d2da02c702a19613434` recebeu `APPROVED-DOC` no follow-up targeted da §9; a aprovação é exclusivamente documental.
+- Decisão técnica de 2026-09-25, após pedido do utilizador para recomendar um SHA: usar `b9396e68eba2140f783927775846cab8e3634a0e` como candidato RDEMO. Inclui a correcção de identidade PTY de `ce5a786` e o hardening genérico do verificador, sem os incrementos posteriores de payload remoto; o plano local valida `vm=local` e não invoca o comando explícito `channel-check`. A árvore contém um handler defensivo de erro QGA, mas RDEMO não executa esse ramo.
+- R0 continua `BLOCKED`: a recomendação ainda não é um freeze receipt; os caminhos de configuração efectiva não estão disponíveis nesta sessão. O receipt histórico de `4b01e5e258b7228958e027eb1df963048f6629c3` não é freeze NG-060.
+- A aprovação documental não autoriza implementação do checker, build, staging, runtime, trial, VM, SSH, QGA, `clean.sh`, reboot, push, tag ou release; essas autorizações permanecem separadas.
 - NG-055/NG-056 são dependências somente para capacidades locais concretamente aplicáveis a R0–R7; o encerramento integral das tarefas e os critérios M1-L/QGA permanecem diferidos.
+
+### Revisão Astra remote-first — 2026-09-25
+
+- O utilizador pediu prioridade para a Release de Engenharia v1.0.0 e uma rota simplificada. Astra considerou legítima a proposta `M0 → M1-R → M2-R → M3`, mas retornou `AMEND — documentary rebaseline only; operational and release HOLD remain`; a sequência remota ainda não foi formalmente rebaselineada nos registos.
+- Conflito de critério ainda sem decisão: `SPEC-054` §6 mantém G9 (100 fotos) como gate e G10 depende de G1–G9; o Plano v6 propõe cinco fotos em M2-R e coloca G0–G10 no apêndice v1.1+. Cinco fotos não substituem G9 implicitamente. Nenhuma alteração a este critério ou marcação `N/A` foi aprovada.
+- `SPEC-052` §11.2 descreve o ensaio posterior `photos-100` e `SPEC-053` L5 descreve 100 JPEGs; a aplicabilidade destes perfis à release remota declarada deve ser verificada no próximo pacote completo. Estes ficheiros não foram fornecidos por inteiro à revisão Astra de 2026-09-25.
+- Aguardar decisão explícita do utilizador: manter G9/100 fotos na v1.0.0 ou aprovar uma substituição específica do perfil remoto por cinco fotos e diferir G9/G10. Até lá, preservar os critérios normativos existentes e os estados M0 `BLOCKED`, M1-R `HOLD`, M2-R `OPEN`, M3 `BLOCKED`.
+- Após essa decisão, reconciliar no mesmo baseline Master Plan, SPEC-054 §§4/6/7, NG-050, NG-060, NG-058, Dashboard e aplicabilidade de SPEC-060/052/053; preservar resultados/histórico. O resultado está em `Specs/RESULTS-SPEC-059/astra-release-priority-rebaseline-review-20260925.md`.
+- Próximo gate técnico após aprovação documental: revisão delimitada do desenho e plano de testes do collector/helper SPEC-060/NG-058. Nenhuma implementação, build, VM, SSH, QGA, trial, push, tag ou release foi autorizada.
+
+### Pausa explícita do proprietário — 2026-09-26
+
+- O proprietário pausou o trabalho da Release 1.0.0 por tempo indeterminado. Não continuar rebaseline, implementação, Astra, build, VM, SSH, QGA, trial, push, tag ou release até pedido explícito de retoma.
+- O conflito G9/100 fotos versus perfil de cinco fotos permanece sem decisão; nenhum critério foi removido ou marcado `N/A`.
+- Preflight Git confirmado antes da operação: AIOPT3 local `51ea4c8a127a9c00bf340d2da02c702a19613434`; `origin/AIOPT3`/GitHub `24a3851e1d5a90f039b9e148a1af38dd03c4d925`; 47 commits à frente, 0 atrás. O plano autorizado é preservar os 47 commits e as duas alterações locais em AIOPT4, registar a pausa num commit local e deixar AIOPT3 no tip remoto. AIOPT4 será apenas arquivo local, não branch de release activa; não foi autorizado push.
+- Os registos Obsidian NG-050/058/060 e Dashboard reflectem a pausa; o trabalho permanece bloqueado, não aceite nem concluído.
 
 ## 7. Regras para novos agentes
 
