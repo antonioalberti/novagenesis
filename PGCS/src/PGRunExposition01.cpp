@@ -49,7 +49,7 @@
 #include "NGRuntimeProfile.h"
 #endif
 
-// #define DEBUG // This debug is important to follow PGCS running
+#define DEBUG // This debug is important to follow PGCS running
 
 PGRunExposition01::PGRunExposition01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

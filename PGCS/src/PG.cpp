@@ -261,6 +261,67 @@ bool PG::PushStressMessage(Message* M)
   return true;
 }
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+void PG::EmitStageSnapshot(bool final, const char* drainState)
+{
+  EmitStageSnapshot(NGALStageTelemetry::Capture(), final, drainState);
+}
+
+void PG::EmitStageSnapshot(const NGALStageTelemetry::Snapshot& snapshot,
+                           bool final, const char* drainState)
+{
+  const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+      std::chrono::steady_clock::now() - StageTelemetryStart).count();
+  std::cerr << NGALStageTelemetry::FormatSnapshot(
+                   snapshot, StageTelemetryRunId, getpid(), elapsed,
+                   final, drainState)
+            << '\n' << std::flush;
+}
+
+void PG::StageTelemetryLoop()
+{
+  const auto interval = std::chrono::seconds(10);
+  auto next = std::chrono::steady_clock::now() + interval;
+  std::unique_lock<std::mutex> lock(StageTelemetryMutex);
+  while (!StageTelemetryStop)
+  {
+    if (StageTelemetryCV.wait_until(lock, next,
+                                     [this] { return StageTelemetryStop; }))
+      break;
+    lock.unlock();
+    EmitStageSnapshot(false, "running");
+    lock.lock();
+    next += interval;
+  }
+  lock.unlock();
+  const auto finalSnapshot = NGALStageTelemetry::Capture();
+  const char* drainState = NGALStageTelemetry::IsDrained(finalSnapshot)
+      ? "drained" : "not-drained";
+  EmitStageSnapshot(finalSnapshot, true, drainState);
+}
+
+void PG::StartStageTelemetryReporter()
+{
+  std::lock_guard<std::mutex> lock(StageTelemetryMutex);
+  if (StageTelemetryThread.joinable())
+    return;
+  StageTelemetryStop = false;
+  StageTelemetryThread = std::thread(&PG::StageTelemetryLoop, this);
+}
+
+void PG::StopStageTelemetryReporter()
+{
+  {
+    std::lock_guard<std::mutex> lock(StageTelemetryMutex);
+    if (!StageTelemetryThread.joinable())
+      return;
+    StageTelemetryStop = true;
+  }
+  StageTelemetryCV.notify_all();
+  StageTelemetryThread.join();
+}
+#endif
+
 void PG::HeartbeatLoop()
 {
   const auto interval = std::chrono::seconds(10);
@@ -334,6 +395,11 @@ PG::~PG()
   HeartbeatCV.notify_one();
   if (hadHeartbeat)
     HeartbeatThread.join();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  // PGCS reaches Process destruction only after RunGateway returns and its
+  // worker threads are joined; the reporter computes drain state from metrics.
+  StopStageTelemetryReporter();
+#endif
 
   cout << endl
        << "[StressTest] Final: Sent=" << StressSent.load(std::memory_order_relaxed)

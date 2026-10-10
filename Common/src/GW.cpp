@@ -53,6 +53,8 @@
 #include "GWExposition02.h"
 #endif
 
+#include "NGAL_StageTelemetry.h"
+
 // #define DEBUG // To follow message processing
 
 #define LG(msg) S << endl \
@@ -222,6 +224,7 @@ void GW::PushToInputQueue(Message* M)
 
   if (M == 0)
   {
+    NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::InputRejected, 1);
     S << "          (ERROR: The message being store in input queue is corrupted at input queue)" << endl;
     return;
   }
@@ -250,25 +253,42 @@ void GW::PushToInputQueue(Message* M)
 
         // Lock for push + notify (thread-safe w.r.t. Gateway() pop)
         {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_START(inputLockWait,
+                                 NGALStageTelemetry::Timing::InputQueueLockWait);
+#endif
           std::lock_guard<std::mutex> lock(InputQueueMutex);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_STOP(inputLockWait);
+          NGAL_STAGE_TIMER_START(inputLockHold,
+                                 NGALStageTelemetry::Timing::InputQueueLockHold);
+#endif
 
           // Push the message to the queue
           InputQueue.push(M);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          InputQueueTelemetry.Enqueue(M);
+#endif
 
           // Increases the tag counter
           InputQueueTag++;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_STOP(inputLockHold);
+#endif
         }
         // Notify after unlock to minimize time input thread is blocked
         InputQueueCV.notify_one();
       }
       else
       {
+        NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::InputRejected, 1);
         // Mark to delete the message
         M->MarkToDelete();
       }
     }
     else
     {
+      NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::InputRejected, 1);
       S << "          (ERROR: Unable to read the number of command lines at input queue)" << endl;
       M->MarkToDelete();
     }
@@ -308,6 +328,10 @@ void GW::PushToOutputQueue(std::string OQS, Message* M)
             {
               std::lock_guard<std::mutex> lock(OutputQueueMutex);
               OutputQueues[OQS].push(M);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::OutputAdmissions, 1);
+              NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::OutputQueueEntries, 1);
+#endif
               OutputQueueTag++;
               NewOutputMessage = true;
             }
@@ -377,6 +401,10 @@ void GW::ReadFromOutputQueue()
         {
           PM1 = it->second.top();
           it->second.pop();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::OutputDequeued, 1);
+          NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::OutputQueueEntries, -1);
+#endif
           batch.emplace_back(it->first, PM1);
         }
       }
@@ -393,6 +421,9 @@ void GW::ReadFromOutputQueue()
       if (WriteToSharedMemory3(kv.first, kv.second) == OK)
       {
         kv.second->MarkToDelete();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+        NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::OutputCompletions, 1);
+#endif
       }
       else
       {
@@ -400,6 +431,10 @@ void GW::ReadFromOutputQueue()
         {
           std::lock_guard<std::mutex> qlock(OutputQueueMutex);
           OutputQueues[kv.first].push(kv.second);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::OutputRetries, 1);
+          NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::OutputQueueEntries, 1);
+#endif
         }
         anyFailed = true;
       }
@@ -493,6 +528,22 @@ void GW::Gateway()
         if (ScheduledTime < Time)
         {
           InputQueue.pop();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          InputQueueTelemetry.Dequeue(PM1);
+          if (NGAL_STAGE_SHOULD_SAMPLE(
+                  NGALStageTelemetry::Timing::SchedulerLateness))
+          {
+            const double latenessSeconds = Time - ScheduledTime;
+            const auto latenessNanoseconds =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::duration<double>(latenessSeconds)).count();
+            NGAL_STAGE_OBSERVE_NS(
+                NGALStageTelemetry::Timing::SchedulerLateness,
+                latenessNanoseconds > 0
+                    ? static_cast<std::uint64_t>(latenessNanoseconds)
+                    : 0);
+          }
+#endif
           RunFlag = true;
         }
         else
@@ -588,7 +639,15 @@ void GW::Gateway()
 
 #endif
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+      NGAL_STAGE_TIMER_START(actionService,
+                             NGALStageTelemetry::Timing::ActionService);
+#endif
       Run(PM1, PM2);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+      NGAL_STAGE_TIMER_STOP(actionService);
+      NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::InputCompletions, 1);
+#endif
 
       PP->DeleteMarkedMessages();
 
@@ -599,8 +658,17 @@ void GW::Gateway()
     // Step 3 : NGAL: drain the NetworkReceiveQueue
     // The ReceiveDispatcher pushes raw char buffers here. The GW thread
     // does NewMessage + deserialisation + PushToInputQueue.
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+    NGAL_STAGE_TIMER_START(networkConsumerLockWait,
+                           NGALStageTelemetry::Timing::NetworkConsumerLockWait);
+#endif
     {
       std::lock_guard<std::mutex> lock(NetworkReceiveQueueMutex);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+      NGAL_STAGE_TIMER_STOP(networkConsumerLockWait);
+      NGAL_STAGE_TIMER_START(networkConsumerLockHold,
+                             NGALStageTelemetry::Timing::NetworkConsumerLockHold);
+#endif
       while (!NetworkReceiveQueue.empty())
       {
         auto entry = NetworkReceiveQueue.front();
@@ -608,24 +676,66 @@ void GW::Gateway()
 
         char* buffer = entry.first;
         long long size = entry.second;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+        NetworkQueueTelemetry.Dequeue(
+            buffer, size > 0 ? static_cast<std::uint64_t>(size) : 0);
+#endif
 
         if (buffer != 0 && size > 0)
         {
           Message* PM = NULL;
-          if (PP->NewMessage(0, 0, false, PM) == OK)
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_START(gatewayMessageCreate,
+                                 NGALStageTelemetry::Timing::GatewayMessageCreate);
+#endif
+          const int newMessageStatus = PP->NewMessage(0, 0, false, PM);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_STOP(gatewayMessageCreate);
+#endif
+          if (newMessageStatus == OK)
           {
-          #ifdef DEBUG_NETWORK_QUEUE
+#if defined(DEBUG_NETWORK_QUEUE) && !defined(SPEC027_PERF_PROFILE)
             cerr << "[DEBUG] GW::Gateway: NETWORK_QUEUE_DELIVERED size=" << size 
                  << " queue_remaining=" << NetworkReceiveQueue.size() << endl;
-          #endif
-            PM->SetMessageFromCharArray(buffer, size);
-            PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+#endif
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+            NGAL_STAGE_TIMER_START(gatewayDeserialize,
+                                   NGALStageTelemetry::Timing::GatewayDeserialize);
+#endif
+            const int setMessageStatus = PM->SetMessageFromCharArray(buffer, size);
+            const int deserializeStatus =
+                PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+            NGAL_STAGE_TIMER_STOP(gatewayDeserialize);
+            if (setMessageStatus != OK || deserializeStatus != OK)
+              NGAL_STAGE_INCREMENT(
+                  NGALStageTelemetry::Counter::NetworkDeserializeFailures, 1);
+#else
+            (void)setMessageStatus;
+            (void)deserializeStatus;
+#endif
             PushToInputQueue(PM);
           }
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          else
+          {
+            NGAL_STAGE_INCREMENT(
+                NGALStageTelemetry::Counter::NetworkNewMessageFailures, 1);
+          }
+#endif
         }
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+        else
+        {
+          NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::NetworkRejected, 1);
+        }
+#endif
 
         delete[] buffer;
       }
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+      NGAL_STAGE_TIMER_STOP(networkConsumerLockHold);
+#endif
     }
 
     // Step 4 : Read OS IPC — poll shared memory for messages from other processes
@@ -669,12 +779,20 @@ void GW::Gateway()
 int GW::ReadFromSharedMemory3()
 {
   int Status = ERROR;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::ShmReadPolls, 1);
+  NGAL_STAGE_TIMER_START(shmReadOperation,
+                         NGALStageTelemetry::Timing::ShmReadOperation);
+#endif
   string Offset = "          ";
   double StartingTime;
 
   for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
        z++) // Modified in 9th April 2021 to deal with parallel shared memories.
   {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+    NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::ShmReadSegmentsProbed, 1);
+#endif
     sem_t* mutex;
     void* shm_address;
     unsigned char* data;     // Manipulate the content on shared memory
@@ -712,6 +830,8 @@ int GW::ReadFromSharedMemory3()
         // Create and connect to the segment
         if ((PP->shmid[z] = shmget(PP->Key + z, MaxSegmentSize, IPC_CREAT | 0666)) < 0)
         { // Modified in 9th April 2021 to deal with parallel shared memories.
+          NGAL_STAGE_INCREMENT(
+              NGALStageTelemetry::Counter::ShmReadSegmentErrors, 1);
           perror("shmget");
           exit(1);
         }
@@ -730,13 +850,22 @@ int GW::ReadFromSharedMemory3()
 
           // Retry sem_trywait with backoff to avoid CPU spin
           int LockAttempts = 0;
-          while (sem_trywait(mutex) != 0 && LockAttempts < 100)
+          NGAL_STAGE_TIMER_START(shmReadSemaphoreWait,
+                                 NGALStageTelemetry::Timing::ShmReadSemaphoreWait);
+          while (NGAL_STAGE_SEM_TRYWAIT(
+                     mutex,
+                     NGALStageTelemetry::Counter::ShmReadSemaphoreBusy,
+                     NGALStageTelemetry::Counter::ShmReadSemaphoreErrors) != 0 &&
+                 LockAttempts < 100)
           {
             tthread::this_thread::sleep_for(tthread::chrono::microseconds(100));
             LockAttempts++;
           }
+          NGAL_STAGE_TIMER_STOP(shmReadSemaphoreWait);
           if (LockAttempts < 100)
           {
+            NGAL_STAGE_INCREMENT(
+                NGALStageTelemetry::Counter::ShmReadSemaphoreAcquisitions, 1);
 #ifdef DEBUG3
             S << Offset << "(Locked the semaphore " << SemaphoreName << ")" << endl;
 #endif
@@ -752,6 +881,10 @@ int GW::ReadFromSharedMemory3()
             {
               if (data[0] == (unsigned char)'w')
               {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                NGAL_STAGE_INCREMENT(
+                    NGALStageTelemetry::Counter::ShmReadFlagReady, 1);
+#endif
                 StartingTime = GetTime();
 
 #ifdef DEBUG1
@@ -852,13 +985,43 @@ int GW::ReadFromSharedMemory3()
 
                   // Allocate a new Message object
                   Message* PM = 0;
-
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                  NGAL_STAGE_TIMER_START(shmReadMessageCreate,
+                                         NGALStageTelemetry::Timing::GatewayMessageCreate);
+#endif
                   const int PMStatus = PP->NewMessage(GetTime(), 0, false, PM);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                  NGAL_STAGE_TIMER_STOP(shmReadMessageCreate);
+#endif
                   if (PMStatus == OK && PM != 0)
                   {
-                    PM->SetMessageFromCharArray(Payload, (TotalSize - 8));
-
-                    PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                    NGAL_STAGE_TIMER_START(shmReadDeserialize,
+                                           NGALStageTelemetry::Timing::GatewayDeserialize);
+#endif
+                    const int setMessageStatus =
+                        PM->SetMessageFromCharArray(Payload, (TotalSize - 8));
+                    const int deserializeStatus =
+                        PM->ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                    NGAL_STAGE_TIMER_STOP(shmReadDeserialize);
+                    if (setMessageStatus == OK && deserializeStatus == OK)
+                    {
+                      NGAL_STAGE_INCREMENT(
+                          NGALStageTelemetry::Counter::ShmReadMessages, 1);
+                      NGAL_STAGE_INCREMENT(
+                          NGALStageTelemetry::Counter::ShmReadBytes,
+                          static_cast<std::uint64_t>(TotalSize - 8));
+                    }
+                    else
+                    {
+                      NGAL_STAGE_INCREMENT(
+                          NGALStageTelemetry::Counter::ShmReadDecodeErrors, 1);
+                    }
+#else
+                    (void)setMessageStatus;
+                    (void)deserializeStatus;
+#endif
 
 #ifdef DEBUG1
                     long long SS;
@@ -899,6 +1062,13 @@ int GW::ReadFromSharedMemory3()
                     PushToInputQueue(PM);
                     Status = OK;
                   }
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                  else
+                  {
+                    NGAL_STAGE_INCREMENT(
+                        NGALStageTelemetry::Counter::ShmReadNewMessageFailures, 1);
+                  }
+#endif
 
                   delete[] HeaderTimeStampField;
 
@@ -919,6 +1089,10 @@ int GW::ReadFromSharedMemory3()
                 else
                 {
                   // Total size is negative or zero
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+                  NGAL_STAGE_INCREMENT(
+                      NGALStageTelemetry::Counter::ShmReadDecodeErrors, 1);
+#endif
                   // Clean the memory segment
                   memset(data, (unsigned char)'f', MaxSegmentSize);
                 }
@@ -929,6 +1103,8 @@ int GW::ReadFromSharedMemory3()
             } // (data == (unsigned char *)(-1)) means that the data at the SHM was not set properly
             else
             {
+              NGAL_STAGE_INCREMENT(
+                  NGALStageTelemetry::Counter::ShmReadAttachErrors, 1);
               S << Offset << "(Warning: unable to read the data on the shared memory)" << endl;
 
               perror("reading SHM : shmat");
@@ -942,6 +1118,10 @@ int GW::ReadFromSharedMemory3()
             }
             else
             {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(
+                  NGALStageTelemetry::Counter::ShmReadPostErrors, 1);
+#endif
               perror("reading SHM : sem_post");
             }
 
@@ -950,12 +1130,16 @@ int GW::ReadFromSharedMemory3()
           // Detach from shared memory
           if (shmdt(shm_address) == -1)
           {
+            NGAL_STAGE_INCREMENT(
+                NGALStageTelemetry::Counter::ShmReadDetachErrors, 1);
             perror("reading SHM : shmdt");
           }
 
         } // (shm_address = shmat(PP->shmid, NULL, 0)) == NULL) means it is unable to attach to the shared memory segment
         else
         {
+          NGAL_STAGE_INCREMENT(
+              NGALStageTelemetry::Counter::ShmReadAttachErrors, 1);
           perror("reading SHM : shmat");
         }
       }
@@ -965,12 +1149,15 @@ int GW::ReadFromSharedMemory3()
     } // (mutex == SEM_FAILED) means it was unable to create/open the semaphore
     else
     {
+      NGAL_STAGE_INCREMENT(
+          NGALStageTelemetry::Counter::ShmReadOpenErrors, 1);
       perror("reading SHM : unable to create/open semaphore");
 
       sem_unlink(SemaphoreName.c_str());
     }
   }
 
+  NGAL_STAGE_TIMER_STOP(shmReadOperation);
   return Status;
 }
 
@@ -979,10 +1166,15 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
 {
   int Status = ERROR;
   unsigned int Category = 17;
+  NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::ShmWriteCalls, 1);
+  NGAL_STAGE_TIMER_START(shmWriteOperation,
+                         NGALStageTelemetry::Timing::ShmWriteOperation);
 
   for (int z = 0; z < NUMBER_OF_PARALLEL_SHARED_MEMORIES;
        z++) // Modified in 9th April 2021 to deal with parallel shared memories.
   {
+    NGAL_STAGE_INCREMENT(
+        NGALStageTelemetry::Counter::ShmWriteSegmentsProbed, 1);
     long long MessageSize = 0; // The size of the Message (in bytes) being transferred
     long long TotalSize = 0;   // The total size of the message being transferred
     unsigned int NoCL = 0;
@@ -1051,18 +1243,27 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
         S << Offset << "(Opened the semaphore " << _oqs << ")" << endl;
 #endif
 
-        if ((shm_address = shmat(shmid, NULL, 0)) != NULL)
+        shm_address = shmat(shmid, NULL, 0);
+        if (!NGALStageTelemetry::IsSysVShmAttachFailure(shm_address))
         {
-
           // Retry sem_trywait with backoff to avoid CPU spin
           int LockAttempts = 0;
-          while (sem_trywait(mutex) != 0 && LockAttempts < 100)
+          NGAL_STAGE_TIMER_START(shmWriteSemaphoreWait,
+                                 NGALStageTelemetry::Timing::ShmWriteSemaphoreWait);
+          while (NGAL_STAGE_SEM_TRYWAIT(
+                     mutex,
+                     NGALStageTelemetry::Counter::ShmWriteSemaphoreBusy,
+                     NGALStageTelemetry::Counter::ShmWriteSemaphoreErrors) != 0 &&
+                 LockAttempts < 100)
           {
             tthread::this_thread::sleep_for(tthread::chrono::microseconds(100));
             LockAttempts++;
           }
+          NGAL_STAGE_TIMER_STOP(shmWriteSemaphoreWait);
           if (LockAttempts < 100)
           {
+            NGAL_STAGE_INCREMENT(
+                NGALStageTelemetry::Counter::ShmWriteSemaphoreAcquisitions, 1);
 
 #ifdef DEBUG3
             S << Offset << "(Locked the semaphore " << _oqs << ")" << endl;
@@ -1184,9 +1385,17 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
                     delete[] HeaderTimeStampField;
 
                     Status = OK;
+                    NGAL_STAGE_INCREMENT(
+                        NGALStageTelemetry::Counter::ShmWriteMessages, 1);
+                    NGAL_STAGE_INCREMENT(
+                        NGALStageTelemetry::Counter::ShmWriteBytes,
+                        static_cast<std::uint64_t>(MessageSize));
                   }
                   else
                   {
+                    if (TotalSize > static_cast<long long>(MaxSegmentSize))
+                      NGAL_STAGE_INCREMENT(
+                          NGALStageTelemetry::Counter::ShmWriteCapacityErrors, 1);
                     S << Offset
                       << "(ERROR: The message is too big for the memory segment or it has less than 3 command lines)"
                       << endl;
@@ -1207,6 +1416,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
             } // (data[0] != (unsigned char)'f') means the memory is not free to write, despite of locking the semaphore.
             else
             {
+              NGAL_STAGE_INCREMENT(
+                  NGALStageTelemetry::Counter::ShmWriteFlagBusy, 1);
 #ifdef DEBUG1
               S << Offset << "(Warning: The peer behind shmid " << shmid << " and key " << _oqs
                 << " still does not read the shared memory. Trying again later)" << endl;
@@ -1226,6 +1437,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
             }
             else
             {
+              NGAL_STAGE_INCREMENT(
+                  NGALStageTelemetry::Counter::ShmWritePostErrors, 1);
               perror("writing SHM : sem_post");
             }
 
@@ -1244,13 +1457,18 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
           // Detach from shared memory, if attached
           if (shmdt(shm_address) == -1)
           {
+            NGAL_STAGE_INCREMENT(
+                NGALStageTelemetry::Counter::ShmWriteDetachErrors, 1);
             perror("writing SHM : shmdt");
           }
 
-        } // ((shm_address = shmat(shmid, NULL, 0)) == NULL) means UNABLE TO ATTACH
+        } // shmat succeeded; only the SysV failure sentinel is an attach failure
         else
         {
-          perror("writing SHM : semop");
+          NGAL_STAGE_INCREMENT(
+              NGALStageTelemetry::Counter::ShmWriteAttachErrors, 1);
+          perror("writing SHM : shmat");
+          Status = ERROR;
         }
 
         // Semaphore kept open in CachedSemaphores (Phase 2: no sem_close per iteration)
@@ -1258,6 +1476,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
       } //(mutex != SEM_FAILED)
       else
       {
+        NGAL_STAGE_INCREMENT(
+            NGALStageTelemetry::Counter::ShmWriteOpenErrors, 1);
         perror("writing SHM : unable to open/create the semaphore");
 
         sem_unlink(_oqs.c_str());
@@ -1266,6 +1486,8 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
     } //(shmid <= 0)
     else
     {
+      NGAL_STAGE_INCREMENT(
+          NGALStageTelemetry::Counter::ShmWriteLookupErrors, 1);
       S << Offset << "(ERROR: Unable to determine shared memory ID in operating system)" << endl;
     }
 
@@ -1278,6 +1500,9 @@ int GW::WriteToSharedMemory3(std::string OQS, Message* M)
   }
 
   // S << Offset << "(Finished)"<< endl;
+
+  if (Status != OK)
+    NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::ShmWriteFailures, 1);
 
   return Status;
 }

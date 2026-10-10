@@ -36,9 +36,11 @@
 #include <memory>
 #include <new>
 
-// #define DEBUG
+#define DEBUG
 
 using namespace std;
+
+#include "NGAL_StageTelemetry.h"
 
 const size_t NGAL_SAR::MAX_REASSEMBLY_BUFFERS;
 const size_t NGAL_SAR::MAX_REASSEMBLY_BYTES;
@@ -56,13 +58,23 @@ NGAL_SAR::NGAL_SAR() : ReassemblyBytes(0)
 
 NGAL_SAR::~NGAL_SAR()
 {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  while (!ReassemblyBuffers.empty())
+    RemoveBuffer(0);
+#else
   for (size_t i = 0; i < ReassemblyBuffers.size(); ++i)
     delete ReassemblyBuffers[i];
+#endif
 }
 
 void NGAL_SAR::RemoveBuffer(size_t index)
 {
   FragmentBuffer* FB = ReassemblyBuffers[index];
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::ReassemblyAssemblies, -1);
+  NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::ReassemblyBytes,
+                       -static_cast<std::int64_t>(FB->ChargedBytes));
+#endif
   ReassemblyBytes -= FB->ChargedBytes;
   delete FB;
   ReassemblyBuffers.erase(ReassemblyBuffers.begin() + index);
@@ -242,6 +254,14 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
                               char*& CompletedBuffer,
                               long long& CompletedSize)
 {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::SarReceiveCalls, 1);
+  NGALStageTelemetry::OutcomeCounterGuard outcome(
+      NGALStageTelemetry::Counter::SarFragmentsAccepted,
+      NGALStageTelemetry::Counter::SarRejectedFrames);
+  NGAL_STAGE_TIMER_START(sarReceiveTimer,
+                         NGALStageTelemetry::Timing::SarReceiveFragment);
+#endif
   CompletedBuffer = 0;
   CompletedSize = 0;
 
@@ -443,6 +463,11 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       FB = NewBuffer.release();
       ReassemblyBytes += Charge;
       BufferIndex = ReassemblyBuffers.size() - 1;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+      NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::ReassemblyAssemblies, 1);
+      NGAL_STAGE_GAUGE_ADD(NGALStageTelemetry::Gauge::ReassemblyBytes,
+                           static_cast<std::int64_t>(Charge));
+#endif
     }
     catch (const std::bad_alloc&)
     {
@@ -461,6 +486,9 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   ++FB->SegmentsSoFar;
   FB->ReceivedSN[SN] = true;
   FB->Timestamp = static_cast<double>(time(0));
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  outcome.MarkAccepted();
+#endif
 
   // Preserve continuing-fragment and incomplete-message progress logging.
   if (SN > 0)
@@ -478,6 +506,9 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     CompletedSize = FB->MessageSize;
     FB->Buffer = 0; // Detach before the owning FragmentBuffer destructor runs.
     RemoveBuffer(BufferIndex);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+    NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::SarCompletions, 1);
+#endif
     Stats().Count(Completed); // Only the completed-buffer handoff counts.
 #ifdef DEBUG
     cerr << "[DEBUG] NGAL_SAR::ReceiveFragment: COMPLETE MN=" << MN

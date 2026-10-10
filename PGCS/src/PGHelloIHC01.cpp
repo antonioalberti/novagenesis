@@ -41,7 +41,7 @@
 #include "NameGenerator.h"
 #endif
 
-// #define DEBUG
+#define DEBUG
 
 #define LOG(msg) PB->S << endl \
                        << "[" << fixed << setprecision(3) << GetTime() << "s] " << Offset << msg << endl
@@ -146,6 +146,14 @@ int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
               }
             }
 
+#ifdef DEBUG
+            PB->S << Offset << "[DEBUG] PGHelloIHC01: PEER_CANDIDATE path=matched-peer-identifier"
+                  << " pid=" << ReceivedElements.at(2)
+                  << " already_present=" << (!StoreNewPGCS1)
+                  << " self_hid_match="
+                  << (ReceivedElements.at(0) == PB->PP->GetHostSelfCertifyingName())
+                  << endl;
+#endif
             if (StoreNewPGCS1 == true && ReceivedElements.at(0) != PB->PP->GetHostSelfCertifyingName()) // Just one PGCS per host
             {
               LOG("(A new peer PGCS was registered via point to point: "
@@ -165,6 +173,12 @@ int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 
               // Store the peer PGCS tuple for future use
               PPGB->PGCSTuples.push_back(PeerPGCS);
+
+#ifdef DEBUG
+              PB->S << Offset << "[DEBUG] PGHelloIHC01: PEER_TUPLE_APPENDED path=point-to-point"
+                    << " pid=" << ReceivedElements.at(2)
+                    << " peer_count=" << PPGB->PGCSTuples.size() << endl;
+#endif
 
               StoreNewPGCS1 = false;
 
@@ -197,6 +211,12 @@ int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
             }
 
 #ifdef DEBUG
+            PB->S << Offset << "[DEBUG] PGHelloIHC01: PEER_CANDIDATE path=unknown-identifier"
+                  << " pid=" << ReceivedElements.at(2)
+                  << " store_new=" << StoreNewPGCS2
+                  << " self_hid_match="
+                  << (ReceivedElements.at(0) == PB->PP->GetHostSelfCertifyingName())
+                  << endl;
             PB->S << Offset << "Trying to store the discovered peer = " << StoreNewPGCS2 << endl;
 #endif
 
@@ -220,6 +240,12 @@ int PGHelloIHC01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vector<Messa
 
               // Store the peer PGCS tuple for future use
               PPGB->PGCSTuples.push_back(PeerPGS);
+
+#ifdef DEBUG
+              PB->S << Offset << "[DEBUG] PGHelloIHC01: PEER_TUPLE_APPENDED path=discovered-without-prior-knowledge"
+                    << " pid=" << ReceivedElements.at(2)
+                    << " peer_count=" << PPGB->PGCSTuples.size() << endl;
+#endif
 
               ScheduleStoreBindings("-de", ReceivedElements, PeerIdentifier, PeerStack);
             }

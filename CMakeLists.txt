@@ -2,9 +2,16 @@ cmake_minimum_required(VERSION 3.5.1)
 project(novagenesis)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(NG_ENABLE_LEGACY_STANDALONE
        "Build deprecated standalone PSS, GIRS and HTS services"
+       OFF)
+option(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS
+       "Build PGCS with SPEC-027 sampled stage telemetry"
+       OFF)
+option(NG_SPEC027_PERF_PROFILE
+       "Disable per-message Gateway queue logs for matched measurements"
        OFF)
 
 if(NG_ENABLE_LEGACY_STANDALONE)
@@ -22,7 +29,7 @@ include_directories(NBTestApp/src)
 include_directories(PGCS/src)
 include_directories(NRNCS/src)
 
-add_library(Common
+set(NOVAGENESIS_COMMON_SOURCES
         Common/src/rapidjson/error/en.h
         Common/src/rapidjson/error/error.h
         Common/src/rapidjson/internal/biginteger.h
@@ -122,6 +129,7 @@ add_library(Common
         Common/src/NameGenerator.h
         Common/src/NGAL_SAR.cpp
         Common/src/NGAL_SAR.h
+        Common/src/NGAL_StageTelemetry.h
         Common/src/NGAL_CS.cpp
         Common/src/NGAL_CS.h
         Common/src/NameStrategy.h
@@ -140,6 +148,27 @@ add_library(Common
         Common/src/tinythread.cpp
         Common/src/tinythread.h
         Common/src/Tuple.h)
+
+add_library(Common ${NOVAGENESIS_COMMON_SOURCES})
+
+if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS OR NG_SPEC027_PERF_PROFILE)
+    add_library(CommonPGCSDiagnostic STATIC ${NOVAGENESIS_COMMON_SOURCES})
+    target_include_directories(CommonPGCSDiagnostic PRIVATE
+        ContentApp/src Common/src Common/src/rapidjson Common/src/rapidjson/error
+        Common/src/rapidjson/internal IoTTestApp/src NBTestApp/src PGCS/src NRNCS/src)
+    if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS)
+        target_compile_definitions(CommonPGCSDiagnostic PRIVATE
+            SPEC027_STAGE_DIAGNOSTICS=1)
+    endif()
+    if(NG_SPEC027_PERF_PROFILE)
+        target_compile_definitions(CommonPGCSDiagnostic PRIVATE
+            SPEC027_PERF_PROFILE=1)
+    endif()
+    # Telemetry and telemetry-disabled comparison arms both use the same
+    # logging profile; the AIOPT5 baseline has DEBUG_NETWORK_QUEUE disabled.
+    target_compile_definitions(CommonPGCSDiagnostic PRIVATE
+        SPEC027_PERF_PROFILE=1)
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++") # SPEC-MUSL-001: musl static link fix (cherry-pick e714ab1)
@@ -398,7 +427,14 @@ add_executable(PGCS
         PGCS/src/PGStresstestPing01.cpp
         PGCS/src/PGStresstestPing01.h)
 
-target_link_libraries(PGCS LINK_PRIVATE Common)
+if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS OR NG_SPEC027_PERF_PROFILE)
+    if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS)
+        target_compile_definitions(PGCS PRIVATE SPEC027_STAGE_DIAGNOSTICS=1)
+    endif()
+    target_link_libraries(PGCS LINK_PRIVATE CommonPGCSDiagnostic)
+else()
+    target_link_libraries(PGCS LINK_PRIVATE Common)
+endif()
 
 if(NG_ENABLE_LEGACY_STANDALONE)
 add_executable(PSS
@@ -468,3 +504,12 @@ add_executable(NRNCS
         NRNCS/src/NRSubBind01.h)
 
 target_link_libraries(NRNCS LINK_PRIVATE Common)
+
+if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS)
+    enable_testing()
+    add_executable(NGALStageTelemetryTest tests/NGALStageTelemetryTest.cpp)
+    target_include_directories(NGALStageTelemetryTest PRIVATE Common/src)
+    target_compile_definitions(NGALStageTelemetryTest PRIVATE
+        SPEC027_STAGE_DIAGNOSTICS=1)
+    add_test(NAME NGALStageTelemetryTest COMMAND NGALStageTelemetryTest)
+endif()

@@ -207,6 +207,15 @@ int PGRunInitialization01::Run(Message* _ReceivedMessage, CommandLine* _PCL, vec
 
   F3.CloseFile();
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  PPG->StageTelemetryStart = std::chrono::steady_clock::now();
+  PPG->StageTelemetryRunId = NGALStageTelemetry::BuildRunId(
+      PB->PP->GetSelfCertifyingName(), getpid(), PPG->StageTelemetryStart);
+  PPG->StartStageTelemetryReporter();
+  PB->S << "(SPEC027_STAGE_RUN run=" << PPG->StageTelemetryRunId
+        << " pid=" << getpid() << " phase=diagnostic)" << endl;
+#endif
+
   // SPEC-028-B: start the heartbeat here — AFTER PGCS.ini parsing loaded StressEnabled
   // (the PG constructor runs before the ini file is read, so StressEnabled is still
   // false there and the heartbeat would never start if launched from the constructor).

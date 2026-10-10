@@ -33,6 +33,8 @@
 #include "GW.h"
 #endif
 
+#include "NGAL_StageTelemetry.h"
+
 #ifndef _GLIBCXX_UTILITY
 #include <utility>
 #endif
@@ -51,21 +53,35 @@ int NGAL_CS::DeliverToGateway(GW* PGW,
 {
   if (PGW == 0 || MessageCharArray == 0 || MessageSize <= 0)
   {
+    NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::NetworkRejected, 1);
     return 1; // ERROR
   }
 
   {
+    NGAL_STAGE_TIMER_START(producerLockWait,
+                           NGALStageTelemetry::Timing::NetworkProducerLockWait);
     std::lock_guard<std::mutex> lock(PGW->NetworkReceiveQueueMutex);
+    NGAL_STAGE_TIMER_STOP(producerLockWait);
+    NGAL_STAGE_TIMER_START(producerLockHold,
+                           NGALStageTelemetry::Timing::NetworkProducerLockHold);
 
     // Allocate a copy of the buffer — the caller owns the original
+    NGAL_STAGE_TIMER_START(bufferCopy,
+                           NGALStageTelemetry::Timing::NetworkCopy);
     char* BufferCopy = new char[static_cast<size_t>(MessageSize)];
 
     for (long long i = 0; i < MessageSize; i++)
     {
       BufferCopy[i] = MessageCharArray[i];
     }
+    NGAL_STAGE_TIMER_STOP(bufferCopy);
 
     PGW->NetworkReceiveQueue.push(std::make_pair(BufferCopy, MessageSize));
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+    PGW->NetworkQueueTelemetry.Enqueue(
+        BufferCopy, static_cast<std::uint64_t>(MessageSize));
+#endif
+    NGAL_STAGE_TIMER_STOP(producerLockHold);
   }
 
   PGW->NetworkReceiveQueueCV.notify_one();

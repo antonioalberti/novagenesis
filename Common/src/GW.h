@@ -124,6 +124,11 @@
 #include <utility>
 #endif
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+#include "NGAL_StageTelemetry.h"
+#include <chrono>
+#endif
+
 #ifndef _TINYTHREAD_H
 #include "tinythread.h"
 #endif
@@ -160,6 +165,13 @@ private:
 
   // Input message queue
   priority_queue<Message*, vector<Message*>, DereferenceCompareNode> InputQueue;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  NGALStageTelemetry::QueueTelemetry<8192> InputQueueTelemetry{
+      NGALStageTelemetry::Counter::InputAdmissions,
+      NGALStageTelemetry::Counter::InputDispatches,
+      NGALStageTelemetry::Gauge::InputQueueEntries,
+      NGALStageTelemetry::Timing::InputResidence};
+#endif
 
   // Per key output message queue
   map<std::string, priority_queue<Message*, vector<Message*>, DereferenceCompareNode>> OutputQueues;
@@ -188,6 +200,17 @@ private:
   // Marked as public: but contained within the private: section above.
 public:
   std::queue<std::pair<char*, long long>> NetworkReceiveQueue;
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  // Protected by NetworkReceiveQueueMutex; bounded and allocation-free.
+  NGALStageTelemetry::QueueTelemetry<8192> NetworkQueueTelemetry{
+      NGALStageTelemetry::Counter::NetworkEnqueued,
+      NGALStageTelemetry::Counter::NetworkDequeued,
+      NGALStageTelemetry::Gauge::NetworkQueueEntries,
+      NGALStageTelemetry::Timing::NetworkResidence,
+      NGALStageTelemetry::Counter::NetworkEnqueuedBytes,
+      NGALStageTelemetry::Counter::NetworkDequeuedBytes,
+      NGALStageTelemetry::Gauge::NetworkQueueBytes};
+#endif
   std::mutex NetworkReceiveQueueMutex;
   std::condition_variable NetworkReceiveQueueCV;
   // ⚠ Access returns to private for everything below ⚠
@@ -211,6 +234,12 @@ private:
   // ------------------------------------------------------------------------------------------------------------------------------
 
   int ReadFromSharedMemory3();
+
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  void EmitStageSnapshot(bool final, const char* drainState);
+  std::chrono::steady_clock::time_point StageTelemetryStart;
+  std::string StageTelemetryRunId;
+#endif
 
   // Write to the shared memory
   int WriteToSharedMemory3(std::string OQS, Message* M);

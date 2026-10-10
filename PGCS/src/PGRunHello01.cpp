@@ -43,7 +43,7 @@
 
 #include "NameGenerator.h"
 
-////#define DEBUG
+#define DEBUG
 
 PGRunHello01::PGRunHello01(string _LN, Block* _PB, MessageBuilder* _PMB)
     : Action(_LN, _PB, _PMB)

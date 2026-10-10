@@ -160,6 +160,23 @@ public:
   // HT pointer
   HT* PHT;
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+  std::chrono::steady_clock::time_point StageTelemetryStart;
+  std::string StageTelemetryRunId;
+private:
+  std::thread StageTelemetryThread;
+  std::mutex StageTelemetryMutex;
+  std::condition_variable StageTelemetryCV;
+  bool StageTelemetryStop = false;
+  void StageTelemetryLoop();
+public:
+  void EmitStageSnapshot(bool final, const char* drainState);
+  void EmitStageSnapshot(const NGALStageTelemetry::Snapshot& snapshot,
+                         bool final, const char* drainState);
+  void StartStageTelemetryReporter();
+  void StopStageTelemetryReporter();
+#endif
+
   // Define the maximum segment size on shared memory
   size_t MaxSegmentSize;
 

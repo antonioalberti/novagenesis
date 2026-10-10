@@ -53,6 +53,10 @@
 #include "GW.h"
 #endif
 
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+#include "NGAL_StageTelemetry.h"
+#endif
+
 #ifndef _SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -78,7 +82,7 @@
 #include <cstdlib>
 #include <sys/uio.h>
 
-// #define DEBUG
+#define DEBUG
 
 // ─────────────────────────────────────────────────────────────────────────
 // SPEC-031: batched receive pool (recvmmsg)
@@ -307,9 +311,17 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
         for (unsigned int attempt = 0; attempt < 2; ++attempt)
         {
           pool->Reset();
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RawReceiveCalls, 1);
+          NGAL_STAGE_TIMER_START(rawReceiveTimer,
+                                 NGALStageTelemetry::Timing::RawReceiveCall);
+#endif
           const int nrec = recvmmsg(fds[i].fd, pool->messages,
                                     RawReceivePool::BatchSize,
                                     MSG_DONTWAIT | MSG_TRUNC, NULL);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+          NGAL_STAGE_TIMER_STOP(rawReceiveTimer);
+#endif
 
           if (nrec <= 0)
           {
@@ -327,6 +339,13 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
           {
             const unsigned int receivedbytes = static_cast<unsigned int>(pool->messages[slot].msg_len);
             const struct sockaddr_ll* from = &pool->addresses[slot];
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+            NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RawFrames, 1);
+            NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RawBytes,
+                                 receivedbytes);
+            NGAL_STAGE_TIMER_START(rawFrameValidation,
+                                   NGALStageTelemetry::Timing::RawFrameValidation);
+#endif
 
             // SPEC-031: reject truncated frames (payload longer than pool capacity)
             // and too-short frames — never parse partial data.
@@ -334,6 +353,9 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
                 receivedbytes > RawReceivePool::Capacity)
             {
               NGAL_SAR::Stats().Count(NGAL_SAR::RxTruncated);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RxTruncated, 1);
+#endif
 #ifdef DEBUG
               cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: RX_TRUNCATED fd=" << fds[i].fd
                    << " bytes=" << receivedbytes << " (dropped)" << endl;
@@ -344,6 +366,9 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
             if (receivedbytes < 14 + 8)
             {
               NGAL_SAR::Stats().Count(NGAL_SAR::RxTooShort);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RxTooShort, 1);
+#endif
 #ifdef DEBUG
               cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd
                    << " bytes=" << receivedbytes << " (dropped)" << endl;
@@ -360,6 +385,9 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
             // Note (F6): 0x1234 on wire appears as 13330 (0x3412) in host byte order
             if (from->sll_protocol != 13330)
             {
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::NonNgFrames, 1);
+#endif
 #ifdef DEBUG
               cerr << "[DEBUG] NGAL_Transport_RAW::ReceiveDispatcher: NON_NG_FRAME fd=" << fds[i].fd
                    << " proto=0x" << hex << from->sll_protocol << dec
@@ -374,12 +402,20 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
             if (numbytes < 8)
             {
               NGAL_SAR::Stats().Count(NGAL_SAR::RxTooShort);
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+              NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::RxTooShort, 1);
+#endif
 #ifdef DEBUG
               cerr << "[WARN] NGAL_Transport_RAW::ReceiveDispatcher: FRAME_TOO_SMALL fd=" << fds[i].fd
                    << " payload_bytes=" << numbytes << " (min 8 for SegHeader, dropping)" << endl;
 #endif
               continue;
             }
+#ifdef SPEC027_STAGE_DIAGNOSTICS
+            NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::NgFrames, 1);
+            NGAL_STAGE_INCREMENT(NGALStageTelemetry::Counter::NgBytes, numbytes);
+            NGAL_STAGE_TIMER_STOP(rawFrameValidation);
+#endif
 
             // Copy payload out of the pool slot — SAR and delivery must not retain
             // pointers into receive buffers (SPEC-031 ownership rule).
