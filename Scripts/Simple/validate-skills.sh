@@ -36,7 +36,7 @@ NG_SKILLS=(
     "novagenesis-spec-workflow"
     "novagenesis-git-workflow"
     "novagenesis-intra-domain-routing"
-    "novagenesis/ng-inverted-pub-sub"
+    "novagenesis/novagenesis-inverted-pub-sub"
 )
 
 # ── Check 1: All expected skills exist ──

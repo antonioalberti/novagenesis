@@ -164,7 +164,7 @@ SPEC-015 e SPEC-016 **não existem**. Remover referências:
 #### 3.1 Skills existentes em `~/.hermes/skills/novagenesis*/`
 | Skill | Estado | Ação |
 |-------|--------|------|
-| `novagenesis/ng-inverted-pub-sub` | Existe | Verificar vs Docs/ARCHITECTURE/NG-INVERTED-PUB-SUB-MODEL.md |
+| `novagenesis/novagenesis-inverted-pub-sub` | Existe | Verificar vs Docs/ARCHITECTURE/NG-INVERTED-PUB-SUB-MODEL.md |
 | `novagenesis-dev` | Existe (SKILL.md 100KB) | **Refactoring necessário** — muito grande, mistura dev workflow + docs |
 | `novagenesis-debug` | Existe | Verificar se ainda relevante pós-NGAL |
 | `novagenesis-intra-domain-routing` | Existe | Verificar |
