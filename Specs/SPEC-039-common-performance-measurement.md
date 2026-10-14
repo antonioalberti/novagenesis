@@ -1,10 +1,10 @@
 # SPEC-039: Gateway Measurement Baseline on AIOPT5
 
-**Version:** v1.9
-**Date:** 2026-10-10
-**Author:** Hermes; owner-requested gate amendment
-**Status:** In Progress
-**Gate:** v1.1 D0 approved for Q0/Q1; D1-H compile/link passed; v1.2 pre-code review returned Astra HOLD; v1.4 packet returned Astra AMEND; v1.5 r03 and v1.6 r04 returned Astra AMEND; v1.7 r05 returned Astra AMEND with three must-fixes in finding 4a; v1.8 same-SPEC documentary response is local and unreviewed; v1.9 is an unreviewed, privacy-only checkout-path redaction; D2 implementation/runtime remain blocked; D3 not authorised
+**Version:** v1.18
+**Date:** 2026-10-14
+**Author:** Hermes; owner-decided single amendment aligning B1–B6
+**Status:** In Progress — local independent verification (§4.5) pending
+**Gate:** v1.1 D0 approved for Q0/Q1; D1-H compile/link passed; v1.2 pre-code HOLD; v1.4-v1.7 AMEND (r03-r05); v1.8/v1.9 local/unreviewed; **v1.18 single coherent amendment B1–B6 aligning SPEC/manifest/proposal**; D2 implementation/runtime blocked pending §4.5 verification PASS; D3 not authorised
 **Branch:** AIOPT5
 **Baseline commit:** `1af604dad66148618cc0e578c28adb4a9829e607`
 **D0-approved v1.1 draft SHA-256:** `8026e1320149c318a5218eaa36c730f262081a5bbe0c2d582b23c307c7144e1c` (owner approval: 2026-10-04; documentary Q0/Q1 scope only; does not approve this v1.8 amendment)
@@ -120,6 +120,57 @@ For non-PASS records, bounded `failure` requires code, phase, message ≤1024 ch
 
 Next gate: local v1.8 fixtures passed: three Draft 2020-12 schemas meta-valid; four valid and fourteen invalid run-record status fixtures behave as specified; compile-command checker accepted both profiles and rejected 26 negative cases; the link checker passed 15 normal/`python3 -O`/`PYTHONOPTIMIZE=1` cases (three positive, twelve negative). These are synthetic checker tests only—no real `compile_commands.json`, CMake configure/build, harness run, IPC/VM or timing result. Freeze sanitized r06 after final SPEC/manifest/task hashes, then present its exact SHA for fresh owner consent. Until a positive review and separate owner execution authorization, do not implement D2, configure/build/run the harness, touch IPC/VMs, or begin D3; Q2–Q4 remain deferred. This documentary work is not correctness or performance evidence.
 
+
+## 9. D2a closure amendment — v1.18 (B1-B6 alignment)
+
+This section records the alignment of B1-B6 blocker resolutions across the SPEC, manifesto, and proposal documents to enable local independent verification under §4.5. The v1.7 r05 Astra AMEND identified three remaining 4a must-fixes: preprocessor-forwarded/function-like observer macros, `-ansi` dialect override, and Python `assert` checks disabled by `PYTHONOPTIMIZE=1`. This v1.18 amendment resolves the B1-B6 blockers through a coordinated set of mechanisms documented in the manifesto and proposal, while maintaining the original D2 scope and five-file implementation allowlist.
+
+### 9.1 B1-B6 Blocker Resolutions
+
+The six B1-B6 blockers are resolved as follows:
+
+**B1/B2 — Execution Model and Cardinality**  
+Resolved by a single-process two-phase Q0→Q1 model with cardinality 1 for all counts (process starts, run IDs, journals, final records). This ensures isolated, sequential execution without concurrency complications.
+
+**B3 — Semaphore Failure Handling**  
+Resolved by sticky semaphore abort with exit code 127, combined with fault injection cases for ENOENT (no such file or directory), EACCES (permission denied), and EMFILE (too many open files). This provides deterministic failure semantics for semaphore operations.
+
+**B4 — Linking Model and Provider Evidence**  
+Resolved by a hybrid link model using `-Wl,-Bdynamic -lc` on the diagnostic target only, paired with the `ng039-sem-provider-evidence/v1` schema. This satisfies linkage requirements while isolating diagnostic-specific dependencies.
+
+**B5 — Lease Ownership and Wait Sets**  
+Resolved by supervisor-owned lease FD (with `lease.finalizer_has_fd = false`), three distinct wait sets (`cgroup_census`, `harness_wait_set`, `finalizer_wait_receipt`), and a bounded state machine with transitions only on verified events. This ensures proper resource lifecycle management.
+
+**B6 — Partial Reservation Handling**  
+Resolved by classifying reservation failures as `INCONCLUSIVE` (never `PASS`, never `FAIL`), retaining partial artifacts without cleanup, and setting `cleanup_outcome = "unknown"`. This preserves evidence for analysis while avoiding destructive cleanup attempts.
+
+### 9.2 Manifest Alignment
+
+The v1.18 SPEC mandates exact alignment with the manifest fields specified in §9.6. The resolved values are:
+
+| Manifest Field | Value |
+|----------------|-------|
+| `execution_model` | `"single_process_two_phase"` |
+| `cardinality.process_start_count` | `1` |
+| `cardinality.run_id_count` | `1` |
+| `cardinality.journal_count` | `1` |
+| `cardinality.final_record_count` | `1` |
+| `sem_failure.protocol` | `"sticky_abort_exit127"` |
+| `sem_failure.fault_injection_cases` | `["ENOENT","EACCES","EMFILE"]` |
+| `link_model.diagnostic_target` | `"hybrid_-Wl,-Bdynamic_-lc"` |
+| `link_model.provider_evidence_schema` | `"ng039-sem-provider-evidence/v1"` |
+| `lease.fd_owner` | `"supervisor_root"` |
+| `lease.finalizer_has_fd` | `false` |
+| `lease.wait_sets` | `["cgroup_census","harness_wait_set","finalizer_wait_receipt"]` |
+| `lease.timeouts` | `{"launch":20,"drain":30,"finalize":10,"total":60}` |
+| `partial_reservation.classification` | `"INCONCLUSIVE"` |
+| `partial_reservation.cleanup_outcome` | `"unknown"` |
+| `partial_reservation.retention_without_cleanup` | `true` |
+| `partial_reservation.abnormal_evidence_only_condition` | `"valid_common_authority_receipt"` |
+
+### 9.3 Verification Gate
+
+This alignment enables local independent verification under §4.5. Until a positive review and separate owner execution authorization, do not implement D2, configure/build/run the harness, touch IPC/VMs, or begin D3; Q2–Q4 remain deferred. The v1.18 amendment is documentary only—no D2 code, build, harness execution, namespace/IPC operation, or D3 timing is authorised. D2 implementation/runtime remain blocked pending §4.5 verification PASS and separate owner authorization.
 ## 8. Revision history
 
 | Version | Date | Change |
