@@ -1,0 +1,100 @@
+{
+  "receipt_type": "ng039-methodology-validation/v1.1",
+  "date": "2026-10-13",
+  "status": "PASS_WITH_EXPLICIT_LIMITATIONS",
+  "purpose": "Post-freeze read-only verification of the context-expanded, unsubmitted r13 Astra review packet",
+  "identity": {
+    "repository": "/home/gandalf/workspace/novagenesis",
+    "branch": "AIOPT5",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_path": "Specs/SPEC-039-common-performance-measurement.md",
+    "spec_sha256": "3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0",
+    "manifest_path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.15-r13.json",
+    "manifest_sha256": "2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5",
+    "packet_path": "Specs/RESULTS-SPEC-039/precode-packet-v1.15-amend-closure-20261013-sanitized-draft-r13.md",
+    "packet_sha256": "0ce8ded82a76281c729ae0bf111d4cb49c7e763490ef8ea221b1c0e4f3686727",
+    "packet_bytes": 137851,
+    "packet_unsubmitted": true,
+    "marked_model_blocks": 1,
+    "artifact_pin_blocks": 1,
+    "packet_builder_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/build_spec039_v15_r13_packet.py",
+    "packet_builder_sha256": "f87c2208ba626d8b3bb483f4a8a57f95fae3b76cfc50e243c909f3d59c4a2ec2",
+    "checker_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_methodology_v1.py",
+    "checker_sha256": "3e77b92932695c589e6b7a227543a74564cff27186a4234576d835e0eaf3d569",
+    "model_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/spec039_methodology_v1.py",
+    "model_sha256": "1066196faf1484d646feaaa2b00fe2a1267d731fe42d93a03fb45488f75fd581",
+    "journal_tests_sha256": "41397e374e3a3e98f159334e606ad2c77b8136e0728dc314cd989079ebd36668",
+    "projection_tests_sha256": "6a5af4a2927ce7bea5c8c7d7963a2e666721803473e8066cfc822206618304d5",
+    "cli_tests_sha256": "9e55a1a8dd79d3f784bdb6d9e350d0e35133c1d11034e2a2c311331b7c32a84d"
+  },
+  "validation": {
+    "final_packet_live_checker": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 verify_spec039_methodology_v1.py --repo-root /home/gandalf/workspace/novagenesis --spec Specs/SPEC-039-common-performance-measurement.md --manifest Specs/RESULTS-SPEC-039/precode-manifest-v1.15-r13.json --packet Specs/RESULTS-SPEC-039/precode-packet-v1.15-amend-closure-20261013-sanitized-draft-r13.md --expected-head 756f493b7049434ab67cf2382486a48f606a470c",
+      "status": "PASS",
+      "errors": [],
+      "reported_spec_sha256": "3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0",
+      "reported_manifest_sha256": "2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5",
+      "reported_packet_sha256": "0ce8ded82a76281c729ae0bf111d4cb49c7e763490ef8ea221b1c0e4f3686727",
+      "writes_performed": false,
+      "schema_meta_validation_by_cli": "NOT_EXECUTED; validated separately",
+      "cross_artifact_pid_set": "NOT_EXECUTED",
+      "runtime_finalizer": "NOT_EXECUTED",
+      "Astra": "NOT_SUBMITTED"
+    },
+    "unit_tests": {
+      "normal": {
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker test_spec039_methodology_cli",
+        "test_methods": 61,
+        "failures": 0,
+        "errors": 0,
+        "status": "PASS"
+      },
+      "optimized": {
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONOPTIMIZE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker test_spec039_methodology_cli",
+        "test_methods": 61,
+        "failures": 0,
+        "errors": 0,
+        "status": "PASS"
+      }
+    },
+    "schema_meta_validation": {
+      "status": "PASS",
+      "python": "3.12.3",
+      "jsonschema": "4.10.3",
+      "draft": "2020-12",
+      "declared_schema_objects_checked": 5,
+      "method": "Draft202012Validator.check_schema"
+    },
+    "r12_counterexample_replay": {
+      "status": "PASS",
+      "event_instances_schema_validated": 5,
+      "fixture": "JOURNAL_OPENED, CREATE_INTENT(sysv_shm, 11), RUN_SHUTDOWN_COMPLETE, orphan REMOVED(sysv_shm, 11), JOURNAL_CLOSED",
+      "r12_classifier": "not_started",
+      "v1_15_model": "unknown",
+      "expected": "unknown"
+    },
+    "coverage_reference_integrity": {
+      "status": "PASS",
+      "requirement_rows": 18,
+      "unique_test_method_references": 24,
+      "unresolved_test_method_names": []
+    },
+    "r12_archived_artifacts": {
+      "status": "PASS",
+      "files_verified_against_frozen_sha256": 6,
+      "note": "Verified r12 manifest, packet, validation receipt, response, raw SSE and submission receipt. The original r12 SPEC digest remains recorded in the immutable r12 manifest; the live SPEC path now contains v1.15."
+    },
+    "git_diff_check": "PASS",
+    "working_tree_head": "756f493b7049434ab67cf2382486a48f606a470c"
+  },
+  "evidence_boundary": {
+    "offline_synthetic_model_only": true,
+    "production_finalizer": "NOT EXECUTED",
+    "correctness_runtime": "NOT EXECUTED",
+    "ipc_vm": "NOT EXECUTED",
+    "d2_d3_measurement": "NOT EXECUTED",
+    "commit_push": "NOT EXECUTED",
+    "cross_artifact_pid_set": "NOT EXECUTED",
+    "owner_exact_sha_consent_for_this_packet": "PENDING"
+  }
+}

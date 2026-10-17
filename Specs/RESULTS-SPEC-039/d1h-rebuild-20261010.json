@@ -1,0 +1,61 @@
+{
+  "binary": {
+    "bytes": 7366600,
+    "executed": false,
+    "path": "<D1H_REBUILD_ROOT>/build/ng039_gw_q0_q1_harness",
+    "sha256": "060266a24546bc9a8e77ec7b0af409cb480bae770e56f65e95f2727877e5cc7d"
+  },
+  "build": {
+    "argv": [
+      "cmake",
+      "--build",
+      "<D1H_REBUILD_ROOT>/build",
+      "--target",
+      "ng039_gw_q0_q1_harness",
+      "--parallel",
+      "2"
+    ],
+    "compiler": "/usr/bin/c++",
+    "compiler_version": "GNU 13.3.0",
+    "exit_code": 0,
+    "log": "<D1H_REBUILD_ROOT>/build.log",
+    "log_bytes": 8936,
+    "log_sha256": "658cdeec0de9d743438c2683f0bca710b3a7b53302374303793a7838d3246e98",
+    "reported_warnings": 2
+  },
+  "configure": {
+    "argv": [
+      "cmake",
+      "-S",
+      "<D1H_WORKTREE>",
+      "-B",
+      "<D1H_REBUILD_ROOT>/build",
+      "-DNG_ENABLE_NG039_GW_Q0_Q1_HARNESS=ON",
+      "-DNG_ENABLE_LEGACY_STANDALONE=OFF"
+    ],
+    "cmake_version": "3.28.3",
+    "exit_code": 0,
+    "generator": "Unix Makefiles",
+    "log": "<D1H_REBUILD_ROOT>/configure.log",
+    "log_bytes": 652,
+    "log_sha256": "65fb7c5ef0f1613c7aa181794678203c1d70d0c1313f8b20a51b471ef8330feb"
+  },
+  "d1h_manifest_sha256": "9a7c4cda741e81192642053c4bdc60c3a5c0a46afcfa6c658ff2e2324f24225a",
+  "distinction_from_lost_artifacts": "This is a fresh build with new hashes; it does not recover or independently rehash the historical binary/log hashes in the original D1-H manifest.",
+  "environment_capture": "Inherited environment was used for this D1-H reconstruction and was not snapshotted; the separate r07 D2 plan specifies a minimal explicit env -i environment.",
+  "gate": "D1-H compile/link only",
+  "output_is_outside_hermes": true,
+  "output_root": "workspace/ng039-d1h-rebuild-20261010",
+  "rebuild_date": "2026-10-10",
+  "schema_version": "ng039-d1h-build-receipt/v1",
+  "scope": "Compile/link only. No harness execution, IPC, namespace, correctness test, timing, D2, D3, VM/SSH, commit or push.",
+  "source_head": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "source_sha256": {
+    "CMakeLists.txt": "d9dfcf2931f62a926241f93a61ed38e3d5d33e377293b84e22082f0c9a323c2d",
+    "tests/spec039/gw_q0_q1_harness.cpp": "15913ee8b82fed7ad259668ed84e6e261aa444a3df443f3521929eba01b8dc92"
+  },
+  "source_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+  "source_worktree": "<D1H_WORKTREE>",
+  "task_id": "NG-039",
+  "working_directory": "<D1H_WORKTREE>"
+}

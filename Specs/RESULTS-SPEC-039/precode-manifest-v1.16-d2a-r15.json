@@ -1,0 +1,282 @@
+{
+  "baseline_source_files": {
+    "CMakeLists.txt": {
+      "baseline_blob_sha256": "5f9cd0676b2dcdcd0a500d778f5d5baea312301d6abc382db5eab95f2bbb1d07",
+      "worktree_sha256": "d9dfcf2931f62a926241f93a61ed38e3d5d33e377293b84e22082f0c9a323c2d"
+    },
+    "Common/src/Block.cpp": {
+      "baseline_blob_sha256": "26dfa06b575cea6bb9c8d21a18b894f37e73ad91c7e7a7450fefe517903e1622",
+      "worktree_sha256": "26dfa06b575cea6bb9c8d21a18b894f37e73ad91c7e7a7450fefe517903e1622"
+    },
+    "Common/src/GW.cpp": {
+      "baseline_blob_sha256": "7893766ab808473f53b66d8fb9e3804ae5c579bc37d700d90e78155a2ab2cc5e",
+      "worktree_sha256": "7893766ab808473f53b66d8fb9e3804ae5c579bc37d700d90e78155a2ab2cc5e"
+    },
+    "Common/src/GW.h": {
+      "baseline_blob_sha256": "54a97c54fe75fd76e157afc1c70ebce370f3c6edab33233babab3f3fc68f0b44",
+      "worktree_sha256": "54a97c54fe75fd76e157afc1c70ebce370f3c6edab33233babab3f3fc68f0b44"
+    },
+    "Common/src/GWRunInitialization01.cpp": {
+      "baseline_blob_sha256": "1656b703c892831a05043a8bf82ae1bed73d701c8ffea7b95af5a02df0c978af",
+      "worktree_sha256": "1656b703c892831a05043a8bf82ae1bed73d701c8ffea7b95af5a02df0c978af"
+    },
+    "Common/src/Message.cpp": {
+      "baseline_blob_sha256": "96f718f16dfa34fb081c02df872a3959a4255180798e6022e61d198905035518",
+      "worktree_sha256": "96f718f16dfa34fb081c02df872a3959a4255180798e6022e61d198905035518"
+    },
+    "Common/src/Message.h": {
+      "baseline_blob_sha256": "bdbbfee17af8512b2c64e9b61cf83e73b5293cffcd7067c0a10787c80bac4e70",
+      "worktree_sha256": "bdbbfee17af8512b2c64e9b61cf83e73b5293cffcd7067c0a10787c80bac4e70"
+    },
+    "Common/src/Process.cpp": {
+      "baseline_blob_sha256": "bd45b77db19adf7a3c0f78bf5970996afce9720b77ea15519f5a4bcf703845d1",
+      "worktree_sha256": "bd45b77db19adf7a3c0f78bf5970996afce9720b77ea15519f5a4bcf703845d1"
+    }
+  },
+  "bounded_prior_review_history": [
+    {
+      "checkpoint": "historical D2 pre-code v1.2",
+      "consent": "consumed; no follow-up consent",
+      "packet_sha256": "f29274fa1fa38701ee8a5b9c4ae47366dee9e8f75e372dac826541c57ccca942",
+      "response_sha256": "a9d900654287be6f3d9afd5c6e90f1b8a53fe03a03202f8311330345675dcd05",
+      "spec_sha256": "8973948334538715a9e02474be7b1d88a24e6b9235339870ba126d0570d91",
+      "verdict": "HOLD"
+    },
+    {
+      "checkpoint": "v1.15/r13",
+      "packet_sha256": "0ce8ded82a76281c729ae0bf111d4cb49c7e763490ef8ea221b1c0e4f3686727",
+      "response_path": "Specs/RESULTS-SPEC-039/astra-review-v1.15-r13-20261013.md",
+      "response_sha256": "94c118fe12b2b27143a521b43be5ea194d4d0969b4ea35c8829d868d91af47d0",
+      "scope": "abnormal-mode journal-policy contradiction",
+      "verdict": "AMEND"
+    },
+    {
+      "checkpoint": "v1.16/r14",
+      "packet_sha256": "c5d42e42ea1fcb015b393de59819fa7c89669cc9e56ba44a13e9c816b3c17e95",
+      "response_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.md",
+      "response_sha256": "2d0183b961cd5d7a7ee48c555f0bf04345ed9bcb07761697d84ec0fdc57d9406",
+      "scope": "r13 journal-policy contradiction only; not full D2/profile/runtime",
+      "verdict": "APPROVE"
+    }
+  ],
+  "consent": {
+    "astra_calls_authorized": 0,
+    "astra_exact_sha_consent_for_this_packet": false,
+    "d2_execution_authorized": false,
+    "provisioning_authorized": false
+  },
+  "created_date": "2026-10-13",
+  "d1h_cmake_overlay_sha256": "75b25d39ae24b524695eebcba758915fbe7c1526c242dc0bec7ba5c2b79cb710",
+  "functional_baseline": {
+    "head": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "pre_existing_overlay": "D1-H CMake change and untracked harness/manifest; preserve unchanged",
+    "tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+    "working_tree_status": "M CMakeLists.txt\n?? tests/",
+    "worktree_alias": "<D2_WORKTREE>"
+  },
+  "historical_d2_hold_response": {
+    "response_chars": 10687,
+    "response_sha256": "a9d900654287be6f3d9afd5c6e90f1b8a53fe03a03202f8311330345675dcd05",
+    "transcript_alias": "ng039_d2_precode_f29274fa"
+  },
+  "host_launcher_proposal": {
+    "candidate_lease": "/run/lock/ng039-d2/lease.lock",
+    "candidate_supervisor": "/usr/local/libexec/ng039-d2-supervisor",
+    "candidate_uid": "ng039d2",
+    "candidate_unit": "/etc/systemd/system/ng039-d2.service",
+    "candidate_workspace_root": "/var/lib/ng039-d2/workspace",
+    "path": "Specs/RESULTS-SPEC-039/d2-launcher-lease-proposal-v1-20261013.md",
+    "sha256": "ab386f6a94228ab9312efa4526e68b67ab43fc0f7936b789a9ebc459b59f67e6",
+    "status": "draft, not installed or tested"
+  },
+  "normative_contract": {
+    "path": "Specs/SPEC-039-common-performance-measurement.md",
+    "sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025",
+    "status": "In Progress",
+    "version": "v1.16"
+  },
+  "not_yet_created": [
+    "tests/spec039/gw_q0_q1_d2.cpp",
+    "tests/spec039/q0_q1_d2.manifest.json",
+    "dedicated UID",
+    "systemd unit",
+    "supervisor executable",
+    "lease/control/workspace directories"
+  ],
+  "proposed_code_allowlist": [
+    "CMakeLists.txt",
+    "Common/src/GW.h",
+    "Common/src/GW.cpp",
+    "tests/spec039/gw_q0_q1_d2.cpp",
+    "tests/spec039/q0_q1_d2.manifest.json"
+  ],
+  "proposed_oracle_resolution": {
+    "bootstrap_drain": "Proposed sticky scalar event after a completed Gateway iteration proves constructor-queued bootstrap work is drained: Q0 requires queue_depth=0 and all-queue admission/pop/Run-entry/Run-return counts reconciled; Q1 requires only the registered future target remain at head and all non-target bootstrap work reconciled. The synchronous constructor Run is complete before the harness receives Process/GW.",
+    "empty_sample_point": "Only at actual condition_variable::wait_for return after InputQueueMutex is reacquired, if StopGateway is false and InputQueue is empty; increment one saturating observation and event sequence there.",
+    "q1_correlation": "WaitCapture and DecisionCapture are sticky; capture returned wait predicate value and the existing strict due/pop branch only; same iteration ID, increasing sequence and identical target/head/candidate scalar ID are required; overflow/mismatch is INCONCLUSIVE.",
+    "run_cardinality": "Interpret N=1 as one GW consumer per condition; proposed paired experiment is two fresh, sequential Q0/Q1 process starts with distinct run IDs/journals/final records under one trusted service/lease. This interpretation is a review question, not execution authorization.",
+    "synchronization": "One lock at existing admission/wait/pop sites; no recursive lock; scalar-copy accessor under InputQueueMutex; no observer Message*; counters saturate and overflow fails closed."
+  },
+  "readiness_evidence": {
+    "d1h_binary_executed": false,
+    "d1h_binary_sha256": "060266a24546bc9a8e77ec7b0af409cb480bae770e56f65e95f2727877e5cc7d",
+    "d1h_harness_sha256": "15913ee8b82fed7ad259668ed84e6e261aa444a3df443f3521929eba01b8dc92",
+    "d1h_manifest_sha256": "9a7c4cda741e81192642053c4bdc60c3a5c0a46afcfa6c658ff2e2324f24225a",
+    "d1h_receipt_sha256": "3a71e39a80241332429c9298d687b1bbedc8078f1d6f00b37df7c6e5602e9f28",
+    "d2_files_present_in_isolated_worktree": {
+      "tests/spec039/gw_q0_q1_d2.cpp": false,
+      "tests/spec039/q0_q1_d2.manifest.json": false
+    },
+    "d2_files_present_in_main_checkout": {
+      "tests/spec039/gw_q0_q1_d2.cpp": false,
+      "tests/spec039/q0_q1_d2.manifest.json": false
+    },
+    "host_preflight": {
+      "d2_source_files_present": {
+        "gw_q0_q1_d2.cpp": false,
+        "q0_q1_d2.manifest.json": false
+      },
+      "gates_still_required": [
+        "Freeze the complete D2 pre-code profile and review packet, including the dedicated identity/launcher/lease design, exact allowlist, target graph, oracle, and supervisor/finalizer evidence contract.",
+        "Obtain owner consent bound to the final exact packet SHA before any additional Astra call.",
+        "Provision and independently verify the dedicated non-login UID, trusted single-run launcher, and exclusive lease; this host-side change is outside the five-file D2 test-code allowlist and was not performed.",
+        "Record a separate owner execution decision before any D2 configure/build/harness/IPC run.",
+        "D3 remains separate and requires D2 PASS plus its own explicit authorization."
+      ],
+      "not_performed": [
+        "No SPEC or production source edit",
+        "No UID/group/service/launcher/lease provisioning",
+        "No sudo",
+        "No build/configure",
+        "No D2 harness or finalizer execution",
+        "No IPC creation/removal or runtime test",
+        "No Astra call",
+        "No commit or push"
+      ],
+      "observations": {
+        "gates_still_required": [
+          "Freeze the complete D2 pre-code profile and review packet, including the dedicated identity/launcher/lease design, exact allowlist, target graph, oracle, and supervisor/finalizer evidence contract.",
+          "Obtain owner consent bound to the final exact packet SHA before any additional Astra call.",
+          "Provision and independently verify the dedicated non-login UID, trusted single-run launcher, and exclusive lease; this host-side change is outside the five-file D2 test-code allowlist and was not performed.",
+          "Record a separate owner execution decision before any D2 configure/build/harness/IPC run.",
+          "D3 remains separate and requires D2 PASS plus its own explicit authorization."
+        ],
+        "host_checks": {
+          "checked_launcher_directories": [
+            "/usr/local/sbin",
+            "/usr/local/bin",
+            "<OWNER_HOME>/.local/bin",
+            "<OWNER_HOME>/.config/systemd/user",
+            "/etc/systemd/system"
+          ],
+          "limitation": "The directory check was name-filtered over the listed locations, not an exhaustive privileged filesystem audit; absence of matching names is not proof that no arbitrary-named launcher/account exists.",
+          "matching_named_launchers_or_units": [],
+          "processes": {
+            "matches": [],
+            "query": "ps -eo user,uid,pid,ppid,comm filtered for ng039, q0_q1_d2, gw_q0_q1, reservation-journal, supervisor-termination"
+          },
+          "sudo_or_root_changes": false,
+          "systemd": {
+            "exit_code": 0,
+            "matches": [],
+            "query": "systemctl list-unit-files --no-legend filtered for ng039, q0_q1_d2, gw_q0_q1, reservation-journal, supervisor-termination"
+          },
+          "user_accounts": {
+            "limitation": "Name-filtered search only; no account name or UID for the future dedicated identity is currently pinned in this receipt.",
+            "matches": [],
+            "query": "local passwd entries whose names contain ng039, q0q1, or q0_q1"
+          }
+        },
+        "not_performed": [
+          "No SPEC or production source edit",
+          "No UID/group/service/launcher/lease provisioning",
+          "No sudo",
+          "No build/configure",
+          "No D2 harness or finalizer execution",
+          "No IPC creation/removal or runtime test",
+          "No Astra call",
+          "No commit or push"
+        ],
+        "receipt_sha256": "38d9d232b27476e89190b82ddc6538d1534362b647d14d904921ae6499ca51b6",
+        "repository_state": {
+          "branch": "AIOPT5",
+          "git_diff_check": "PASS",
+          "head": "756f493b7049434ab67cf2382486a48f606a470c",
+          "preexisting_dirty_paths_preserved": [
+            "Specs/SPEC-039-common-performance-measurement.md",
+            "Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md",
+            "Specs/RESULTS-SPEC-039/",
+            "Specs/RESULTS-SPEC-059/"
+          ],
+          "spec_sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025"
+        },
+        "review_scope": {
+          "limitation": "Astra approved only the bounded documentary closure of the r13 journal-policy contradiction; it did not approve the full D2 profile, implementation, or runtime.",
+          "r14_packet_sha256": "c5d42e42ea1fcb015b393de59819fa7c89669cc9e56ba44a13e9c816b3c17e95",
+          "r14_verdict": "APPROVE"
+        },
+        "scope": "Read-only local host/worktree readiness checks to identify prerequisites for the SPEC-039 D2 gate. This is not a runtime or authorization receipt.",
+        "status": "BLOCKED_PREPARATION_ONLY",
+        "worktrees": {
+          "isolated_d1h_checkout": {
+            "actions": "Preserved; no edits/build/run performed during this preflight.",
+            "branch": "DETACHED",
+            "d1h_files": [
+              "tests/spec039/gw_q0_q1_harness.cpp",
+              "tests/spec039/q0_q1.manifest.json"
+            ],
+            "d2_files": {
+              "tests/spec039/gw_q0_q1_d2.cpp": "ABSENT",
+              "tests/spec039/q0_q1_d2.manifest.json": "ABSENT"
+            },
+            "head": "1af604dad66148618cc0e578c28adb4a9829e607",
+            "status": [
+              "M CMakeLists.txt",
+              "?? tests/"
+            ]
+          },
+          "primary_checkout_d2_files": {
+            "tests/spec039/gw_q0_q1_d2.cpp": "ABSENT",
+            "tests/spec039/q0_q1_d2.manifest.json": "ABSENT"
+          }
+        }
+      },
+      "receipt_sha256": "38d9d232b27476e89190b82ddc6538d1534362b647d14d904921ae6499ca51b6",
+      "runtime_build_ipc": "not run by this preflight",
+      "scope": "bounded read-only checks only; not an exhaustive host audit",
+      "status": "BLOCKED_PREPARATION_ONLY",
+      "uid_launcher_service": "not provisioned or verified"
+    },
+    "local_r14_validation_receipt_sha256": "ebafdb331e823f25975e4e9c7f85cc03fe75e809e64253ed177f8b1ec77931af",
+    "r14_local_tests": "63 normal + 63 optimized; 5 Draft 2020-12 schemas meta-validated; read-only checker PASS; D2 runtime/finalizer NOT EXECUTED"
+  },
+  "receipt_type": "ng039-spec039-d2a-precode-manifest/v1",
+  "repository_identity": {
+    "branch": "AIOPT5",
+    "commit_or_push": "not performed",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "working_tree_status": "M Specs/SPEC-039-common-performance-measurement.md\n M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md\n?? Specs/RESULTS-SPEC-039/\n?? Specs/RESULTS-SPEC-059/"
+  },
+  "review_questions": [
+    "Do current v1.16 clauses and supplied source excerpts close all four historical D2 pre-code HOLD findings at documentary level?",
+    "Is the proposed exact bootstrap-drain and empty-observation event point sufficient to prove Q0 queue state without changing queue behavior?",
+    "Is the Q0/Q1 cardinality interpretation (two fresh sequential process starts under one service/lease) consistent with §§2–4 and §7.1, or must it be amended before code?",
+    "Does the root-owned systemd supervisor, dedicated UID, control-plane receipt/log ownership, cgroup process ledger, root-only continuous lease and inherited finalizer lease FD satisfy §7.1, including the proposed WORKSPACE_ROOT?",
+    "Is the proposed compile-time-gated observer field/interface map and D2-only CMake graph specific enough for the pre-code gate; identify any exact remaining design blocker.",
+    "Does the three-path diagnostic sem_unlink suppression remain bounded and fail-closed, with macro-off default behavior unchanged?"
+  ],
+  "review_scope": "D2a pre-code design readiness only; no implementation, build, runtime, IPC, host provisioning, D2/D3 acceptance, or operational authority",
+  "status": "LOCAL_DRAFT_UNSUBMITTED",
+  "validation_boundary": {
+    "Astra": false,
+    "IPC": false,
+    "VM_SSH": false,
+    "commit_push": false,
+    "configure_build": false,
+    "packet_assembly": "local deterministic assembly only",
+    "packet_submitted": false,
+    "runtime": false,
+    "system_changes": false,
+    "test_harness": false
+  }
+}

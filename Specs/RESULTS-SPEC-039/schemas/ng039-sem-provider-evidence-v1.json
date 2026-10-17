@@ -1,0 +1,162 @@
+{
+  "$id": "urn:ng039:sem-provider-evidence:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SPEC-039 D2 semaphore provider evidence",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "provider_path",
+    "device",
+    "inode",
+    "build_id",
+    "sha256",
+    "version",
+    "available",
+    "reason"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "ng039-sem-provider-evidence/v1"
+    },
+    "provider_path": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 1024,
+      "minLength": 1
+    },
+    "device": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "inode": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "build_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256,
+      "minLength": 1
+    },
+    "sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 1
+    },
+    "version": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 64,
+      "minLength": 1
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 1024
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "available": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provider_path": {
+            "const": null
+          },
+          "device": {
+            "const": null
+          },
+          "inode": {
+            "const": null
+          },
+          "build_id": {
+            "const": null
+          },
+          "sha256": {
+            "const": null
+          },
+          "version": {
+            "const": null
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "available": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provider_path": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "device": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "inode": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "build_id": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "sha256": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "version": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "reason": {
+            "const": null
+          }
+        }
+      }
+    }
+  ]
+}

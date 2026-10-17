@@ -1,0 +1,68 @@
+{
+  "schema_version": "ng039-precode-validation-receipt/v1",
+  "created_utc_date": "2026-10-12",
+  "scope": "Local documentary/schema checks for SPEC-039 v1.14/r11 only; no runtime or operational evidence.",
+  "repository": "AIOPT5",
+  "document_head": "756f493b7049434ab67cf2382486a48f606a470c",
+  "files": {
+    "spec": {
+      "path": "Specs/SPEC-039-common-performance-measurement.md",
+      "sha256": "bbb26a1331d832ab2dcbf37f1d243d7b9239e6ff1d1932319ad1141923baa609"
+    },
+    "manifest": {
+      "path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.14-r11.json",
+      "sha256": "c7d9598d1827b6ee91ab0e6ad9d15ebeaa04e73ddf181b363eb5f2f04f1e589b"
+    },
+    "packet": {
+      "path": "Specs/RESULTS-SPEC-039/precode-packet-v1.14-amend-closure-20261012-sanitized-draft-r11.md",
+      "sha256": "feb69f164ec879e1b567c44f83e7e56811d2a347fbe904a16337a7a8e3bad829",
+      "bytes": 73327
+    }
+  },
+  "validation_driver": {
+    "path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_v14_r11.py",
+    "sha256": "2a58ce2f002108c2f49af67c6785b4d3fd3a975d27d0e2f843a313e0913242af",
+    "command": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 /home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_v14_r11.py",
+    "result": "PASS; read-only; no files written"
+  },
+  "checks": {
+    "git_diff_check": "PASS",
+    "r10_response_embedded_byte_for_byte": "PASS",
+    "draft_2020_12_json_schemas_meta_valid": {
+      "result": "PASS",
+      "count": 5,
+      "note": "The sixth evidence_schemas entry, collection_responsibility, is manifest policy data, not a JSON Schema."
+    },
+    "run_record_v5": {
+      "result": "PASS",
+      "allOf_conditionals": 8,
+      "abnormal_missing_artifact_contains_requirement": "REMOVED",
+      "missing_artifacts_enum": "Exactly the eight required runtime evidence-artifact names; optional harness-diagnostics.txt excluded; maxItems=8",
+      "positive_fixture": "Final INCONCLUSIVE record accepted while ipc-post.json and ipc-final.json are present as unverified artifacts and their inventory summaries remain unavailable.",
+      "negative_fixtures": [
+        "Abnormal PASS claim rejected",
+        "Abnormal cleanup claim rejected",
+        "Optional harness-diagnostics.txt rejected from missing_artifacts",
+        "Empty supervisor wait_receipts rejected by schema"
+      ]
+    },
+    "missing_artifacts_set_equality": {
+      "result": "PASS",
+      "positive": "Reported absent evidence-artifact names matched the fixture's absent-name set.",
+      "negative": "A deliberately omitted absent name was detected."
+    },
+    "shutdown_event_order": "PASS: RUN_SHUTDOWN_COMPLETE precedes CLEANUP_INTENT in the declared normal event order.",
+    "finalizer_mode_contract": "PASS: preconditions are mode-specific; full live inventories are required only for normal_cleanup; abnormal mode performs no live inventory capture.",
+    "artifact_cardinality": "PASS: eight required runtime evidence artifacts, maximum nine excluding run-record.json, ten total files including run-record.json.",
+    "supervisor_pid_set_cross_artifact_validation": "NOT EXECUTED: semantic finalizer is not implemented; this is not claimed as a schema test or runtime result."
+  },
+  "authorization": {
+    "astra_submitted": false,
+    "fresh_owner_exact_packet_sha_consent": false,
+    "code_build_finalizer_runtime_ipc_vm_d3": "NOT PERFORMED / NOT AUTHORIZED"
+  },
+  "limitations": [
+    "This receipt records local document and schema checks only; it does not establish runtime safety or implementation readiness.",
+    "The working tree remains uncommitted; reviewed inputs are bound by these SHA-256 values, not by HEAD alone."
+  ]
+}

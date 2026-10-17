@@ -1,0 +1,11 @@
+{
+  "schema_version": "ng039-sem-provider-evidence/v1",
+  "provider_path": "/lib/x86_64-linux-gnu/libc.so.6",
+  "device": 8,
+  "inode": 1234567,
+  "build_id": "abcdef123456",
+  "sha256": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "version": "2.35",
+  "available": true,
+  "reason": null
+}

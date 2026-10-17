@@ -1,0 +1,34 @@
+{
+  "schema_version": "ng039-astra-documentary-review-submission/v1",
+  "authorisation": "Owner authorised exactly one documentary Astra review of the frozen r07 B1/B2/B3 packet; no D2 or operational activity.",
+  "reviewed_identities": {
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "f7742629a6069810bade1df295277dfcb2c0ff6c47d614236b4b1e29ca630f26",
+    "manifest_sha256": "1a90346598f5799565bf1f39610ccb45f43afdb8c7acba08d82616e747a6a70d",
+    "packet_sha256": "ffc71bf48dd0f2c2bea7a3448923a9e11ba5d3a16ebbea19ff81a9725e8f46af",
+    "receipt_sha256": "6cc8dccffe7208d651c83d28473e7308ae58b2e55c9e4d48e9645c07fa86355a"
+  },
+  "result": {
+    "verdict": "APPROVE — documentary closure only",
+    "response_id": "resp_00f0490433d54fc0016acb8d33fcd481918764717d05d7e1d7",
+    "model": "gpt-6-astra",
+    "derived_response_path": "Specs/RESULTS-SPEC-039/astra-review-r07-b1b2b3-20261011-derived.md",
+    "derived_response_sha256": "43425d2dff3c639667edf50d01deed5e3e789cad04223ba09a0852276e597852",
+    "review_summary_path": "Specs/RESULTS-SPEC-039/astra-review-r07-b1b2b3-20261011.md",
+    "raw_sse_path": "Specs/RESULTS-SPEC-039/astra-session-r07-b1b2b3-20261011/ng039-r07-b1b2b3-documentary-review.last.sse",
+    "raw_sse_sha256": "cd069756e08fb194b01eb55777e56777eb13b59471d156da45b8efaa93561cc1",
+    "session_transcript": "Specs/RESULTS-SPEC-039/astra-session-r07-b1b2b3-20261011/ng039-r07-b1b2b3-documentary-review.jsonl",
+    "session_transcript_sha256": "ec8eccede091647bd0d378cd4321e5d72928c35cb0ad5d51e74b32f59e37f8a7",
+    "packet_embedded_byte_for_byte": true,
+    "raw_response_normalization": "The raw SSE is retained byte-for-byte. The exact duplicated final-answer block was deduplicated only in the derived Markdown response."
+  },
+  "usage": {
+    "input_tokens": 46989,
+    "cached_tokens": 0,
+    "output_tokens": 745,
+    "total_tokens": 47734,
+    "primary_used_percent": 14,
+    "secondary_used_percent": 18
+  },
+  "authority_boundary": "The review does not authorize code edits, configure/build, harness execution, IPC/VM activity, D3 measurement, commit, push, or release. D2 requires a separate exact-scope owner execution decision."
+}

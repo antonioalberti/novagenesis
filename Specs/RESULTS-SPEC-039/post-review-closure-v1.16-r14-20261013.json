@@ -1,0 +1,98 @@
+{
+  "receipt_type": "ng039-spec039-post-review-closure/v1",
+  "created_date": "2026-10-13",
+  "status": "DOCUMENTARY_SCOPE_APPROVED_WITH_LIMITATIONS",
+  "scope": {
+    "task": "NG-068 — same-SPEC-039 methodology and evidence-transition closure",
+    "review_round": "v1.16/r14, one exact-SHA Astra review of the r13 journal-policy AMEND only",
+    "review_scope_approved": true,
+    "implementation_or_operational_authority": false,
+    "followup_call_authorized": false
+  },
+  "owner_authorization": {
+    "exact_response": "Sim — autorizo exatamente uma revisão desse SHA e confirmo que não serão usados créditos flexíveis/recarga paga",
+    "packet_sha256": "c5d42e42ea1fcb015b393de59819fa7c89669cc9e56ba44a13e9c816b3c17e95",
+    "calls_authorized": 1,
+    "no_flexible_credits_or_paid_auto_reload_confirmed": true
+  },
+  "review_identity": {
+    "repository": "/home/gandalf/workspace/novagenesis",
+    "branch": "AIOPT5",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_path": "Specs/SPEC-039-common-performance-measurement.md",
+    "spec_sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025",
+    "manifest_path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.16-r14.json",
+    "manifest_sha256": "f04b5d6333b14db6dc91a4cd0b7afd5f77c2f148797d1f0631b843457c1e393f",
+    "packet_path": "Specs/RESULTS-SPEC-039/precode-packet-v1.16-amend-closure-20261013-sanitized-draft-r14.md",
+    "packet_sha256": "c5d42e42ea1fcb015b393de59819fa7c89669cc9e56ba44a13e9c816b3c17e95",
+    "packet_bytes": 182410
+  },
+  "review_result": {
+    "provider": "gpt-6-astra",
+    "response_id": "resp_0b401687b872f549016ace416a60148191ab8eb172184d24c3",
+    "verdict": "APPROVE",
+    "scope_qualification": "Bounded documentary assessment of supplied excerpts and active projections; not whole-file or runtime correctness.",
+    "must_fix_blockers": [],
+    "optional_advice": "Editorially qualify the generic inventory-parsing language at /semantic_finalizer_contract/failure_summary_checks/3 by mode. Astra states this is not a blocker because abnormal-mode overrides prohibit inventory replay and require unavailable post/final summaries.",
+    "optional_advice_applied": false,
+    "prior_r12_b1_b2": "Astra reports the accepted corrections are preserved in the supplied r14 materials.",
+    "context_limitations_reported_by_astra": [
+      "Omitted SPEC text and digest-only manifest sections, including /evidence_recovery and /runtime_bundle, were not inspected; their hashes do not establish consistency.",
+      "Synthetic tests were not independently reproduced by Astra.",
+      "The post-freeze checker/schema-validation sidecar was not supplied to Astra.",
+      "Full-interpreter, cross-artifact PID and production-finalizer behavior remain unverified.",
+      "Astra did not recompute packet or other hashes and used no tools or filesystem."
+    ],
+    "review_text_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.md",
+    "review_text_sha256": "2d0183b961cd5d7a7ee48c555f0bf04345ed9bcb07761697d84ec0fdc57d9406",
+    "parser_output_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.parsed.md",
+    "parser_output_sha256": "0019baaef7ac48c1a599877900c0913b2beda4151e2568cca555e075f86e3b36",
+    "normalization_receipt_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013-normalization.json",
+    "normalization_receipt_sha256": "ed52048d18b796d77cef95f6d4ab7614747fdcf3d4540f8dc4dcda8d86962d11",
+    "raw_sse_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.raw.sse",
+    "raw_sse_sha256": "cd5a9a0c53f7e19b83986035500d7a3e4017a3564d21c10d39c02c80afd17093",
+    "submission_receipt_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013-submission.json",
+    "submission_receipt_sha256": "91d3d933c1c3d982e5d2a4d12dd83c5c96ad179f33fef73bd55efa0f2b83d8b7",
+    "local_validation_receipt_path": "Specs/RESULTS-SPEC-039/precode-validation-v1.16-r14-20261013.json",
+    "local_validation_receipt_sha256": "ebafdb331e823f25975e4e9c7f85cc03fe75e809e64253ed177f8b1ec77931af"
+  },
+  "usage": {
+    "input_tokens": 43208,
+    "cached_input_tokens": 0,
+    "output_tokens": 907,
+    "total_tokens": 44115,
+    "plan": "Plus",
+    "primary_used_percent_response_header": "17",
+    "secondary_used_percent_response_header": "8",
+    "credits_has_credits_response_header": "False",
+    "credits_balance_response_header": "0",
+    "tracker_estimate": 12.162500000000001,
+    "tracker_estimate_unit": "internal Codex tracker credits, not USD and not proof of billing category",
+    "usage_row_verified": true,
+    "usage_label": "NG039-SPEC039-r14-Astra-c5d42e42ea1f"
+  },
+  "local_validation_summary": {
+    "normal_mode_tests": 63,
+    "optimized_mode_tests": 63,
+    "schema_meta_validations": 5,
+    "read_only_checker": "PASS",
+    "active_text_projections_checked": 17,
+    "stale_r13_probe": "EXPECTED_FAIL_CLOSED",
+    "synthetic_documentary_only": true
+  },
+  "remaining_gates": {
+    "documentary_r14_amendment": "APPROVED within bounded supplied-evidence review, with limitations above",
+    "production_finalizer_runtime": "NOT_EXECUTED",
+    "cross_artifact_pid_set": "NOT_EXECUTED",
+    "build_or_configure": "NOT_EXECUTED",
+    "IPC_VM_or_SSH": "NOT_EXECUTED",
+    "D2_D3": "BLOCKED by separate launcher/lease and owner operational gates",
+    "commit_push": "NOT_PERFORMED",
+    "followup_Astra": "NOT_AUTHORIZED"
+  },
+  "r13_history": {
+    "verdict": "AMEND",
+    "packet_sha256": "0ce8ded82a76281c729ae0bf111d4cb49c7e763490ef8ea221b1c0e4f3686727",
+    "r13_artifacts_remain_immutable": true
+  }
+}

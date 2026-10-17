@@ -1,0 +1,3529 @@
+{
+  "amendment_response": {
+    "optional_r05_hardening": {
+      "actual_output_based_target_mapping": "incorporated",
+      "conflicting_dynamic_link_controls": "incorporated",
+      "schema_level_status_consistency": "incorporated"
+    },
+    "r05_must_fix_4a": [
+      "Reject compiler-option encodings that bypass macro inspection, including -Wp, and -Xpreprocessor; recognize function-like macro names by base identifier.",
+      "Reject -ansi and all unsupported/alternate dialect, optimization, response-file, forced-include, toolchain, and driver-option forms; use an explicit supported-argument grammar.",
+      "Replace Python assert checks in link validation with explicit nonzero failures that remain active under python3 -O and PYTHONOPTIMIZE=1."
+    ],
+    "r05_verdict": "AMEND",
+    "review_status": "unreviewed; r06 requires new explicit owner consent bound to final packet SHA",
+    "v1_8_documentary_response": [
+      "Compile-command target identity comes from the actual -o output, with metadata/path disagreement rejected.",
+      "Joined and split -D/-U spellings are parsed; malformed, forwarded, duplicate, conflicting, undefined, and function-like observer-macro forms fail closed.",
+      "Require exactly one -std=gnu++20 and only -O0; reject -ansi, -traditional, -x, unknown driver flags, and response files.",
+      "Link validation uses shlex tokenization, exact standalone static flags, pinned compiler identity, response-file rejection, and explicit dynamic-link conflict checks.",
+      "Run-record schema allOf expresses PASS/FAIL/INCONCLUSIVE cross-field conditions; fixtures cover each conditional."
+    ]
+  },
+  "changed_file_allowlist": [
+    "CMakeLists.txt",
+    "Common/src/GW.h",
+    "Common/src/GW.cpp",
+    "tests/spec039/gw_q0_q1_d2.cpp",
+    "tests/spec039/q0_q1_d2.manifest.json"
+  ],
+  "classification_rules": {
+    "assertion_values": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE",
+      "NOT_RUN"
+    ],
+    "dev_shm_bounds": {
+      "max_entries": 128,
+      "max_file_bytes": 16777216,
+      "sum_bytes_max": 16777216
+    },
+    "fail_requires": [
+      "record_finalized=true and failure.code=ASSERTION_FAILED",
+      "at least one assertion FAIL and no assertion INCONCLUSIVE or NOT_RUN; safety/inventory/cleanup assertions PASS",
+      "known harness code 0..255; normal outer code 0..123; signal=null; timeout_fired=false",
+      "all six required artifacts; available/complete empty pre and final inventories; complete attributable post inventory; every cleanup flag true; no uncertainty trigger"
+    ],
+    "failure_safety_assertions": [
+      "evidence_complete",
+      "final_inventory_complete",
+      "final_inventory_empty",
+      "finalization_complete",
+      "gateway_joined",
+      "namespace_setup",
+      "output_worker_joined",
+      "post_inventory_complete",
+      "post_resources_attributable",
+      "post_resources_removed",
+      "pre_inventory_complete",
+      "pre_inventory_empty",
+      "process_blocks_verified",
+      "scalar_run_identity_valid",
+      "target_erased_once",
+      "wait_decision_correlated"
+    ],
+    "inconclusive_precedence": [
+      "timeout/signal",
+      "missing/invalid stage/final/artifact",
+      "finalizer failure",
+      "overflow or identity/correlation ambiguity",
+      "partial construction or blocked join",
+      "incomplete/unattributable post or failed removal",
+      "incomplete final inventory",
+      "NOT_RUN/INCONCLUSIVE assertion",
+      "schema/resource/bundle cap violation",
+      "wrapper/invocation error or ambiguous signal-style outer code"
+    ],
+    "local_fixture_coverage": {
+      "invalid_count": 14,
+      "invalid_examples": [
+        "PASS assertion NOT_RUN",
+        "unsafe cleanup",
+        "nonempty pre-inventory",
+        "incomplete final inventory",
+        "unmatched Q1",
+        "nonzero PASS exit",
+        "missing required artifact",
+        "FAIL without false assertion",
+        "FAIL with NOT_RUN",
+        "incomplete post-inventory",
+        "FAIL ambiguous outer code",
+        "FAIL unknown harness exit",
+        "finalized INCONCLUSIVE without failure",
+        "pending with failure claim"
+      ],
+      "status": "historical v1.8 local result; detailed standalone fixtures were not retained in the current worktree",
+      "valid_count": 4
+    },
+    "observed_exit": {
+      "ambiguous_code": "125-127 wrapper/invocation failure and 128-255 without independent signal evidence are INCONCLUSIVE; never infer a unique harness signal from a shell code",
+      "outer_code": "raw timeout-wrapper exit code; always preserve it",
+      "signal": "only set from an independent unambiguous wait result; otherwise null",
+      "timeout_fired": "true on an explicit supervisor timeout; code 124 is treated conservatively as timeout"
+    },
+    "pass_requires": [
+      "record_finalized=true; failure=null; outer_code=0; harness_code=0; signal=null; timeout_fired=false",
+      "every required assertion is PASS; all six required artifact names are present at least once",
+      "pre and final inventories are available, complete, and empty; post inventory is available, complete, and attributable but may be non-empty before cleanup",
+      "every cleanup flag is true; counter_overflow=false; Q1 correlation_status=MATCHED"
+    ],
+    "post_inventory": "Complete and attributable; may be non-empty if it contains only objects absent from empty pre; remove them and require complete empty final.",
+    "required_artifact_names": [
+      "stdout.txt",
+      "stderr.txt",
+      "ipc-pre.json",
+      "ipc-post.json",
+      "ipc-final.json",
+      "observer-events.json"
+    ],
+    "run_id_uniqueness": "unique per execution; compare across records.",
+    "staged_and_final_inconclusive": {
+      "finalized": "status=INCONCLUSIVE and failure is a bounded object",
+      "not_finalized": "status=INCONCLUSIVE and failure=null; no failure claim before finalization"
+    },
+    "staging": "record_finalized=false => status INCONCLUSIVE; staging is never in final bundle.",
+    "status_values": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE"
+    ],
+    "sysv_bounds": {
+      "max_segment_bytes": 33554532,
+      "max_segments": 5,
+      "max_total_bytes": 167772660,
+      "reported_total_equals_segment_sum": true,
+      "unique_ids": true
+    }
+  },
+  "cmake": {
+    "build_type": "Debug",
+    "changed_file_allowlist_is_not_target_census": true,
+    "cmake_version": "3.28.3",
+    "compile_commands_verification": {
+      "checker_logic": "import json, os, re, shlex, sys\nfrom pathlib import Path\n\nEXPECTED = {\n    \"diagnostic\": {\"Common\", \"ng039_gw_q0_q1_d2\"},\n    \"default\": {\"Common\", \"ContentApp\", \"IoTTestApp\", \"NBTestApp\", \"PGCS\", \"NRNCS\"},\n}\nCOMPILER = os.path.realpath(\"/usr/bin/x86_64-linux-gnu-g++-13\")\nOBSERVER = \"NG_GW_QUEUE_TEST_OBSERVATION\"\nREQUIRED = {\"-O0\", \"-g\", \"-g3\", \"-Wall\", \"-fmessage-length=0\", \"-pthread\", \"-Wno-deprecated\", \"-lpthread\", \"-lrt\", \"-fno-omit-frame-pointer\", \"-c\"}\nPAIRED = {\"-o\", \"-MF\", \"-MT\", \"-I\", \"-isystem\", \"-iquote\"}\nJOINED = (\"-isystem\", \"-iquote\", \"-MF\", \"-MT\", \"-I\", \"-o\")\nDEP = {\"-MD\", \"-MMD\", \"-MP\"}\nSHELL_CONTROL = set(\";|&<>\")\n\ndef reject(message):\n    raise ValueError(message)\n\ndef norm_path(value, directory):\n    p = Path(value)\n    return (p if p.is_absolute() else directory / p).resolve(strict=False)\n\ndef macro_parts(value):\n    m = re.fullmatch(r\"([A-Za-z_][A-Za-z0-9_]*)(\\([^)]*\\))?(?:=(.*))?\", value)\n    if not m:\n        reject(\"malformed -D/-U operand\")\n    return m.group(1), m.group(2), m.group(3)\n\ndef target_from_output(output_path):\n    parts = output_path.parts\n    found = []\n    for i, part in enumerate(parts[:-1]):\n        if part == \"CMakeFiles\" and parts[i + 1].endswith(\".dir\"):\n            found.append(parts[i + 1][:-4])\n    if len(found) != 1:\n        reject(\"target cannot be uniquely derived from actual -o output\")\n    return found[0]\n\ndef entry_tokens(entry):\n    directory = Path(entry[\"directory\"]).resolve(strict=False)\n    command = entry.get(\"command\")\n    arguments = entry.get(\"arguments\")\n    if command is not None:\n        if not isinstance(command, str):\n            reject(\"command must be a string\")\n        words = shlex.split(command, posix=True)\n        if any(c in command for c in \"$`;&|<>\"):\n            reject(\"shell expansion/control syntax is unsupported\")\n        if arguments is not None and (not isinstance(arguments, list) or words != arguments):\n            reject(\"command/arguments disagreement\")\n    elif isinstance(arguments, list):\n        words = list(arguments)\n    else:\n        reject(\"compile entry has neither command nor arguments\")\n    if not words or not all(isinstance(x, str) for x in words):\n        reject(\"empty or malformed argv\")\n    if os.path.realpath(words[0]) != COMPILER:\n        reject(\"compiler identity mismatch\")\n    if any(x.startswith(\"@\") for x in words):\n        reject(\"response files are unsupported\")\n    if any(x.startswith(\"-Wp\") or x == \"-Xpreprocessor\" for x in words):\n        reject(\"forwarded preprocessor arguments are unsupported\")\n    return words, directory\n\ndef validate_compile_database(entries, profile):\n    if profile not in EXPECTED or not isinstance(entries, list) or not entries:\n        reject(\"unknown profile or empty compile database\")\n    seen = set()\n    for entry in entries:\n        if not isinstance(entry, dict) or not {\"directory\", \"file\"}.issubset(entry):\n            reject(\"malformed compile entry\")\n        argv, directory = entry_tokens(entry)\n        target_outputs = []\n        sources = []\n        standards = []\n        optimizations = []\n        macros = []\n        observed_defines = []\n        i = 1\n        while i < len(argv):\n            token = argv[i]\n            if token in PAIRED:\n                i += 1\n                if i >= len(argv) or not argv[i] or argv[i].startswith(\"-\"):\n                    reject(\"missing/malformed option operand\")\n                value = argv[i]\n                if token == \"-o\":\n                    target_outputs.append(value)\n                i += 1\n                continue\n            if token in (\"-D\", \"-U\"):\n                op = token\n                i += 1\n                if i >= len(argv):\n                    reject(\"missing macro operand\")\n                raw = argv[i]\n                base, function_like, value = macro_parts(raw)\n                macros.append((op, base, function_like, value, raw))\n                if base == OBSERVER:\n                    observed_defines.append((op, function_like, value, raw))\n                i += 1\n                continue\n            if token.startswith(\"-D\") or token.startswith(\"-U\"):\n                op, raw = token[:2], token[2:]\n                base, function_like, value = macro_parts(raw)\n                macros.append((op, base, function_like, value, raw))\n                if base == OBSERVER:\n                    observed_defines.append((op, function_like, value, raw))\n                i += 1\n                continue\n            if token.startswith(\"-std=\"):\n                standards.append(token)\n                i += 1\n                continue\n            if token.startswith(\"-O\"):\n                optimizations.append(token)\n                if token != \"-O0\":\n                    reject(\"optimization override\")\n                i += 1\n                continue\n            if token in REQUIRED or token in DEP:\n                i += 1\n                continue\n            matched = False\n            for prefix in JOINED:\n                if token.startswith(prefix) and len(token) > len(prefix):\n                    value = token[len(prefix):]\n                    if not value or any(c in value for c in SHELL_CONTROL):\n                        reject(\"malformed joined operand\")\n                    if prefix == \"-o\":\n                        target_outputs.append(value)\n                    matched = True\n                    break\n            if matched:\n                i += 1\n                continue\n            if token.startswith(\"-\"):\n                reject(\"unsupported compiler/driver option: \" + token)\n            if any(c in token for c in SHELL_CONTROL):\n                reject(\"shell control token\")\n            sources.append(token)\n            i += 1\n        if len(target_outputs) != 1:\n            reject(\"exactly one actual -o output is required\")\n        output_path = norm_path(target_outputs[0], directory)\n        target = target_from_output(output_path)\n        if target not in EXPECTED[profile]:\n            reject(\"unexpected target: \" + target)\n        seen.add(target)\n        if \"output\" in entry and norm_path(entry[\"output\"], directory) != output_path:\n            reject(\"output metadata disagrees with actual -o path\")\n        if len(sources) != 1 or norm_path(sources[0], directory) != norm_path(entry[\"file\"], directory):\n            reject(\"source operand disagrees with entry file\")\n        if standards != [\"-std=gnu++20\"]:\n            reject(\"effective language mode must be exactly gnu++20\")\n        if not optimizations or any(x != \"-O0\" for x in optimizations):\n            reject(\"effective optimization must be -O0 only\")\n        if not REQUIRED.issubset(set(argv)):\n            reject(\"required project/debug flags missing\")\n        if profile == \"default\" and observed_defines:\n            reject(\"observer macro defined or undefined in default profile\")\n        if profile == \"diagnostic\" and target in {\"Common\", \"ng039_gw_q0_q1_d2\"}:\n            if observed_defines != [(\"-D\", None, \"1\", OBSERVER + \"=1\")]:\n                reject(\"diagnostic observer macro must be exactly one object-like =1 define\")\n    if seen != EXPECTED[profile]:\n        reject(\"target census mismatch\")\n    return {\"profile\": profile, \"targets\": sorted(seen), \"entries\": len(entries)}\n\nif __name__ == \"__main__\":\n    with open(sys.argv[1], encoding=\"utf-8\") as f:\n        data = json.load(f)\n    print(json.dumps(validate_compile_database(data, sys.argv[2]), sort_keys=True))\n",
+      "command_arguments_binding": "If both command and arguments are present, POSIX-shlex command tokens must equal arguments exactly. Never execute compile-database text.",
+      "compiler_realpath_required": "/usr/bin/x86_64-linux-gnu-g++-13",
+      "database_sha256_and_target_counts_recorded": true,
+      "implementation_boundary": "Inline preflight checker in the authorized D2 manifest/harness package; no extra production or changed-file allowlist path.",
+      "metadata_binding": "If compile_commands.json has output metadata, normalize it relative to directory and require equality with the actual -o path. Require the source operand to normalize exactly to the entry file.",
+      "negative_fixtures": [
+        "wrong compiler",
+        "command/arguments disagreement",
+        "false output metadata",
+        "conflicting output metadata",
+        "unexpected target",
+        "direct bare observer define",
+        "split bare observer define",
+        "direct zero-valued define",
+        "split zero-valued define",
+        "duplicate observer define",
+        "observer undefine",
+        "-Wp,-DNG_GW_QUEUE_TEST_OBSERVATION=1",
+        "-Xpreprocessor -DNG_GW_QUEUE_TEST_OBSERVATION=1",
+        "joined function-like define",
+        "split function-like define",
+        "-ansi",
+        "later -std=gnu++17",
+        "later -std=gnu++23",
+        "later -O1",
+        "-Ofast",
+        "-include",
+        "-imacros",
+        "-specs",
+        "response file",
+        "-fplugin",
+        "-B toolchain override"
+      ],
+      "not_executed_in_r06": true,
+      "observer_macro": {
+        "default_profile": "no define or undefine in any target",
+        "diagnostic_profile": "exactly one object-like -DNG_GW_QUEUE_TEST_OBSERVATION=1 for every Common/harness compile entry; no undefine, duplicate, conflicting value, or function-like form",
+        "name": "NG_GW_QUEUE_TEST_OBSERVATION"
+      },
+      "planned_command": "python3 <inline compile-database checker> \"$DB\" \"$PROFILE\"",
+      "reject_explicitly": [
+        "@response files",
+        "-Wp and -Wp,*",
+        "-Xpreprocessor",
+        "-include",
+        "-imacros",
+        "-ansi",
+        "-traditional",
+        "-x",
+        "-specs",
+        "-B",
+        "-wrapper",
+        "-fplugin",
+        "unknown -f/-m/driver flags",
+        "shell expansion/control tokens",
+        "missing/extra source or -o operands"
+      ],
+      "required": true,
+      "required_optimization": "one or more -O0 tokens only; every other -O* form rejected",
+      "required_standard": "exactly one -std=gnu++20",
+      "supported_exact_flags": [
+        "-O0",
+        "-g",
+        "-g3",
+        "-Wall",
+        "-fmessage-length=0",
+        "-pthread",
+        "-Wno-deprecated",
+        "-lpthread",
+        "-lrt",
+        "-fno-omit-frame-pointer",
+        "-c",
+        "-MD",
+        "-MMD",
+        "-MP"
+      ],
+      "supported_macro_switches": [
+        "-DNAME[=VALUE]",
+        "-UNAME",
+        "joined and split spellings, parsed by base identifier; function-like spelling recognized"
+      ],
+      "supported_operand_switches": [
+        "-o",
+        "-MF",
+        "-MT",
+        "-I",
+        "-isystem",
+        "-iquote"
+      ],
+      "target_census": {
+        "exact": true,
+        "legacy_absent_off": [
+          "GIRS",
+          "HTS",
+          "PSS"
+        ],
+        "off": [
+          "Common",
+          "ContentApp",
+          "IoTTestApp",
+          "NBTestApp",
+          "PGCS",
+          "NRNCS"
+        ],
+        "on": [
+          "Common",
+          "ng039_gw_q0_q1_d2"
+        ],
+        "on_forbidden": [
+          "ContentApp",
+          "GIRS",
+          "HTS",
+          "IoTTestApp",
+          "NBTestApp",
+          "PGCS",
+          "PSS",
+          "NRNCS"
+        ]
+      },
+      "target_identity_source": "Parse the actual -o operand, resolve it relative to the compile entry directory, and derive CMakeFiles/<target>.dir from that normalized output path; do not select the first regex hit in arbitrary command text or trust output metadata alone."
+    },
+    "compiler": "/usr/bin/x86_64-linux-gnu-g++-13",
+    "compiler_version": "GNU C++ 13.3.0",
+    "configure_common_flags": "-G \"Unix Makefiles\" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=/usr/bin/x86_64-linux-gnu-g++-13 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_EXTENSIONS=ON -DCMAKE_CXX_FLAGS=-O0 '-DCMAKE_CXX_FLAGS_DEBUG=-O0 -g'",
+    "configure_generator": "Unix Makefiles",
+    "configured_target_census": {
+      "basis": "CMakeLists.txt at immutable baseline; existing standalone targets are behind NG_ENABLE_LEGACY_STANDALONE=OFF. Diagnostic graph is a future exact two-target root-listfile early-return graph, not present in the baseline.",
+      "default_off": [
+        "Common",
+        "ContentApp",
+        "IoTTestApp",
+        "NBTestApp",
+        "PGCS",
+        "NRNCS"
+      ],
+      "diagnostic_forbidden": [
+        "ContentApp",
+        "GIRS",
+        "HTS",
+        "IoTTestApp",
+        "NBTestApp",
+        "PGCS",
+        "PSS",
+        "NRNCS"
+      ],
+      "diagnostic_on": [
+        "Common",
+        "ng039_gw_q0_q1_d2"
+      ],
+      "exact": true,
+      "legacy_absent_default_off": [
+        "GIRS",
+        "HTS",
+        "PSS"
+      ]
+    },
+    "cxx_extensions": "ON",
+    "cxx_standard": "20 (gnu++20)",
+    "default_build_command": "cmake --build \"$D2_SCRATCH/build-default\" --target Common --parallel 2",
+    "default_configure_command": "cmake -S \"$D2_WORKTREE\" -B \"$D2_SCRATCH/build-default\" -G \"Unix Makefiles\" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=/usr/bin/x86_64-linux-gnu-g++-13 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_EXTENSIONS=ON -DCMAKE_CXX_FLAGS=-O0 '-DCMAKE_CXX_FLAGS_DEBUG=-O0 -g' -DNG_ENABLE_NG039_GW_Q0_Q1_D2=OFF -DNG_ENABLE_LEGACY_STANDALONE=OFF",
+    "default_value": "OFF",
+    "diagnostic_build_command": "cmake --build \"$D2_SCRATCH/build-diagnostic\" --target ng039_gw_q0_q1_d2 --parallel 2",
+    "diagnostic_configure_command": "cmake -S \"$D2_WORKTREE\" -B \"$D2_SCRATCH/build-diagnostic\" -G \"Unix Makefiles\" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=/usr/bin/x86_64-linux-gnu-g++-13 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_EXTENSIONS=ON -DCMAKE_CXX_FLAGS=-O0 '-DCMAKE_CXX_FLAGS_DEBUG=-O0 -g' -DNG_ENABLE_NG039_GW_Q0_Q1_D2=ON -DNG_ENABLE_LEGACY_STANDALONE=OFF",
+    "diagnostic_option": "NG_ENABLE_NG039_GW_Q0_Q1_D2",
+    "diagnostic_value": "ON",
+    "export_compile_commands": true,
+    "legacy_option": "NG_ENABLE_LEGACY_STANDALONE",
+    "legacy_value_in_both_fresh_configs": "OFF",
+    "link_command_verification": {
+      "checker_logic": "import json, os, shlex, sys\n\nCOMPILER = os.path.realpath(\"/usr/bin/x86_64-linux-gnu-g++-13\")\nREQUIRED = (\"-static\", \"-static-libgcc\", \"-static-libstdc++\")\n\ndef validate_link_tokens(argv):\n    if not isinstance(argv, list) or not argv:\n        raise ValueError(\"empty linker argv\")\n    if os.path.realpath(argv[0]) != COMPILER:\n        raise ValueError(\"linker compiler identity mismatch\")\n    if any(token.startswith(\"@\") for token in argv):\n        raise ValueError(\"response files are unsupported\")\n    if any(argv.count(flag) != 1 for flag in REQUIRED):\n        raise ValueError(\"required standalone static linker flags must each occur once\")\n    for i, token in enumerate(argv):\n        if token in {\"-Bdynamic\", \"-dynamic\", \"-shared\", \"--dynamic-linker\"}:\n            raise ValueError(\"conflicting dynamic link mode\")\n        if token.startswith(\"-Wl,\"):\n            forwarded = token[4:].split(\",\")\n            if any(x in {\"-Bdynamic\", \"-dynamic\", \"--dynamic-linker\"} or x.startswith(\"--dynamic-linker=\") for x in forwarded):\n                raise ValueError(\"conflicting forwarded dynamic link mode\")\n            if any(forwarded[j] == \"-B\" and j + 1 < len(forwarded) and forwarded[j + 1] == \"dynamic\" for j in range(len(forwarded))):\n                raise ValueError(\"conflicting forwarded -B dynamic mode\")\n        if token == \"-Xlinker\" and i + 1 < len(argv):\n            next_token = argv[i + 1]\n            if next_token in {\"-Bdynamic\", \"-dynamic\", \"-shared\", \"--dynamic-linker\"} or next_token.startswith(\"--dynamic-linker=\"):\n                raise ValueError(\"conflicting -Xlinker dynamic mode\")\n    return \"link flags PASS\"\n\nif __name__ == \"__main__\":\n    try:\n        argv = shlex.split(sys.stdin.read(), posix=True)\n        print(validate_link_tokens(argv))\n    except Exception as exc:\n        print(\"link check failed: \" + str(exc), file=sys.stderr)\n        raise SystemExit(2)\n",
+      "compiler_realpath_required": "/usr/bin/x86_64-linux-gnu-g++-13",
+      "exact_count": "each required linker token occurs exactly once as a standalone token",
+      "failure_behavior": "Explicit if/raise/SystemExit nonzero checks; no Python assert; execute identical negative fixtures under normal Python, python3 -O, and PYTHONOPTIMIZE=1.",
+      "implementation_boundary": "Explicit conditional checker in the authorized D2 manifest/harness package; no assert-based acceptance checks.",
+      "negative_fixtures": [
+        "wrong linker compiler",
+        "response file",
+        "missing -static",
+        "duplicate -static",
+        "missing -static-libgcc",
+        "missing -static-libstdc++",
+        "-Bdynamic",
+        "-dynamic",
+        "-shared",
+        "-Wl,-Bdynamic",
+        "-Wl,--dynamic-linker=...",
+        "-Xlinker --dynamic-linker ..."
+      ],
+      "not_executed_in_r06": true,
+      "planned_command": "python3 <inline link-command checker> \"$D2_SCRATCH/build-diagnostic/CMakeFiles/ng039_gw_q0_q1_d2.dir/link.txt\"",
+      "reject_dynamic_controls": [
+        "-Bdynamic",
+        "-dynamic",
+        "-shared",
+        "-Wl,-Bdynamic",
+        "-Wl payload containing -Bdynamic or --dynamic-linker",
+        "-Xlinker followed by a dynamic-link override"
+      ],
+      "required": true,
+      "required_exact_arguments": [
+        "-static",
+        "-static-libgcc",
+        "-static-libstdc++"
+      ],
+      "response_files": "reject any @... token",
+      "tokenizer": "shlex.split(posix=True)"
+    },
+    "macro": "NG_GW_QUEUE_TEST_OBSERVATION",
+    "macro_scope": "Common PUBLIC + harness PRIVATE only in isolated option-ON graph",
+    "project_appended_cxx_flags": [
+      "-O0",
+      "-g3",
+      "-Wall",
+      "-fmessage-length=0",
+      "-pthread",
+      "-Wno-deprecated",
+      "-lpthread",
+      "-lrt",
+      "-fno-omit-frame-pointer"
+    ],
+    "project_executable_link_flags": [
+      "-static",
+      "-static-libgcc",
+      "-static-libstdc++"
+    ],
+    "root_return_before_production_targets": true,
+    "target_graph_guard_required": true
+  },
+  "evidence_recovery": {
+    "d1h_binary_at_recorded_path_available_now": false,
+    "d1h_build_log_at_recorded_path_available_now": false,
+    "d1h_evidence_status": "historical manifest and source hashes verified; binary/log unavailable for independent rehash; never runtime evidence",
+    "d1h_manifest_sha256": "9a7c4cda741e81192642053c4bdc60c3a5c0a46afcfa6c658ff2e2324f24225a",
+    "d1h_manifest_sha256_rechecked": true,
+    "d1h_reported_binary_sha256": "ddf06f6d47e37564b9e52866c3d272ce3cc6cd8b433700c864c4499d676c31ab",
+    "d1h_reported_build_exit_code": 0,
+    "d1h_reported_build_log_sha256": "095009a9e4fb7097aef005300f7562ab8ce941c691538a88a4064f944f4d19aa",
+    "historical_v1_8_synthetic_results": {
+      "compile_checker": {
+        "negative_cases": 26,
+        "positive_profiles": 2
+      },
+      "link_checker": {
+        "cases": 15,
+        "modes": [
+          "normal",
+          "python3 -O",
+          "PYTHONOPTIMIZE=1"
+        ],
+        "negative": 12,
+        "positive": 3
+      },
+      "not_real_build_or_runtime_evidence": true,
+      "run_record_fixtures": {
+        "invalid": 14,
+        "valid": 4
+      },
+      "schemas_meta_valid": 3,
+      "source": "NG-039/NG-040 task notes and prior-session record, not a retained standalone validator run bundle"
+    },
+    "r05_archive_manifest_sha256_rechecked": "27eabdd3b469b7044f9ed4935058ffe509f3a92712371924cc73b76dd619266a",
+    "r05_raw_sse_sha256_rechecked": "3d375e4cc4551793dff18a299e3e82ded99bf631a5fdfb0aed195a4dae24dc31",
+    "r05_response_sha256_rechecked": "9b0fa2aa410d6055e50da31134e42af29d97ece12aac77d971299ece7e3851dc"
+  },
+  "evidence_schemas": {
+    "collection_responsibility": {
+      "finalizer_bounds": "10 s timeout + 5 s kill grace; RLIMIT_AS 128 MiB, CPU 10 s, FSIZE 4 MiB, NOFILE 32, CORE 0.",
+      "finalizer_failure": "No valid finalized record means INCONCLUSIVE and cannot PASS.",
+      "harness_run": "Writes bounded run-record.pending.json (record_finalized=false, INCONCLUSIVE) and available inventories/events; does not claim closed-log hashes or outer exit.",
+      "missing_or_invalid_staging": "Metadata-only INCONCLUSIVE; assertions NOT_RUN, measurements null, inventories unavailable, cleanup unknown, missing artifact names; no invented values.",
+      "outer_finalizer": "Same allowlisted binary --finalize outside namespaces; binds outer status, hashes closed artifacts, validates staging/caps, atomically writes final record, removes staging. No Process/GW, IPC or child.",
+      "runtime_manifest_file": "none; q0_q1_d2.manifest.json is plan/schema input, not part of runtime bundle.",
+      "shell_redirection": "Captures stdout/stderr outside namespaces and closes descriptors before collection."
+    },
+    "ipc_inventory": {
+      "$id": "urn:ng039:ipc-inventory:v2",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "dev_shm_entries": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "regular",
+                  "symlink",
+                  "other"
+                ]
+              },
+              "name": {
+                "maxLength": 255,
+                "minLength": 1,
+                "pattern": "^[^/]+$",
+                "type": "string"
+              },
+              "size_bytes": {
+                "maximum": 16777216,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "kind",
+              "size_bytes"
+            ],
+            "type": "object"
+          },
+          "maxItems": 128,
+          "type": "array"
+        },
+        "error": {
+          "maxLength": 512,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_empty": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "pre",
+            "post",
+            "final"
+          ]
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 16,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "ng039-ipc-inventory/v2"
+        },
+        "sysv_ids": {
+          "additionalProperties": false,
+          "properties": {
+            "msg": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "maxItems": 4096,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "sem": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "maxItems": 4096,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "shm": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "maxItems": 4096,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "shm",
+            "sem",
+            "msg"
+          ],
+          "type": "object"
+        },
+        "sysv_shm_segments": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "key": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "size_bytes": {
+                "maximum": 33554532,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "size_bytes",
+              "key"
+            ],
+            "type": "object"
+          },
+          "maxItems": 5,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "sysv_shm_total_bytes": {
+          "maximum": 167772660,
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "phase",
+        "complete",
+        "is_empty",
+        "sysv_ids",
+        "dev_shm_entries",
+        "error",
+        "sysv_shm_segments",
+        "sysv_shm_total_bytes"
+      ],
+      "type": "object"
+    },
+    "observer_events": {
+      "$id": "urn:ng039:observer-events:v2",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "candidate_was_popped": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "correlation_status": {
+                "enum": [
+                  "PENDING",
+                  "MATCHED",
+                  "DECISION_NOT_REACHED",
+                  "HEAD_MISMATCH",
+                  "INVALID",
+                  "OVERFLOW"
+                ]
+              },
+              "counter_overflow": {
+                "type": "boolean"
+              },
+              "decision_candidate_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "decision_candidate_time": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "decision_due_branch": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "decision_iteration_id": {
+                "maximum": 18446744073709551615,
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "decision_sequence": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "decision_was_popped": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "empty_queue_observation_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "event": {
+                "enum": [
+                  "None",
+                  "QueueSnapshot",
+                  "Admission",
+                  "WaitReturn",
+                  "PopDecision",
+                  "RunEntry",
+                  "RunReturn",
+                  "Stop"
+                ]
+              },
+              "event_message_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_depth": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_head_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_head_time": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "first_target_wait_iteration_id": {
+                "maximum": 18446744073709551615,
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_message_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_returned_by_predicate": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "first_target_wait_sequence": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_timeout_ms": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "first_target_wait_valid": {
+                "type": "boolean"
+              },
+              "gateway_iteration_id": {
+                "maximum": 18446744073709551615,
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "gateway_started": {
+                "type": "boolean"
+              },
+              "has_head": {
+                "type": "boolean"
+              },
+              "head_message_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "head_time": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "queue_depth": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "registered_target_id": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "scheduled_time_is_due": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "sequence": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "stop_requested": {
+                "type": "boolean"
+              },
+              "target_admission_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "target_non_due_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "target_pop_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "target_run_entry_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "target_run_return_count": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "valid": {
+                "type": "boolean"
+              },
+              "wait_returned_by_predicate": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "wait_timeout_ms": {
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "sequence",
+              "event",
+              "valid",
+              "gateway_started",
+              "registered_target_id",
+              "event_message_id",
+              "queue_depth",
+              "has_head",
+              "head_message_id",
+              "head_time",
+              "wait_timeout_ms",
+              "wait_returned_by_predicate",
+              "scheduled_time_is_due",
+              "candidate_was_popped",
+              "empty_queue_observation_count",
+              "target_admission_count",
+              "target_non_due_count",
+              "target_pop_count",
+              "target_run_entry_count",
+              "target_run_return_count",
+              "first_target_wait_valid",
+              "first_target_wait_sequence",
+              "first_target_wait_message_id",
+              "first_target_wait_head_id",
+              "first_target_wait_head_time",
+              "first_target_wait_depth",
+              "first_target_wait_timeout_ms",
+              "first_target_wait_returned_by_predicate",
+              "stop_requested",
+              "counter_overflow",
+              "gateway_iteration_id",
+              "first_target_wait_iteration_id",
+              "decision_sequence",
+              "decision_iteration_id",
+              "decision_candidate_id",
+              "decision_candidate_time",
+              "decision_due_branch",
+              "decision_was_popped",
+              "correlation_status"
+            ],
+            "type": "object"
+          },
+          "maxItems": 4096,
+          "type": "array"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 16,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "ng039-observer-events/v2"
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "events"
+      ],
+      "type": "object"
+    },
+    "run_record": {
+      "$defs": {
+        "assertion_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE",
+            "NOT_RUN"
+          ]
+        }
+      },
+      "$id": "urn:ng039:d2-run-record:v2",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_finalized": {
+                "const": false
+              }
+            },
+            "required": [
+              "record_finalized"
+            ]
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "type": "null"
+              },
+              "status": {
+                "const": "INCONCLUSIVE"
+              }
+            },
+            "required": [
+              "status",
+              "failure"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PASS"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "allOf": [
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "stdout.txt"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "stderr.txt"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-pre.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-post.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-final.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "observer-events.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  }
+                ]
+              },
+              "assertions": {
+                "properties": {
+                  "bootstrap_queue_drained": {
+                    "const": "PASS"
+                  },
+                  "evidence_complete": {
+                    "const": "PASS"
+                  },
+                  "final_inventory_complete": {
+                    "const": "PASS"
+                  },
+                  "final_inventory_empty": {
+                    "const": "PASS"
+                  },
+                  "finalization_complete": {
+                    "const": "PASS"
+                  },
+                  "first_target_wait_fresh": {
+                    "const": "PASS"
+                  },
+                  "gateway_joined": {
+                    "const": "PASS"
+                  },
+                  "namespace_setup": {
+                    "const": "PASS"
+                  },
+                  "output_worker_joined": {
+                    "const": "PASS"
+                  },
+                  "post_inventory_complete": {
+                    "const": "PASS"
+                  },
+                  "post_resources_attributable": {
+                    "const": "PASS"
+                  },
+                  "post_resources_removed": {
+                    "const": "PASS"
+                  },
+                  "pre_inventory_complete": {
+                    "const": "PASS"
+                  },
+                  "pre_inventory_empty": {
+                    "const": "PASS"
+                  },
+                  "process_blocks_verified": {
+                    "const": "PASS"
+                  },
+                  "q0_empty_observation_delta": {
+                    "const": "PASS"
+                  },
+                  "q0_zero_controlled_offers": {
+                    "const": "PASS"
+                  },
+                  "scalar_run_identity_valid": {
+                    "const": "PASS"
+                  },
+                  "target_admitted": {
+                    "const": "PASS"
+                  },
+                  "target_delete_false_before_gateway": {
+                    "const": "PASS"
+                  },
+                  "target_erased_once": {
+                    "const": "PASS"
+                  },
+                  "target_future_at_end": {
+                    "const": "PASS"
+                  },
+                  "target_is_head": {
+                    "const": "PASS"
+                  },
+                  "target_not_popped": {
+                    "const": "PASS"
+                  },
+                  "target_not_run": {
+                    "const": "PASS"
+                  },
+                  "wait_decision_correlated": {
+                    "const": "PASS"
+                  }
+                },
+                "required": [
+                  "bootstrap_queue_drained",
+                  "evidence_complete",
+                  "final_inventory_complete",
+                  "final_inventory_empty",
+                  "finalization_complete",
+                  "first_target_wait_fresh",
+                  "gateway_joined",
+                  "namespace_setup",
+                  "output_worker_joined",
+                  "post_inventory_complete",
+                  "post_resources_attributable",
+                  "post_resources_removed",
+                  "pre_inventory_complete",
+                  "pre_inventory_empty",
+                  "process_blocks_verified",
+                  "q0_empty_observation_delta",
+                  "q0_zero_controlled_offers",
+                  "scalar_run_identity_valid",
+                  "target_admitted",
+                  "target_delete_false_before_gateway",
+                  "target_erased_once",
+                  "target_future_at_end",
+                  "target_is_head",
+                  "target_not_popped",
+                  "target_not_run",
+                  "wait_decision_correlated"
+                ]
+              },
+              "cleanup": {
+                "properties": {
+                  "complete": {
+                    "const": true
+                  },
+                  "final_inventory_complete": {
+                    "const": true
+                  },
+                  "finalizer_complete": {
+                    "const": true
+                  },
+                  "gateway_joined": {
+                    "const": true
+                  },
+                  "gateway_stop_requested": {
+                    "const": true
+                  },
+                  "output_worker_joined": {
+                    "const": true
+                  },
+                  "post_inventory_attributable": {
+                    "const": true
+                  },
+                  "post_resources_removed": {
+                    "const": true
+                  },
+                  "process_destroyed": {
+                    "const": true
+                  },
+                  "target_deleted_once": {
+                    "const": true
+                  },
+                  "target_detached": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "complete",
+                  "final_inventory_complete",
+                  "finalizer_complete",
+                  "gateway_joined",
+                  "gateway_stop_requested",
+                  "output_worker_joined",
+                  "post_inventory_attributable",
+                  "post_resources_removed",
+                  "process_destroyed",
+                  "target_deleted_once",
+                  "target_detached"
+                ]
+              },
+              "exit": {
+                "properties": {
+                  "harness_code": {
+                    "const": 0
+                  },
+                  "outer_code": {
+                    "const": 0
+                  },
+                  "signal": {
+                    "type": "null"
+                  },
+                  "timeout_fired": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "harness_code",
+                  "outer_code",
+                  "signal",
+                  "timeout_fired"
+                ]
+              },
+              "failure": {
+                "type": "null"
+              },
+              "inventories": {
+                "properties": {
+                  "final": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      },
+                      "is_empty": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete",
+                      "is_empty"
+                    ]
+                  },
+                  "post": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete"
+                    ]
+                  },
+                  "pre": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      },
+                      "is_empty": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete",
+                      "is_empty"
+                    ]
+                  }
+                },
+                "required": [
+                  "pre",
+                  "post",
+                  "final"
+                ]
+              },
+              "observations": {
+                "properties": {
+                  "counter_overflow": {
+                    "const": false
+                  },
+                  "q1": {
+                    "properties": {
+                      "correlation_status": {
+                        "const": "MATCHED"
+                      }
+                    },
+                    "required": [
+                      "correlation_status"
+                    ]
+                  }
+                },
+                "required": [
+                  "counter_overflow",
+                  "q1"
+                ]
+              },
+              "record_finalized": {
+                "const": true
+              }
+            },
+            "required": [
+              "record_finalized",
+              "failure",
+              "exit",
+              "assertions",
+              "artifacts",
+              "inventories",
+              "cleanup",
+              "observations"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "FAIL"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "artifacts": {
+                "allOf": [
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "stdout.txt"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "stderr.txt"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-pre.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-post.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "ipc-final.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  },
+                  {
+                    "contains": {
+                      "properties": {
+                        "name": {
+                          "const": "observer-events.json"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "minContains": 1
+                  }
+                ]
+              },
+              "assertions": {
+                "allOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "bootstrap_queue_drained": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "bootstrap_queue_drained"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "evidence_complete": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "evidence_complete"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "final_inventory_complete": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "final_inventory_complete"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "final_inventory_empty": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "final_inventory_empty"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "finalization_complete": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "finalization_complete"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "first_target_wait_fresh": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "first_target_wait_fresh"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "gateway_joined": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "gateway_joined"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "namespace_setup": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "namespace_setup"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "output_worker_joined": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "output_worker_joined"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "post_inventory_complete": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "post_inventory_complete"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "post_resources_attributable": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "post_resources_attributable"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "post_resources_removed": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "post_resources_removed"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "pre_inventory_complete": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "pre_inventory_complete"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "pre_inventory_empty": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "pre_inventory_empty"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "process_blocks_verified": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "process_blocks_verified"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "q0_empty_observation_delta": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "q0_empty_observation_delta"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "q0_zero_controlled_offers": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "q0_zero_controlled_offers"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "scalar_run_identity_valid": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "scalar_run_identity_valid"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_admitted": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_admitted"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_delete_false_before_gateway": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_delete_false_before_gateway"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_erased_once": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_erased_once"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_future_at_end": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_future_at_end"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_is_head": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_is_head"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_not_popped": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_not_popped"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "target_not_run": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "target_not_run"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "wait_decision_correlated": {
+                            "const": "FAIL"
+                          }
+                        },
+                        "required": [
+                          "wait_decision_correlated"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "evidence_complete": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "evidence_complete"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "final_inventory_complete": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "final_inventory_complete"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "final_inventory_empty": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "final_inventory_empty"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "finalization_complete": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "finalization_complete"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "gateway_joined": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "gateway_joined"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "namespace_setup": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "namespace_setup"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "output_worker_joined": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "output_worker_joined"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "post_inventory_complete": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "post_inventory_complete"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "post_resources_attributable": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "post_resources_attributable"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "post_resources_removed": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "post_resources_removed"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "pre_inventory_complete": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "pre_inventory_complete"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "pre_inventory_empty": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "pre_inventory_empty"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "process_blocks_verified": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "process_blocks_verified"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "scalar_run_identity_valid": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "scalar_run_identity_valid"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "target_erased_once": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "target_erased_once"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "wait_decision_correlated": {
+                        "const": "PASS"
+                      }
+                    },
+                    "required": [
+                      "wait_decision_correlated"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "bootstrap_queue_drained": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "evidence_complete": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "final_inventory_complete": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "final_inventory_empty": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "finalization_complete": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "first_target_wait_fresh": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "gateway_joined": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "namespace_setup": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "output_worker_joined": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "post_inventory_complete": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "post_resources_attributable": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "post_resources_removed": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "pre_inventory_complete": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "pre_inventory_empty": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "process_blocks_verified": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "q0_empty_observation_delta": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "q0_zero_controlled_offers": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "scalar_run_identity_valid": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_admitted": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_delete_false_before_gateway": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_erased_once": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_future_at_end": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_is_head": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_not_popped": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "target_not_run": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  },
+                  "wait_decision_correlated": {
+                    "enum": [
+                      "PASS",
+                      "FAIL"
+                    ]
+                  }
+                },
+                "required": [
+                  "bootstrap_queue_drained",
+                  "evidence_complete",
+                  "final_inventory_complete",
+                  "final_inventory_empty",
+                  "finalization_complete",
+                  "first_target_wait_fresh",
+                  "gateway_joined",
+                  "namespace_setup",
+                  "output_worker_joined",
+                  "post_inventory_complete",
+                  "post_resources_attributable",
+                  "post_resources_removed",
+                  "pre_inventory_complete",
+                  "pre_inventory_empty",
+                  "process_blocks_verified",
+                  "q0_empty_observation_delta",
+                  "q0_zero_controlled_offers",
+                  "scalar_run_identity_valid",
+                  "target_admitted",
+                  "target_delete_false_before_gateway",
+                  "target_erased_once",
+                  "target_future_at_end",
+                  "target_is_head",
+                  "target_not_popped",
+                  "target_not_run",
+                  "wait_decision_correlated"
+                ]
+              },
+              "cleanup": {
+                "properties": {
+                  "complete": {
+                    "const": true
+                  },
+                  "final_inventory_complete": {
+                    "const": true
+                  },
+                  "finalizer_complete": {
+                    "const": true
+                  },
+                  "gateway_joined": {
+                    "const": true
+                  },
+                  "gateway_stop_requested": {
+                    "const": true
+                  },
+                  "output_worker_joined": {
+                    "const": true
+                  },
+                  "post_inventory_attributable": {
+                    "const": true
+                  },
+                  "post_resources_removed": {
+                    "const": true
+                  },
+                  "process_destroyed": {
+                    "const": true
+                  },
+                  "target_deleted_once": {
+                    "const": true
+                  },
+                  "target_detached": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "complete",
+                  "final_inventory_complete",
+                  "finalizer_complete",
+                  "gateway_joined",
+                  "gateway_stop_requested",
+                  "output_worker_joined",
+                  "post_inventory_attributable",
+                  "post_resources_removed",
+                  "process_destroyed",
+                  "target_deleted_once",
+                  "target_detached"
+                ]
+              },
+              "exit": {
+                "properties": {
+                  "harness_code": {
+                    "maximum": 255,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "outer_code": {
+                    "maximum": 123,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "signal": {
+                    "type": "null"
+                  },
+                  "timeout_fired": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "harness_code",
+                  "outer_code",
+                  "signal",
+                  "timeout_fired"
+                ]
+              },
+              "failure": {
+                "properties": {
+                  "code": {
+                    "const": "ASSERTION_FAILED"
+                  }
+                },
+                "required": [
+                  "code"
+                ],
+                "type": "object"
+              },
+              "inventories": {
+                "properties": {
+                  "final": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      },
+                      "is_empty": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete",
+                      "is_empty"
+                    ]
+                  },
+                  "post": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete"
+                    ]
+                  },
+                  "pre": {
+                    "properties": {
+                      "available": {
+                        "const": true
+                      },
+                      "complete": {
+                        "const": true
+                      },
+                      "is_empty": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "available",
+                      "complete",
+                      "is_empty"
+                    ]
+                  }
+                },
+                "required": [
+                  "pre",
+                  "post",
+                  "final"
+                ]
+              },
+              "observations": {
+                "properties": {
+                  "counter_overflow": {
+                    "const": false
+                  },
+                  "q1": {
+                    "properties": {
+                      "correlation_status": {
+                        "const": "MATCHED"
+                      }
+                    },
+                    "required": [
+                      "correlation_status"
+                    ]
+                  }
+                },
+                "required": [
+                  "counter_overflow",
+                  "q1"
+                ]
+              },
+              "record_finalized": {
+                "const": true
+              }
+            },
+            "required": [
+              "record_finalized",
+              "failure",
+              "exit",
+              "assertions",
+              "artifacts",
+              "inventories",
+              "cleanup",
+              "observations"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "record_finalized": {
+                "const": true
+              },
+              "status": {
+                "const": "INCONCLUSIVE"
+              }
+            },
+            "required": [
+              "record_finalized",
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "failure"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "artifacts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bytes": {
+                "maximum": 4194304,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "name": {
+                "enum": [
+                  "stdout.txt",
+                  "stderr.txt",
+                  "ipc-pre.json",
+                  "ipc-post.json",
+                  "ipc-final.json",
+                  "observer-events.json",
+                  "harness-diagnostics.txt"
+                ]
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "bytes",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "maxItems": 7,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "assertions": {
+          "additionalProperties": false,
+          "properties": {
+            "bootstrap_queue_drained": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "evidence_complete": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "final_inventory_complete": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "final_inventory_empty": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "finalization_complete": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "first_target_wait_fresh": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "gateway_joined": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "namespace_setup": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "output_worker_joined": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "post_inventory_complete": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "post_resources_attributable": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "post_resources_removed": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "pre_inventory_complete": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "pre_inventory_empty": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "process_blocks_verified": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "q0_empty_observation_delta": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "q0_zero_controlled_offers": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "scalar_run_identity_valid": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_admitted": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_delete_false_before_gateway": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_erased_once": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_future_at_end": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_is_head": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_not_popped": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "target_not_run": {
+              "$ref": "#/$defs/assertion_status"
+            },
+            "wait_decision_correlated": {
+              "$ref": "#/$defs/assertion_status"
+            }
+          },
+          "required": [
+            "namespace_setup",
+            "pre_inventory_empty",
+            "process_blocks_verified",
+            "target_delete_false_before_gateway",
+            "bootstrap_queue_drained",
+            "q0_zero_controlled_offers",
+            "q0_empty_observation_delta",
+            "target_admitted",
+            "target_is_head",
+            "first_target_wait_fresh",
+            "target_not_popped",
+            "target_not_run",
+            "target_future_at_end",
+            "gateway_joined",
+            "output_worker_joined",
+            "target_erased_once",
+            "final_inventory_empty",
+            "evidence_complete",
+            "pre_inventory_complete",
+            "post_inventory_complete",
+            "post_resources_attributable",
+            "post_resources_removed",
+            "final_inventory_complete",
+            "finalization_complete",
+            "wait_decision_correlated",
+            "scalar_run_identity_valid"
+          ],
+          "type": "object"
+        },
+        "baseline_commit": {
+          "const": "1af604dad66148618cc0e578c28adb4a9829e607"
+        },
+        "baseline_tree": {
+          "const": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b"
+        },
+        "cleanup": {
+          "additionalProperties": false,
+          "properties": {
+            "complete": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "final_inventory_complete": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "finalizer_complete": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "gateway_joined": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "gateway_stop_requested": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "output_worker_joined": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "post_inventory_attributable": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "post_resources_removed": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "process_destroyed": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "target_deleted_once": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "target_detached": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "gateway_stop_requested",
+            "gateway_joined",
+            "output_worker_joined",
+            "target_detached",
+            "process_destroyed",
+            "target_deleted_once",
+            "complete",
+            "post_inventory_attributable",
+            "post_resources_removed",
+            "final_inventory_complete",
+            "finalizer_complete"
+          ],
+          "type": "object"
+        },
+        "configured_targets": {
+          "const": [
+            "Common",
+            "ng039_gw_q0_q1_d2"
+          ]
+        },
+        "document_head": {
+          "const": "756f493b7049434ab67cf2382486a48f606a470c"
+        },
+        "exit": {
+          "additionalProperties": false,
+          "properties": {
+            "harness_code": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "outer_code": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "signal": {
+              "maxLength": 64,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timeout_fired": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "outer_code",
+            "harness_code",
+            "signal",
+            "timeout_fired"
+          ],
+          "type": "object"
+        },
+        "failure": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "cleanup_outcome": {
+                  "enum": [
+                    "complete",
+                    "partial",
+                    "not_started",
+                    "unknown"
+                  ]
+                },
+                "code": {
+                  "enum": [
+                    "ASSERTION_FAILED",
+                    "NAMESPACE_SETUP_FAILED",
+                    "PRE_INVENTORY_FAILED",
+                    "PARTIAL_CONSTRUCTION",
+                    "IDENTITY_MISMATCH",
+                    "COUNTER_OVERFLOW",
+                    "TIMEOUT",
+                    "SIGNAL",
+                    "JOIN_BLOCKED",
+                    "OWNERSHIP_UNCERTAIN",
+                    "INVENTORY_INCOMPLETE",
+                    "EVIDENCE_MISSING",
+                    "EVIDENCE_INVALID",
+                    "RESOURCE_LIMIT",
+                    "OTHER",
+                    "POST_INVENTORY_UNATTRIBUTABLE",
+                    "POST_RESOURCE_REMOVE_FAILED",
+                    "FINALIZER_FAILED"
+                  ]
+                },
+                "inventory_availability": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "final": {
+                      "type": "boolean"
+                    },
+                    "post": {
+                      "type": "boolean"
+                    },
+                    "pre": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "pre",
+                    "post",
+                    "final"
+                  ],
+                  "type": "object"
+                },
+                "last_event_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "message": {
+                  "maxLength": 1024,
+                  "type": "string"
+                },
+                "missing_artifacts": {
+                  "items": {
+                    "enum": [
+                      "stdout.txt",
+                      "stderr.txt",
+                      "ipc-pre.json",
+                      "ipc-post.json",
+                      "ipc-final.json",
+                      "observer-events.json",
+                      "harness-diagnostics.txt"
+                    ]
+                  },
+                  "maxItems": 7,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "phase": {
+                  "enum": [
+                    "preflight",
+                    "namespace",
+                    "pre_inventory",
+                    "construction",
+                    "q0",
+                    "q1",
+                    "shutdown",
+                    "cleanup",
+                    "capture",
+                    "validation",
+                    "unknown",
+                    "finalize"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "phase",
+                "message",
+                "last_event_sequence",
+                "inventory_availability",
+                "cleanup_outcome",
+                "missing_artifacts"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "inventories": {
+          "additionalProperties": false,
+          "properties": {
+            "final": {
+              "additionalProperties": false,
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                },
+                "complete": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "is_empty": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "available",
+                "is_empty",
+                "sha256",
+                "reason",
+                "complete"
+              ],
+              "type": "object"
+            },
+            "post": {
+              "additionalProperties": false,
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                },
+                "complete": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "is_empty": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "available",
+                "is_empty",
+                "sha256",
+                "reason",
+                "complete"
+              ],
+              "type": "object"
+            },
+            "pre": {
+              "additionalProperties": false,
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                },
+                "complete": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "is_empty": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "maxLength": 512,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "available",
+                "is_empty",
+                "sha256",
+                "reason",
+                "complete"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "pre",
+            "post",
+            "final"
+          ],
+          "type": "object"
+        },
+        "observations": {
+          "additionalProperties": false,
+          "properties": {
+            "counter_overflow": {
+              "type": "boolean"
+            },
+            "q0": {
+              "additionalProperties": false,
+              "properties": {
+                "controlled_application_offers": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "empty_observation_delta": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "end_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "start_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "start_sequence",
+                "end_sequence",
+                "controlled_application_offers",
+                "empty_observation_delta"
+              ],
+              "type": "object"
+            },
+            "q1": {
+              "additionalProperties": false,
+              "properties": {
+                "actual_due_branch": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "actual_popped": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "correlation_status": {
+                  "enum": [
+                    "PENDING",
+                    "MATCHED",
+                    "DECISION_NOT_REACHED",
+                    "HEAD_MISMATCH",
+                    "INVALID",
+                    "OVERFLOW",
+                    null
+                  ]
+                },
+                "decision_candidate_id": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "decision_candidate_time": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "decision_iteration_id": {
+                  "maximum": 18446744073709551615,
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "decision_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "end_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "first_target_wait_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "gateway_iteration_id": {
+                  "maximum": 18446744073709551615,
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "head_time_at_end": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "process_time_at_end": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "start_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "target_message_id": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "target_pop_count": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "target_run_entry_count": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "target_run_return_count": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_depth": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_head_id": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_head_time": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "wait_iteration_id": {
+                  "maximum": 18446744073709551615,
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_predicate_return": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "wait_sequence": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_target_id": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "wait_timeout_ms": {
+                  "minimum": 0,
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "start_sequence",
+                "end_sequence",
+                "target_message_id",
+                "first_target_wait_sequence",
+                "target_pop_count",
+                "target_run_entry_count",
+                "target_run_return_count",
+                "head_time_at_end",
+                "process_time_at_end",
+                "gateway_iteration_id",
+                "wait_sequence",
+                "wait_iteration_id",
+                "wait_target_id",
+                "wait_head_id",
+                "wait_head_time",
+                "wait_depth",
+                "wait_timeout_ms",
+                "wait_predicate_return",
+                "decision_sequence",
+                "decision_iteration_id",
+                "decision_candidate_id",
+                "decision_candidate_time",
+                "actual_due_branch",
+                "actual_popped",
+                "correlation_status"
+              ],
+              "type": "object"
+            },
+            "target_message_id": {
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "target_message_id",
+            "q0",
+            "q1",
+            "counter_overflow"
+          ],
+          "type": "object"
+        },
+        "process_identity": {
+          "additionalProperties": false,
+          "properties": {
+            "ipc_key": {
+              "const": 11
+            },
+            "name": {
+              "const": "NG039TestProcess"
+            }
+          },
+          "required": [
+            "name",
+            "ipc_key"
+          ],
+          "type": "object"
+        },
+        "record_finalized": {
+          "type": "boolean"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 16,
+          "pattern": "^NG039-D2-[A-Za-z0-9][A-Za-z0-9._-]{7,47}$",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "ng039-d2-run-record/v2"
+        },
+        "spec_sha256": {
+          "const": "2477ac94b67ecf6e81665fe2c8899cbfdff31edec08830dc2b60ebbaa7b0d0d0"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE"
+          ]
+        },
+        "task_id": {
+          "const": "NG-039"
+        }
+      },
+      "required": [
+        "schema_version",
+        "task_id",
+        "run_id",
+        "spec_sha256",
+        "baseline_commit",
+        "baseline_tree",
+        "document_head",
+        "configured_targets",
+        "process_identity",
+        "status",
+        "exit",
+        "assertions",
+        "observations",
+        "inventories",
+        "cleanup",
+        "failure",
+        "artifacts",
+        "record_finalized"
+      ],
+      "title": "SPEC-039 D2 v2 staged/final runtime result record",
+      "type": "object"
+    }
+  },
+  "fixture": {
+    "bootstrap_deadline_s": 5,
+    "expected_block_count": 2,
+    "future_horizon_s": 10,
+    "harness_must_not_call_newblock_for_ht_or_gw": true,
+    "key": 11,
+    "process_constructor_creates_blocks_in_order": [
+      "HT",
+      "GW"
+    ],
+    "process_name": "NG039TestProcess",
+    "q0_application_offers": 0,
+    "q0_empty_observation_delta_required": true,
+    "q0_window_ms": 100,
+    "q1_window_ms": 100,
+    "target_message": {
+      "action_match": "none; neither exact registered action nor 0.1 fallback",
+      "admit_after_q0_via": "GW::PushToInputQueue",
+      "command_lines": [
+        "-ng039 --probe 0.2",
+        "-ng039 --probe 0.2",
+        "-ng039 --probe 0.2"
+      ],
+      "creation": "Process::NewMessage before Gateway thread starts",
+      "has_payload": false,
+      "initial_delete_flag": false,
+      "owner": "Process",
+      "time_expression": "Process::GetTime()+10.0",
+      "type": 0
+    }
+  },
+  "local_path_audit": {
+    "absolute_alias_resolution_required_before_any_future_execution": true,
+    "d2_build_directories_created": false,
+    "d2_execution_leaf_must_not_be_created_before_review_and_separate_owner_gate": true,
+    "d2_execution_leaf_preflight": "absent and not a symlink",
+    "d2_harness_or_ipc_executed": false,
+    "d2_worktree_created": false,
+    "review_directory_preflight": "existing directory; not a symlink",
+    "review_packet_directory": "NG_REPO_ROOT/Specs/RESULTS-SPEC-039"
+  },
+  "local_validation_this_freeze": {
+    "assert_based_link_validation_present": false,
+    "astra_submitted": false,
+    "compile_checker_synthetic_negative_cases_rejected": 26,
+    "compile_checker_synthetic_profiles_passed": 2,
+    "external_or_paid_calls": false,
+    "ipc_vm_d3_or_performance_measurement": false,
+    "link_checker_modes": [
+      "normal",
+      "python3 -O",
+      "PYTHONOPTIMIZE=1"
+    ],
+    "link_checker_negative_cases_per_mode": 12,
+    "link_checker_positive_cases_per_mode": 3,
+    "link_checker_subprocess_runs": 45,
+    "real_compile_commands_configure_build_or_harness_run": false,
+    "run_record_invalid_fixtures": 14,
+    "run_record_invalid_fixtures_rejected": 14,
+    "run_record_valid_fixtures": 4,
+    "three_embedded_draft_2020_12_schemas_meta_validate": true
+  },
+  "observer": {
+    "correlation_rule": [
+      "wait and decision iteration_id equal",
+      "decision.sequence greater than wait.sequence",
+      "wait target_id and head_id equal decision candidate_id",
+      "only then correlation_status=MATCHED; otherwise preserve PENDING/DECISION_NOT_REACHED/HEAD_MISMATCH/INVALID/OVERFLOW"
+    ],
+    "decision_capture_fields": [
+      "sequence",
+      "iteration_id",
+      "candidate_id",
+      "candidate_time",
+      "actual_due_branch",
+      "actual_popped"
+    ],
+    "event_sequence_bits": 64,
+    "gateway_iteration_id_one_per_loop": true,
+    "gateway_started_one_way": true,
+    "iteration_id_bits": 64,
+    "iteration_id_saturates": true,
+    "run_identity_capture": "Copy Message::InstantiationNumber to a scalar immediately before each production Run; use the copy for RunEntry/RunReturn before DeleteMarkedMessages; never dereference a Message after reclamation.",
+    "sequence_and_counters": "saturate; set overflow flag; fail inconclusive",
+    "sticky_counts": [
+      "admission",
+      "non_due",
+      "pop",
+      "Run_entry",
+      "Run_return",
+      "empty_queue"
+    ],
+    "sticky_decision_capture": true,
+    "sticky_first_target_wait_record": true,
+    "stores_message_pointer": false,
+    "target_wait_fields": [
+      "sequence",
+      "iteration_id",
+      "target_id",
+      "head_id",
+      "head_time",
+      "depth",
+      "timeout_ms",
+      "wait_return"
+    ],
+    "update_sites": [
+      {
+        "event": "target admission after valid NoCL>2 insertion under InputQueueMutex",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::PushToInputQueue",
+        "lines": [
+          219,
+          267
+        ]
+      },
+      {
+        "event": "one-way gateway_started and locked queue-head/empty snapshot",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::Gateway",
+        "lines": [
+          451,
+          467
+        ]
+      },
+      {
+        "event": "saturating gateway_iteration_id increment once at loop-iteration start",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::Gateway",
+        "lines": [
+          451,
+          452
+        ]
+      },
+      {
+        "event": "actual wait_for result; sticky first target wait if target is head",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::Gateway",
+        "lines": [
+          470,
+          480
+        ]
+      },
+      {
+        "event": "strict due decision and actual pop/non-due outcome under the queue mutex",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::Gateway",
+        "lines": [
+          482,
+          503
+        ]
+      },
+      {
+        "event": "scalar target Run entry/return around production Run call before reclamation",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::Gateway",
+        "lines": [
+          506,
+          597
+        ]
+      },
+      {
+        "event": "stop-request observation outside queue-lock recursion",
+        "file": "Common/src/GW.cpp",
+        "function": "GW::SetStopGatewayFlag",
+        "lines": [
+          1331,
+          1337
+        ]
+      }
+    ]
+  },
+  "parent_task_id": "NG-039",
+  "path_aliases": {
+    "D1H_WORKTREE": "separate historical compile/link-only worktree at the immutable baseline",
+    "D2_RESULTS": "${NG_REPO_ROOT}/Specs/RESULTS-SPEC-039/ng039-d2-v1.9-20261010",
+    "D2_SCRATCH": "${HERMES_SCRATCH}/ng039-d2-v1.9-1af604d",
+    "D2_WORKTREE": "${NG_REPO_PARENT}/novagenesis-ng039-d2-v1.9-1af604d",
+    "HERMES_SCRATCH": "profile scratch root; host prefix withheld",
+    "NG_REPO_PARENT": "parent of NG_REPO_ROOT; host prefix withheld",
+    "NG_REPO_ROOT": "AIOPT5 repository root; host prefix withheld from the sanitized packet",
+    "absolute_resolution_required_before_execution": true
+  },
+  "planned_results": {
+    "artifacts_not_generated": true,
+    "binary_sha256": null,
+    "compile_commands_sha256": null,
+    "default_binary_sha256": null,
+    "diagnostic_binary_sha256": null,
+    "finalizer_exit_code": null,
+    "inventory_hashes": null,
+    "process_exit_code": null,
+    "run_id": null,
+    "run_record_sha256": null,
+    "status": null
+  },
+  "prior_review": {
+    "archive_manifest_sha256": "27eabdd3b469b7044f9ed4935058ffe509f3a92712371924cc73b76dd619266a",
+    "one_call_consent_consumed": true,
+    "packet_sha256": "1b45bd2838f82686414257a9fe1c4cec0945b1faba04d59170d99e0e3367508a",
+    "parsed_response_sha256": "9b0fa2aa410d6055e50da31134e42af29d97ece12aac77d971299ece7e3851dc",
+    "raw_sse_sha256": "3d375e4cc4551793dff18a299e3e82ded99bf631a5fdfb0aed195a4dae24dc31",
+    "response_id": "resp_066534905404d5a5016ac3b9c91aac87d2b521fcde5b122863",
+    "scope": "advisory textual pre-code review only; no implementation/runtime authority",
+    "verdict": "AMEND"
+  },
+  "review_artifacts": {
+    "manifest_path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.9-r06.json",
+    "packet_path": "Specs/RESULTS-SPEC-039/precode-packet-v1.9-amend-closure-20261010-sanitized-draft-r06.md",
+    "packet_sha256": "computed after final packet bytes; not embedded in this manifest to avoid a hash cycle",
+    "submission_state": "not submitted; exact-SHA owner consent pending"
+  },
+  "review_date": "2026-10-10",
+  "review_revision": "r06",
+  "review_scope": "Document-only, advisory pre-code review. No Astra submission or D2/D3 execution is authorised by this packet.",
+  "runtime_bundle": {
+    "max_artifact_bytes": 4194304,
+    "max_artifacts_excluding_run_record": 7,
+    "max_files_total": 8,
+    "max_run_record_bytes": 262144,
+    "max_sysv_shm_segment_bytes": 33554532,
+    "max_sysv_shm_segments": 5,
+    "max_sysv_shm_total_bytes": 167772660,
+    "max_total_bytes": 33554432,
+    "optional_files": [
+      "harness-diagnostics.txt"
+    ],
+    "required_files": [
+      "run-record.json",
+      "stdout.txt",
+      "stderr.txt",
+      "ipc-pre.json",
+      "ipc-post.json",
+      "ipc-final.json",
+      "observer-events.json"
+    ],
+    "run_record_sha256_location": "outer archive index; not self-referenced",
+    "staging_file": {
+      "deleted_after_finalization": true,
+      "included_in_final_bundle": false,
+      "maximum_bytes": 262144,
+      "name": "run-record.pending.json"
+    },
+    "tracked_plan_manifest_is_not_runtime_file": true
+  },
+  "sandbox": {
+    "cwd": "$D2_RESULTS",
+    "dev_shm_tmpfs": {
+      "nr_inodes": 128,
+      "options": [
+        "noexec",
+        "nosuid",
+        "nodev"
+      ],
+      "size_mib": 16
+    },
+    "empty_pre_inventory_required": true,
+    "finalizer_command": "prlimit --core=0 --as=134217728 --fsize=4194304 --nofile=32 --cpu=10 -- timeout --signal=TERM --kill-after=5s 10s \"$D2_SCRATCH/build-diagnostic/ng039_gw_q0_q1_d2\" --finalize \"$D2_RESULTS\" \"$RUN_ID\" --outer-code \"$OUTER_CODE\" --outer-signal \"$OUTER_SIGNAL\" --timeout-fired \"$TIMEOUT_FIRED\"",
+    "finalizer_exit_is_separate_from_test_exit": true,
+    "finalizer_kill_grace_s": 5,
+    "finalizer_rlimits": {
+      "RLIMIT_AS_bytes": 134217728,
+      "RLIMIT_CORE_bytes": 0,
+      "RLIMIT_CPU_seconds": 10,
+      "RLIMIT_FSIZE_bytes": 4194304,
+      "RLIMIT_NOFILE": 32
+    },
+    "finalizer_timeout_s": 10,
+    "harness_spawns_children": false,
+    "host_fallback": false,
+    "kill_grace_s": 5,
+    "launch_command": "prlimit --as=536870912 --fsize=4194304 --nofile=64 --core=0 --cpu=30 -- timeout --signal=TERM --kill-after=5s 20s unshare --user --map-root-user --ipc --mount --pid --propagation private --fork --kill-child --mount-proc \"$D2_SCRATCH/build-diagnostic/ng039_gw_q0_q1_d2\" --run \"$RUN_ID\"",
+    "launch_stdout_stderr": "shell redirection to stdout.txt and stderr.txt outside namespaces; close both before finalizer invocation",
+    "mount_propagation": "private",
+    "namespaces": [
+      "user",
+      "ipc",
+      "mount",
+      "pid"
+    ],
+    "outer_status_capture": {
+      "ambiguous_status": "128-255 without independent signal evidence is INCONCLUSIVE; do not infer signal from shell exit code",
+      "outer_code": "raw exit status from timeout wrapper",
+      "outer_signal": "populate only from unambiguous independent wait evidence; otherwise null",
+      "timeout_fired": "true on supervisor timeout; code 124 conservatively treated as timeout"
+    },
+    "rlimits": {
+      "RLIMIT_AS_bytes": 536870912,
+      "RLIMIT_CORE_bytes": 0,
+      "RLIMIT_CPU_seconds": 30,
+      "RLIMIT_FSIZE_bytes": 4194304,
+      "RLIMIT_NOFILE": 64
+    },
+    "sysv_shm": {
+      "basis": "one ReturnIPCSHMID(11) setup segment plus four Process shmid[] parallel slots; fail INCONCLUSIVE above bound",
+      "expected_initial_key": 11,
+      "max_segment_bytes": 33554532,
+      "max_segments": 5,
+      "max_total_bytes": 167772660
+    },
+    "timeout_s": 20
+  },
+  "schema_version": "ng039-spec039-precode-review-manifest/v1.9",
+  "scope": {
+    "algorithm_change": false,
+    "correctness_only": true,
+    "d3_timing": false,
+    "ngal_or_wire_time_coverage": false,
+    "production_vm_or_host_ipc_fallback": false
+  },
+  "source": {
+    "baseline_file_sha256": {
+      "CMakeLists.txt": "5f9cd0676b2dcdcd0a500d778f5d5baea312301d6abc382db5eab95f2bbb1d07",
+      "Common/src/GW.cpp": "7893766ab808473f53b66d8fb9e3804ae5c579bc37d700d90e78155a2ab2cc5e",
+      "Common/src/GW.h": "54a97c54fe75fd76e157afc1c70ebce370f3c6edab33233babab3f3fc68f0b44",
+      "Common/src/Message.cpp": "96f718f16dfa34fb081c02df872a3959a4255180798e6022e61d198905035518",
+      "Common/src/Process.cpp": "bd45b77db19adf7a3c0f78bf5970996afce9720b77ea15519f5a4bcf703845d1"
+    },
+    "document_checkout_branch": "AIOPT5",
+    "document_checkout_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "document_checkout_relation": "local HEAD is two commits ahead of origin/AIOPT5",
+    "document_checkout_tracking": "origin/AIOPT5",
+    "document_checkout_tree": "9adf665c0eb06213a29a6c12d650451948c7a4ab",
+    "functional_baseline_commit": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "functional_baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+    "primary_checkout_status_at_freeze_input": {
+      "r06_outputs_not_yet_created": true,
+      "reviewed_spec_status": "clean",
+      "unrelated_modified_path_present": true,
+      "unrelated_untracked_results_path_present": true
+    },
+    "reviewed_spec_clean_in_primary_worktree": true,
+    "source_for_code_claims": "immutable baseline Git objects only",
+    "unrelated_changes_included_or_validated": false,
+    "unrelated_primary_worktree_changes_present": true
+  },
+  "source_snapshots_before_packet_freeze": {
+    "dashboard_sha256": "57aed9be4fbe8109fb7cfb37e3dc8f2e53a056091ef7aceeeb8f157f149bf26a",
+    "ng039_task_sha256": "c36aad8d563fd0853a3fee575be4ab88e50481a0a70843f326a336499ced3d84",
+    "ng040_task_sha256": "f8797413f668e89dcbd021d7a3bbe590b1c052cc685366f48d754d302239e0b4",
+    "post_freeze_note": "The final task/Dashboard will record r06 hashes after packet freeze; those subsequent handoff edits are intentionally not fed back into the packet.",
+    "snapshot_timing": "before r06 files and post-freeze task/Dashboard receipt updates"
+  },
+  "spec": {
+    "change_from_v1_8": "Privacy-only stable alias for the D1-H checkout; no design, scope, or gate change.",
+    "path": "Specs/SPEC-039-common-performance-measurement.md",
+    "sha256": "2477ac94b67ecf6e81665fe2c8899cbfdff31edec08830dc2b60ebbaa7b0d0d0",
+    "status": "In Progress",
+    "version": "v1.9"
+  },
+  "synthetic_validation": {
+    "compile_negative_cases": [
+      "wrong compiler",
+      "command/arguments disagreement",
+      "false output metadata",
+      "conflicting output metadata",
+      "unexpected target",
+      "direct bare observer define",
+      "split bare observer define",
+      "direct zero-valued define",
+      "split zero-valued define",
+      "duplicate observer define",
+      "observer undefine",
+      "-Wp,-DNG_GW_QUEUE_TEST_OBSERVATION=1",
+      "-Xpreprocessor -DNG_GW_QUEUE_TEST_OBSERVATION=1",
+      "joined function-like define",
+      "split function-like define",
+      "-ansi",
+      "later -std=gnu++17",
+      "later -std=gnu++23",
+      "later -O1",
+      "-Ofast",
+      "-include",
+      "-imacros",
+      "-specs",
+      "response file",
+      "-fplugin",
+      "-B toolchain override"
+    ],
+    "d3_measurement": false,
+    "harness_or_ipc_execution": false,
+    "link_negative_cases": [
+      "wrong linker compiler",
+      "response file",
+      "missing -static",
+      "duplicate -static",
+      "missing -static-libgcc",
+      "missing -static-libstdc++",
+      "-Bdynamic",
+      "-dynamic",
+      "-shared",
+      "-Wl,-Bdynamic",
+      "-Wl,--dynamic-linker=...",
+      "-Xlinker --dynamic-linker ..."
+    ],
+    "purpose": "Pre-code contract probes only; never compile, runtime, IPC, VM, or performance evidence.",
+    "r06_local_preflight": {
+      "compile_checker": "PASS: 2 synthetic target profiles and 26/26 negative cases rejected",
+      "json_schema_meta_validation": "PASS: 3/3 embedded Draft 2020-12 schemas",
+      "link_checker": "PASS: 45 subprocess runs; 3 positive + 12 negative cases under normal, python3 -O, and PYTHONOPTIMIZE=1",
+      "link_checker_assertions": "none; explicit nonzero failures",
+      "real_compile_database_configure_build_harness_ipc_vm_d3": "not run",
+      "run_record_status_fixtures": "PASS: 4 valid and 14 invalid; all invalid records rejected by the revised allOf schema"
+    },
+    "real_cmake_configure_or_build": false,
+    "real_compile_database_or_link_txt": false,
+    "schema_status_cases": {
+      "invalid_count": 14,
+      "invalid_examples": [
+        "PASS assertion NOT_RUN",
+        "unsafe cleanup",
+        "nonempty pre-inventory",
+        "incomplete final inventory",
+        "unmatched Q1",
+        "nonzero PASS exit",
+        "missing required artifact",
+        "FAIL without false assertion",
+        "FAIL with NOT_RUN",
+        "incomplete post-inventory",
+        "FAIL ambiguous outer code",
+        "FAIL unknown harness exit",
+        "finalized INCONCLUSIVE without failure",
+        "pending with failure claim"
+      ],
+      "status": "historical v1.8 local result; detailed standalone fixtures were not retained in the current worktree",
+      "valid_count": 4
+    }
+  },
+  "task_id": "NG-040"
+}

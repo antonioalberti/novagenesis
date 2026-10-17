@@ -1,0 +1,378 @@
+# SPEC-039 v1.13 — r10 same-SPEC documentary response to Astra r09 B1
+
+Status: FROZEN CANDIDATE, UNSUBMITTED. The owner authorized preparation of a same-SPEC documentary response. This does not authorize submission: obtain fresh owner consent bound to the exact final packet SHA before one Astra call. No implementation, configure/build, harness/finalizer execution, IPC, namespace, VM/SSH, D3, cleanup, commit, push or release authority.
+
+## Frozen identities
+- Repository AIOPT5 document HEAD: `756f493b7049434ab67cf2382486a48f606a470c`; tree: `9adf665c0eb06213a29a6c12d650451948c7a4ab`.
+- Functional source baseline: `1af604dad66148618cc0e578c28adb4a9829e607`; tree: `5a3ebb9fbdf61185f05b18e58b8799ced40eb60b`.
+- SPEC-039 v1.13 SHA-256: `b4e1c0c2db88a0d1a8f02ab98c934b7b33ec23fd2162c8e1b2921b72afbaf88d`.
+- Full manifest v1.13/r10 SHA-256: `5707467a0c4e41d254dfe64c30b5d34b74da165bb755f9d8d792f209fda28a13`.
+- Prior immutable r09 packet SHA-256: `560ee5654d9a8859e3e21aa916a1dca9f0e564fe1f8eac41fb4ee8f4bd3397a6`; prior r09 SPEC and manifest hashes: `a2feea01cb80b60256da3a7abd5e8c2196954d6e008d6f488cd4fb37f2058af1`, `613c5843f503ff75f704aef6fd9c7b68fb994029d5f822691223212bfbf7bc9a`.
+- Current `Common/src/GW.cpp` at the pinned functional baseline SHA-256: `7893766ab808473f53b66d8fb9e3804ae5c579bc37d700d90e78155a2ab2cc5e`.
+- Working tree status (context only; baseline HEAD remains pinned):
+```
+M Specs/SPEC-039-common-performance-measurement.md
+ M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md
+?? Specs/RESULTS-SPEC-039/
+?? Specs/RESULTS-SPEC-059/
+```
+
+## Review question and strict scope
+Determine whether this same-SPEC v1.13 response resolves the sole r09 blocker B1 without weakening the r08 B2/B3 safeguards. In particular verify: (1) one consistent finalizer owner and sequence; (2) whether allowed IPC operations are exhaustively limited to required inventory reads, exact current-identity inspection, journal-authorized `IPC_RMID`/`sem_unlink` after immediate identity/lease recheck; (3) whether creation/opening, Process/GW construction, production message traffic, arbitrary/broad cleanup, and retry after ambiguous outcome remain prohibited; (4) whether lease-loss, journal ambiguity and identity mismatch fail closed before destructive calls; (5) whether the SPEC, manifest and collection/finalizer contract agree; (6) whether any must-fix blocker remains, distinguishing non-blocking r09 advisories.
+
+Do not infer that the launcher/lease exists, that the proposed source guards are implemented, or that finalizer behavior has been tested. The dedicated UID launcher remains NOT_PROVISIONED and D2 remains BLOCKED. The exact-source excerpts are from the immutable functional baseline; no source was modified. A positive documentary verdict must not grant operational authority.
+
+Return concise UK English: (1) VERDICT APPROVE / AMEND / HOLD, documentary scope only; (2) must-fix blockers with exact packet clause and concrete risk, or none; (3) optional advisories separately; (4) explicit no-operational-authority statement.
+
+## r09 review outcome — immutable prior evidence
+The owner separately authorized one review of the r09 packet listed above. Astra returned `AMEND — documentary contract only`; it found B2/B3 substantially addressed and one must-fix B1 contradiction: the allowlist row prohibited touching IPC although §7.1 assigned exact cleanup to `--finalize`. The reviewer required one consistent owner/sequence, a narrowly defined allowance for inventory/current-identity inspection and journal-authorized exact removal under the continuously verified lease, while retaining prohibitions on Process/GW construction, resource creation, production IPC and broad cleanup. Optional advisories concerned mapping evidence representation, historical fixture counts and fsync claims; they were not blockers and are not promoted here.
+
+### Full r09 Astra response (read-back verified against the exact submitted session)
+## 1. VERDICT: AMEND — documentary contract only
+
+Reviewed only the supplied packet identified as SHA-256 `560ee5654d9a8859e3e21aa916a1d7a6` **[correction: exact identity below]**:
+
+`560ee5654d9a8859e3e21aa916a1dca9f0e564fe1f8eac41fb4ee8f4bd3397a6`
+
+The r09 amendment substantially addresses r08 B2/B3, but contains one blocking contradiction about finalizer responsibilities. No unchanged r07 checker findings are reopened.
+
+- **Dedicated UID/launcher/lease:** adequate as a mandatory, fail-closed prerequisite, not proof of an existing enforcement mechanism. The explicit `NOT_PROVISIONED`/`BLOCKED` states, prohibition on ordinary-host-UID execution, rejection of census-only evidence and trusted-root boundary appropriately prevent a readiness claim.
+- **Diagnostic unlink suppression:** properly bounded to the three pinned branches, the opt-in isolated diagnostic build and targeted zero-unlink tests. It complements, rather than replaces, continuous exclusion.
+- **Journal and inventories:** the required retained bytes, intent/outcome ordering, fsync obligations, ambiguous-crash handling, no-retry rule and final hash binding substantially close the earlier evidence gaps. Raw inventory digests and summaries must be independently recomputed.
+- **Semaphore mapping:** the retained matching maps-line route can support pointer-range/shared-mapping/device/inode checks against the recorded semaphore and libc identity. This is an untested evidence procedure; missing or contradictory linkage must remain `INCONCLUSIVE`.
+- **Classification:** schemas alone do not establish safety. The combined semantic contract appropriately requires evidence-derived status and excludes unsafe or incomplete runs from both PASS and correctness FAIL, subject to resolving the blocker below.
+
+## 2. Must-fix blocker
+
+### B1 — Contradictory finalizer IPC boundary
+
+**Exact locations**
+
+- **“Proposed runtime artifacts”**, D2 proposed allowlist row: `--finalize` performs finalisation “without constructing Process/GW **or touching IPC**”.
+- **§7.1**, paragraphs beginning “The three pinned…” and “After Gateway/output threads…”: only the separate finalizer may clean resources; it verifies current identities and performs removal.
+- **`collection_responsibility.outer_finalizer`**: the finalizer logs cleanup intent/outcome and performs exact identity-bound cleanup.
+- **`sandbox.runtime_finalizer_cleanup`**: cleanup occurs after the run process exits.
+
+**Concrete risk:** these requirements cannot all be satisfied. An implementation following the no-IPC clause cannot perform the assigned cleanup; an implementation following the cleanup clauses breaches that explicit boundary. It also leaves current-identity inspection and cleanup ownership contradictory at the point where safety depends on them.
+
+**Required amendment:** establish one consistent owner and sequence. If `--finalize` owns cleanup, replace “or touching IPC” with a narrowly defined allowance for inventory/current-identity inspection and journal-authorised exact removal under the continuously verified lease. Continue to prohibit Process/GW construction, resource creation, production IPC use and speculative or broad cleanup. Align the cited clauses.
+
+## 3. Optional advisories — not blockers
+
+- Make the matching `mapping_line` mandatory for successful semaphore evidence, or add explicit mapping permissions and offset fields. The current structured alternative lacks those fields; the semantic contract must reject projections that cannot prove a shared mapping.
+- Separate historical fixture counts from newly required negative classes and remove duplicated policy entries. These are not evidence that r09 semantic fixtures ran.
+- State explicitly that retained journal bytes support replay but do not independently prove historical fsync calls; durability also depends on the subsequently verified collector implementation.
+
+## 4. Authority boundary
+
+The launcher remains **unprovisioned**, and execution remains **BLOCKED**. No tools, code execution, hash recomputation or runtime validation were performed.
+
+**No operational authority is granted:** no implementation, configure/build, harness/finalizer execution, IPC, namespace, VM/SSH, D3, cleanup, commit, push or release. Documentary approval, if subsequently obtained, would not replace the separate provisioning, verification and owner-authorisation gates.
+
+### Corrected r08 follow-up (historical context; not reopened)
+## 1. Correction to prior B1 — WITHDRAWN
+
+B1 was a **submission-envelope error, not a packet defect**. The supplied packet consistently uses:
+
+`bc735702fff9adde69a00705715e4025cedca5f3e1314eb7200da29712822992`
+
+This appears in “Frozen identity and privacy”, “Full SPEC SHA-256”, manifest `spec.sha256` and `run_record_host_profile_delta.spec_sha256_binding`.
+
+The sender’s earlier digest omitted `128`. I withdraw the conflicting-packet-identity finding and its requirement for packet amendment or fresh consent **on that account**. This correction concerns the unchanged packet.
+
+## 2. Remaining blockers
+
+### B2 — SUPPORTED, with a qualification on the proposed remedy
+
+The supplied text supports independent review A:
+
+- **Creation is not continuous exclusion.** §7.1 specifies exclusive reservation and `0600` permissions, but no enforceable exclusion of same-UID competing mutation through receipt capture, production use and cleanup.
+- **Production opens are not identity-bound.** `GW.cpp:693,713` and `1300,1306` use `O_CREAT`/`IPC_CREAT`, allowing attachment to replacements or recreation after disappearance.
+- **Unchecked unlink is explicit.** `GW.cpp:1318–1322` calls `sem_unlink` following `sem_open` failure, without checking ownership or identity.
+- **Cleanup remains check-then-act.** §7.1 and D2b require identity rechecking before name-based unlink; they do not make that check and unlink atomic. Replacement can also occur between semaphore creation and pathname-based receipt capture.
+
+The finalizer’s `inventory_checks` requirement that the production failure path “cannot cause” foreign unlink states an obligation, not a mechanism satisfying it. Subsequent `INCONCLUSIVE` classification cannot undo deletion.
+
+**Required documentary resolution:** establish enforceable identity continuity and exclusion across the relevant lifecycle, or retain the host-profile block. Suppressing the reachable unchecked unlink is a possible local mitigation within already-allowlisted `GW.cpp`, but is neither a complete remedy nor an approved change. Likewise, “INCONCLUSIVE/no cleanup when ambiguous” is safe only if unsafe production deletion is also prevented; it does not itself establish safe execution.
+
+SHM removal by recorded **shmid** is materially safer than semaphore removal by name; the two should not be treated as identical races.
+
+### B3 — SUPPORTED, with precision about the evidence gap
+
+The supplied projection supports independent review B:
+
+- **Journal lifecycle:** `collection_responsibility.harness_run` requires fsynced before/after-create records, but `runtime_bundle` and `reservations` do not designate their storage, event/state representation, recovery rules or binding into retained final evidence. Reservation arrays plus `journal_fsynced=true` do not supply that contract.
+- **Raw inventory verification:** `semantic_finalizer_contract.inventory_checks` requires raw `/proc/sysvipc` digests and normalised summaries to agree. The complete `ipc_inventory` schema retains digests and summaries, not the raw bytes needed to recompute those digests and validate their relationship to the summaries.
+- **Semaphore mapping:** §7.1 requires verification, but `reservations` supplies a libc version, name/path, inode metadata and a verification boolean without defining the procedure and evidence connecting the **returned semaphore object** to that pathname identity.
+
+**Qualification:** the packet already defines general artifact hashing and an outer-index hash for the run record. Therefore, the defect is not “no cryptographic binding anywhere”; it is the absence of a specified retained journal/mapping/raw-evidence representation covered by those mechanisms. Existing allowlisted artifacts could hold that evidence; additional files are not inherently required.
+
+**Required documentary resolution:** define bounded evidence storage, lifecycle and verification rules, including honest partial/failure records. Preserve `INCONCLUSIVE` and no speculative deletion when mapping or ownership cannot be established.
+
+There is no substantive disagreement with reviews A/B after these qualifications. Review C’s envelope correction is consistent with the supplied text; archived SSE and deduplication claims are not independently verified here.
+
+## 3. Corrected documentary verdict — AMEND
+
+For unchanged packet SHA-256  
+`3295a1bffd234673aaa82e2e7e254f3d5bad6c1e747f4d18123f702510445272`:
+
+**B1 withdrawn; B2 and B3 remain blocking.** The prior overall verdict therefore remains **AMEND**, solely on lifecycle safety and evidence-contract grounds.
+
+**Optional advisory, not a blocker:** say “five candidate key/name pairs: five SHM segments and five semaphores”, rather than “five resources”.
+
+This assessment uses only the supplied packet and correction context. No tools, hash recomputation or runtime validation were performed; the r07 review boundary remains unchanged.
+
+## 4. Gate
+
+**Documentary only; operational authority remains NO.** This response authorises no implementation, configure/build, harness/finalizer execution, IPC, namespace, VM, SSH, D3, cleanup, commit, push or release.
+
+## Current normative SPEC text
+Path: `Specs/SPEC-039-common-performance-measurement.md`; full frozen hash above. The complete current D2b block, Astra checkpoint, affected proposed-artifact table row and §7.1 host-controlled finalizer profile follow.
+
+### D2b block
+```markdown
+5. **D2b — Correctness test code/build/run:** only after this v1.13 host-controlled profile is positively reviewed under fresh exact-SHA consent, the dedicated-identity preconditions are provisioned and verified, and a separate owner execution decision is recorded, implement only the frozen allowlist: root `CMakeLists.txt`; `Common/src/GW.h`; `Common/src/GW.cpp`; new `tests/spec039/gw_q0_q1_d2.cpp`; and new `tests/spec039/q0_q1_d2.manifest.json`. Add the separate option `NG_ENABLE_NG039_GW_Q0_Q1_D2` (default `OFF`) and target `ng039_gw_q0_q1_d2`; define `NG_GW_QUEUE_TEST_OBSERVATION` for `Common` and the harness only inside an isolated diagnostic target graph: the option-on root CMake path must declare only `Common` and this harness and return before production application targets, with a configure-time target-census guard rejecting any other target. Keep the existing D1-H harness/manifest as historical evidence and do not overwrite them. Gate observer declarations, storage, methods and production call sites together. In the diagnostic build only, guard all three pinned `GW.cpp` branches that call `sem_unlink` after `sem_open` failure (`GW.cpp:970,1263,1322`): they must record a bounded failure event and must not call `sem_unlink`; the macro-off default build preserves existing behavior. Add targeted tests proving each injected `sem_open` failure path performs no unlink. This safety change is specified, not authorized for implementation by this document. Build the D2 target in a fresh isolated checkout at the pinned functional baseline. The dedicated-UID launcher and lease must be pinned and verified before any D2 action; until provisioned, no launch command is authorized and the old direct `timeout <harness>` invocation is prohibited. The manifest must freeze the exact launcher, lease identity, run/finalizer command and process-tree bounds before the separate execution gate. Resolve all path aliases before any command. Keep worktree, build directories, HOME/TMPDIR and results outside `.hermes`; use only named workspace/repository roots. The harness spawns no child processes.
+
+   The trusted dedicated-UID launcher and exclusive lease must be verified before any IPC action; the direct host-UID launch command is prohibited. Only then capture complete host inventories for `/proc/sysvipc/{shm,sem,msg}` and `/dev/shm`; host inventories may be non-empty, but all five candidate key/name pairs must be absent. Derive and record `D2_PROCESS_KEY` and selected attempt using §7.1's exact algorithm; candidate keys are `{11, D2_PROCESS_KEY, D2_PROCESS_KEY+1, D2_PROCESS_KEY+2, D2_PROCESS_KEY+3}`. Embed exact raw `/proc/sysvipc` bytes (canonical base64) in each inventory artifact; finalizer must recompute raw digests and normalized summaries from those bytes. Create and fsync `reservation-journal.jsonl` before reservation. Abort before construction on unreadable/over-cap inventory, candidate collision, key overflow, missing lease, or ambiguity. Then exclusively reserve all five SHM segments and five POSIX semaphores and journal each intent/outcome. NovaGenesis constructors may open only these reserved resources. A collision, mode mismatch, unverified returned-handle/libc mapping, incomplete journal or failed reservation blocks construction/PASS; do no speculative cleanup.
+
+   After Gateway/output threads stop and join and `Process/GW` are destroyed, retain the dedicated-UID lease through finalization. Remove only exact run-created SHM IDs/names whose successful journal receipts and current identities match. Name-based `sem_unlink` is permitted only while the verified exclusive execution domain remains held; if the lease is lost, another process appears, or identity/journal state is ambiguous, perform no unlink/RMID for the disputed object and preserve residue. Append/fsync each cleanup intent and outcome; an intent without a durable outcome is `INCONCLUSIVE`, never evidence of removal. Capture final inventory, including exact raw table bytes, and require it to match pre. Any failed cleanup, residual candidate, unexplained change, blocked join, timeout or ambiguous exit is `INCONCLUSIVE`; no broad cleanup. The finalizer verifies and hashes the journal and all bundle artifacts. Keep D2 at `N=1`, Q0/Q1 correctness only; no performance claim, algorithm change, `PGCS`/`PG`, VM, commit or push unless separately authorized.
+```
+
+### Astra review checkpoint
+```markdown
+### 4.5 GPT-6 Astra consultation checkpoints (advisory; no execution authority)
+
+| Checkpoint | Packet and question | Gate informed |
+|---|---|---|
+| Before D2 test-seam/code | Exact SPEC/manifest/packet hashes, functional baseline, D1-H manifest, proposed observer/interface diff and isolated CMake target graph; the dedicated-UID launcher, exclusive lease and exact process-tree evidence; all three guarded `sem_unlink` paths; journal event schema/state transitions; raw `/proc/sysvipc` retention/recomputation and exact returned-`sem_t`→libc/dev-shm inode mapping. Ask whether the trust boundary actually excludes same-UID mutation from pre-inventory through finalizer, whether any failure path can still unlink an unowned object, whether crash/replay semantics forbid ambiguous cleanup, and whether the schemas can support a non-vacuous PASS without claiming unverified evidence. | The frozen v1.10/r07 B1/B2/B3 packet received `APPROVE` only for its documentary findings. The immutable v1.11/r08 packet `3295a1bffd234673aaa82e2e7e254f3d5bad6c1e747f4d18123f702510445272` received `AMEND`; follow-up withdrew B1 (sender-envelope typo) and retained B2/B3. The v1.12/r09 packet was reviewed once and returned `AMEND` on B1; this v1.13 response requires a fresh exact-SHA Astra review after manifest/packet freeze. Review is advisory and cannot authorize D2 or expand owner scope. |
+| After D2 correctness result, before D3 | Frozen diff/build/test manifest, all raw outcomes including failures, identities and cleanup evidence. Ask whether the D2 assertions are supported and what remains inconclusive. | Planned checkpoint; a separate Astra submission requires owner consent. The owner decides whether to accept D2 and authorize D3. |
+| After D3, before any implementation SPEC | Frozen raw data, analysis, source/build/workload identities and hypothesis classification. Ask whether the evidence supports a future implementation proposal and its acceptance metric. | Future checkpoint only; separate owner consent is required. Astra advice never authorises production changes. |
+
+The owner authorised one GPT-6 Astra review via OpenAI Codex for the frozen v1.2 pre-code D2 packet. That call returned HOLD on the v1.2 SPEC SHA-256 `8973948334538715a9e02474be7b1d88a24e6b9235339870ba126d0570d91` and packet SHA-256 `f29274fa1fa38701ee8a5b9c4ae47366dee9e8f75e372dac826541c57ccca942`; its consent was consumed. On 2026-10-05 the owner separately authorised one review of the sanitized v1.4 packet SHA-256 `ba4ec6ec4b6660e98c3e7d0cdbbd6f18b7945ab6f6bdd30c2294e6c654150948`, bound to SPEC v1.4 SHA-256 `f54901cad03209f94fe98cfad3bf62953895ed24fef3d771a89b89f5229217e1` and baseline `1af604dad66148618cc0e578c28adb4a9829e607`. Astra returned AMEND, response ID `resp_0a12ead61fee5339016ac370498edc87d28ec6212dafa33cf9`. The archived raw SSE SHA-256 is `25b8c29265d327c34323e12f2c35177c2069c13b1d7e99f83a42ffea75240a58`; archive manifest SHA-256 is `46f41c9af22a6b1c9e86e2a66682dfd83f7323fb25d1c47aded2aa52c95e6782`. The r03 AMEND is advisory; its one-call consent is consumed and grants no implementation, build, runtime, IPC/VM, or D3 authority. Raw SSE SHA-256 `14f95d55a4a5611f518a0e236c98edd255e6809acd256b105177f975577bef09`; parsed-response SHA-256 `6fae28a46fd385e0d5aa87e8a1bc7149c832fcd8878170b470dab558941bc587`; archive manifest SHA-256 `b26c7767c9a74f2c9ee716a59257f79064c5480191addbc5f61da998989ca5fd`. The packet’s “NOT submitted” line is a time-frozen pre-review snapshot; this paragraph records the later submission/result. The v1.6 r04 packet SHA-256 `754ad970c1bb5e915262e825856345416360154274ece78ae80642ca6a30d829`, tied to the v1.6 SPEC SHA-256 `3296530c13801de945ed97b920532533c1a4a44d628075a9c5e61cdcc7ee01cb` and baseline `1af604dad66148618cc0e578c28adb4a9829e607`, was reviewed once on 2026-10-05 and returned AMEND (response ID `resp_0d91609fd866592e016ac3b3b903e487d2891f1ae2407fb075`). Raw SSE SHA-256 `a1c62af8a4e35a59aec3428fdf45818f2dd89b3f57dce9c3bf8be9a6279fe08d`; parsed-response SHA-256 `3655369b4c6c348e439ec87e48f6a8c1e789c46d5d4500890bee8577b8a969d3`; archive manifest SHA-256 `3f6dbf25e22ffd3ce5ce9290935fd41db162fd81aa67923c445b5ea250fbe2a8`. That exact-SHA consent is consumed. The review closed r03 findings 3 and 4b–4d at design level only; finding 4a remains must-fix. The v1.7 r05 packet SHA-256 `1b45bd2838f82686414257a9fe1c4cec0945b1faba04d59170d99e0e3367508a`, tied to SPEC v1.7 SHA-256 `b73bcc7361bb797b4ddd40952860f0092fb840bb11b31bf0a99659bef8475b70` and baseline `1af604dad66148618cc0e578c28adb4a9829e607`, was reviewed once on 2026-10-05 and returned AMEND (response ID `resp_066534905404d5a5016ac3b9c91aac87d2b521fcde5b122863`). Raw SSE SHA-256 `3d375e4cc4551793dff18a299e3e82ded99bf631a5fdfb0aed195a4dae24dc31`; parsed-response SHA-256 `9b0fa2aa410d6055e50da31134e42af29d97ece12aac77d971299ece7e3851dc`; archive manifest SHA-256 `27eabdd3b469b7044f9ed4935058ffe509f3a92712371924cc73b76dd619266a`. Usage: 22,569 input / 1,650 output / 24,219 total tokens; 8.11725 estimated credits (not USD); quota at return 5h 51%, weekly 86%. Three 4a must-fixes remain: preprocessor-forwarded and function-like observer macros; `-ansi` dialect override; Python assertions disabled by `PYTHONOPTIMIZE=1`. Optional hardening: actual `-o` target mapping, dynamic-linker conflict rejection, and stronger run-record schema `allOf`. Findings 3 and 4b–4d remain design-level closures only. The r05 consent is consumed. SPEC-039 v1.8 is local/unreviewed; any r06 review requires fresh exact-SHA consent. D2 remains blocked.
+
+No VM/SSH/QGA operation, algorithmic production change, commit, push, or release is authorised by these gates. All Astra reviews to date were separately owner-authorised by exact packet SHA and their one-call consents are consumed; none expands the D2 seam/runtime scope. The old NG-062 trial locks and evidence remain untouched.
+```
+
+### Proposed allowlist and artifact boundary
+```markdown
+| D2 proposed allowlist (not implemented) | `CMakeLists.txt`, `Common/src/GW.h`, `Common/src/GW.cpp`, new `tests/spec039/gw_q0_q1_d2.cpp`, and `tests/spec039/q0_q1_d2.manifest.json`; separate opt-in option defaults OFF. No modifications to NGAL, `Process`, `PGCS` or `PG`, no algorithm change, separate source helper file, or D3 timing files are proposed. The D2 harness may construct the existing `Process/GW` under test; the same allowlisted harness binary's `--finalize` mode runs after the test exits without constructing `Process/GW`, creating IPC resources, or sending/receiving production messages. While the dedicated-UID lease remains continuously verified, this finalizer may only read the required host IPC inventories, perform `IPC_STAT`/equivalent exact-identity inspections, and issue journal-authorized `IPC_RMID` or `sem_unlink` for exact run-created objects after an immediate identity recheck. It must not create/open candidate resources, call Gateway production IPC paths, retry ambiguous removals, or perform broad/speculative cleanup. The trusted dedicated-UID launcher/lease is a provisioned external runtime prerequisite, not part of the five-file code allowlist; it does not exist here and direct host-UID execution is prohibited. |
+```
+
+### §7.1 full host-controlled profile
+```markdown
+### 7.1 Host-controlled execution profile — v1.13 (documentary; execution blocked)
+
+The v1.11 direct launch under the ordinary host UID is prohibited for D2. Mode `0600`, umask `0077`, exclusive creation and a pre-inventory do not prevent a same-UID process from replacing a POSIX semaphore name or removing/reusing a SysV resource during the run. This amendment does not claim the current host can satisfy the stronger prerequisite. No D2 configure/build, harness/finalizer execution, IPC creation/removal or measurement may occur until the dedicated single-run identity and launcher are provisioned, independently inspected, pinned in the manifest, and separately authorised by the owner. If they cannot be provided, the D2 execution profile remains `BLOCKED` before any candidate resource is created.
+
+The run and its sequential finalizer must execute under a dedicated non-login UID reserved solely for this D2 run, through a trusted owner-controlled single-run launcher. The launcher must prevent another process from entering that UID's execution domain from before pre-inventory until finalization/lease release, hold an exclusive run lease across launch and finalization, and record its exact path, file identity/hash, UID/GID, lease identity and process-tree identity. A process census alone is not proof of exclusivity. The ordinary interactive UID, an unverified cooperative lock, or a missing launcher/lease is insufficient. Only controlled supervisor/harness/finalizer descendants for this run may use the UID; no login shell, unrelated service or concurrent run may use it. Treat host root/administrator as trusted; if root-level concurrent mutation is in the threat model, this shared-host profile is unacceptable and remains blocked. Record precondition evidence in the run record. Loss or uncertainty of identity/lease is `INCONCLUSIVE`, prohibits further name-based unlink/RMID, and preserves residue for owner-directed recovery. The launcher is outside the five-file code allowlist and has not been provisioned or authorised by this documentary amendment.
+
+The three pinned `GW.cpp` paths at lines 970, 1263 and 1322 call `sem_unlink(name)` when `sem_open` fails. In the future diagnostic build only, the already-listed `NG_GW_QUEUE_TEST_OBSERVATION` compile-time guard must suppress all three unlinks and emit a bounded failure event; the normal macro-off build remains unchanged. Failure to open a semaphore aborts the diagnostic run; only the separate finalizer may clean a resource, and only from a complete reservation journal under a still-valid dedicated-UID lease. Synthetic fault-injection coverage must prove each path makes zero `sem_unlink` calls. This required source behavior is design text only; code changes still need separate owner authorisation.
+
+Before constructing `Process/GW`, capture complete host-visible inventories for `/proc/sysvipc/shm`, `/proc/sysvipc/sem`, `/proc/sysvipc/msg`, and `/dev/shm`. Global inventories may be non-empty, but every candidate key/name must be absent. Capture each raw `/proc/sysvipc` table byte-for-byte in canonical base64 fields inside its phase inventory artifact; the finalizer decodes those bytes, recomputes each SHA-256 over the exact raw bytes, parses the table using the pinned Linux table grammar, and independently recomputes normalized rows/IDs before comparing them to stored summaries. Reject non-canonical base64, duplicate/invalid rows, digest mismatch, parse mismatch, unreadable/over-cap input or any inventory artifact exceeding its bound as `INCONCLUSIVE` before resource creation. The `/dev/shm` structured listing is sorted by bytewise name and retains each entry's kind, device, inode, UID/GID, mode, link count and size; the finalizer compares actual post/final listings with captured records. Inventory incompleteness never means “empty”.
+
+Choose `D2_PROCESS_KEY` deterministically: for attempts `0..31`, compute `0x40000000 + (uint32_be(SHA256(ASCII(run_id + ':' + decimal(attempt)))[0:4]) mod 0x3FFFFFF8)` and select the first base whose four-key range is unoccupied and fits positive signed 32-bit `key_t`; key `11` is checked separately. Record the selected attempt and candidate set `{11, D2_PROCESS_KEY, D2_PROCESS_KEY+1, D2_PROCESS_KEY+2, D2_PROCESS_KEY+3}`. If no base is available, abort `INCONCLUSIVE`.
+
+Before any candidate create, create `reservation-journal.jsonl` in the run result directory using exclusive non-symlink creation and mode `0600`; fsync the file and containing directory. This file is a required runtime artifact, capped at 256 KiB and 128 events, one strict JSON object per newline-terminated record, with monotonically increasing sequence numbers and the same run ID. Each event contains schema version, sequence, event kind, monotonic timestamp, process PID/UID, resource kind, candidate key/source name, and nullable identity/result fields. Event kinds are `JOURNAL_OPENED`, `CREATE_INTENT`, `CREATED`, `CREATE_FAILED`, `CLEANUP_INTENT`, `REMOVED`, `CLEANUP_FAILED`, and `JOURNAL_CLOSED`. Write and fsync `CREATE_INTENT` before each `shmget`/`sem_open`; after the call, append and fsync exactly one `CREATED` record with returned identity or `CREATE_FAILED` with errno. Keep the descriptor open, verify its file identity before each append, and never rewrite/truncate prior events. The finalizer appends/fsyncs `CLEANUP_INTENT` before cleanup and `REMOVED`/`CLEANUP_FAILED` after. It may close the journal only after final inventory capture and all events are durable. A missing event, sequence gap/duplicate, partial line, identity mismatch, crash between intent and outcome, or failure to fsync makes the run `INCONCLUSIVE`; the finalizer must not infer success or retry deletion for an ambiguous resource.
+
+After pre-inventory and journal readiness, set harness umask to `0077`; exclusively reserve five SysV SHM keys with `shmget(..., IPC_CREAT|IPC_EXCL|0600)` at pinned `MaxSegmentSize` and five exact POSIX semaphore names with `sem_open(..., O_CREAT|O_EXCL, 0600, 1)`. Verify effective modes are exactly `0600`. Each `CREATED` event records exact key/name and exclusive-create evidence: for SHM, `shmid`, key, `IPC_STAT` size, creator PID/UID, owner UID and mode; for semaphore, exact source name, `sem_t*` address, `/dev/shm` resolved path, device/inode/UID/GID/mode/link count, and libc identity. A failed/mismatched reservation aborts before `Process/GW` construction; remove only resources whose successful journal receipt and current identity are exact while the lease remains valid. Otherwise do no deletion and report `INCONCLUSIVE`.
+
+For each semaphore, record the `sem_open` provider via `dladdr`, resolved libc path, file device/inode, GNU build ID when available, SHA-256 of the opened libc file, `gnu_get_libc_version()`, and exact production source name/path. Immediately after successful exclusive `sem_open`, capture `/proc/self/maps` and prove the returned `sem_t*` address lies within a shared mapping whose device/inode equals the `stat` identity of exact `/dev/shm/sem.<decimal-name>`. Retain the exact matching maps line or a strict projection including address range, permissions, offset, device and inode in the reservation journal. Recompute/validate this linkage from retained evidence; version/path plus a boolean is insufficient. The mapping procedure is target-libc-specific and is not claimed tested here. If `sem_open` returns no handle, mapping is absent, path/device/inode disagree, or mapping cannot be captured, abort before `Process/GW`; do not set `semaphore_name_mapping_verified=true`, do not PASS, and do no speculative deletion.
+
+After Gateway/output threads stop and join and `Process/GW` are destroyed, capture post inventory. The finalizer has one narrowly bounded responsibility: replay/validate the journal, read the required `/proc/sysvipc` and `/dev/shm` inventories, inspect exact current identities (`shmctl(..., IPC_STAT, ...)` for SysV SHM and `stat`/equivalent metadata for the exact POSIX semaphore object), and remove only journal-proven run-created resources. For each resource it must append/fsync `CLEANUP_INTENT`, reverify the still-valid dedicated-UID lease and exact current identity immediately before the destructive call, invoke only `shmctl(exact_shmid, IPC_RMID, ...)` or `sem_unlink(exact_recorded_name)`, then append/fsync the matching `REMOVED`/`CLEANUP_FAILED` outcome. The finalizer must not construct `Process/GW`, create/open candidate resources, attach/use them for message traffic, invoke Gateway production IPC paths, retry an ambiguous removal, or perform broad/speculative cleanup. The name-based `sem_unlink` remains permitted only while the verified exclusive execution domain is continuously held; this lease is the required exclusion against same-UID replacement, not an assumption derived from `0600`. If the lease is absent/uncertain, another process appears in the domain, the journal is incomplete, or any identity differs, do not call `sem_unlink` or `IPC_RMID` for that resource; preserve residue. A crash after `CLEANUP_INTENT` without a durable outcome is never treated as successful removal and never triggers automatic retry.
+
+Capture final complete inventory and require it to match pre exactly for all `/proc/sysvipc` raw bytes/parsed summaries and `/dev/shm` entries. The final run record lists `reservation-journal.jsonl` exactly once with final size/hash and every other required artifact exactly once. The finalizer strictly parses journal/inventories, recomputes event order/transitions, raw table hashes and normalized inventories, proves each cleanup event maps to one successful create receipt, and derives status from those bytes rather than caller booleans. It must not accept `journal_fsynced=true`, `mapping_verified=true` or a final inventory match as substitutes for underlying evidence. Missing/contradictory evidence, unexplained change, residual candidate, failed join, timeout or ambiguous exit is `INCONCLUSIVE`; no broad host cleanup is permitted. If a failure occurs before journal closure, retain partial evidence and do not claim PASS/FAIL. D2 remains one controlled process tree, one Q0/Q1 correctness run, no network/VM, D3 timing, performance claim, algorithm change, PGCS/PG, commit or push unless separately authorised.
+
+1. Host-controlled preflight before construction: the run starts only after the §7.1 inventory and attribution prerequisites pass. No constructor-time IPC may precede that successful preflight.
+
+2. HT construction, Message lifetime, and failure-safe ownership: after the host-controlled preflight succeeds, construct the isolated non-`PGCS` `Process`. Its pinned constructor calls `NewBlock("HT", ...)` then `NewBlock("GW", ...)` (`Process.cpp:228–230`), and the `GW` constructor retrieves that HT (`GW.cpp:99–101`) before initialization dereferences it (`GWRunInitialization01.cpp:68–80`). Do not call `NewBlock("HT")` or `NewBlock("GW")` again; verify exactly two blocks exist and one lookup succeeds for each name. Before starting Gateway, create the Process-owned target, capture `GetDeleteFlag()==false` while single-threaded, and bind its ID with the observer. Capture the immutable scalar `Message::InstantiationNumber` (`Message.h:158`) before each production `Run`; use only that copied ID for Run-entry and Run-return events, publishing the return event before `DeleteMarkedMessages()` can reclaim the object. Never dereference a Message pointer after a possible reclamation; duplicate, zero, stale or wrapped identity is INCONCLUSIVE. The three-argument constructor used by `Process::NewMessage` initializes `Delete=false` and `ApplicationDeleted=DELETED_BY_CORE` (`Message.cpp:37–70`, especially 63–64); `DeleteMarkedMessages` deletes only true-flagged messages (`Process.cpp:885–917`). Keep the target out of the queue and do not mark it through Q0; use exactly three inert command lines `-ng039 --probe 0.2`, which match neither the registered action nor the `0.1` fallback in `Block::Run` (`Block.cpp:244–313`). For the expected Q0/Q1 pending path, after Gateway and its output worker stop/join, verify no target pop/Run and `Delete=false`; call `EraseMessage` only while Process is quiescent and require `GetNumberOfMessages()` to decrease by exactly one. Keep the detached object alive through `Process` destruction: its destructor calls `DeleteMessages()` before deleting `Blocks`, so after EraseMessage it will not own/delete this target; `GW::~GW` destroys actions, while the queue container drops raw pointer values. Delete the detached target exactly once after Process/GW destruction. If any target pop/Run, delete flag, count, or identity makes ownership uncertain, never dereference, erase, delete, or invoke the C++ Process/GW destructors on a possibly stale pointer: write a bounded/fsynced `run-record.pending.json` with `record_finalized=false` and no fabricated measurements, exit nonzero via `_Exit`, and let the isolated process/namespace terminate; after it exits, only the parent-side finalizer in item 5 may produce the final INCONCLUSIVE record, with unavailable post/final inventories explicitly not empty—not PASS. A partial construction or blocked join follows the same fail-closed classification; the outer timeout is the bound if join cannot return.
+
+3. Fresh, correlated observation contract: keep the 64-bit event sequence and add a saturating `gateway_iteration_id`, assigned once at the start of each Gateway loop iteration and carried across its wait and due/pop decision. Preserve two distinct sticky scalar records: (a) while the existing `InputQueueMutex` lock is held when the real `wait_for` returns, if the registered target is the head, capture `WaitCapture{sequence, iteration_id, target_id, head_id, head_time, depth, timeout_ms, predicate_return}` once and never overwrite it; (b) while the production due/pop critical-section lock is held, capture the corresponding `DecisionCapture{sequence, iteration_id, candidate_id, candidate_time, actual_due_branch, actual_popped}` from the existing strict comparison/pop branch, without performing a second comparison, and never overwrite that capture. The records correlate only if the iteration IDs match, `decision.sequence > wait.sequence`, and the wait target/head ID matches the actual decision candidate. Set `correlation_status=MATCHED` only then. Otherwise use `PENDING`, `DECISION_NOT_REACHED`, `HEAD_MISMATCH`, `INVALID`, or `OVERFLOW`; no incomplete pair is exposed as a valid due result. Stop before the decision, a changed head, invalid/duplicate/wrapped ID, missed event, stale sequence, or counter overflow makes Q1 BLOCKED/INCONCLUSIVE, never zero/PASS. Under Q0/Q1, capture sequence/counter baselines at each window start: Q0 requires a fresh empty-observation delta inside its 100 ms no-controlled-offer window after bootstrap drain; Q1 requires target admission/head identity, a matched wait/decision pair newer than the Q1 baseline, zero target pops/Run entries/returns throughout 100 ms, and a future target time at end. Use `std::chrono::steady_clock` for correctness windows; `Message::Time` remains the scheduler clock. Set `gateway_started=true` under `InputQueueMutex` before the loop and never reset it; later registration fails. Before production `Run`, copy `Message::InstantiationNumber` to a scalar; emit Run-entry/return with that copy and publish the return before `DeleteMarkedMessages()` can reclaim the object. Never dereference a Message pointer after possible reclamation. These are correctness-window rules, not timing/performance evidence.
+
+4. Bounded source/build verification contract: the five-path code allowlist and the CMake target census remain separate checks. The diagnostic graph contains exactly `Common` and `ng039_gw_q0_q1_d2`; the normal graph contains the pinned default targets, with the observer macro absent. The root CMake file returns before production application targets in the diagnostic branch. The compile-database checker receives the database, profile, pinned worktree root and fresh build root as four positional inputs after `python3 -c <checker>`; do not insert a `--` separator unless the checker explicitly consumes it. It verifies that each compile entry's working directory and actual `-o` output resolve under the build root, the source operand and entry `file` resolve to the same regular source inside the worktree, any `output` metadata agrees with `-o`, exactly one `-c` occurs, and compiler realpath/target census match the manifest. Require exactly one `-std=gnu++20`, only `-O0` optimization tokens, and the observer define exactly once on `Common` and the harness in diagnostic mode and nowhere in default mode. Parse joined and split `-D`/`-U` switches by base identifier, including function-like macro spellings; reject every function-like or undefined `NG_GW_QUEUE_TEST_OBSERVATION` form. Reject response files, `-Wp`, `-Xpreprocessor`, `-ansi`, `-traditional`, `-x`, forced-include and macro-file forms in both split (`-include file`, `-imacros file`) and joined (`-includefile`, `-imacrosfile`) spelling, plus toolchain-selection and plugin forms that can bypass those checks. Do not reject unrelated warning/debug switches through a purported universal grammar; preserve every complete argument vector and the compile database SHA-256 as evidence. This checker is scoped to the pinned CMake output and is not a generic validator for arbitrary compile databases.
+
+Resolve the roots before configure. Use fresh, pairwise-disjoint source/build/results paths beneath `<WORKSPACE_ROOT>`; never place NovaGenesis source, build or result artifacts in `.hermes`. Invoke configure, build and both checkers through the same minimal `env -i` environment, retaining only explicit `PATH`, `HOME`, `TMPDIR`, `LANG` and `LC_ALL` values. Set `HOME` and `TMPDIR` to distinct directories under the named D2 scratch root. Record those retained values, command working directories, tool versions and exact commands in the manifest/run identity; inherited environment variables are not passed through. No broad environment-variable inventory or custom denylist is required.
+
+For link validation, invoke `python3 -c <checker> <link.txt> <build-root> ng039_gw_q0_q1_d2` without an unconsumed `--`; the checker opens that exact named `link.txt` itself, requires a regular non-symlink file at the expected diagnostic target path under the build root, and never validates stdin or another caller-supplied string. Parse its contents with `shlex.split(posix=True)`, verify the pinned compiler realpath and exactly one standalone `-static`, `-static-libgcc`, and `-static-libstdc++`, and reject response files plus direct dynamic-link modes. For this target, reject `-Wl` and `-Xlinker` entirely rather than normalizing every forwarding grammar; this rejects `-Wl,-shared` and `-Xlinker -B -Xlinker dynamic` without a general linker-option parser. The checker uses explicit nonzero failures, not Python `assert`.
+
+Freeze only the directly relevant synthetic cases: source/output path escape, mismatched compile metadata, repeated `-c`, wrong compiler, observer macro via `-Wp`/`-Xpreprocessor`, joined `-include`/`-imacros` override, alternate standard or optimization, wrong link-file path/content, missing/duplicate required static flag, `-Wl,-shared`, and the split `-Xlinker` dynamic override. For both literal checker entrypoints, test one complete accepted invocation and a missing-operand rejection, in normal Python and `PYTHONOPTIMIZE=1`; test the two joined forced-include negatives in the same modes. No real D2 configure/build/run is implied by these synthetic tests.
+
+5. Bounded run-record and finalizer contract: `tests/spec039/q0_q1_d2.manifest.json` defines strict Draft 2020-12 schemas for the pending/final run record, IPC inventories, observer events and `reservation-journal.jsonl` events. JSON Schema enforces shape and local implications; the same allowlisted `--finalize` binary is the only semantic authority for cross-artifact consistency. It must strictly parse JSON/JSONL (reject duplicate keys, non-finite values, non-canonical base64, partial journal lines and sequence gaps), verify the dedicated-UID lease evidence and journal transitions, recompute raw `/proc/sysvipc` SHA-256 values from decoded bytes, parse those exact bytes into normalized rows/IDs, verify the returned `sem_t*` mapping evidence against the exact libc and `/dev/shm` device/inode, correlate observer records, and derive PASS/FAIL/INCONCLUSIVE rather than trust labels. PASS requires all Q0/Q1 predicates, complete exact-create receipts, verified lease continuity, all journal events and fsyncs, safe stop/join, exact cleanup receipts and final raw/parsed inventories equal to pre. FAIL is permitted only for a directly observed correctness assertion failure with complete evidence and safe cleanup. Any absent or ambiguous precondition/evidence—including launcher/lease, journal, raw inventory, mapping, or cleanup linkage—forces INCONCLUSIVE/BLOCKED and forbids speculative deletion. No semantic finalizer exists or was executed; this is a future contract, not validation evidence.
+
+The bounded semantic regression set must reject claimed PASS/FAIL and produce `INCONCLUSIVE` for: missing/unverified dedicated-UID launcher or lease; a second/foreign process entering the run identity; any diagnostic `sem_open` failure path that calls `sem_unlink`; pre-existing candidate key/name; unreadable, over-cap or raw/parsed-mismatched `/proc/sysvipc` inventory; non-canonical base64; missing, partial, reordered, duplicated or unfsynced journal events; crash after cleanup intent without a durable outcome; failed exclusive reservation; candidate identity/mode mismatch; missing or mismatched returned-`sem_t` mapping; residual candidate; unexpected non-candidate change; or final inventory mismatch. The finalizer must perform no speculative deletion for disputed/unproven resources. PASS and safe FAIL fixtures require a complete, replayable journal and all required evidence. The runtime bundle contains eight required files: `run-record.json`, `stdout.txt`, `stderr.txt`, `ipc-pre.json`, `ipc-post.json`, `ipc-final.json`, `observer-events.json`, and `reservation-journal.jsonl`; only `harness-diagnostics.txt` is optional, so total file cap is nine. Each artifact remains ≤4 MiB; the journal is additionally capped at 256 KiB/128 events, the final run record at 256 KiB, total bundle at 32 MiB. Raw table bytes are retained within each IPC inventory JSON as canonical base64 and count toward that artifact's 4 MiB cap. Any overflow is incomplete evidence and `INCONCLUSIVE`.
+
+The host-controlled runtime shape remains one controlled D2 process tree under the dedicated UID, one Q0/Q1 correctness run, no network input and no performance timing. The launcher serializes the run and finalizer under the verified exclusive lease; the harness itself spawns no child process. The host IPC namespace may contain unrelated objects, but all candidate resources must be absent before reservation and all exact cleanup remains bound to the durable journal. No broad host cleanup is permitted. If the launcher/lease is absent or lost, a second process enters the identity domain, the journal is incomplete, or ownership is ambiguous, do not perform name-based unlink/RMID on disputed objects; classify `INCONCLUSIVE`/`BLOCKED` and preserve residue for owner-directed recovery.
+
+**Next gate:** validate the v1.13 SPEC/r10 manifest and packet against the r09 B1 finding: one consistent finalizer owner/sequence; only bounded inventory/current-identity reads plus exact journal-authorized `IPC_RMID`/`sem_unlink` under the continuously verified lease; no Process/GW construction, candidate creation/opening, production message traffic, retry of ambiguous removal, or broad cleanup. The r09 one-call consent is consumed; obtain fresh owner consent bound to the exact final r10 packet SHA before Astra. D2 implementation/configure/build/run remains blocked until positive review, provisioned launcher/preconditions and separate owner execution gate. D3 and Q2–Q4 remain deferred. This documentary work is not correctness or performance evidence.
+```
+
+## Machine-readable r10 manifest projection
+The full manifest is pinned above. This projection includes the complete finalizer IPC boundary, current sandbox status, collection responsibility, semantic-finalizer responsibilities, SPEC binding and local validation claims. JSON Schema checks are structural only; no semantic finalizer or runtime was executed.
+```json
+{
+  "cleanup_authority": "Only exact candidate resources with complete durable journal CREATE receipts, matching current identities and a continuously valid dedicated-UID lease. Finalizer IPC operations are limited to semantic_finalizer_contract.finalizer_ipc_boundary; on any uncertainty, make no destructive call for the disputed resource and perform no broad cleanup.",
+  "collection_responsibility": {
+    "artifact_name_uniqueness": "Exactly one each of stdout.txt, stderr.txt, ipc-pre.json, ipc-post.json, ipc-final.json, observer-events.json and reservation-journal.jsonl; optional harness-diagnostics.txt at most once; run-record.json is separate.",
+    "failure_summary_binding": "The finalizer recomputes code, phase, last_event_sequence, inventory_availability, cleanup_outcome and missing_artifacts. ASSERTION_FAILED is valid only for an observed correctness-predicate failure with complete safe evidence; contradictory summary fields finalize INCONCLUSIVE/EVIDENCE_INVALID.",
+    "finalizer_bounds": "10 s timeout + 5 s kill grace; RLIMIT_AS 128 MiB, CPU 10 s, FSIZE 4 MiB, NOFILE 32, CORE 0.",
+    "finalizer_failure": "No valid finalized record means INCONCLUSIVE and cannot PASS.",
+    "finalizer_semantic_authority": "The same allowlisted --finalize binary is the sole cross-artifact semantic authority. It validates hashes, journal transitions, raw inventory bytes/digests/parsed summaries, libc mapping evidence and exact cleanup identities, and may perform only the bounded reads and journal-authorized removals defined by semantic_finalizer_contract.finalizer_ipc_boundary. Missing/contradictory evidence is INCONCLUSIVE; no broad cleanup.",
+    "harness_run": "Only after dedicated UID launcher/lease is verified: write bounded pending run record, create exclusive append-only reservation-journal.jsonl, fsync every pre/post-create and cleanup event, and retain exact raw /proc/sysvipc bytes per phase. No final status or closed-artifact hash before finalization.",
+    "missing_or_invalid_staging": "Metadata-only INCONCLUSIVE; assertions NOT_RUN, measurements null, inventories unavailable, exact cleanup status unknown, missing artifact names; no invented values.",
+    "outer_finalizer": "The same allowlisted --finalize binary starts only after harness exit/log closure, Gateway/output workers stop/join and Process/GW destruction, under the still-valid serialized UID lease. It replays the durable journal, reads required inventories, checks exact current identities, logs/fsyncs cleanup intent/outcome, and performs only the exact IPC_STAT/IPC_RMID/sem_unlink operations allowed by semantic_finalizer_contract.finalizer_ipc_boundary. Incomplete/ambiguous journal or identity permits no destructive call for that object.",
+    "reservation_journal_artifact": "reservation-journal.jsonl is required, final, max 256 KiB/128 events, append-only strict JSONL; each record is fsynced and its artifact hash is bound in run-record.",
+    "runtime_manifest_file": "none; q0_q1_d2.manifest.json is plan/schema input, not part of runtime bundle.",
+    "shell_redirection": "The outer supervisor captures stdout/stderr under D2_RESULTS and closes descriptors before finalization."
+  },
+  "finalizer_ipc_boundary": {
+    "allowed_operations": [
+      "read complete /proc/sysvipc/{shm,sem,msg} table bytes and /dev/shm inventory for the required pre/post/final phases",
+      "shmctl(exact_recorded_shmid, IPC_STAT, ...) to inspect the exact SysV shared-memory object identity",
+      "stat/equivalent metadata inspection of the exact journal-recorded /dev/shm semaphore object, including device/inode/UID/GID/mode/link count",
+      "shmctl(exact_recorded_shmid, IPC_RMID, ...) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass",
+      "sem_unlink(exact_recorded_name) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass"
+    ],
+    "failure_rule": "If lease, journal, current identity or operation outcome is missing, conflicting, stale or ambiguous, make no destructive call for that disputed object, preserve residue and classify INCONCLUSIVE/BLOCKED; no automatic retry.",
+    "forbidden_operations": [
+      "construct Process/GW",
+      "create/open candidate IPC resources or attach/use them for message traffic",
+      "invoke Gateway production IPC/send/receive paths",
+      "delete an object not exactly bound to its successful journal CREATE receipt",
+      "retry a removal whose durable outcome is ambiguous",
+      "broad/speculative host cleanup"
+    ],
+    "owner_and_sequence": "The same allowlisted binary --finalize is the sole semantic finalizer. It starts only after Gateway/output workers stop and join and Process/GW are destroyed; it replays/validates the journal, captures the post/final inventories, performs bounded identity checks and exact journal-authorized cleanup, then closes/binds the final evidence.",
+    "preconditions": [
+      "Gateway/output workers stopped and joined; Process/GW destroyed",
+      "complete replayable journal with durable CREATE receipt and CLEANUP_INTENT",
+      "dedicated non-login UID launcher and exclusive lease verified continuously from before pre-inventory through finalizer completion",
+      "immediate lease and exact current identity recheck before each destructive call"
+    ]
+  },
+  "launcher_status": "NOT_PROVISIONED; no D2 configure/build/harness/finalizer or IPC action until separate owner authorization",
+  "local_validation_this_freeze": {
+    "astra_submitted": false,
+    "d2_d3_measurement": false,
+    "finalizer_boundary_consistency": "PASS: allowed operations, prohibited actions, owner/sequence and fail-closed rule present in manifest; textual SPEC contradiction absent",
+    "harness_execution": false,
+    "interpretation": "Documentary contract only; launcher/lease remains NOT_PROVISIONED, D2 blocked, and exact-SHA consent for r10 not yet requested/granted.",
+    "ipc_or_vm_activity": false,
+    "json_duplicate_key_check": "PASS: strict source parse",
+    "json_schema_meta_validation": "PASS: all five Draft 2020-12 schemas meta-validated with jsonschema",
+    "manifest_generation": "PASS: new r10 copied from immutable submitted r09 manifest; r09 packet/manifest/review evidence preserved",
+    "owner_exact_sha_consent_for_r10": false,
+    "runtime_finalizer_execution": false,
+    "spec_sha256": "b4e1c0c2db88a0d1a8f02ab98c934b7b33ec23fd2162c8e1b2921b72afbaf88d",
+    "synthetic_schema_instances": "PASS: empty inventory and JOURNAL_OPENED shape fixtures accepted; no finalizer/runtime fixture executed"
+  },
+  "manifest_sha256": "5707467a0c4e41d254dfe64c30b5d34b74da165bb755f9d8d792f209fda28a13",
+  "r09_review": {
+    "manifest_sha256": "613c5843f503ff75f704aef6fd9c7b68fb994029d5f822691223212bfbf7bc9a",
+    "one_call_consent_consumed": true,
+    "optional_advisories_not_adopted_as_blockers": [
+      "require mapping_line rather than an evidence-equivalent structured mapping projection",
+      "separate historical fixture counts from newly required negative classes",
+      "clarify retained journal bytes do not independently prove historic fsync calls"
+    ],
+    "packet_sha256": "560ee5654d9a8859e3e21aa916a1dca9f0e564fe1f8eac41fb4ee8f4bd3397a6",
+    "raw_sse_path": "Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012.raw.sse",
+    "raw_sse_sha256": "93f78263662d085a45fde57ea4377c8420b381c958f556a0a80f6a70a089f80e",
+    "response_path": "Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012.md",
+    "response_sha256": "4b52a1759768714492d4c2bc5099fc9a3626a334e1a33c65e627f1725494fd01",
+    "spec_sha256": "a2feea01cb80b60256da3a7abd5e8c2196954d6e008d6f488cd4fb37f2058af1",
+    "submission_receipt_path": "Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012-submission.json",
+    "submission_receipt_sha256": "20e62f856c5909c0f3c9bc99d065316b4047ebf8e295bdcb680a840b6139ab6b",
+    "verdict": "AMEND — documentary contract only; B1 finalizer IPC boundary is the only blocker; B2/B3 substantially addressed"
+  },
+  "review_scope": "Same-SPEC v1.13 documentary response to the sole r09 B1 finalizer-boundary contradiction. No code, configure/build, harness/finalizer execution, IPC, D3, commit or push. Fresh exact-SHA owner consent is required for one r10 Astra review. D2 remains blocked until the dedicated launcher/lease is provisioned and separately authorized. The sole reviewed change is the finalizer IPC responsibility boundary; r09 optional advisories remain non-blocking and are not silently promoted.",
+  "run_record_spec_sha256_binding": {
+    "const": "b4e1c0c2db88a0d1a8f02ab98c934b7b33ec23fd2162c8e1b2921b72afbaf88d"
+  },
+  "runtime_finalizer_cleanup": "After Gateway/output threads stop/join and Process/GW destruction, --finalize may only read required inventories, inspect exact identities, and issue journal-authorized IPC_RMID or sem_unlink under the continuously verified dedicated-UID lease; see semantic_finalizer_contract.finalizer_ipc_boundary. No construction, creation/opening, production message traffic, ambiguous retry or broad cleanup.",
+  "semantic_finalizer_checks": {
+    "artifact_checks": [
+      "exact allowlisted file set",
+      "optional harness-diagnostics.txt at most once",
+      "reject symlink/non-regular files",
+      "check byte caps and SHA-256 against actual closed files",
+      "check total bundle cap",
+      "seven required artifact names exactly once, including reservation-journal.jsonl",
+      "strict journal JSONL event schema/order/run-ID validation and file hash verification",
+      "verify dedicated UID launcher/lease identity and continuous lease evidence before cleanup",
+      "seven required runtime artifact names exactly once, including reservation-journal.jsonl",
+      "strict reservation-journal schema/order/run-ID/replay validation and closed-file hashing",
+      "dedicated UID launcher/lease identity and continuity verified before cleanup"
+    ],
+    "execution_identity": {
+      "failure": "missing/unverified launcher blocks before IPC; lease loss or competing process yields INCONCLUSIVE and no name-based cleanup of disputed resources",
+      "lease": "held continuously from before pre-inventory through finalizer completion",
+      "required": "dedicated non-login UID and trusted serialized launcher/lease; process census alone insufficient"
+    },
+    "inventory_checks": [
+      "schema, run_id and phase agree with record role",
+      "is_empty is recomputed but need not be true for host-wide pre/post/final inventories",
+      "candidate keys and semaphore names are absent from pre-inventory",
+      "post inventory contains no unexplained changes; exact run-created candidates may be present before cleanup",
+      "only exact run-created SHM IDs and semaphore names are removed; final inventory equals pre",
+      "each raw /proc/sysvipc table is present as canonical base64; finalizer recomputes SHA-256 from decoded bytes and reparses to independently derive normalized summaries",
+      "all candidate resources have successful exclusive-reservation journal events, effective mode 0600 and exact kernel/file identity",
+      "dedicated non-login UID and exclusive launcher lease verified continuously through finalizer; ordinary host UID is invalid",
+      "diagnostic sem_open failure paths cannot issue sem_unlink; all three pinned sites are guarded in the diagnostic build",
+      "returned sem_t* address lies in a shared mapping whose device/inode equals exact semaphore path identity under the recorded libc",
+      "only exact run-created SHM IDs/semaphore names are removed while lease remains valid; final raw/parsed inventories equal pre",
+      "each /proc/sysvipc table is retained as canonical base64; finalizer recomputes SHA-256 and reparses normalized rows/IDs",
+      "all candidates have successful journal events, effective mode 0600 and exact identity",
+      "dedicated UID and exclusive launcher lease verified continuously; ordinary host UID invalid",
+      "diagnostic sem_open failure paths cannot issue sem_unlink",
+      "returned sem_t* address lies in shared mapping whose device/inode equals exact semaphore file under recorded libc",
+      "only exact run-created SHM IDs/semaphore names removed while lease valid; final raw/parsed inventories equal pre",
+      "Finalizer IPC calls are limited exactly to finalizer_ipc_boundary.allowed_operations; every destructive call is preceded by the required continuous-lease and identity recheck."
+    ],
+    "single_authority": "same allowlisted ng039_gw_q0_q1_d2 binary --finalize mode; no extra runner/helper file"
+  }
+}
+```
+
+## Exact-source excerpts from immutable functional baseline
+These three branches call `sem_unlink` after `sem_open` failure. The r09 diagnostic suppression remains a proposed, unimplemented compile-time behavior; r10 changes documentation only.
+
+### GW.cpp:963-971
+```cpp
+963:       // Semaphore kept open in CachedSemaphores (Phase 2: no sem_close per iteration)
+964: 
+965:     } // (mutex == SEM_FAILED) means it was unable to create/open the semaphore
+966:     else
+967:     {
+968:       perror("reading SHM : unable to create/open semaphore");
+969: 
+970:       sem_unlink(SemaphoreName.c_str());
+971:     }
+```
+
+### GW.cpp:1256-1264
+```cpp
+1256:         // Semaphore kept open in CachedSemaphores (Phase 2: no sem_close per iteration)
+1257: 
+1258:       } //(mutex != SEM_FAILED)
+1259:       else
+1260:       {
+1261:         perror("writing SHM : unable to open/create the semaphore");
+1262: 
+1263:         sem_unlink(_oqs.c_str());
+1264:       }
+```
+
+### GW.cpp:1318-1324
+```cpp
+1318:   else
+1319:   {
+1320:     perror("While initiating the SHM: unable to create semaphore");
+1321: 
+1322:     sem_unlink(SemaphoreName.c_str());
+1323: 
+1324:     S << Offset << "(ERROR: Unable to create the semaphore while discovering the peer shmid)" << endl;
+```
+
+## Prior r08 corrected review context
+The corrected r08 follow-up retained B2/B3 blockers. Three independent read-only reviews supported those findings: 0600/exclusive create does not provide continuous same-UID exclusion; the three pinned GW failure branches unlink by name; the earlier evidence contract did not retain/replay raw journal/inventory bytes or prove the returned sem_t mapping. r09 materially addressed those findings; they are not the blocker under review in this round.
+
+The packet SHA-256 is computed out-of-band after these exact bytes are frozen; it is intentionally not embedded in itself. Assess only the supplied packet.

@@ -1,0 +1,31 @@
+{
+  "acceptance_blockers": [
+    "required evidence area is not covered: artifacts/repository/",
+    "required-artifact or hash validation reported a blocker"
+  ],
+  "debug_profile": "obs-normal",
+  "effective_uid": 0,
+  "evidence_result": "INCOMPLETE",
+  "exit_code": 20,
+  "local_acceptance_eligible": false,
+  "local_profile": "native-privileged",
+  "local_profile_selection": {
+    "cli_explicit": true,
+    "cli_profile": "native-privileged",
+    "euid": 0,
+    "explicit": true,
+    "name": "native-privileged",
+    "plan_explicit": true,
+    "plan_profile": "native-privileged"
+  },
+  "mode": "local",
+  "protected_input_blockers": [
+    "required evidence area is not covered: artifacts/repository/",
+    "required-artifact or hash validation reported a blocker"
+  ],
+  "runtime_result": "INCONCLUSIVE",
+  "scenario": "local-intra-os",
+  "schema_version": 2,
+  "teardown_result": "UNKNOWN",
+  "trial_id": "qga-r9-20260917"
+}

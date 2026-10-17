@@ -1,0 +1,25 @@
+{
+  "archive_type": "immutable-r13-tool-snapshot/v1",
+  "r13_packet_sha256": "0ce8ded82a76281c729ae0bf111d4cb49c7e763490ef8ea221b1c0e4f3686727",
+  "r13_receipt_sha256": "f5c3fa5aef02e1c5343079eec706ef9df094630668a74ff05b4433bb6bc224b1",
+  "files": {
+    "spec039_methodology_v1.py": {
+      "source": "/home/gandalf/CodeRepository/infra-novagenesis-tools/spec039_methodology_v1.py",
+      "snapshot": "Specs/RESULTS-SPEC-039/r13-tool-snapshot/spec039_methodology_v1.py",
+      "sha256": "1066196faf1484d646feaaa2b00fe2a1267d731fe42d93a03fb45488f75fd581",
+      "mode": "0o600"
+    },
+    "test_spec039_journal_transitions.py": {
+      "source": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_journal_transitions.py",
+      "snapshot": "Specs/RESULTS-SPEC-039/r13-tool-snapshot/test_spec039_journal_transitions.py",
+      "sha256": "41397e374e3a3e98f159334e606ad2c77b8136e0728dc314cd989079ebd36668",
+      "mode": "0o600"
+    },
+    "test_spec039_projection_checker.py": {
+      "source": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_projection_checker.py",
+      "snapshot": "Specs/RESULTS-SPEC-039/r13-tool-snapshot/test_spec039_projection_checker.py",
+      "sha256": "6a5af4a2927ce7bea5c8c7d7963a2e666721803473e8066cfc822206618304d5",
+      "mode": "0o600"
+    }
+  }
+}

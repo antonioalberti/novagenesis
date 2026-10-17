@@ -1,0 +1,272 @@
+{
+  "$id": "urn:ng039:observer-events:v2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SPEC-039 D2 observer events",
+  "type": "array",
+  "maxItems": 4096,
+  "items": {
+    "type": "object",
+    "required": [
+      "schema_version",
+      "run_id",
+      "sequence",
+      "event",
+      "monotonic_ns",
+      "pid",
+      "uid",
+      "resource_type",
+      "candidate_key",
+      "source_name",
+      "error_number",
+      "identity"
+    ],
+    "properties": {
+      "schema_version": {
+        "const": "ng039-observer-events/v2"
+      },
+      "run_id": {
+        "type": "string",
+        "minLength": 16,
+        "maxLength": 64
+      },
+      "sequence": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "event": {
+        "type": "string",
+        "enum": [
+          "GATEWAY_STARTED",
+          "GATEWAY_STOPPED",
+          "TARGET_ADMITTED",
+          "TARGET_POP",
+          "TARGET_RUN_ENTRY",
+          "TARGET_RUN_RETURN",
+          "STICKY_FIRST_TARGET_WAIT",
+          "DUE_BRANCH_TAKEN",
+          "POP_BRANCH_TAKEN"
+        ]
+      },
+      "monotonic_ns": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "pid": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uid": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "resource_type": {
+        "type": "string",
+        "enum": [
+          "process",
+          "thread",
+          "ipc",
+          "timer",
+          "signal",
+          "journal"
+        ]
+      },
+      "candidate_key": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1
+      },
+      "source_name": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 255
+      },
+      "error_number": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "identity": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "candidate_key": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "shmid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "creator_pid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2
+          },
+          "creator_uid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "owner_uid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "mode": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "source_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 255
+          },
+          "path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 512
+          },
+          "device": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "inode": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "uid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "gid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "nlink": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "sem_t_address": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "map_start": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "map_end": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "map_device_major": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "map_device_minor": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "map_inode": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "mapping_line": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "libc_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          },
+          "libc_version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "libc_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "description": "Event shape only; not a complete correlated GW oracle or reservation journal."
+}

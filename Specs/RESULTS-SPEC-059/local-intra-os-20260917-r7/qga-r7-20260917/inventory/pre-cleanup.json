@@ -1,0 +1,12 @@
+{
+  "ipc": {
+    "baseline": {
+      "posix_semaphores": [],
+      "queues": [],
+      "semaphores": [],
+      "shm": []
+    }
+  },
+  "processes": [],
+  "schema_version": 2
+}

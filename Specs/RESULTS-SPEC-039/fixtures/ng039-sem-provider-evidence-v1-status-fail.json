@@ -1,0 +1,11 @@
+{
+  "schema_version": "ng039-sem-provider-evidence/v1",
+  "provider_path": null,
+  "device": null,
+  "inode": null,
+  "build_id": null,
+  "sha256": null,
+  "version": null,
+  "available": false,
+  "reason": "Synthetic provider identity unavailable"
+}

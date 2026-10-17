@@ -96,8 +96,8 @@
     "candidate_unit": "/etc/systemd/system/ng039-d2.service",
     "candidate_workspace_root": "/var/lib/ng039-d2/workspace",
     "path": "Specs/RESULTS-SPEC-039/d2-launcher-lease-proposal-v1.18-20261014.md",
-    "sha256": "0187c55de8c46d44e729001b4e7db794dfc1308a3e9ef42f3f358b048b56368d",
-    "status": "draft v1.18 aligned, not installed or tested"
+    "sha256": "c40bd33c280e34571daa4f69a14999ee071219236eb74909b585616de3226553",
+    "status": "corrected documentary candidate; HOLD, not installed or tested"
   },
   "link_model": {
     "diagnostic_target": "hybrid_-Wl,-Bdynamic_-lc",
@@ -106,7 +106,7 @@
   },
   "normative_contract": {
     "path": "Specs/SPEC-039-common-performance-measurement.md",
-    "sha256": "2054b669da7856aded2ba459f2dfccd9a310bcb8ec3fb4268e3a7c248f9a1507",
+    "sha256": "80713abc89f0b945f0c752f56f58cbfaa2c847c71b79fbb453fa219450c701c1",
     "status": "In Progress",
     "version": "v1.18"
   },
@@ -132,7 +132,7 @@
     "tests/spec039/q0_q1_d2.manifest.json"
   ],
   "proposed_oracle_resolution": {
-    "bootstrap_drain": "Sandbox before any constructor-time IPC: unshare namespaces, mount private tmpfs /dev/shm, capture empty SysV IPC + /dev/shm pre-inventory. Then construct Process -> HT -> GW; verify exactly two blocks, one lookup each. Register D2 target before Gateway start (lock InputQueueMutex, reject ID 0/started Gateway, bind observation, set gateway_started=true under mutex never reset). Drain: after Gateway/output threads start, wait for bootstrap/periodic queue to quiesce (no controlled offer). Capture Q0 baseline: sequence/counter snapshot.",
+    "bootstrap_drain": "Host-controlled reservation/identity checks before construction; no unshare/private tmpfs. One Q0->Q1 harness process. Exact bootstrap/drain equations and name/key/hello tuple remain OPEN under SPEC 9.1; no current pre-code PASS.",
     "empty_sample_point": "At actual condition_variable::wait_for return after InputQueueMutex reacquired, if StopGateway is false and InputQueue is empty; increment one saturating observation and event sequence there.",
     "q1_correlation": "WaitCapture and DecisionCapture are sticky; capture returned wait predicate value and the existing strict due/pop branch only; same iteration ID, increasing sequence and identical target/head/candidate scalar ID are required; overflow/mismatch is INCONCLUSIVE.",
     "run_cardinality": "Single process with Q0->Q1 phases under ordered gate. All cardinality invariants = 1: process_start_count, run_id_count, journal_count, final_record_count.",
@@ -229,7 +229,7 @@
             "Specs/RESULTS-SPEC-039/",
             "Specs/RESULTS-SPEC-059/"
           ],
-          "spec_sha256": "2054b669da7856aded2ba459f2dfccd9a310bcb8ec3fb4268e3a7c248f9a1507"
+          "spec_sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025"
         },
         "review_scope": {
           "limitation": "Astra approved only the bounded documentary closure of the r13 journal-policy contradiction; it did not approve the full D2 profile, implementation, or runtime.",
@@ -264,7 +264,7 @@
       },
       "receipt_sha256": "38d9d232b27476e89190b82ddc6538d1534362b647d14d904921ae6499ca51b6",
       "runtime_build_ipc": "not run by this preflight",
-      "scope": "bounded read-only checks only; not an exhaustive host audit",
+      "scope": "Historical 2026-10-13 preflight only; not re-executed or applicable as current acceptance",
       "status": "BLOCKED_PREPARATION_ONLY",
       "uid_launcher_service": "not provisioned or verified"
     },
@@ -274,9 +274,9 @@
   "receipt_type": "ng039-spec039-d2a-precode-manifest/v1",
   "repository_identity": {
     "branch": "AIOPT5",
-    "commit_or_push": "not performed",
-    "head": "756f493b7049434ab67cf2382486a48f606a470c",
-    "working_tree_status": "M Specs/SPEC-039-common-performance-measurement.md\n M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md\n?? Specs/RESULTS-SPEC-039/\n?? Specs/RESULTS-SPEC-059/"
+    "head": "a9d6a8c28f5ef3b32e0c01d652b61526cdf76343",
+    "working_tree_status": "Uncommitted corrections to SPEC-039 and its v1.18 manifest/proposal; unrelated SPEC-062 changes and historical untracked evidence preserved.",
+    "commit_or_push": "not performed during this correction"
   },
   "review_questions": [
     "Does the single-process two-phase Q0->Q1 model with cardinality 1 resolve B1/B2?",
@@ -284,7 +284,7 @@
     "Does the hybrid link model (-Wl,-Bdynamic -lc on diagnostic target only) with SemProviderEvidence schema resolve B4?",
     "Does the supervisor-owned lease FD + finalizer FD-free + 3 wait sets + bounded state machine resolve B5?",
     "Does the partial reservation -> INCONCLUSIVE retention without cleanup resolve B6?",
-    "Do the manifest fields in this document exactly match SPEC \u00a79.6 table and launcher proposal?"
+    "Do the manifest fields in this document exactly match SPEC §9.2 table and launcher proposal?"
   ],
   "review_scope": "D2a pre-code design readiness only; no implementation, build, runtime, IPC, host provisioning, D2/D3 acceptance, or operational authority",
   "sem_failure": {
@@ -295,7 +295,29 @@
       "EMFILE"
     ]
   },
-  "status": "LOCAL_DRAFT_UNSUBMITTED",
+  "evidence_schemas": {
+    "run_record": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:ng039:run-record:v2",
+      "title": "SPEC-039 D2 v2 staged/final runtime result record"
+    },
+    "ipc_inventory": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:ng039:ipc-inventory:v2",
+      "title": "SPEC-039 D2 IPC inventory"
+    },
+    "observer_events": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:ng039:observer-events:v2",
+      "title": "SPEC-039 D2 observer events"
+    },
+    "sem_provider_evidence": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "urn:ng039:sem-provider-evidence:v1",
+      "title": "SPEC-039 D2 semaphore provider evidence"
+    }
+  },
+  "status": "HOLD_DOCUMENTARY_CORRECTION_PENDING_EXECUTABLE_VALIDATION",
   "validation_boundary": {
     "Astra": false,
     "IPC": false,
@@ -322,5 +344,24 @@
       "finalize": 10,
       "total": 60
     }
+  },
+  "current_gate": {
+    "verdict": "HOLD",
+    "review": "Astra in-session AMEND of original a9d6a8c snapshot; correction not approved by that review",
+    "not_executed": [
+      "current schema and status fixtures",
+      "current compile/link checker matrix",
+      "current target graph validation",
+      "D2 build/runtime",
+      "provisioning",
+      "IPC",
+      "D3"
+    ],
+    "open_contracts": [
+      "bootstrap/oracle and concrete delta",
+      "reservation identity and cleanup replay",
+      "provider schema and ordered link proof",
+      "lease receipt/liveness and bounded containment"
+    ]
   }
 }

@@ -1,0 +1,106 @@
+{
+  "diagnostic_only": false,
+  "local_profile": "native-privileged",
+  "require_fresh_boot": false,
+  "roles": [
+    {
+      "command": [
+        "/home/gandalf/workspace/ng-build-qga-r5-20260917/PGCS",
+        "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/PGCS/",
+        "0",
+        "Intra_Domain",
+        "-lc"
+      ],
+      "cwd": "/home/gandalf/workspace/ng-build-qga-r5-20260917",
+      "name": "PGCS",
+      "readiness": [
+        {
+          "id": "gw-operational",
+          "pattern": "State: Operational"
+        }
+      ],
+      "vm": "local"
+    },
+    {
+      "command": [
+        "/home/gandalf/workspace/ng-build-qga-r5-20260917/NRNCS",
+        "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/NRNCS/"
+      ],
+      "cwd": "/home/gandalf/workspace/ng-build-qga-r5-20260917",
+      "name": "NRNCS",
+      "readiness": [
+        {
+          "id": "nrncs-operational",
+          "pattern": "OPERATIONAL: Everything ok!"
+        }
+      ],
+      "vm": "local"
+    },
+    {
+      "command": [
+        "/home/gandalf/workspace/ng-build-qga-r5-20260917/ContentApp",
+        "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/Repository1/",
+        "Repository"
+      ],
+      "cwd": "/home/gandalf/workspace/ng-build-qga-r5-20260917",
+      "name": "Repository",
+      "readiness": [
+        {
+          "id": "repository-operational",
+          "pattern": "State: Operational"
+        }
+      ],
+      "vm": "local"
+    },
+    {
+      "command": [
+        "/home/gandalf/workspace/ng-build-qga-r5-20260917/ContentApp",
+        "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/Source1/",
+        "Source"
+      ],
+      "cwd": "/home/gandalf/workspace/ng-build-qga-r5-20260917",
+      "name": "Source",
+      "readiness": [
+        {
+          "id": "source-operational",
+          "pattern": "State: Operational"
+        }
+      ],
+      "vm": "local"
+    }
+  ],
+  "runtime_oracle": {
+    "expected_count": 5,
+    "hash": "sha256",
+    "pattern": "*.jpg",
+    "repository": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/Repository1",
+    "source": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/staging/io/Source1",
+    "type": "files"
+  },
+  "schema_version": 1,
+  "timeouts": {
+    "observation": 120,
+    "readiness": 240,
+    "total": 600
+  },
+  "workload": {
+    "generator": {
+      "id": "synthetic-jpeg",
+      "parameters": {
+        "count": 5,
+        "prefix": "spec056-photo",
+        "size_bytes": 4096
+      },
+      "seed": 56002,
+      "version": "1.0"
+    },
+    "names": [
+      "spec056-photo-01.jpg",
+      "spec056-photo-02.jpg",
+      "spec056-photo-03.jpg",
+      "spec056-photo-04.jpg",
+      "spec056-photo-05.jpg"
+    ],
+    "schema_version": 1
+  }
+}

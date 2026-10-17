@@ -11,7 +11,9 @@
 **Owner task:** NG-040, under NG-039
 **Related:** `SPEC-032-gw-input-queue-batching.md`, `SPEC-033-message-commandline-refactor.md`
 
-> v1.8 retains the v1.1 Q0/Q1 conditions and the owner’s separate D2 scope (compile-time-gated test seam in Common plus one isolated local correctness run; no algorithm change). The v1.5 r03, v1.6 r04 and v1.7 r05 packets returned AMEND. The r04/r05 reviews closed findings 3 and 4b–4d at design level only; finding 4a remains must-fix. The r05 response identified preprocessor-forwarded/function-like macro gaps, `-ansi` as an alternate dialect selector, and Python `assert` checks disabled by `PYTHONOPTIMIZE=1`; it also recommended binding target identity to actual `-o`, rejecting conflicting dynamic-linker controls, and encoding more PASS/failure consistency in schema `allOf`. This same-SPEC amendment hardens those contracts while keeping the original scope and five-file implementation allowlist. No review approved implementation; D2 code/build/runtime remain blocked pending a fresh exact-SHA review and separate owner authorization. D0 approval alone grants none of these permissions; D3 remains unauthorised.
+> **Current authority:** §9 is the active v1.18 correction for D2 cardinality, host-controlled isolation, diagnostic linking, lease ownership and partial-reservation handling. Conflicting v1.8/v1.9 operational recipes retained in §§4–7 are historical and must not be executed. Their lifecycle/observer safety constraints remain requirements unless explicitly superseded in §9; unresolved details keep the gate HOLD. No contract or runtime PASS is claimed.
+
+> **Historical v1.8 introduction:** v1.8 retains the v1.1 Q0/Q1 conditions and the owner’s separate D2 scope (compile-time-gated test seam in Common plus one isolated local correctness run; no algorithm change). The v1.5 r03, v1.6 r04 and v1.7 r05 packets returned AMEND. The r04/r05 reviews closed findings 3 and 4b–4d at design level only; finding 4a remains must-fix. The r05 response identified preprocessor-forwarded/function-like macro gaps, `-ansi` as an alternate dialect selector, and Python `assert` checks disabled by `PYTHONOPTIMIZE=1`; it also recommended binding target identity to actual `-o`, rejecting conflicting dynamic-linker controls, and encoding more PASS/failure consistency in schema `allOf`. This same-SPEC amendment hardens those contracts while keeping the original scope and five-file implementation allowlist. No review approved implementation; D2 code/build/runtime remain blocked pending a fresh exact-SHA review and separate owner authorization. D0 approval alone grants none of these permissions; D3 remains unauthorised.
 
 > This AIOPT5 Proposal uses the existing SPEC-039 number; it is not a restoration of the archived AIOPT3 Proposal or its approval. The archived copy was deliberately set aside during the NG-050 release freeze; its SHA-256 is `c46dd50a6d58c760eba165a8dfdc3e390df41e8049cf0f95527655350c80da4f`. Keep that copy intact. The v1.1 D0 approval was documentary only. Later, separately scoped owner permissions are recorded in §4; they do not transfer to other gates or authorise a performance claim.
 
@@ -61,7 +63,11 @@ Acceptance of the *Q0/Q1 measurement* gate requires a frozen manifest, repeatabl
 6. **D3 — Characterisation:** Q0/Q1 timing is a separate gate, allowed only after D2 passes and the owner explicitly authorises the frozen measurement plan. Preserve all run outcomes and identities; classify the future-head hypothesis `MEASURED`, `INCONCLUSIVE`, or `BLOCKED`.
 7. **D4 — Follow-up decision:** decide whether to stop, approve another measurement slice, or propose a performance implementation SPEC. Any future change requires a predeclared baseline/metric, actual-source review, correctness controls and its own owner-approved implementation allowlist. Astra or subagent opinions never grant implementation or runtime authority.
 
-### 4.5 GPT-6 Astra consultation checkpoints (advisory; no execution authority)
+### 4.5 Current pre-code review gate and historical Astra checkpoints
+
+The owner replaced mandatory external paid pre-code review with independent, reproducible local verification on 2026-10-14. The later request for Astra review directly in the Hermes MoA conversation authorises that documentary review, not a new external API call or execution. The in-session review of commit `a9d6a8c28f5ef3b32e0c01d652b61526cdf76343` returned AMEND; it did not approve D2. The corrected working text requires a fresh final-byte check under §9.3. Separate owner authorisations remain necessary for C++ implementation, provisioning, build/runtime and D3.
+
+The table and consent receipts below are historical review records, not the current pre-code procedure. References to mandatory new paid Astra submission in the retained v1.8/v1.9 material do not override this gate.
 
 | Checkpoint | Packet and question | Gate informed |
 |---|---|---|
@@ -90,7 +96,7 @@ If the approved D0 design is later abandoned, mark this Proposal as abandoned/su
 
 Before D2 code: freeze the compile-time-gated observer, exact five-file allowlist, in-memory future-message admission through `PushToInputQueue`, command, IPC/mount namespace and ownership cleanup oracle in the pre-code packet; obtain the authorised GPT-6 Astra review before applying the diff. Q0 distinguishes zero application offers from bootstrap queue state; Q1 uses a future `Message::Time` created locally because wire serialization does not carry that scheduling field. Cleanup must reconcile the Process-owned pending test message only after Gateway/output workers stop. The owner’s D2 scope is one correctness-only local run and does not include NGAL ingress coverage, D3 or algorithm changes. Q2–Q4 remain deferred; do not import approval or measurements from archived AIOPT3 SPECs.
 
-## 7. D2a closure amendment — v1.8 (documentary; not implementation authorization)
+## 7. Historical D2a closure amendment — v1.8 (not an executable current plan)
 
 This section records the response to the v1.7 r05 Astra AMEND within the same SPEC number and bounded D2 scope. The r04/r05 reviews closed findings 3 and 4b–4d at design level only; finding 4a remains must-fix in three areas: preprocessor-forwarded/function-like observer macros, `-ansi` dialect selection, and Python `assert` checks removable by `PYTHONOPTIMIZE=1`. This amendment adds a supported compile-argument grammar, derives target identity from actual `-o` output, removes assertion-dependent link checks, rejects dynamic-link controls, and encodes status/cleanup/inventory conditions in schema `allOf`. No D2 code, build, harness execution, namespace/IPC operation, or D3 timing is authorised. The r05 consent is consumed; D2 remains blocked pending a fresh review of a new exact-SHA packet and separate owner execution authorization.
 
@@ -123,30 +129,24 @@ Next gate: local v1.8 fixtures passed: three Draft 2020-12 schemas meta-valid; f
 
 ## 9. D2a closure amendment — v1.18 (B1-B6 alignment)
 
-This section records the alignment of B1-B6 blocker resolutions across the SPEC, manifesto, and proposal documents to enable local independent verification under §4.5. The v1.7 r05 Astra AMEND identified three remaining 4a must-fixes: preprocessor-forwarded/function-like observer macros, `-ansi` dialect override, and Python `assert` checks disabled by `PYTHONOPTIMIZE=1`. This v1.18 amendment resolves the B1-B6 blockers through a coordinated set of mechanisms documented in the manifesto and proposal, while maintaining the original D2 scope and five-file implementation allowlist.
+This section records the alignment of B1-B6 blocker resolutions across the SPEC, manifesto, and proposal documents to enable local independent verification under §4.5. The v1.7 r05 Astra AMEND identified three remaining 4a must-fixes: preprocessor-forwarded/function-like observer macros, `-ansi` dialect override, and Python `assert` checks disabled by `PYTHONOPTIMIZE=1`. This v1.18 working correction reconciles the documented B1–B6 direction; executable closure remains unproven and HOLD. It maintains the original D2 scope and five-file implementation allowlist.
 
-### 9.1 B1-B6 Blocker Resolutions
+### 9.1 Active corrections and unresolved evidence
 
-The six B1-B6 blockers are resolved as follows:
+These clauses supersede the conflicting older recipes identified below. They are documentary corrections, not proof that B1–B6 have passed an executable gate.
 
-**B1/B2 — Execution Model and Cardinality**  
-Resolved by a single-process two-phase Q0→Q1 model with cardinality 1 for all counts (process starts, run IDs, journals, final records). This ensures isolated, sequential execution without concurrency complications.
+- **B1/B2 — one run:** one harness process performs Q0 then Q1 with one run ID, one journal and at most one final record. Cardinality `final_record_count=1` is the required completed-run outcome, not a promise on failure: missing finalisation is INCONCLUSIVE. Q1 begins only after Q0's in-process assertions and boundary checks; no intermediate finalizer, new Process/GW construction or new pre-inventory separates the phases. Q0 uncertainty makes Q1 NOT_RUN. The one external finalizer is post-processing, not a second correctness process. Registration before Gateway start, saturating counters, correlated real wait/due observations and no post-reclamation pointer access remain required. Exact bootstrap/drain equations, name/key/hello tuple and concrete observer delta remain OPEN; one empty sample cannot prove continuously empty Q0.
+- **B3 — sticky abort:** diagnostic-only failures at all three sem_open sites must capture the first errno/site in non-resettable state before `_Exit(127)`, never call sem_unlink on a failed open, and never produce PASS. Constructor and worker paths must be covered. The supervisor interprets the raw child wait result, not a shell code alone; only valid common-authority evidence permits abnormal evidence-only finalisation. ENOENT/EACCES/EMFILE fault fixtures and the exact failure-record interface remain OPEN. Macro-off production behaviour must remain unchanged.
+- **Isolation/cleanup:** the selected candidate is the host-controlled dedicated-UID/supervisor/lease profile, replacing the older unshare/private-tmpfs/empty-host-inventory recipe in §§4–7. No IPC or mount namespace may hide host resources. Inventory must preserve foreign objects; a non-empty host inventory alone is not an error. Before construction, prove exclusive reservations and the exact backing-object identity for every semaphore/SHM resource the run may touch. Never remove an object based solely on name, UID, or its absence from a pre-inventory. Missing attribution, identity or exclusivity blocks construction or cleanup. The exact reservation/identity contract and normal-cleanup schema/replay remain OPEN; this amendment does not waive them or authorise host IPC.
+- **B4 — diagnostic link candidate:** default production flags remain unchanged. For the diagnostic target only, the proposed hybrid selector `-Wl,-Bdynamic -lc` requires removal of standalone `-static` from that target's effective link invocation; retain static libgcc/libstdc++ only if the concrete link proof establishes compatibility. This explicitly supersedes §7's diagnostic mandatory-static/reject-all-Bdynamic rule. Unknown/extra dynamic-linker controls remain rejected. Exact ordered CMake/link delta, actual ELF dependency/provider evidence and a strict `ng039-sem-provider-evidence/v1` schema remain OPEN. The selector is not proof that the linker produced the intended binary.
+- **B5 — supervisor-only lease:** neither harness nor finalizer inherits or opens the lock-capable FD. Only the root supervisor owns it continuously through authorised final-record closure. Keep the live cgroup census (including supervisor), the reaped harness wait set, and finalizer receipt distinct. A validated supervisor receipt is necessary but does not alone prove continuous liveness; the launch/receipt/liveness protocol remains OPEN. Lease/identity/reaping ambiguity forbids finalizer invocation/re-entry and automatic release/retry. The 60-second execution budget includes all phases and kill grace; phase budgets are maxima within the remaining total, never additive extensions. Timeout enters SHUTDOWN_BLOCKED, not successful terminal/release; durable containment/recovery policy remains OPEN. Do not promise an eternal flock after supervisor death.
+- **B6 — partial reservation:** preserve partial evidence/reservations without destructive cleanup or retry; classify INCONCLUSIVE with cleanup_outcome unknown. Do not fabricate RUN_SHUTDOWN_COMPLETE or CLEANUP_INTENT before construction. With invalid/missing common authority, retain pending evidence without finalizer invocation. With valid common authority, an abnormal evidence-only final record may be produced and remains INCONCLUSIVE. Therefore partial reservation does not imply record_finalized=false in every case. The mode-specific schema/semantic fixtures remain OPEN.
 
-**B3 — Semaphore Failure Handling**  
-Resolved by sticky semaphore abort with exit code 127, combined with fault injection cases for ENOENT (no such file or directory), EACCES (permission denied), and EMFILE (too many open files). This provides deterministic failure semantics for semaphore operations.
-
-**B4 — Linking Model and Provider Evidence**  
-Resolved by a hybrid link model using `-Wl,-Bdynamic -lc` on the diagnostic target only, paired with the `ng039-sem-provider-evidence/v1` schema. This satisfies linkage requirements while isolating diagnostic-specific dependencies.
-
-**B5 — Lease Ownership and Wait Sets**  
-Resolved by supervisor-owned lease FD (with `lease.finalizer_has_fd = false`), three distinct wait sets (`cgroup_census`, `harness_wait_set`, `finalizer_wait_receipt`), and a bounded state machine with transitions only on verified events. This ensures proper resource lifecycle management.
-
-**B6 — Partial Reservation Handling**  
-Resolved by classifying reservation failures as `INCONCLUSIVE` (never `PASS`, never `FAIL`), retaining partial artifacts without cleanup, and setting `cleanup_outcome = "unknown"`. This preserves evidence for analysis while avoiding destructive cleanup attempts.
+**Preserved principles:** no change to wire bytes, naming/bindings, inverted pub/sub, scheduling algorithm, ownership or production IPC layout. This correction enforces provenance and scoped contracts; it introduces no deliberate architectural deviation. Existing source baseline and the five-file C++ allowlist remain unchanged; host provisioning is outside that allowlist.
 
 ### 9.2 Manifest Alignment
 
-The v1.18 SPEC mandates exact alignment with the manifest fields specified in §9.6. The resolved values are:
+The following table is the canonical documentary projection. Values describe candidate contracts, not validated implementation; completion cardinality is interpreted under §9.1.
 
 | Manifest Field | Value |
 |----------------|-------|
@@ -170,7 +170,11 @@ The v1.18 SPEC mandates exact alignment with the manifest fields specified in §
 
 ### 9.3 Verification Gate
 
-This alignment enables local independent verification under §4.5. Until a positive review and separate owner execution authorization, do not implement D2, configure/build/run the harness, touch IPC/VMs, or begin D3; Q2–Q4 remain deferred. The v1.18 amendment is documentary only—no D2 code, build, harness execution, namespace/IPC operation, or D3 timing is authorised. D2 implementation/runtime remain blocked pending §4.5 verification PASS and separate owner authorization.
+Gate remains **HOLD**. Check final-byte SPEC/manifest/proposal identities and documentary coherence first, then require: (1) a concrete baseline-anchored observer/CMake/interface delta and exact bootstrap/oracle; (2) strict evidence schemas plus positive/negative status and partial-reservation fixtures; (3) executable compile/link grammar tests in normal and optimised Python modes; (4) an applicable target-graph check; (5) semaphore-failure and supervisor/lease/containment contracts and fixtures. Each check needs command, inputs, expected/actual outcome and exit status in a hash-bound receipt. Historical tests and text-presence checks cannot satisfy these requirements. Missing executable evidence is NOT_EXECUTED/INCONCLUSIVE, never PASS.
+
+An independent reviewer must inspect the final frozen inputs and actual outputs before a positive pre-code verdict. This correction addresses the review's contradictory prose and stale identities only; it does not supply the missing contracts/validators or authorise D2 code, configure/build/run, provisioning or IPC. D3 remains separately gated. Keep the critical path: D2 correctness → D3 pre-change → separately approved Gateway change → D2/D3 post-change, with the owner's 2026-10-31 target unchanged.
+
+The review at `a9d6a8c28f5ef3b32e0c01d652b61526cdf76343` is AMEND for its exact original bytes. This working correction is not automatically approved by that earlier verdict.
 ## 8. Revision history
 
 | Version | Date | Change |

@@ -1,0 +1,40 @@
+{
+  "schema_version": "ng039-ipc-inventory/v2",
+  "run_id": "NG039-D2-000000000002",
+  "phase": "post",
+  "complete": true,
+  "is_empty": false,
+  "sysv_ids": {
+    "shm": [
+      11,
+      12
+    ],
+    "sem": [
+      101,
+      102
+    ],
+    "msg": [
+      201,
+      202
+    ]
+  },
+  "dev_shm_entries": [
+    {
+      "size": 33554432,
+      "owner": 1000,
+      "mode": 438,
+      "ctime": 1787654321
+    }
+  ],
+  "error": "IPC resource mismatch",
+  "proc_sysvipc_sha256": {
+    "shm": "077d15ecfcdf9bd541be33eb890f19f7eb8dbc6db863a453e4e4c196ee3cacc0",
+    "sem": "839ac2570a6ecb419587f25fa1868c8b016dd836eed59ef7e09a8cbc0ae4f9aa",
+    "msg": "e1a7ddee2c9751156074d17c92560e07fe10be00eafe3621b126ed8df6a55593"
+  },
+  "proc_sysvipc_raw_b64": {
+    "shm": "U1lOVEhFVElDIHNobSBpbnZlbnRvcnkgc2hhcGUgZml4dHVyZQo=",
+    "sem": "U1lOVEhFVElDIHNlbSBpbnZlbnRvcnkgc2hhcGUgZml4dHVyZQo=",
+    "msg": "U1lOVEhFVElDIG1zZyBpbnZlbnRvcnkgc2hhcGUgZml4dHVyZQo="
+  }
+}

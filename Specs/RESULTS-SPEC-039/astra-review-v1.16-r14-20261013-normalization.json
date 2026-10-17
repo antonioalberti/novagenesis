@@ -1,0 +1,12 @@
+{
+  "normalization_type": "exact-duplicate-final-answer-removal/v1",
+  "source_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.parsed.md",
+  "source_sha256": "0019baaef7ac48c1a599877900c0913b2beda4151e2568cca555e075f86e3b36",
+  "source_answer_copies": 2,
+  "copies_byte_identical_after_marker": true,
+  "derived_path": "Specs/RESULTS-SPEC-039/astra-review-v1.16-r14-20261013.md",
+  "operation": "Retained the first exact answer block; removed only the second byte-identical parser duplicate.",
+  "raw_sse_and_session_transcript_modified": false,
+  "parser_output_modified": false,
+  "derived_sha256": "2d0183b961cd5d7a7ee48c555f0bf04345ed9bcb07761697d84ec0fdc57d9406"
+}

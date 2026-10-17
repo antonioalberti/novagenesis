@@ -1,0 +1,74 @@
+{
+  "derived_response": {
+    "normalization": "Exact repeated final-answer half deduplicated only in derived Markdown; raw SSE and transcript remain unchanged.",
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.14-r11-20261012.md",
+    "sha256": "9ef48bdfafbfd9818613d9356f9b011972f6efc0af1d2433f7a039c3ba260ed7"
+  },
+  "instructions_sha256": "433ec01b8aeb840382f044f4b90d6666559c19b8b310bf50f67cca84ce970736",
+  "manifest_freeze_note": "Consent occurred after the unsubmitted freeze snapshot; manifest consent/submission booleans are preserved as pre-consent facts.",
+  "owner_consent": {
+    "meaning": "Owner authorized exactly one documentary review after the exact packet SHA and scope had been presented; no operational authority.",
+    "message_id": "1559215860005081219"
+  },
+  "packet_archive": {
+    "byte_identical_to_frozen": true,
+    "path": "Specs/RESULTS-SPEC-039/precode-packet-v1.14-r11-20261012-submitted.md",
+    "sha256": "feb69f164ec879e1b567c44f83e7e56811d2a347fbe904a16337a7a8e3bad829"
+  },
+  "raw_sse": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.14-r11-20261012.raw.sse",
+    "sha256": "5c9ffcebbb2bd90535465bc04a54fa13155531c267bf9ab69b69f8e830174acb"
+  },
+  "request_user_turn_sha256": "feb69f164ec879e1b567c44f83e7e56811d2a347fbe904a16337a7a8e3bad829",
+  "result": {
+    "latency_s": 39.53,
+    "quota": {
+      "active-limit": "premium",
+      "credits-balance": "0",
+      "credits-has-credits": "False",
+      "credits-unlimited": "False",
+      "plan-type": "plus",
+      "primary-over-secondary-limit-percent": "0",
+      "primary-reset-after-seconds": "7805",
+      "primary-reset-at": "1791824446",
+      "primary-used-percent": "52",
+      "primary-window-minutes": "300",
+      "safety-buffering-enabled": "true",
+      "safety-buffering-faster-model": "gpt-6-luna",
+      "secondary-reset-after-seconds": "493764",
+      "secondary-reset-at": "1792310406",
+      "secondary-used-percent": "45",
+      "secondary-window-minutes": "10080"
+    },
+    "session_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-session-v1.14-r11-20261012/ng039-v114-r11-abnormal-finalization-documentary-review.jsonl",
+    "turn": 1,
+    "usage": {
+      "cached_tokens": 0,
+      "input_tokens": 16425,
+      "output_tokens": 1082,
+      "total_tokens": 17507
+    }
+  },
+  "reviewed_identities": {
+    "manifest_sha256": "c7d9598d1827b6ee91ab0e6ad9d15ebeaa04e73ddf181b363eb5f2f04f1e589b",
+    "packet_sha256": "feb69f164ec879e1b567c44f83e7e56811d2a347fbe904a16337a7a8e3bad829",
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "bbb26a1331d832ab2dcbf37f1d243d7b9239e6ff1d1932319ad1141923baa609"
+  },
+  "schema_version": "ng039-astra-documentary-review-submission/v1",
+  "session_transcript": "Specs/RESULTS-SPEC-039/astra-session-v1.14-r11-20261012/ng039-v114-r11-abnormal-finalization-documentary-review.jsonl",
+  "usage_record": {
+    "cached_tokens": 0,
+    "credits": 5.72925,
+    "input_tokens": 16425,
+    "label": "NG-039 SPEC-039 v1.14/r11 abnormal-finalization documentary review",
+    "latency_s": 39.53,
+    "model": "gpt-6-astra",
+    "output_tokens": 1082,
+    "plan": "plus",
+    "primary_used_percent": 52.0,
+    "secondary_used_percent": 45.0,
+    "total_tokens": 17507,
+    "ts": "2026-10-12T14:51:21Z"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version": "ng039-d2-run-record/v2",
+  "task_id": "NG-039",
+  "run_id": "NG039-D2-000000000003",
+  "spec_sha256": "80713abc89f0b945f0c752f56f58cbfaa2c847c71b79fbb453fa219450c701c1",
+  "baseline_commit": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+  "document_head": "a9d6a8c28f5ef3b32e0c01d652b61526cdf76343",
+  "configured_targets": [
+    "Common",
+    "ng039_gw_q0_q1_d2"
+  ],
+  "process_identity": {
+    "name": "NG039TestProcess",
+    "ipc_key": 11
+  },
+  "status": "INCONCLUSIVE",
+  "exit": {
+    "outer_code": 0,
+    "harness_code": null,
+    "signal": null,
+    "timeout_fired": false
+  },
+  "assertions": {
+    "q0_admission": "NOT_RUN",
+    "q0_idle_floor": "NOT_RUN",
+    "q0_no_spurious_wakeup": "NOT_RUN",
+    "q0_strict_due": "NOT_RUN",
+    "q1_admission": "NOT_RUN",
+    "q1_future_head_admitted": "NOT_RUN",
+    "q1_strict_due": "NOT_RUN",
+    "q1_no_spurious_wakeup": "NOT_RUN"
+  },
+  "observations": {
+    "target_message_id": null,
+    "q0": null,
+    "q1": null,
+    "counter_overflow": false
+  },
+  "inventories": {
+    "pre": {
+      "available": false,
+      "complete": false,
+      "is_empty": null,
+      "sha256": null,
+      "reason": "Synthetic unavailable inventory"
+    },
+    "post": {
+      "available": false,
+      "complete": false,
+      "is_empty": null,
+      "sha256": null,
+      "reason": "Synthetic unavailable inventory"
+    },
+    "final": {
+      "available": false,
+      "complete": false,
+      "is_empty": null,
+      "sha256": null,
+      "reason": "Synthetic unavailable inventory"
+    }
+  },
+  "cleanup": {
+    "complete": false,
+    "candidate_resources_removed": false,
+    "finalizer_complete": false,
+    "gateway_joined": false,
+    "output_worker_joined": false,
+    "process_destroyed": false,
+    "final_inventory_complete": false,
+    "final_inventory_matches_pre": false
+  },
+  "failure": null,
+  "artifacts": [],
+  "record_finalized": false,
+  "execution_identity": {
+    "dedicated_uid_verified": false,
+    "uid": 1000,
+    "gid": 1000,
+    "interactive_login_disabled": true,
+    "launcher_verified": false,
+    "launcher_path": null,
+    "launcher_sha256": null,
+    "launcher_device": null,
+    "launcher_inode": null,
+    "lease_path": "/run/lock/ng039-d2/lease.lock",
+    "lease_device": 1,
+    "lease_inode": 2,
+    "lease_acquired": false,
+    "lease_held_through_finalizer": false,
+    "no_concurrent_uid_process": true,
+    "process_tree_pids": []
+  },
+  "reservations": {
+    "run_id": "NG039-D2-000000000003",
+    "harness_pid": null,
+    "d2_process_key": null,
+    "selected_attempt": null,
+    "candidate_keys": [],
+    "exclusive_reservation_complete": false,
+    "journal_fsynced": false,
+    "libc_version": null,
+    "semaphore_name_mapping_verified": false,
+    "reservation_umask": null,
+    "sysv_shm": [],
+    "posix_semaphores": [],
+    "journal_artifact_name": "reservation-journal.jsonl",
+    "journal_event_count": 0,
+    "journal_closed": false,
+    "journal_sha256": null,
+    "libc_identity": null
+  },
+  "common_authority_validated": false,
+  "reservation_state": "partial",
+  "cleanup_outcome": "unknown"
+}

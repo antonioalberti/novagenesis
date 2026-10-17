@@ -1,0 +1,92 @@
+{
+  "receipt_type": "ng039-d2-host-readiness-preflight/v1",
+  "date": "2026-10-13",
+  "status": "BLOCKED_PREPARATION_ONLY",
+  "scope": "Read-only local host/worktree readiness checks to identify prerequisites for the SPEC-039 D2 gate. This is not a runtime or authorization receipt.",
+  "owner_request": "Do the necessary preparation to reach the next D2 gate.",
+  "repository": {
+    "path": "/home/gandalf/workspace/novagenesis",
+    "branch": "AIOPT5",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025",
+    "git_diff_check": "PASS",
+    "preexisting_dirty_paths_preserved": [
+      "Specs/SPEC-039-common-performance-measurement.md",
+      "Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md",
+      "Specs/RESULTS-SPEC-039/",
+      "Specs/RESULTS-SPEC-059/"
+    ]
+  },
+  "review_scope": {
+    "r14_packet_sha256": "c5d42e42ea1fcb015b393de59819fa7c89669cc9e56ba44a13e9c816b3c17e95",
+    "r14_verdict": "APPROVE",
+    "limitation": "Astra approved only the bounded documentary closure of the r13 journal-policy contradiction; it did not approve the full D2 profile, implementation, or runtime."
+  },
+  "host_checks": {
+    "sudo_or_root_changes": false,
+    "user_accounts": {
+      "query": "local passwd entries whose names contain ng039, q0q1, or q0_q1",
+      "matches": [],
+      "limitation": "Name-filtered search only; no account name or UID for the future dedicated identity is currently pinned in this receipt."
+    },
+    "processes": {
+      "query": "ps -eo user,uid,pid,ppid,comm filtered for ng039, q0_q1_d2, gw_q0_q1, reservation-journal, supervisor-termination",
+      "matches": []
+    },
+    "systemd": {
+      "query": "systemctl list-unit-files --no-legend filtered for ng039, q0_q1_d2, gw_q0_q1, reservation-journal, supervisor-termination",
+      "exit_code": 0,
+      "matches": []
+    },
+    "checked_launcher_directories": [
+      "/usr/local/sbin",
+      "/usr/local/bin",
+      "/home/gandalf/.local/bin",
+      "/home/gandalf/.config/systemd/user",
+      "/etc/systemd/system"
+    ],
+    "matching_named_launchers_or_units": [],
+    "limitation": "The directory check was name-filtered over the listed locations, not an exhaustive privileged filesystem audit; absence of matching names is not proof that no arbitrary-named launcher/account exists."
+  },
+  "worktrees": {
+    "primary_checkout_d2_files": {
+      "tests/spec039/gw_q0_q1_d2.cpp": "ABSENT",
+      "tests/spec039/q0_q1_d2.manifest.json": "ABSENT"
+    },
+    "isolated_d1h_checkout": {
+      "path": "/home/gandalf/workspace/novagenesis-ng039-q0q1-1af604d",
+      "head": "1af604dad66148618cc0e578c28adb4a9829e607",
+      "branch": "DETACHED",
+      "status": [
+        "M CMakeLists.txt",
+        "?? tests/"
+      ],
+      "d1h_files": [
+        "tests/spec039/gw_q0_q1_harness.cpp",
+        "tests/spec039/q0_q1.manifest.json"
+      ],
+      "d2_files": {
+        "tests/spec039/gw_q0_q1_d2.cpp": "ABSENT",
+        "tests/spec039/q0_q1_d2.manifest.json": "ABSENT"
+      },
+      "actions": "Preserved; no edits/build/run performed during this preflight."
+    }
+  },
+  "gates_still_required": [
+    "Freeze the complete D2 pre-code profile and review packet, including the dedicated identity/launcher/lease design, exact allowlist, target graph, oracle, and supervisor/finalizer evidence contract.",
+    "Obtain owner consent bound to the final exact packet SHA before any additional Astra call.",
+    "Provision and independently verify the dedicated non-login UID, trusted single-run launcher, and exclusive lease; this host-side change is outside the five-file D2 test-code allowlist and was not performed.",
+    "Record a separate owner execution decision before any D2 configure/build/harness/IPC run.",
+    "D3 remains separate and requires D2 PASS plus its own explicit authorization."
+  ],
+  "not_performed": [
+    "No SPEC or production source edit",
+    "No UID/group/service/launcher/lease provisioning",
+    "No sudo",
+    "No build/configure",
+    "No D2 harness or finalizer execution",
+    "No IPC creation/removal or runtime test",
+    "No Astra call",
+    "No commit or push"
+  ]
+}

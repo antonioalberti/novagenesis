@@ -1,0 +1,86 @@
+{
+  "schema_version": "ng039-astra-documentary-review-submission/v1",
+  "scope": "Exactly one owner-authorized documentary review; no operational authority.",
+  "owner_consent": {
+    "source": "Immediately preceding owner message in this conversation",
+    "exact_packet_sha256": "a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd",
+    "authorized_calls": 1,
+    "scope": "SPEC-039 v1.14/r12 documentary review only"
+  },
+  "reviewed_identities": {
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "functional_baseline": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "spec_sha256": "0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115",
+    "manifest_sha256": "63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917",
+    "packet_sha256": "a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd",
+    "validation_receipt_sha256": "481fb1dd8b5cad5951a5916a16e4e03481dc8fe70687923a3f60c7c77b5e4c73"
+  },
+  "request_user_turn": {
+    "path": "Specs/RESULTS-SPEC-039/astra-session-v1.14-r12-20261013/request-user-turn.md",
+    "sha256": "b57962e2946373c3f929c3cac9ad297a401c72c0a465103fb40637efa9da7382",
+    "bytes": 447092,
+    "primary_packet_embedded_byte_for_byte": true
+  },
+  "session_transcript": "Specs/RESULTS-SPEC-039/astra-session-v1.14-r12-20261013/ng039-v114-r12-documentary-review.jsonl",
+  "raw_sse": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.raw.sse",
+    "sha256": "b6a6e0ded8ff307bc43a13177832436087f309e16c8ee47c2215c6fdf93caf19",
+    "bytes": 316689,
+    "captured_before_parse_by_codex_usage.session": true
+  },
+  "parsed_response": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.parsed.md",
+    "sha256": "405cdcf63ecf3b3153a514c5c2c9b50d792a67eb5d802f51a6a7807ddacbc7eb",
+    "bytes": 9608
+  },
+  "result": {
+    "usage": {
+      "input_tokens": 95140,
+      "cached_tokens": 0,
+      "output_tokens": 1175,
+      "total_tokens": 96315
+    },
+    "quota": {
+      "active-limit": "premium",
+      "plan-type": "plus",
+      "primary-used-percent": "2",
+      "secondary-used-percent": "0",
+      "primary-window-minutes": "300",
+      "primary-over-secondary-limit-percent": "0",
+      "secondary-window-minutes": "10080",
+      "primary-reset-after-seconds": "16175",
+      "secondary-reset-after-seconds": "602975",
+      "primary-reset-at": "1791892823",
+      "secondary-reset-at": "1792479623",
+      "credits-has-credits": "False",
+      "credits-balance": "0",
+      "credits-unlimited": "False",
+      "safety-buffering-enabled": "true",
+      "safety-buffering-faster-model": "gpt-6-luna"
+    },
+    "latency_s": 53.377,
+    "text": "## 1. VERDICT: AMEND — documentary scope only\n\nReviewed the supplied r12 packet identified as SHA-256 `a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd`, with the supplied full SPEC and manifest as consistency context.\n\n**r11 B1 is closed at documentary level:** both modes share the lease, supervisor and result-directory authority gate; authority loss blocks entry/re-entry and preserves pending evidence. Bounded abnormal raw preservation is substantially addressed, and r08 B2/B3 protections remain specified. **Truthful cleanup-history classification still has the contradictions below.**\n\n## 2. MUST-FIX blockers\n\n### B1 — The supplied cleanup classifier accepts an invalid transaction as `not_started`\n\n**Locations**\n- `verify_spec039_v14_r12.py`, `classify()`: shared `pending` set, `REMOVED`/`CLEANUP_FAILED` handling, and `intent_count == 0` return.\n- `precode-manifest-v1.14-r12.json`, `local_validation_this_freeze.cleanup_history_outcome_fixtures`.\n- Primary packet, `validation_claims.cleanup_history_outcome_fixtures`.\n- SPEC §7.1, bounded regression rules requiring malformed/conflicting history to yield `unknown`.\n\n**Concrete contradiction:** by inspection, the following stream, using the supplied schema-valid event shape and consecutive sequence/timestamp values, returns `not_started`:\n\n```text\nJOURNAL_OPENED\nCREATE_INTENT(resource A)\nRUN_SHUTDOWN_COMPLETE\nREMOVED(resource A)\nJOURNAL_CLOSED\n```\n\n`REMOVED` consumes the pending **creation** intent despite there being neither `CREATED` nor `CLEANUP_INTENT`. With no successful create and zero cleanup intents, the final branch returns `not_started`, ignoring the contradictory removal outcome. The classifier also lacks a prohibition on creation transactions after shutdown.\n\nThis contradicts the claimed rejection of malformed/reordered history and the evidence-derived outcome contract.\n\n**Required amendment:** distinguish creation and cleanup transaction states, enforce lifecycle phase ordering, and reject orphan or wrong-kind outcomes as `unknown`. Align the bounded classifier contract and validation claims; include these specific negative cases. Invalid history must still permit safe raw preservation and an otherwise authorised `INCONCLUSIVE` record.\n\n### B2 — Normal-finalisation failure rules still exclude a supported `complete` cleanup outcome\n\n**Locations**\n- SPEC §7.1, paragraph beginning **“In `normal_cleanup` mode, capture a complete final inventory…”**, and numbered item **5**: after an intent, failure requires `cleanup_outcome=partial` or `unknown`.\n- Manifest `sandbox.finalizer_ipc_boundary.failure_rule` and its duplicate under `semantic_finalizer_contract.finalizer_ipc_boundary`.\n- Conversely, manifest `semantic_finalizer_contract.normal_cleanup_failure` explicitly permits `partial/complete/unknown`.\n- These conflicting clauses are reproduced in the primary packet.\n\n**Concrete contradiction:** all removals can have durable successful outcomes and the journal can be closed, while subsequent evidence validation fails. With common authority intact, cleanup history can support `complete` while overall status remains `INCONCLUSIVE`. The manifest expressly permits that result, but the SPEC’s broader post-intent failure rule excludes it.\n\n**Required amendment:** consistently distinguish destructive-cleanup failure from later finalisation/evidence failure. Permit `complete` when supported by the historical cleanup evidence, without implying PASS, verified final inventory or permission to retry.\n\n**Other requested checks:** no stale unconditional abnormal `not_started` requirement remains in `classification_rules.pass_requires` or `fail_requires`; the abnormal schema includes `complete`. Missing/unavailable enums cover the eight required evidence names and exclude the record and optional diagnostics; exactness and disjointness remain semantic requirements. PID cross-artifact validation is explicitly **NOT EXECUTED**, not falsely reported as passed.\n\n**Optional advice:** consolidate duplicated policy clauses and clearly separate historical fixture counts from current claims.\n\n## 3. Evidence limitation\n\nI used no tools, executed no code or tests, recomputed no hashes, and independently inspected no filesystem, launcher or runtime artefacts. The classifier counterexample is textual reasoning, not an executed probe. Supplied synthetic checks and compile/link-only D1-H evidence do not establish D2 runtime correctness or performance.\n\n## 4. Authority boundary\n\n**No implementation, configure/build, runtime, harness/finalizer, IPC, cleanup, VM/SSH, commit, push or D3 authority is granted.** The launcher remains **NOT_PROVISIONED** and D2 **BLOCKED** pending the separate prerequisites and owner decision. This review authorises no follow-up call.## 1. VERDICT: AMEND — documentary scope only\n\nReviewed the supplied r12 packet identified as SHA-256 `a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd`, with the supplied full SPEC and manifest as consistency context.\n\n**r11 B1 is closed at documentary level:** both modes share the lease, supervisor and result-directory authority gate; authority loss blocks entry/re-entry and preserves pending evidence. Bounded abnormal raw preservation is substantially addressed, and r08 B2/B3 protections remain specified. **Truthful cleanup-history classification still has the contradictions below.**\n\n## 2. MUST-FIX blockers\n\n### B1 — The supplied cleanup classifier accepts an invalid transaction as `not_started`\n\n**Locations**\n- `verify_spec039_v14_r12.py`, `classify()`: shared `pending` set, `REMOVED`/`CLEANUP_FAILED` handling, and `intent_count == 0` return.\n- `precode-manifest-v1.14-r12.json`, `local_validation_this_freeze.cleanup_history_outcome_fixtures`.\n- Primary packet, `validation_claims.cleanup_history_outcome_fixtures`.\n- SPEC §7.1, bounded regression rules requiring malformed/conflicting history to yield `unknown`.\n\n**Concrete contradiction:** by inspection, the following stream, using the supplied schema-valid event shape and consecutive sequence/timestamp values, returns `not_started`:\n\n```text\nJOURNAL_OPENED\nCREATE_INTENT(resource A)\nRUN_SHUTDOWN_COMPLETE\nREMOVED(resource A)\nJOURNAL_CLOSED\n```\n\n`REMOVED` consumes the pending **creation** intent despite there being neither `CREATED` nor `CLEANUP_INTENT`. With no successful create and zero cleanup intents, the final branch returns `not_started`, ignoring the contradictory removal outcome. The classifier also lacks a prohibition on creation transactions after shutdown.\n\nThis contradicts the claimed rejection of malformed/reordered history and the evidence-derived outcome contract.\n\n**Required amendment:** distinguish creation and cleanup transaction states, enforce lifecycle phase ordering, and reject orphan or wrong-kind outcomes as `unknown`. Align the bounded classifier contract and validation claims; include these specific negative cases. Invalid history must still permit safe raw preservation and an otherwise authorised `INCONCLUSIVE` record.\n\n### B2 — Normal-finalisation failure rules still exclude a supported `complete` cleanup outcome\n\n**Locations**\n- SPEC §7.1, paragraph beginning **“In `normal_cleanup` mode, capture a complete final inventory…”**, and numbered item **5**: after an intent, failure requires `cleanup_outcome=partial` or `unknown`.\n- Manifest `sandbox.finalizer_ipc_boundary.failure_rule` and its duplicate under `semantic_finalizer_contract.finalizer_ipc_boundary`.\n- Conversely, manifest `semantic_finalizer_contract.normal_cleanup_failure` explicitly permits `partial/complete/unknown`.\n- These conflicting clauses are reproduced in the primary packet.\n\n**Concrete contradiction:** all removals can have durable successful outcomes and the journal can be closed, while subsequent evidence validation fails. With common authority intact, cleanup history can support `complete` while overall status remains `INCONCLUSIVE`. The manifest expressly permits that result, but the SPEC’s broader post-intent failure rule excludes it.\n\n**Required amendment:** consistently distinguish destructive-cleanup failure from later finalisation/evidence failure. Permit `complete` when supported by the historical cleanup evidence, without implying PASS, verified final inventory or permission to retry.\n\n**Other requested checks:** no stale unconditional abnormal `not_started` requirement remains in `classification_rules.pass_requires` or `fail_requires`; the abnormal schema includes `complete`. Missing/unavailable enums cover the eight required evidence names and exclude the record and optional diagnostics; exactness and disjointness remain semantic requirements. PID cross-artifact validation is explicitly **NOT EXECUTED**, not falsely reported as passed.\n\n**Optional advice:** consolidate duplicated policy clauses and clearly separate historical fixture counts from current claims.\n\n## 3. Evidence limitation\n\nI used no tools, executed no code or tests, recomputed no hashes, and independently inspected no filesystem, launcher or runtime artefacts. The classifier counterexample is textual reasoning, not an executed probe. Supplied synthetic checks and compile/link-only D1-H evidence do not establish D2 runtime correctness or performance.\n\n## 4. Authority boundary\n\n**No implementation, configure/build, runtime, harness/finalizer, IPC, cleanup, VM/SSH, commit, push or D3 authority is granted.** The launcher remains **NOT_PROVISIONED** and D2 **BLOCKED** pending the separate prerequisites and owner decision. This review authorises no follow-up call.",
+    "turn": 1,
+    "session_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-session-v1.14-r12-20261013/ng039-v114-r12-documentary-review.jsonl"
+  },
+  "usage_record": {
+    "ts": "2026-10-13T07:31:40Z",
+    "label": "NG-039 SPEC-039 v1.14/r12 exact-SHA documentary review",
+    "model": "gpt-6-astra",
+    "input_tokens": 95140,
+    "cached_tokens": 0,
+    "output_tokens": 1175,
+    "total_tokens": 96315,
+    "credits": 25.5475,
+    "primary_used_percent": 2.0,
+    "secondary_used_percent": 0.0,
+    "latency_s": 53.377,
+    "plan": "plus"
+  },
+  "raw_sse_path_in_session": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-session-v1.14-r12-20261013/ng039-v114-r12-documentary-review.last.sse",
+  "derived_response": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.md",
+    "sha256": "6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97",
+    "normalization": "The session parser concatenated two byte-identical copies of the final response (output_item.done and response.completed); only this derived Markdown removes the second copy. Transcript, parsed response and raw SSE remain unchanged."
+  }
+}

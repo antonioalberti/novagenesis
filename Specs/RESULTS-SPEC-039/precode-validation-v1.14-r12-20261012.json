@@ -1,0 +1,80 @@
+{
+  "schema_version": "ng039-precode-validation-receipt/v2",
+  "created_utc_date": "2026-10-12",
+  "scope": "Local documentary/schema/classifier checks for SPEC-039 v1.14/r12 only; not runtime, implementation, IPC or finalizer evidence.",
+  "repository": "AIOPT5",
+  "document_head": "756f493b7049434ab67cf2382486a48f606a470c",
+  "files": {
+    "spec": {
+      "path": "Specs/SPEC-039-common-performance-measurement.md",
+      "sha256": "0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115"
+    },
+    "manifest": {
+      "path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.14-r12.json",
+      "sha256": "63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917"
+    },
+    "packet": {
+      "path": "Specs/RESULTS-SPEC-039/precode-packet-v1.14-amend-closure-20261012-sanitized-draft-r12.md",
+      "sha256": "a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd",
+      "bytes": 70789
+    }
+  },
+  "validation_drivers": {
+    "contract_verifier": {
+      "path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_v14_r12.py",
+      "sha256": "6a29bd9b24c2c60440383edeb1c89a14af04ce19ea7e25d564bcb1b211f8948c",
+      "command": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 /home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_v14_r12.py",
+      "result": "PASS; read-only; no files written"
+    },
+    "classifier_probes": {
+      "path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_v14_r12_classifier.py",
+      "sha256": "b68c4299be7416aa26289d4d7c6628831b021294072d3091c81b10cc4984f80c",
+      "command": "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 /home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_v14_r12_classifier.py",
+      "result": "PASS; executes only synthetic in-memory journal records; no files written"
+    }
+  },
+  "executed_checks": {
+    "git_diff_check": "PASS",
+    "draft_2020_12_schemas_meta_valid": {
+      "result": "PASS",
+      "count": 5,
+      "note": "collection_responsibility is manifest policy data, not a JSON Schema."
+    },
+    "cleanup_outcome_contract": {
+      "result": "PASS",
+      "outcomes": ["not_started", "partial", "complete", "unknown"],
+      "stale_abnormal_not_started_rule": "ABSENT from classification_rules.pass_requires and fail_requires"
+    },
+    "cleanup_history_classifier": {
+      "result": "PASS",
+      "executed_synthetic_cases": {
+        "schema_valid_complete_no_intent_and_no_created_resource": "not_started",
+        "schema_valid_complete_failed_cleanup": "partial",
+        "schema_valid_complete_successful_cleanup": "complete",
+        "empty": "unknown",
+        "unknown_label": "unknown",
+        "malformed_record": "unknown",
+        "reordered_sequence": "unknown",
+        "intent_without_outcome": "unknown",
+        "truncated_without_journal_closed": "unknown",
+        "created_resource_without_any_cleanup_intent_or_outcome": "unknown",
+        "created_resource_without_its_own_cleanup_while_another_is_cleaned": "unknown"
+      }
+    },
+    "supervisor_receipt_fixture": {
+      "result": "PASS",
+      "details": "A synthetic schema-valid receipt is accepted; an empty wait_receipts array is rejected."
+    },
+    "supervisor_pid_set_cross_artifact_validation": "NOT EXECUTED: semantic finalizer is absent; this receipt does not claim it as schema or fixture coverage."
+  },
+  "authorization": {
+    "astra_submitted": false,
+    "fresh_owner_exact_packet_sha_consent": false,
+    "implementation_build_runtime_ipc_vm_d3": "NOT PERFORMED / NOT AUTHORIZED"
+  },
+  "limitations": [
+    "The cleanup classifier and fixtures are documentary, bounded offline probes; they do not execute a runtime finalizer.",
+    "The worktree remains uncommitted; SHA-256 pins bind the reviewed bytes, not a clean Git tree.",
+    "This sidecar intentionally does not embed its own digest to avoid a self-referential hash cycle."
+  ]
+}

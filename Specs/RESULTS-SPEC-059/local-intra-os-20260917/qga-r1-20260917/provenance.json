@@ -1,0 +1,231 @@
+{
+  "acceptance_eligibility": {
+    "blockers": [
+      "dirty source tree",
+      "build linkage missing",
+      "build manifest is empty or invalid",
+      "protected-input provenance blocker"
+    ],
+    "eligible": false
+  },
+  "binaries": {
+    "NRNCS": {
+      "argv0": "/home/gandalf/workspace/novagenesis/cmake-build-debug/NRNCS",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/NRNCS",
+      "resolved_path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/NRNCS",
+      "sha256": "ad9ec118bd8374b9d06fc327c4f5fa850949cd93339827e84a5e529ea2b2579c",
+      "size": 8541384
+    },
+    "PGCS": {
+      "argv0": "/home/gandalf/workspace/novagenesis/cmake-build-debug/PGCS",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/PGCS",
+      "resolved_path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/PGCS",
+      "sha256": "ec3e9bdd309973d31340faabe001802c977fdca12c8d7f95ffe7eac0ef4e9a69",
+      "size": 12434800
+    },
+    "Repository": {
+      "argv0": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "resolved_path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "sha256": "910a3c038f72d539b013c01d9dcda319e346f91b3c6fc9d9e28b527eaf879cc6",
+      "size": 9945216
+    },
+    "Source": {
+      "argv0": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "resolved_path": "/home/gandalf/workspace/novagenesis/cmake-build-debug/ContentApp",
+      "sha256": "910a3c038f72d539b013c01d9dcda319e346f91b3c6fc9d9e28b527eaf879cc6",
+      "size": 9945216
+    }
+  },
+  "build": {
+    "commands": null,
+    "manifest_evidence": null,
+    "options": null,
+    "recipe": null,
+    "runtime_library_identity": null,
+    "source_snapshot": null,
+    "toolchain": null
+  },
+  "build_linkage": false,
+  "build_linkage_reason": "build manifest was not supplied",
+  "build_manifest": null,
+  "build_path": "/home/gandalf/workspace/novagenesis/cmake-build-debug",
+  "capture_complete": false,
+  "controller": {
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_remote_executor.py",
+    "sha256": "9ad7ebf029bf4cb55ee9f24108d02776aff6c20658798185956fa33ce75369ab",
+    "size": 175519
+  },
+  "controller_hash": "9ad7ebf029bf4cb55ee9f24108d02776aff6c20658798185956fa33ce75369ab",
+  "controller_helpers": {
+    "controller": {
+      "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_remote_executor.py",
+      "sha256": "9ad7ebf029bf4cb55ee9f24108d02776aff6c20658798185956fa33ce75369ab",
+      "size": 175519
+    },
+    "helpers": {
+      "evidence_verifier": {
+        "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/evidence_verifier.py",
+        "sha256": "54fa5c5921a8071ef307a1fb466885b10d2074dd7247c90bc309fb28918b1e6d",
+        "size": 14212
+      },
+      "local_provenance": {
+        "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/local_provenance.py",
+        "sha256": "f3e94b4fe38a0e197e1d31848bc5a19ff5a642d5e67987ac81351ad66de37dc5",
+        "size": 90896
+      },
+      "ng_observability": {
+        "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_observability.py",
+        "sha256": "bc71f74f7252e009a92aeac5aa8f45bb71896c8285105f3a9a9b1e70fa2a824a",
+        "size": 24999
+      }
+    }
+  },
+  "controller_identity": true,
+  "controller_identity_error": null,
+  "effective_config": {
+    "NG_LOCAL_BUILD_PATH": "/home/gandalf/workspace/novagenesis/cmake-build-debug",
+    "NG_LOCAL_EVIDENCE_PATH": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917",
+    "NG_LOCAL_IO_PATH": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/staging/io",
+    "NG_LOCAL_REPO_PATH": "/home/gandalf/workspace/novagenesis"
+  },
+  "effective_uid": 0,
+  "evidence_dir": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917",
+  "evidence_schema_v2": true,
+  "expanded_plan": {
+    "path": "plan/expanded.json",
+    "sha256": "a290f0450f8610634346b413c29333dbd18081f20dacbfaae245f737940c1eb8",
+    "size": 3100
+  },
+  "git_clean": false,
+  "git_head": null,
+  "git_status": [
+    "git status unavailable"
+  ],
+  "helper_hashes": {
+    "evidence_verifier": "54fa5c5921a8071ef307a1fb466885b10d2074dd7247c90bc309fb28918b1e6d",
+    "local_provenance": "f3e94b4fe38a0e197e1d31848bc5a19ff5a642d5e67987ac81351ad66de37dc5",
+    "ng_observability": "bc71f74f7252e009a92aeac5aa8f45bb71896c8285105f3a9a9b1e70fa2a824a"
+  },
+  "helpers": {
+    "evidence_verifier": {
+      "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/evidence_verifier.py",
+      "sha256": "54fa5c5921a8071ef307a1fb466885b10d2074dd7247c90bc309fb28918b1e6d",
+      "size": 14212
+    },
+    "local_provenance": {
+      "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/local_provenance.py",
+      "sha256": "f3e94b4fe38a0e197e1d31848bc5a19ff5a642d5e67987ac81351ad66de37dc5",
+      "size": 90896
+    },
+    "ng_observability": {
+      "path": "/home/gandalf/workspace/novagenesis/Scripts/AlpineVMs/ng_observability.py",
+      "sha256": "bc71f74f7252e009a92aeac5aa8f45bb71896c8285105f3a9a9b1e70fa2a824a",
+      "size": 24999
+    }
+  },
+  "io_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/staging/io",
+  "local_profile": "native-privileged",
+  "local_profile_selection": {
+    "cli_explicit": true,
+    "cli_profile": "native-privileged",
+    "euid": 0,
+    "explicit": true,
+    "name": "native-privileged",
+    "plan_explicit": true,
+    "plan_profile": "native-privileged"
+  },
+  "mode": "local",
+  "ownership_anchor": {
+    "method": "linux-prctl-subreaper",
+    "pid": 498124,
+    "trial_id": "qga-r1-20260917",
+    "verified": true
+  },
+  "plan": {
+    "complete": true,
+    "files": {
+      "plan/effective-config.json": {
+        "path": "plan/effective-config.json",
+        "sha256": "47880c584ed245d34e465f43bd7ffba4a04386427a7484b233e6b8c94545fa50",
+        "size": 397
+      },
+      "plan/expanded.json": {
+        "path": "plan/expanded.json",
+        "sha256": "a290f0450f8610634346b413c29333dbd18081f20dacbfaae245f737940c1eb8",
+        "size": 3100
+      },
+      "plan/observability.json": {
+        "path": "plan/observability.json",
+        "sha256": "ef1601ca55c51affba14fd16344af73d1aa3e8526216f586f3b1a53eae1367bf",
+        "size": 180
+      },
+      "plan/original.json": {
+        "path": "plan/original.json",
+        "sha256": "6eba94abbfc26324507ad9a76bcd98b2fba8bbd510873a664144c82ca8cff358",
+        "size": 2312
+      },
+      "plan/scenario.json": {
+        "path": "plan/scenario.json",
+        "sha256": "05b4b72a03bb4725245d7753e165391fa5fd51a8418da4a9a3de48daa2bcd2d5",
+        "size": 181
+      }
+    }
+  },
+  "plan_snapshot": true,
+  "protected_input_blockers": [],
+  "protected_inputs": [
+    "protected-input build manifest unavailable: build manifest was not supplied"
+  ],
+  "repo_path": "/home/gandalf/workspace/novagenesis",
+  "sanitized_config": {
+    "NG_LOCAL_BUILD_PATH": "/home/gandalf/workspace/novagenesis/cmake-build-debug",
+    "NG_LOCAL_EVIDENCE_PATH": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917",
+    "NG_LOCAL_IO_PATH": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/staging/io",
+    "NG_LOCAL_REPO_PATH": "/home/gandalf/workspace/novagenesis"
+  },
+  "schema_version": 2,
+  "source": {
+    "clean": false,
+    "content_snapshot": {
+      "captured": true,
+      "entries": [],
+      "errors": [],
+      "files": [],
+      "root": "/home/gandalf/workspace/novagenesis"
+    },
+    "head": null,
+    "index": {
+      "captured": false,
+      "entries": [],
+      "errors": [
+        "git index unavailable"
+      ]
+    },
+    "index_entries": [],
+    "index_sha256": null,
+    "status": [
+      "git status unavailable"
+    ],
+    "submodules": [
+      "git submodule status unavailable"
+    ],
+    "submodules_complete": false,
+    "tree_sha256": "baed01705b0bbb8fa02ca1728298c0a0d5abddbe647ff06c8d231c1db06bf37e"
+  },
+  "source_content_snapshot": {
+    "captured": true,
+    "entries": [],
+    "errors": [],
+    "files": [],
+    "root": "/home/gandalf/workspace/novagenesis"
+  },
+  "source_head": null,
+  "source_snapshot_complete": true,
+  "source_status": [
+    "git status unavailable"
+  ],
+  "workload_error": null,
+  "workload_verified": true
+}

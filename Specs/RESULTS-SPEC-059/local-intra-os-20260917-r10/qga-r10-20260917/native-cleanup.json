@@ -1,0 +1,46 @@
+{
+  "after": {
+    "ipc": {
+      "posix_semaphores": [],
+      "queues": [],
+      "semaphores": [],
+      "shm": []
+    },
+    "processes": []
+  },
+  "baseline": "ZERO",
+  "before": {
+    "ipc": {
+      "posix_semaphores": [],
+      "queues": [],
+      "semaphores": [],
+      "shm": []
+    },
+    "processes": []
+  },
+  "command": [
+    "bash",
+    "/proc/self/fd/3"
+  ],
+  "effective_uid": 0,
+  "ok": true,
+  "returncode": 0,
+  "schema_version": 1,
+  "script": {
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/Simple/clean.sh",
+    "sha256": "70e37f22ee2836ab2cb253005fd663109aafc06137d4334b73e7ef11a5246805",
+    "size": 2222,
+    "st_dev": 64512,
+    "st_ino": 673052
+  },
+  "script_identity_after": {
+    "path": "/home/gandalf/workspace/novagenesis/Scripts/Simple/clean.sh",
+    "sha256": "70e37f22ee2836ab2cb253005fd663109aafc06137d4334b73e7ef11a5246805",
+    "size": 2222,
+    "st_dev": 64512,
+    "st_ino": 673052
+  },
+  "script_stable": true,
+  "stderr": "",
+  "stdout": "=== Native NG-ELC pre-clean: inventory delegated to controller ===\n"
+}

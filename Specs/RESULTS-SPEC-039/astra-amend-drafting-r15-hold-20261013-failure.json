@@ -1,0 +1,45 @@
+{
+  "receipt_type": "ng039-astra-amend-drafting-transport-failure/v1",
+  "status": "INCOMPLETE_RESPONSE_NO_VERDICT",
+  "request": {
+    "path": "Specs/RESULTS-SPEC-039/astra-amendment-drafting-request-r15-20261013.md",
+    "sha256": "637b07cfb5e739b2d85ad5e09c23d32edfec7642779a536c553bd5faebb5afe0",
+    "bytes": 653087,
+    "target_r15_packet_sha256": "ab4855bdc79c81ad637903abc4071a892d64224a17519a60d0992a160226b7c1"
+  },
+  "authorization": "Owner authorized exactly one Astra drafting call bound to the request SHA above.",
+  "call": {
+    "model_requested": "gpt-6-astra",
+    "submitted": true,
+    "transport_error": "http.client.IncompleteRead: incomplete chunked response; 1772704 bytes read before EOF",
+    "retry": "not attempted; no retry without new owner authorization"
+  },
+  "session": {
+    "path": "Specs/RESULTS-SPEC-039/astra-amend-session-r15-hold-20261013/ng039-amend-drafting-r15-hold-20261013.jsonl",
+    "sha256": "e09cbfe754f3c21c2c5fd59b418ccc23af307cea8d50bbea6953b5c7a5eb23c2",
+    "records": 1,
+    "user_turn_exactly_matches_request": true,
+    "assistant_response_persisted": false
+  },
+  "raw_sse": "not captured; Session.say raised during resp.read() before its raw-SSE write step",
+  "response": "not recovered; no verdict or patch available",
+  "usage": "unknown; Session.say did not return parsed usage or response headers, and no usage.jsonl record was fabricated",
+  "quota_snapshots": {
+    "before": {
+      "fetched_at_utc": "2026-10-13T18:02:13.519044+00:00",
+      "primary_5h_used_percent": 9,
+      "secondary_weekly_used_percent": 14,
+      "credits_balance": "0",
+      "auto_reload": "not reported"
+    },
+    "after": {
+      "fetched_at_utc": "2026-10-13T18:43:47.818125+00:00",
+      "primary_5h_used_percent": 13,
+      "secondary_weekly_used_percent": 15,
+      "credits_balance": "0",
+      "auto_reload": "not reported"
+    },
+    "attribution": "The quota changed between snapshots, but the delta cannot be attributed solely to this request."
+  },
+  "authority_boundary": "No repository amendment, code edit, provisioning, build, runtime, IPC, D2/D3, commit, or push was performed."
+}

@@ -1,0 +1,207 @@
+{
+  "schema_version": "ng039-d2-run-record/v2",
+  "task_id": "NG-039",
+  "run_id": "NG039-D2-000000000001",
+  "spec_sha256": "80713abc89f0b945f0c752f56f58cbfaa2c847c71b79fbb453fa219450c701c1",
+  "baseline_commit": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+  "document_head": "a9d6a8c28f5ef3b32e0c01d652b61526cdf76343",
+  "configured_targets": [
+    "Common",
+    "ng039_gw_q0_q1_d2"
+  ],
+  "process_identity": {
+    "name": "NG039TestProcess",
+    "ipc_key": 11
+  },
+  "status": "PASS",
+  "exit": {
+    "outer_code": 0,
+    "harness_code": 0,
+    "signal": null,
+    "timeout_fired": false
+  },
+  "assertions": {
+    "q0_admission": "PASS",
+    "q0_idle_floor": "PASS",
+    "q0_no_spurious_wakeup": "PASS",
+    "q0_strict_due": "PASS",
+    "q1_admission": "PASS",
+    "q1_future_head_admitted": "PASS",
+    "q1_strict_due": "PASS",
+    "q1_no_spurious_wakeup": "PASS"
+  },
+  "observations": {
+    "target_message_id": 1001,
+    "q0": {
+      "cycles": 1000,
+      "wait_calls": 500,
+      "immediate_returns": 400,
+      "blocked_duration": 100,
+      "wake_reasons": [
+        "timeout"
+      ],
+      "process_cpu_time": 800,
+      "peak_rss": 10240,
+      "shm_poll_attempts": 100,
+      "max_inter_poll_gap": 10
+    },
+    "q1": {
+      "cycles": 1000,
+      "wait_calls": 500,
+      "immediate_returns": 400,
+      "blocked_duration": 100,
+      "wake_reasons": [
+        "timeout"
+      ],
+      "process_cpu_time": 800,
+      "peak_rss": 10240,
+      "shm_poll_attempts": 100,
+      "max_inter_poll_gap": 10,
+      "future_message_offered": 1,
+      "future_message_admitted": 1,
+      "future_message_pending": 1,
+      "future_message_executed": 0
+    },
+    "counter_overflow": false
+  },
+  "inventories": {
+    "pre": {
+      "available": true,
+      "complete": true,
+      "is_empty": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": null
+    },
+    "post": {
+      "available": true,
+      "complete": true,
+      "is_empty": false,
+      "sha256": "a865eb197fbe3ce3f71609f0e5e2fa17f7388b785ee6655d61542ac447a6e387",
+      "reason": null
+    },
+    "final": {
+      "available": true,
+      "complete": true,
+      "is_empty": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": null
+    }
+  },
+  "cleanup": {
+    "complete": true,
+    "candidate_resources_removed": true,
+    "finalizer_complete": true,
+    "gateway_joined": true,
+    "output_worker_joined": true,
+    "process_destroyed": true,
+    "final_inventory_complete": true,
+    "final_inventory_matches_pre": true
+  },
+  "failure": null,
+  "artifacts": [
+    {
+      "name": "stdout.txt",
+      "bytes": 1024,
+      "sha256": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+    },
+    {
+      "name": "stderr.txt",
+      "bytes": 512,
+      "sha256": "3d6f4ea4f7d42fd848d62b111555d6e3977d826de9a442d32facc8cd9e6d8fbe"
+    },
+    {
+      "name": "ipc-pre.json",
+      "bytes": 256,
+      "sha256": "6512bd43d9caa6e02c990b0a82652dca6f8c0f6fb36609241e78d2df44bace7d"
+    },
+    {
+      "name": "ipc-post.json",
+      "bytes": 256,
+      "sha256": "7d865e959b2466918c9863afca942d0fb89d7c9ac0f99b8664f861729f2ac27a"
+    },
+    {
+      "name": "ipc-final.json",
+      "bytes": 256,
+      "sha256": "4b227777d4dd1fc61c6f884f48647d0b8b866f791d5dc74155b678f161ea094f"
+    },
+    {
+      "name": "observer-events.json",
+      "bytes": 1024,
+      "sha256": "8e0b9728f3f38af07e985fbef0bbf34333e9e5e729affba45348fba090d6ee46"
+    },
+    {
+      "name": "reservation-journal.jsonl",
+      "bytes": 512,
+      "sha256": "fcea920f7412b5da7be0cf42b8c9305984a2723ce846a073061e5ed3d0ab2563"
+    }
+  ],
+  "record_finalized": true,
+  "execution_identity": {
+    "dedicated_uid_verified": true,
+    "uid": 1000,
+    "gid": 1000,
+    "interactive_login_disabled": true,
+    "launcher_verified": true,
+    "launcher_path": "/usr/local/libexec/ng039-d2-launcher",
+    "launcher_sha256": "b99f34149f4f1b489f8ac47ef5b7996604805359513ebb4955b9062875f0f33f",
+    "launcher_device": 1,
+    "launcher_inode": 2,
+    "lease_path": "/run/lock/ng039-d2/lease.lock",
+    "lease_device": 1,
+    "lease_inode": 2,
+    "lease_acquired": true,
+    "lease_held_through_finalizer": true,
+    "no_concurrent_uid_process": true,
+    "process_tree_pids": [
+      1234,
+      1235
+    ]
+  },
+  "reservations": {
+    "run_id": "NG039-D2-000000000001",
+    "harness_pid": 1234,
+    "d2_process_key": null,
+    "selected_attempt": null,
+    "candidate_keys": [],
+    "exclusive_reservation_complete": true,
+    "journal_fsynced": true,
+    "libc_version": "2.35",
+    "semaphore_name_mapping_verified": true,
+    "reservation_umask": "0022",
+    "sysv_shm": [
+      {
+        "id": 11,
+        "size": 33554432,
+        "attached": true,
+        "detached": false
+      }
+    ],
+    "posix_semaphores": [
+      {
+        "sem_t_address": 140735000000000,
+        "map_start": 140735000000000,
+        "map_end": 140735000004096,
+        "map_device_major": 0,
+        "map_device_minor": 1,
+        "map_inode": 12345,
+        "mapping_line": "/dev/shm/sem.12345 00007f8b4c00d000-00007f8b4c011000 rw-s 0000000 00:05 12345 /dev/shm/sem.12345"
+      }
+    ],
+    "journal_artifact_name": "reservation-journal.jsonl",
+    "journal_event_count": 10,
+    "journal_closed": true,
+    "journal_sha256": "fcea920f7412b5da7be0cf42b8c9305984a2723ce846a073061e5ed3d0ab2563",
+    "libc_identity": {
+      "provider_path": "/lib/x86_64-linux-gnu/libc.so.6",
+      "device": 8,
+      "inode": 1234567,
+      "build_id": "abcdef123456",
+      "sha256": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "version": "2.35"
+    }
+  },
+  "common_authority_validated": true,
+  "reservation_state": "complete",
+  "cleanup_outcome": "complete"
+}

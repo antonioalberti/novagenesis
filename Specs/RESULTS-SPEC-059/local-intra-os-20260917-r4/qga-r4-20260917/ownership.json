@@ -1,0 +1,19 @@
+{
+  "anchor": {
+    "method": "linux-prctl-subreaper",
+    "pid": 514418,
+    "trial_id": "qga-r4-20260917",
+    "verified": true
+  },
+  "attribution": "creator-pid",
+  "ipc_new_ids": {
+    "posix_semaphores": [],
+    "queues": [],
+    "semaphores": [],
+    "shm": []
+  },
+  "method": "linux-subreaper-anchor",
+  "ownership_proven": true,
+  "schema_version": 2,
+  "trial_pids": []
+}

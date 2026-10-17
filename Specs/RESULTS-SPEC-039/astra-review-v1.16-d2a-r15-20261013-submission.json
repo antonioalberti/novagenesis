@@ -1,0 +1,116 @@
+{
+  "auto_reload": "not reported by the quota endpoint",
+  "baseline": {
+    "commit": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b"
+  },
+  "date": "2026-10-13",
+  "instructions": {
+    "path": "astra-session-v1.16-d2a-r15-20261013/review-instructions.md",
+    "sha256": "756f4a3d8eba508f92058b6aa0137c784237858a6441793eea31f648f891eb1f"
+  },
+  "manifest": {
+    "path": "precode-manifest-v1.16-d2a-r15.json",
+    "sha256": "4ed5646dcaab8af74344f3acba22c962fef8703b2d4d0fddd463c0381b9e3827"
+  },
+  "operations_not_authorized_or_performed": [
+    "code edit",
+    "configure/build",
+    "UID/launcher/lease provisioning",
+    "harness/finalizer runtime",
+    "IPC",
+    "VM/SSH",
+    "cleanup/retry",
+    "D2 acceptance",
+    "D3",
+    "commit",
+    "push",
+    "additional Astra call"
+  ],
+  "owner_authorization": {
+    "calls_authorized": 1,
+    "calls_made": 1,
+    "credit_instruction": "Owner directed to consult the existing Codex usage session and said not to worry about subscription credits; review was made against included subscription usage, without purchasing flexible credits.",
+    "exact_packet_sha256": "ab4855bdc79c81ad637903abc4071a892d64224a17519a60d0992a160226b7c1",
+    "owner_message": "Eu nao estava aqui para autorizar. Mas, agora estou."
+  },
+  "packet": {
+    "bytes": 194163,
+    "path": "Specs/RESULTS-SPEC-039/precode-packet-v1.16-d2a-precode-20261013-sanitized-draft-r15.md",
+    "sha256": "ab4855bdc79c81ad637903abc4071a892d64224a17519a60d0992a160226b7c1"
+  },
+  "proposal": {
+    "path": "d2-launcher-lease-proposal-v1-20261013.md",
+    "sha256": "ab386f6a94228ab9312efa4526e68b67ab43fc0f7936b789a9ebc459b59f67e6"
+  },
+  "provider_credit_balance": "0; no flexible credits reported or available in the response",
+  "quota_headers_after_call": {
+    "active-limit": "premium",
+    "credits-balance": "0",
+    "credits-has-credits": "False",
+    "credits-unlimited": "False",
+    "plan-type": "plus",
+    "primary-used-percent": "2",
+    "primary-window-minutes": "300",
+    "safety-buffering-enabled": "true",
+    "safety-buffering-faster-model": "gpt-6-luna",
+    "secondary-used-percent": "13",
+    "secondary-window-minutes": "10080"
+  },
+  "quota_observation_before_call": {
+    "credits_balance": "0",
+    "credits_has_credits": false,
+    "overage_limit_reached": false,
+    "primary_used_percent": 1,
+    "recorded_at_utc": "2026-10-13T17:40:54.907161+00:00",
+    "secondary_used_percent": 13,
+    "session": "@session:default/20261010_102003_091b24"
+  },
+  "raw_sse": {
+    "bytes": 829964,
+    "copied_before_any_followup_call": true,
+    "path": "astra-session-v1.16-d2a-r15-20261013/astra-review-v1.16-d2a-r15-20261013.raw.sse",
+    "sha256": "f381eb4922b0d45322b9e38ae44278846c40c15b4f823b1471988ed715d5092e"
+  },
+  "receipt_type": "ng039-astra-documentary-review-submission/v1",
+  "request": {
+    "path": "astra-session-v1.16-d2a-r15-20261013/request-user-turn.md",
+    "sha256": "4fc063f7c4d6ea3d3475616256d581ff70261e95a0de95df2c63b67dc34a8306"
+  },
+  "response": {
+    "parser_duplicate_normalization": "NONE; raw SSE parser text matched the transcript byte-for-byte",
+    "path": "astra-review-v1.16-d2a-r15-20261013.parsed.md",
+    "sha256": "e6ea5ac8fde7da03214ac243d22982a563cd36d03d4f9bf895335275182a89d3"
+  },
+  "readable_response_derivative": {
+    "path": "astra-review-v1.16-d2a-r15-20261013.md",
+    "sha256": "aae8ee3d515744f947755ab3f67d3f097623be04356db5200535c86a559fe6f2",
+    "normalization": "Derived readable copy: trailing whitespace stripped and one LF appended. The exact parser response is preserved unchanged in the parsed response file, session transcript, and raw SSE."
+  },
+  "scope": "D2a pre-code design readiness only; no implementation or operational authority",
+  "session": {
+    "path": "astra-session-v1.16-d2a-r15-20261013/ng039-v116-d2a-r15.jsonl",
+    "sha256": "a78fd7a28ebc74d145d93e35ce25e1127ca6d4df25f48ddfc4010fd2a84c588f",
+    "turns": 2,
+    "user_turn_exactly_matches_archived_request": true
+  },
+  "spec": {
+    "path": "Specs/SPEC-039-common-performance-measurement.md",
+    "sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025"
+  },
+  "usage": {
+    "cached_tokens": 0,
+    "credits": 16.90325,
+    "input_tokens": 49385,
+    "label": "ng039-v1.16-d2a-r15",
+    "latency_s": 121.383,
+    "model": "gpt-6-astra",
+    "output_tokens": 3038,
+    "plan": "plus",
+    "primary_used_percent": "2",
+    "secondary_used_percent": "13",
+    "total_tokens": 52423,
+    "ts": "2026-10-13T17:46:53Z"
+  },
+  "verdict": "HOLD"
+}

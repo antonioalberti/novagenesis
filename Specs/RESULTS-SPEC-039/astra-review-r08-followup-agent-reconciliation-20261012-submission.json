@@ -1,0 +1,65 @@
+{
+  "derived_response": {
+    "normalization": null,
+    "path": "Specs/RESULTS-SPEC-039/astra-review-r08-followup-agent-reconciliation-20261012.md",
+    "sha256": "6ff9bd65cab5cadb535aeb428781ede9b17ab357a6cdf6121e358af70630ff7b"
+  },
+  "exact_packet_embedded": true,
+  "owner_instruction": "one follow-up consultation requested after three independent read-only reviews; exact unchanged r08 packet only; no operational authority",
+  "prompt_sha256": "8c5082375555147e12cb0179b14acd680a2232e57db5cd1ad9c39ca77de848ea",
+  "raw_sse": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-r08-followup-agent-reconciliation-20261012.raw.sse",
+    "sha256": "fa3348e5a680811772bd5c472cc24feff55c2b080a09f8b6e50e451475ea084d"
+  },
+  "result": {
+    "latency_s": 39.029,
+    "quota": {
+      "active-limit": "premium",
+      "credits-balance": "0",
+      "credits-has-credits": "False",
+      "credits-unlimited": "False",
+      "plan-type": "plus",
+      "primary-over-secondary-limit-percent": "0",
+      "primary-reset-after-seconds": "8616",
+      "primary-reset-at": "1791805813",
+      "primary-used-percent": "9",
+      "primary-window-minutes": "300",
+      "safety-buffering-enabled": "true",
+      "safety-buffering-faster-model": "gpt-6-luna",
+      "secondary-reset-after-seconds": "513209",
+      "secondary-reset-at": "1792310406",
+      "secondary-used-percent": "33",
+      "secondary-window-minutes": "10080"
+    },
+    "session_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-session-r08-followup-20261012/ng039-r08-followup-agent-reconciliation.jsonl",
+    "turn": 1,
+    "usage": {
+      "cached_tokens": 0,
+      "input_tokens": 21122,
+      "output_tokens": 1061,
+      "total_tokens": 22183
+    }
+  },
+  "reviewed_identities": {
+    "manifest_sha256": "d0518b500343fe80fef834b4b9a3f819396224e8da9ec601690100749d819301",
+    "packet_sha256": "3295a1bffd234673aaa82e2e7e254f3d5bad6c1e747f4d18123f702510445272",
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "bc735702fff9adde69a00705715e4025cedca5f3e1314eb7200da29712822992"
+  },
+  "schema_version": "ng039-astra-documentary-followup/v1",
+  "session_transcript": "Specs/RESULTS-SPEC-039/astra-session-r08-followup-20261012/ng039-r08-followup-agent-reconciliation.jsonl",
+  "usage_record": {
+    "cached_tokens": 0,
+    "credits": 6.872,
+    "input_tokens": 21122,
+    "label": "NG-039 r08 Astra follow-up: agent reconciliation and envelope correction",
+    "latency_s": 39.029,
+    "model": "gpt-6-astra",
+    "output_tokens": 1061,
+    "plan": "plus",
+    "primary_used_percent": 9.0,
+    "secondary_used_percent": 33.0,
+    "total_tokens": 22183,
+    "ts": "2026-10-12T09:27:15Z"
+  }
+}

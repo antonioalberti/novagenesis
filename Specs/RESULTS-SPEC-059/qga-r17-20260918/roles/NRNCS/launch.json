@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "/proc/self/fd/7",
+    "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-059/qga-r17-20260918/staging/io/NRNCS/"
+  ],
+  "cwd": "/tmp/ng-observability-68f0678-normal",
+  "executable": "/proc/self/fd/7",
+  "launched_identity": {
+    "child_pid": 1256019,
+    "fd": 7,
+    "proc_path": "/proc/self/fd/7",
+    "representation": "sealed-memfd",
+    "seals": 15,
+    "sha256": "292cbaa5e6d21331e048f740f81fda4320bed6c2806f4ecd37635decb457c079",
+    "size": 8541368,
+    "source_dev": 64512,
+    "source_ino": 549834,
+    "source_path": "/tmp/ng-observability-68f0678-normal/NRNCS",
+    "source_sha256": "292cbaa5e6d21331e048f740f81fda4320bed6c2806f4ecd37635decb457c079",
+    "source_size": 8541368
+  },
+  "pgid": 1145756,
+  "pid": 1256019,
+  "role": "NRNCS",
+  "starttime": "9475674",
+  "stream_topology": {
+    "authoritative": "stdout.log",
+    "stdout_stderr_merged": true
+  }
+}

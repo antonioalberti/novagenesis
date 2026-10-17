@@ -1,0 +1,40 @@
+{
+  "scope": "documentary reconciliation only, not D2a acceptance",
+  "head": "a9d6a8c28f5ef3b32e0c01d652b61526cdf76343",
+  "sha256": {
+    "Specs/SPEC-039-common-performance-measurement.md": "80713abc89f0b945f0c752f56f58cbfaa2c847c71b79fbb453fa219450c701c1",
+    "Specs/RESULTS-SPEC-039/precode-manifest-v1.18-d2a.json": "3960555f1b13db4191ed9d09345ea1a6a6a9b30d679d0481f7f4a22c7eb5a915",
+    "Specs/RESULTS-SPEC-039/d2-launcher-lease-proposal-v1.18-20261014.md": "c40bd33c280e34571daa4f69a14999ee071219236eb74909b585616de3226553"
+  },
+  "checks": {
+    "spec_pin": true,
+    "proposal_pin": true,
+    "head_pin": true,
+    "projection:execution_model": true,
+    "projection:cardinality.process_start_count": true,
+    "projection:cardinality.run_id_count": true,
+    "projection:cardinality.journal_count": true,
+    "projection:cardinality.final_record_count": true,
+    "projection:sem_failure.protocol": true,
+    "projection:sem_failure.fault_injection_cases": true,
+    "projection:link_model.diagnostic_target": true,
+    "projection:link_model.provider_evidence_schema": true,
+    "projection:lease.fd_owner": true,
+    "projection:lease.finalizer_has_fd": true,
+    "projection:lease.wait_sets": true,
+    "projection:lease.timeouts": true,
+    "projection:partial_reservation.classification": true,
+    "projection:partial_reservation.cleanup_outcome": true,
+    "projection:partial_reservation.retention_without_cleanup": true,
+    "projection:partial_reservation.abnormal_evidence_only_condition": true,
+    "projection_count_17": true,
+    "no_missing_9_refs": true,
+    "no_finalizer_fd_transfer": true,
+    "no_two_run_recipe": true,
+    "hold_explicit": true,
+    "git_diff_check": true
+  },
+  "gate": "HOLD",
+  "runtime": "NOT_EXECUTED",
+  "independent_review": "deleg_e390a232: read-only; HEAD and three hashes verified; documentary corrections confirmed; HOLD retained, six executable-contract/test groups OPEN; no runtime approval"
+}

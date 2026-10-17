@@ -1,0 +1,742 @@
+# SPEC-039 v1.15 — r13 same-SPEC documentary review packet
+
+**State:** expanded local candidate; UNSUBMITTED. Fresh owner consent bound to the final packet SHA-256 is required before exactly one Astra call.
+**Requested verdict:** `APPROVE`, `AMEND`, or `HOLD` for r12 B1/B2 documentary closure only. This is not an implementation, build, runtime, IPC, VM, D2/D3, commit, push, or performance-acceptance request.
+
+## Frozen identity and worktree boundary
+
+- Repository: `/home/gandalf/workspace/novagenesis`; branch `AIOPT5`; HEAD `756f493b7049434ab67cf2382486a48f606a470c`; HEAD tree `9adf665c0eb06213a29a6c12d650451948c7a4ab`.
+- Current SPEC-039 v1.15 SHA-256 `3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0`.
+- Current manifest v1.15/r13 SHA-256 `2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5`.
+- Packet SHA-256 is computed out-of-band after all context is frozen and is deliberately not embedded in itself.
+- Current tracked diff SHA-256 `5fa4a1c80f4cccebf9f74027f56e8ac5df4d83a84aa4184986b77174d1b92ca9` (112510 bytes); SPEC-039 diff SHA-256 `3d289989521551afd24cacf33bb55c0e6163817f3dd0f0f9348608a5b91313c8` (101180 bytes).
+- Other pre-existing SPEC-062 diff SHA-256 `67a578612bb29c85c6589087357857907c2ff3e6c66f7c34fa852f3697731619` (11330 bytes); explicitly outside this review.
+- `git status --short --untracked-files=normal`: `M Specs/SPEC-039-common-performance-measurement.md;  M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md; ?? Specs/RESULTS-SPEC-039/; ?? Specs/RESULTS-SPEC-059/`.
+- Separate untracked census: 343 files; counts `{"RESULTS-SPEC-039": 78, "RESULTS-SPEC-059": 265}`. `RESULTS-SPEC-059` is unrelated and excluded; only named SPEC-039 evidence below is supplied.
+- Packet and manifest are working-tree artifacts, not checked-in contracts. The tracked SPEC-062 change and SPEC-059 evidence are excluded from this review.
+
+<!-- NG039-ARTIFACT-PINS-BEGIN -->
+```json
+{
+  "document_head": "756f493b7049434ab67cf2382486a48f606a470c",
+  "manifest_sha256": "2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5",
+  "spec_sha256": "3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0"
+}
+```
+<!-- NG039-ARTIFACT-PINS-END -->
+
+## Scope and exact decision requested
+
+Inspect every attached active cleanup/lifecycle policy projection, not just the model JSON or test pass. Decide: (1) whether the schema-valid orphan `REMOVED` can still be treated as `not_started`; (2) whether creation and cleanup are separate transactions and cleanup binds to the same physical resource; (3) whether `not_started`, `partial`, `complete`, `unknown`, and overall run status have consistent conditions in every attached clause; (4) whether orphan `CLEANUP_FAILED` and identity mismatch are rejected; (5) whether any attached clause permits cleanup history to imply PASS, destructive retry, or authority bypass; and (6) whether the stated evidence boundary and remaining limitations are accurate.
+
+For each blocker, cite the exact SPEC section and manifest JSON pointer. Separate must-fix blockers from optional hardening. If an omitted section is necessary to decide, name the path/field and explain why; do not infer that an omitted clause is absent or consistent. Do not expand this documentary review into D2/D3 or the broader Gateway measurement design.
+
+## Prior r12 verdict — verbatim response
+
+Response path `Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.md`; SHA-256 `6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97`. Reviewed packet SHA `a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd`, SPEC SHA `0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115`, manifest SHA `63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917`. The prior one-call consent was consumed and does not cover r13.
+
+```text
+## 1. VERDICT: AMEND — documentary scope only
+
+Reviewed the supplied r12 packet identified as SHA-256 `a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd`, with the supplied full SPEC and manifest as consistency context.
+
+**r11 B1 is closed at documentary level:** both modes share the lease, supervisor and result-directory authority gate; authority loss blocks entry/re-entry and preserves pending evidence. Bounded abnormal raw preservation is substantially addressed, and r08 B2/B3 protections remain specified. **Truthful cleanup-history classification still has the contradictions below.**
+
+## 2. MUST-FIX blockers
+
+### B1 — The supplied cleanup classifier accepts an invalid transaction as `not_started`
+
+**Locations**
+- `verify_spec039_v14_r12.py`, `classify()`: shared `pending` set, `REMOVED`/`CLEANUP_FAILED` handling, and `intent_count == 0` return.
+- `precode-manifest-v1.14-r12.json`, `local_validation_this_freeze.cleanup_history_outcome_fixtures`.
+- Primary packet, `validation_claims.cleanup_history_outcome_fixtures`.
+- SPEC §7.1, bounded regression rules requiring malformed/conflicting history to yield `unknown`.
+
+**Concrete contradiction:** by inspection, the following stream, using the supplied schema-valid event shape and consecutive sequence/timestamp values, returns `not_started`:
+
+```text
+JOURNAL_OPENED
+CREATE_INTENT(resource A)
+RUN_SHUTDOWN_COMPLETE
+REMOVED(resource A)
+JOURNAL_CLOSED
+```
+
+`REMOVED` consumes the pending **creation** intent despite there being neither `CREATED` nor `CLEANUP_INTENT`. With no successful create and zero cleanup intents, the final branch returns `not_started`, ignoring the contradictory removal outcome. The classifier also lacks a prohibition on creation transactions after shutdown.
+
+This contradicts the claimed rejection of malformed/reordered history and the evidence-derived outcome contract.
+
+**Required amendment:** distinguish creation and cleanup transaction states, enforce lifecycle phase ordering, and reject orphan or wrong-kind outcomes as `unknown`. Align the bounded classifier contract and validation claims; include these specific negative cases. Invalid history must still permit safe raw preservation and an otherwise authorised `INCONCLUSIVE` record.
+
+### B2 — Normal-finalisation failure rules still exclude a supported `complete` cleanup outcome
+
+**Locations**
+- SPEC §7.1, paragraph beginning **“In `normal_cleanup` mode, capture a complete final inventory…”**, and numbered item **5**: after an intent, failure requires `cleanup_outcome=partial` or `unknown`.
+- Manifest `sandbox.finalizer_ipc_boundary.failure_rule` and its duplicate under `semantic_finalizer_contract.finalizer_ipc_boundary`.
+- Conversely, manifest `semantic_finalizer_contract.normal_cleanup_failure` explicitly permits `partial/complete/unknown`.
+- These conflicting clauses are reproduced in the primary packet.
+
+**Concrete contradiction:** all removals can have durable successful outcomes and the journal can be closed, while subsequent evidence validation fails. With common authority intact, cleanup history can support `complete` while overall status remains `INCONCLUSIVE`. The manifest expressly permits that result, but the SPEC’s broader post-intent failure rule excludes it.
+
+**Required amendment:** consistently distinguish destructive-cleanup failure from later finalisation/evidence failure. Permit `complete` when supported by the historical cleanup evidence, without implying PASS, verified final inventory or permission to retry.
+
+**Other requested checks:** no stale unconditional abnormal `not_started` requirement remains in `classification_rules.pass_requires` or `fail_requires`; the abnormal schema includes `complete`. Missing/unavailable enums cover the eight required evidence names and exclude the record and optional diagnostics; exactness and disjointness remain semantic requirements. PID cross-artifact validation is explicitly **NOT EXECUTED**, not falsely reported as passed.
+
+**Optional advice:** consolidate duplicated policy clauses and clearly separate historical fixture counts from current claims.
+
+## 3. Evidence limitation
+
+I used no tools, executed no code or tests, recomputed no hashes, and independently inspected no filesystem, launcher or runtime artefacts. The classifier counterexample is textual reasoning, not an executed probe. Supplied synthetic checks and compile/link-only D1-H evidence do not establish D2 runtime correctness or performance.
+
+## 4. Authority boundary
+
+**No implementation, configure/build, runtime, harness/finalizer, IPC, cleanup, VM/SSH, commit, push or D3 authority is granted.** The launcher remains **NOT_PROVISIONED** and D2 **BLOCKED** pending the separate prerequisites and owner decision. This review authorises no follow-up call.
+```
+
+## Earlier plan-only review — summary, not a verdict
+
+Source `Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-only-20261013.parsed.md`; SHA-256 `c4bf76c6dffe9ed1bdfc02a03244f5b19e6ed288771cdc2c085837cf6aeeb50a`. The earlier plan-only answer diagnosed policy drift and an under-specified lifecycle model, recommended a bounded same-SPEC model/fixtures/read-only checker, and explicitly granted no call or operational authority. It is plan-only context, not an acceptance verdict; the owner now requests one documentary review, still subject to exact-SHA consent.
+
+## Independent local audit dispositions
+
+These were static local audits, not Astra verdicts. The exact current relevant policy objects are attached below so the reviewer can assess the dispositions directly.
+
+```json
+[
+  {
+    "prior_finding": "The projection tests used synthetic SPEC/model data and did not prove correspondence with live r12 bytes.",
+    "r13_evidence": "The canonical model is extracted from live v1.15 SPEC bytes, compared with the fixture, and the CLI hashes live SPEC/manifest/packet bytes plus Git HEAD; a stale r12 manifest/packet probe fails as expected."
+  },
+  {
+    "prior_finding": "Cleanup results were not bound to the exact physical identity created.",
+    "r13_evidence": "SysV binds (candidate_key, shmid); POSIX binds (source_name, device, inode); replay requires the same identity across CREATED, CLEANUP_INTENT and terminal outcome."
+  },
+  {
+    "prior_finding": "SPEC and manifest differed on partial/complete history and later evidence failure.",
+    "r13_evidence": "The attached active policy objects project one canonical COUT-001..004 model; complete historical cleanup remains distinct from overall INCONCLUSIVE and never implies PASS."
+  },
+  {
+    "prior_finding": "No targeted negative fixture for orphan CLEANUP_FAILED.",
+    "r13_evidence": "The schema-valid CLEANUP_FAILED-without-intent fixture expects unknown and is included in the attached transition-test excerpt and COUT-004/JRN-008 coverage."
+  },
+  {
+    "scope_limit": "The read-only checker verifies exact model equality, selected structured projections, hashes and HEAD; it is not a production finalizer, does not adjudicate every prose rule, and does not validate cross-artifact PID-set equality."
+  }
+]
+```
+
+## Current SPEC-039 excerpts (verbatim)
+
+Full-file SHA-256 `3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0`. Attached are the exact frontmatter, the D3/D4 gate statements, and the selected §7.1 paragraphs plus full §7.2. The remainder of the SPEC is not reproduced; its current whole-file digest is pinned, but Astra is not asked to claim it inspected omitted sections.
+
+### Frontmatter
+```markdown
+# SPEC-039: Gateway Measurement Baseline on AIOPT5
+
+**Version:** v1.15
+**Date:** 2026-10-13
+**Author:** Hermes; owner-directed same-SPEC documentary amendment
+**Status:** In Progress
+**Gate:** D0 remains limited to Q0/Q1. The v1.10/r07 checker amendments received documentary `APPROVE` only. The v1.11/r08 host-profile packet received `AMEND`; follow-up withdrew B1 as a sender-envelope typo and confirmed B2/B3. The v1.12/r09 and v1.13/r10 IPC/finalization findings were addressed in the same SPEC. Astra r12 returned `AMEND`: the journal classifier accepted an orphan `REMOVED` as `not_started`, and the SPEC/manifest disagreed on `complete` cleanup history after later finalization failure. The owner authorized the bounded NG-068 methodology package on 2026-10-13. This v1.15 same-SPEC correction formalizes lifecycle phases, distinct creation/cleanup transitions, stable resource-identity binding and structured outcome/mode rules in §7.2. The local model is synthetic/documentary evidence only; no production finalizer is implemented or executed. This revision is unreviewed; D2 remains blocked pending fresh exact-SHA documentary review, provisioned prerequisites and a separate owner execution decision. D3 is not authorised.
+**Branch:** AIOPT5
+**Baseline commit:** `1af604dad66148618cc0e578c28adb4a9829e607`
+**D0-approved v1.1 draft SHA-256:** `8026e1320149c318a5218eaa36c730f262081a5bbe0c2d582b23c307c7144e1c` (owner approval: 2026-10-04; documentary Q0/Q1 scope only; does not approve this v1.15 amendment)
+**Owner task:** NG-040, under NG-039
+**Related:** `SPEC-032-gw-input-queue-batching.md`, `SPEC-033-message-commandline-refactor.md`
+
+> v1.15 is the owner-authorized same-SPEC response to the r12 B1/B2 findings and the bounded methodology plan. It preserves the v1.14 finalizer boundary and all r08–r11 safeguards, while defining one canonical lifecycle model and exact projections for the SPEC, manifest and packet. It distinguishes cleanup history from overall run status and binds cleanup events to the created resource identity. The model, checker and fixtures are local documentary/synthetic controls—not a production finalizer, runtime test or implementation authorization. The dedicated launcher/lease remains unprovisioned; D2/D3 remain blocked. A fresh exact-SHA Astra review and separate owner execution decision are required before any D2 work.
+
+> This AIOPT5 Proposal uses the existing SPEC-039 number; it is not a restoration of the archived AIOPT3 Proposal or its approval. The archived copy was deliberately set aside during the NG-050 release freeze; its SHA-256 is `c46dd50a6d58c760eba165a8dfdc3e390df41e8049cf0f95527655350c80da4f`. Keep that copy intact. The v1.1 D0 approval was documentary only. Later, separately scoped owner permissions are recorded in §4; they do not transfer to other gates or authorise a performance claim.
+```
+
+### SPEC D3/D4 gate statements
+```markdown
+6. **D3 — Characterisation:** Q0/Q1 timing is a separate gate, allowed only after D2 passes and the owner explicitly authorises the frozen measurement plan. Preserve all run outcomes and identities; classify the future-head hypothesis `MEASURED`, `INCONCLUSIVE`, or `BLOCKED`.
+
+7. **D4 — Follow-up decision:** decide whether to stop, approve another measurement slice, or propose a performance implementation SPEC. Any future change requires a predeclared baseline/metric, actual-source review, correctness controls and its own owner-approved implementation allowlist. Astra or subagent opinions never grant implementation or runtime authority.
+```
+
+### Applicable §7.1 clauses and complete §7.2 canonical model
+```markdown
+The v1.11 direct launch under the ordinary host UID is prohibited for D2. Mode `0600`, umask `0077`, exclusive creation and a pre-inventory do not prevent a same-UID process from replacing a POSIX semaphore name or removing/reusing a SysV resource during the run. This amendment does not claim the current host can satisfy the stronger prerequisite. No D2 configure/build, harness/finalizer execution, IPC creation/removal or measurement may occur until the dedicated single-run identity and launcher are provisioned, independently inspected, pinned in the manifest, and separately authorised by the owner. If they cannot be provided, the D2 execution profile remains `BLOCKED` before any candidate resource is created.
+
+Before any candidate create, create `reservation-journal.jsonl` in the run result directory using exclusive non-symlink creation and mode `0600`; fsync the file and containing directory. This file is a required runtime artifact, capped at 256 KiB and 128 events, one strict JSON object per newline-terminated record, with monotonically increasing sequence numbers and the same run ID; use `ng039-reservation-journal-event/v2` for the event schema. Each event contains schema version, sequence, event kind, monotonic timestamp, process PID/UID, resource kind, candidate key/source name, and nullable identity/result fields. Event kinds are `JOURNAL_OPENED`, `CREATE_INTENT`, `CREATED`, `CREATE_FAILED`, `RUN_SHUTDOWN_COMPLETE`, `CLEANUP_INTENT`, `REMOVED`, `CLEANUP_FAILED`, and `JOURNAL_CLOSED`. Append/fsync `RUN_SHUTDOWN_COMPLETE` exactly once only after all Gateway/output workers have stopped and joined and `Process/GW` has been destroyed; it must precede every `CLEANUP_INTENT`. Write and fsync `CREATE_INTENT` before each `shmget`/`sem_open`; after the call, append and fsync exactly one `CREATED` record with returned identity or `CREATE_FAILED` with errno. Keep the descriptor open, verify its file identity before each append, and never rewrite/truncate prior events. In normal cleanup, the finalizer appends/fsyncs each `CLEANUP_INTENT` before cleanup and `REMOVED`/`CLEANUP_FAILED` after. It may close the journal only after final inventory capture and all events are durable. Abnormal evidence-only finalization never appends to, repairs or closes this journal. A missing event, sequence gap/duplicate, partial line, identity mismatch, crash between intent and outcome, or failure to fsync makes the run `INCONCLUSIVE`; the finalizer must not infer success or retry deletion for an ambiguous resource.
+
+After Gateway/output workers stop and join and `Process/GW` are destroyed, the harness must append/fsync exactly one `RUN_SHUTDOWN_COMPLETE` event to the still-open reservation journal. This event is the positive proof that normal shutdown completed; a caller boolean or process exit is not a substitute. The trusted supervisor then waits/reaps every recorded harness process PID and closes stdout/stderr before invoking the same allowlisted `--finalize` binary. It selects `normal_cleanup` only when the journal contains exactly one valid shutdown-complete event, every recorded process has a verified wait receipt, both logs are closed, no timeout/signal/ambiguous termination occurred, and the lease remains continuously valid. In this mode the finalizer captures post inventory, validates/replays the journal, reads required inventories, inspects exact current identities (`shmctl(..., IPC_STAT, ...)` for SysV SHM and `stat`/equivalent metadata for the exact POSIX semaphore object), and removes only journal-proven run-created resources. For each resource it appends/fsyncs `CLEANUP_INTENT`, rechecks lease and identity immediately before the destructive call, invokes only exact `shmctl(exact_shmid, IPC_RMID, ...)` or `sem_unlink(exact_recorded_name)`, then appends/fsyncs the matching outcome. The `normal_cleanup` gate above is satisfied only while the trusted launcher, supervisor receipt, execution identity, result-directory identity and continuous lease remain valid through final-record closure. If normal-shutdown proof is absent while these common authority/file-safety conditions remain valid, the finalizer may choose `abnormal_evidence_only`. Loss or ambiguity of the lease, supervisor proof, execution identity or result-directory authority is not an abnormal-mode trigger: do not invoke or re-enter the finalizer; preserve the pending/partial record and report `BLOCKED/INCONCLUSIVE`. A failure during normal cleanup after any `CLEANUP_INTENT` stops further destructive calls and retries; while authority remains valid, record `INCONCLUSIVE` with the evidence-derived cleanup outcome in the current finalization, otherwise retain pending recovery state. No ambiguous deletion is retried.
+
+In `abnormal_evidence_only` mode, only while the trusted launcher, execution identity, result-directory identity and continuous lease remain verified, and after a valid `supervisor-termination.json` proves every recorded process was reaped and both logs were closed, the finalizer strictly validates the pending run record and supervisor receipt. It may then open only allowlisted evidence names using no-follow regular-file checks, preserving and hashing safely readable closed raw bytes within per-file caps; it does not require all eight evidence files or enforce the normal complete-bundle/schema checks. `failure.missing_artifacts` lists required evidence names actually absent; `failure.unavailable_artifacts` lists required names present but unreadable/unsafe/over-cap. These sets are disjoint, exclude the run record and optional `harness-diagnostics.txt`, and neither may falsely classify a present file as missing. Malformed but safely readable non-control evidence is preserved and hashed, not parsed or used to block an otherwise permitted `INCONCLUSIVE` record. The bounded journal-history classifier validates event shape, sequence, phase/resource transitions and the stable resource-identity binding defined by §7.2; it is not a full runtime finalizer. `failure.cleanup_outcome` is derived only by the §7.2 `COUT-001`–`COUT-004` rules. Invalid, malformed, truncated, orphan, identity-mismatched or uncovered-resource history yields `unknown`. Abnormal mode always sets `record_finalized=true`, `finalization_mode=abnormal_evidence_only`, and `status=INCONCLUSIVE`, including when the historical cleanup outcome is `complete`. A cleanup outcome never proves final inventory or PASS. The abnormal finalizer performs no new cleanup, does not retry or mutate the journal, and preserves its bytes. If the lease, receipt, process/log proof or result-directory authority fails at any point, do not write/re-enter finalization; keep the pending/partial record and report `BLOCKED/INCONCLUSIVE`. A present but partial, stale, or shutdown-unverified `ipc-post.json` or `ipc-final.json` may be preserved and hashed as a file, but must not be treated as a verified inventory: the run-record post/final inventory summaries remain unavailable, with `is_empty=null` and no claimed inventory digest. The finalizer never reads `/proc/sysvipc` or `/dev/shm`, calls `IPC_STAT`, `IPC_RMID` or `sem_unlink`, appends/repairs/closes the journal, or performs cleanup during this mode.
+
+In `normal_cleanup` mode, capture a complete final inventory and require it to match pre exactly for all `/proc/sysvipc` raw bytes/parsed summaries and `/dev/shm` entries. The final run record lists `reservation-journal.jsonl` exactly once with final size/hash and every other required runtime artifact exactly once. The finalizer strictly parses journal/inventories, replays the §7.2 transition/identity model, recomputes raw table hashes and normalized inventories, proves each cleanup event maps to one successful create receipt, and derives status from those bytes rather than caller booleans. It must not accept `journal_fsynced=true`, `mapping_verified=true` or a final inventory match as substitutes for underlying evidence. PASS/FAIL require the complete bundle and safe normal cleanup; missing/contradictory evidence, unexplained change, residual candidate, failed join, timeout or ambiguous exit is `INCONCLUSIVE`; no broad host cleanup is permitted. If a failure occurs before journal closure, retain partial evidence and do not claim PASS/FAIL. If failure occurs after any `CLEANUP_INTENT`, stop subsequent destructive calls and retries; while authority remains valid, derive `cleanup_outcome` from the closed, transition-valid journal under §7.2. `partial` requires every created resource to have one terminal cleanup outcome and at least one proven `CLEANUP_FAILED`; an uncovered or ambiguous resource is `unknown`. If a complete closed journal proves every created resource was removed and no cleanup failed, preserve `cleanup_outcome=complete` even when a later evidence/inventory/final-record check fails; the overall run remains `INCONCLUSIVE` unless all normal acceptance gates pass. Cleanup history never upgrades PASS or substitutes for inventory evidence. If authority or safe record writing is lost, leave pending/partial evidence and report `BLOCKED/INCONCLUSIVE`; never re-enter finalization to claim `not_started`. The abnormal evidence-only path preserves the historical cleanup outcome and performs no further cleanup. D2 remains one controlled correctness run only; no network/VM, D3 timing, performance claim, algorithm change, PGCS/PG, commit or push unless separately authorised.
+
+5. Bounded run-record and dual-mode finalizer contract: `tests/spec039/q0_q1_d2.manifest.json` defines strict Draft 2020-12 schemas for the pending/final run record v5, `supervisor-termination.json` receipt v1, IPC inventories, observer events and `reservation-journal.jsonl` events v2. The finalized run record's `finalization_mode` is exactly `normal_cleanup` or `abnormal_evidence_only`; pending records use null, and the finalizer derives the mode from journal and supervisor evidence rather than a caller label. The same allowlisted `--finalize` binary is the sole semantic authority. Both finalization modes require a strictly valid pending run record and supervisor receipt; every recorded PID reaped; closed stdout/stderr; unchanged execution/result-directory identities; and a dedicated-UID lease continuously held through final-record closure. If any common prerequisite is absent, ambiguous or lost, do not invoke/re-enter the finalizer or write a final record; retain pending/partial evidence and report `BLOCKED/INCONCLUSIVE`. In `normal_cleanup`, strictly parse/replay all required JSON/JSONL, verify raw `/proc/sysvipc` hashes/rows, exact artifact set, wait/log receipt, lease and semaphore mapping, then inspect exact identities and perform only journal-authorised cleanup after `CLEANUP_INTENT` fsync and immediate identity/lease recheck. `RUN_SHUTDOWN_COMPLETE` must be durable after joins/destruction and before any cleanup intent. PASS/FAIL require the full normal evidence and inventory gates. If cleanup fails after an intent, stop further destructive calls/retries and derive the historical `cleanup_outcome` from §7.2: `partial` requires full created-resource terminal coverage plus a proven `CLEANUP_FAILED`; an uncovered or ambiguous resource is `unknown`. A complete closed journal may retain `cleanup_outcome=complete` if a later inventory/evidence/final-record check fails, but overall status is `INCONCLUSIVE` unless all normal acceptance gates pass. If the final record cannot safely be written, leave pending recovery evidence.
+
+The bounded semantic regression set must reject claimed PASS/FAIL for missing/unverified launcher or lease, a second/foreign process, diagnostic `sem_open` failure calling `sem_unlink`, pre-existing candidate keys/names, unreadable/over-cap/raw-parsed-mismatched normal inventories, noncanonical base64, missing/reordered/duplicated/unfsynced normal journal events, candidate identity/mode mismatch, missing `sem_t` mapping, residual candidates, unexpected host changes, or final-inventory mismatch. Reject normal cleanup without a durable `RUN_SHUTDOWN_COMPLETE`, complete supervisor wait receipts, closed logs and continuous lease. Reject invocation of either mode before all recorded PIDs are reaped and logs closed; when common launcher/receipt/lease/result-directory authority is absent, retain pending evidence and report `BLOCKED/INCONCLUSIVE`. Abnormal fixtures must accept malformed but safely readable non-control evidence as raw preserved/hashable bytes without requiring a complete bundle or parsing it; reject claims of PASS/FAIL, empty inventories, joins/destruction, optional diagnostics in `missing_artifacts`, overlap between `missing_artifacts` and `unavailable_artifacts`, or an inaccurate cleanup-history outcome. Journal-history fixtures follow §7.2: `not_started` requires a complete transition-valid closed journal with zero `CREATED` and zero `CLEANUP_INTENT` (a `CREATE_FAILED` may occur); `partial` requires one terminal cleanup outcome for every created resource and at least one `CLEANUP_FAILED`; `complete` requires every created resource exactly one `REMOVED` and no cleanup failure but never implies PASS; all other histories are `unknown`. Include schema-valid negatives for orphan `REMOVED` and `CLEANUP_FAILED` without cleanup intent, cleanup identity mismatch, pending intent, created-without-cleanup and one resource left uncovered while another is cleaned. Abnormal mode must never retry cleanup or mutate journal/IPC. The finalizer must perform no speculative deletion for disputed resources. Normal PASS/FAIL requires a complete, replayable journal and every required evidence artifact; the normal bundle has eight evidence artifacts plus `run-record.json`, optional `harness-diagnostics.txt`, and a ten-file maximum. Normal artifacts are each ≤4 MiB, the journal ≤256 KiB/128 events, the final run record ≤256 KiB, and the complete normal bundle ≤32 MiB. Abnormal raw preservation remains no-follow and bounded: per-file/total read caps apply, but excess/unsafe present files are recorded as unavailable rather than making strict schema/completeness validation a prerequisite to the `INCONCLUSIVE` record.
+
+The host-controlled runtime shape remains one controlled D2 process tree under the dedicated UID, one Q0/Q1 correctness run, no network input and no performance timing. The launcher serializes the run and finalizer under the verified exclusive lease; the harness itself spawns no child process. The host IPC namespace may contain unrelated objects, but all candidate resources must be absent before reservation and all exact cleanup remains bound to the durable journal. No broad host cleanup is permitted. If the launcher/lease or result-directory identity is absent/lost, a second process enters the identity domain, or supervisor evidence is incomplete, do not perform name-based unlink/RMID or invoke/re-enter finalization; preserve pending/partial evidence and report `BLOCKED/INCONCLUSIVE`. An abnormal record may be written only while common lease and file-safety authority remains valid.
+
+**Next gate:** complete the finite NG-068 local package: verify the §7.2 model, fixtures, structured SPEC/manifest/packet projections and read-only checker; record exact hashes and evidence classes. The r12 one-call consent is consumed. No Astra follow-up is authorized by this amendment; present the new frozen packet SHA for a separate owner decision. D2 implementation/configure/build/run remains blocked until a fresh positive documentary review, provisioned launcher/preconditions and separate owner execution gate. D3 and Q2–Q4 remain deferred. This work is documentary/synthetic, not finalizer runtime, correctness or performance evidence.
+
+### 7.2 Canonical lifecycle and outcome model — v1.15
+
+The following versioned JSON object is the single normative model for journal transitions, resource identity binding, finalizer-mode eligibility and cleanup-history classification. The manifest's `classification_rules.journal_transition_model` and the review packet's marked model block must be structurally identical to this block; the read-only checker verifies those projections and related schema enums. Human-readable requirements use the stable IDs below. This is an offline contract model, not an operational finalizer or runtime evidence.
+
+<!-- NG039-JOURNAL-MODEL-BEGIN -->
+```json
+{
+  "model_id": "ng039-journal-finalization-model",
+  "model_version": 1,
+  "schema_version": "ng039-reservation-journal-event/v2",
+  "journal_states": [
+    "absent",
+    "open",
+    "shutdown_complete",
+    "closed"
+  ],
+  "journal_initial_state": "absent",
+  "journal_terminal_state": "closed",
+  "resource_states": [
+    "none",
+    "create_pending",
+    "create_failed",
+    "created",
+    "cleanup_pending",
+    "removed",
+    "cleanup_failed"
+  ],
+  "resource_initial_state": "none",
+  "resource_kinds": {
+    "journal": "journal",
+    "candidates": [
+      "sysv_shm",
+      "posix_semaphore"
+    ]
+  },
+  "identity_binding": {
+    "sysv_shm": [
+      "candidate_key",
+      "shmid"
+    ],
+    "posix_semaphore": [
+      "source_name",
+      "device",
+      "inode"
+    ]
+  },
+  "required_events": [
+    "JOURNAL_OPENED",
+    "CREATE_INTENT",
+    "CREATED",
+    "CREATE_FAILED",
+    "RUN_SHUTDOWN_COMPLETE",
+    "CLEANUP_INTENT",
+    "REMOVED",
+    "CLEANUP_FAILED",
+    "JOURNAL_CLOSED"
+  ],
+  "events": [
+    {
+      "requirement_id": "JRN-001",
+      "event": "JOURNAL_OPENED",
+      "scope": "journal",
+      "phase_from": [
+        "absent"
+      ],
+      "phase_to": "open",
+      "resource_from": null,
+      "resource_to": null
+    },
+    {
+      "requirement_id": "JRN-002",
+      "event": "CREATE_INTENT",
+      "scope": "resource",
+      "phase_from": [
+        "open"
+      ],
+      "phase_to": "open",
+      "resource_from": "none",
+      "resource_to": "create_pending"
+    },
+    {
+      "requirement_id": "JRN-003",
+      "event": "CREATED",
+      "scope": "resource",
+      "phase_from": [
+        "open"
+      ],
+      "phase_to": "open",
+      "resource_from": "create_pending",
+      "resource_to": "created"
+    },
+    {
+      "requirement_id": "JRN-004",
+      "event": "CREATE_FAILED",
+      "scope": "resource",
+      "phase_from": [
+        "open"
+      ],
+      "phase_to": "open",
+      "resource_from": "create_pending",
+      "resource_to": "create_failed"
+    },
+    {
+      "requirement_id": "JRN-005",
+      "event": "RUN_SHUTDOWN_COMPLETE",
+      "scope": "journal",
+      "phase_from": [
+        "open"
+      ],
+      "phase_to": "shutdown_complete",
+      "resource_from": null,
+      "resource_to": null,
+      "requires_no_resource_states": [
+        "create_pending"
+      ]
+    },
+    {
+      "requirement_id": "JRN-006",
+      "event": "CLEANUP_INTENT",
+      "scope": "resource",
+      "phase_from": [
+        "shutdown_complete"
+      ],
+      "phase_to": "shutdown_complete",
+      "resource_from": "created",
+      "resource_to": "cleanup_pending"
+    },
+    {
+      "requirement_id": "JRN-007",
+      "event": "REMOVED",
+      "scope": "resource",
+      "phase_from": [
+        "shutdown_complete"
+      ],
+      "phase_to": "shutdown_complete",
+      "resource_from": "cleanup_pending",
+      "resource_to": "removed"
+    },
+    {
+      "requirement_id": "JRN-008",
+      "event": "CLEANUP_FAILED",
+      "scope": "resource",
+      "phase_from": [
+        "shutdown_complete"
+      ],
+      "phase_to": "shutdown_complete",
+      "resource_from": "cleanup_pending",
+      "resource_to": "cleanup_failed"
+    },
+    {
+      "requirement_id": "JRN-009",
+      "event": "JOURNAL_CLOSED",
+      "scope": "journal",
+      "phase_from": [
+        "shutdown_complete"
+      ],
+      "phase_to": "closed",
+      "resource_from": null,
+      "resource_to": null,
+      "requires_no_resource_states": [
+        "create_pending",
+        "cleanup_pending"
+      ]
+    }
+  ],
+  "authority_modes": {
+    "requirement_ids": {
+      "common": "AUTH-001",
+      "normal": "AUTH-002",
+      "abnormal": "AUTH-003",
+      "blocked": "AUTH-004"
+    },
+    "common_requirements": [
+      "trusted_launcher",
+      "valid_supervisor_receipt",
+      "all_pids_reaped",
+      "logs_closed",
+      "stable_result_directory",
+      "continuous_lease"
+    ],
+    "normal_requirements": [
+      "durable_shutdown_complete",
+      "normal_waits_valid",
+      "no_timeout_or_signal"
+    ],
+    "mode_names": {
+      "normal": "normal_cleanup",
+      "abnormal": "abnormal_evidence_only",
+      "blocked": "blocked"
+    }
+  },
+  "mode_effects": {
+    "normal_cleanup": {
+      "requirement_id": "AUTH-002",
+      "status": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE"
+      ],
+      "requires": [
+        "full_bundle_schema_journal_replay",
+        "complete_inventory_verification",
+        "exact_journal_authorized_cleanup"
+      ],
+      "forbidden": [
+        "cleanup_before_shutdown_complete",
+        "broad_host_cleanup"
+      ]
+    },
+    "abnormal_evidence_only": {
+      "requirement_id": "AUTH-003",
+      "status": [
+        "INCONCLUSIVE"
+      ],
+      "requires": [
+        "common_authority_gates_true",
+        "strict_pending_record_supervisor_receipt",
+        "bounded_raw_evidence_preservation"
+      ],
+      "forbidden": [
+        "live_ipc_inspection",
+        "cleanup",
+        "journal_mutation",
+        "retry",
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "blocked": {
+      "requirement_id": "AUTH-004",
+      "status": [
+        "BLOCKED",
+        "INCONCLUSIVE"
+      ],
+      "requires": [
+        "preserve_pending_evidence"
+      ],
+      "forbidden": [
+        "finalizer_entry",
+        "finalizer_reentry",
+        "cleanup",
+        "unsafe_record_write"
+      ]
+    }
+  },
+  "cleanup_outcomes": {
+    "not_started": {
+      "requirement_id": "COUT-001",
+      "journal_required": "complete_transition_valid_closed",
+      "created_count": 0,
+      "cleanup_intent_count": 0,
+      "create_failed_allowed": true,
+      "run_status_effect": "NO_PASS_INFERENCE"
+    },
+    "partial": {
+      "requirement_id": "COUT-002",
+      "journal_required": "complete_transition_valid_closed",
+      "all_created_have_one_terminal_outcome": true,
+      "cleanup_failed_count_min": 1,
+      "run_status_effect": "INCONCLUSIVE"
+    },
+    "complete": {
+      "requirement_id": "COUT-003",
+      "journal_required": "complete_transition_valid_closed",
+      "created_count_min": 1,
+      "all_created_removed": true,
+      "cleanup_failed_count": 0,
+      "run_status_effect": "DOES_NOT_IMPLY_PASS"
+    },
+    "unknown": {
+      "requirement_id": "COUT-004",
+      "journal_required": "otherwise",
+      "run_status_effect": "INCONCLUSIVE"
+    }
+  },
+  "normal_cleanup_failure": {
+    "requirement_id": "FIN-001",
+    "stop_destructive_calls_after_failure": true,
+    "retry_after_intent": false,
+    "outcome_source": "complete_transition_valid_closed_journal",
+    "complete_history_after_journal_closed_later_evidence_failure": {
+      "cleanup_outcome": "complete",
+      "run_status": "INCONCLUSIVE"
+    },
+    "authority_loss": {
+      "finalizer_entry": false,
+      "finalizer_reentry": false,
+      "preserve_pending": true,
+      "status": "BLOCKED/INCONCLUSIVE"
+    }
+  }
+}
+```
+<!-- NG039-JOURNAL-MODEL-END -->
+
+`JRN-002` and `JRN-006` deliberately use separate pending states. `JRN-003`/`JRN-004` can consume only a create intent; `JRN-007`/`JRN-008` can consume only a cleanup intent after a successful create. `JRN-005` rejects unresolved create intents; `JRN-009` rejects unresolved intents but may close with an uncleaned `created` resource, which `COUT-004` classifies as `unknown`. For identity continuity, `CREATED`, `CLEANUP_INTENT` and the terminal cleanup event must carry the same stable binding: SysV SHM uses `(candidate_key, shmid)`; a POSIX semaphore uses `(source_name, device, inode)`. Other identity attributes (owner/mode/libc/mapping) remain separate required checks in the normal finalizer; these model bindings do not replace them.
+
+`AUTH-001` is a common gate for both finalizer modes. If any common launcher, receipt, reaping, log-closure, result-directory or continuous-lease requirement is false or unknown, choose `blocked`, do not invoke/re-enter the finalizer, and preserve pending evidence. With common authority intact, `AUTH-002` selects normal cleanup only when every normal gate is true; otherwise `AUTH-003` permits bounded abnormal evidence preservation only, ending `INCONCLUSIVE` with no IPC inspection, cleanup, journal mutation or retry. `COUT-001` through `COUT-004` describe cleanup history, not overall acceptance. `FIN-001` requires stopping destructive actions and retries after failure; a complete closed history remains `complete` if a later evidence/final-record step fails, while run status remains `INCONCLUSIVE`.
+```
+
+## Current manifest: complete B1/B2-relevant active projections
+
+Manifest full raw-byte SHA-256 `2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5`. The bundle includes all selected cleanup/journal/authority/outcome clauses from `classification_rules`, `sandbox`, and `semantic_finalizer_contract`, plus complete journal-event and run-record failure/conditional schema branches, validation/coverage claims, r12 provenance and review state. Every omitted root or policy subsection and omitted schema entry is named and canonical-digest-bound below; the full raw manifest itself is not reproduced.
+
+### Attached structured projection
+```json
+{"classification_rules_active_paths":{"authority_mode_projection":{"common_requirements":["trusted_launcher","valid_supervisor_receipt","all_pids_reaped","logs_closed","stable_result_directory","continuous_lease"],"mode_names":{"abnormal":"abnormal_evidence_only","blocked":"blocked","normal":"normal_cleanup"},"normal_requirements":["durable_shutdown_complete","normal_waits_valid","no_timeout_or_signal"],"requirement_ids":{"abnormal":"AUTH-003","blocked":"AUTH-004","common":"AUTH-001","normal":"AUTH-002"}},"cleanup_outcome_projection":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"cleanup_outcome_requirement_ids":["COUT-001","COUT-002","COUT-003","COUT-004"],"fail_requires":["record_finalized=true and failure.code=ASSERTION_FAILED","at least one correctness assertion FAIL; every inventory/reservation/cleanup assertion PASS; no INCONCLUSIVE/NOT_RUN assertion","known harness exit; normal outer code 0..123; signal=null; timeout_fired=false","all run-created IPC removed by exact identity and final inventory equals pre; failure.missing_artifacts=[]; no uncertainty trigger","failure summary exactly matches recomputed evidence","dedicated UID/launcher/lease verified","journal complete and replayable","raw table digests/summaries recomputable","returned semaphore mapping verified","all required run artifacts including reservation-journal.jsonl present","complete closed journal and eight runtime artifacts","raw inventories/hashes independently recomputable","diagnostic failure paths cannot unlink by name","validated supervisor-termination.json receipt binds the exact process-tree PID set to raw waitpid statuses; stdout/stderr closed and available log hashes match","normal_cleanup has durable RUN_SHUTDOWN_COMPLETE after worker joins and Process/GW destruction; no timeout/signal/ambiguous wait","abnormal_evidence_only is INCONCLUSIVE, requires confirmed process reaping and closed logs, and performs zero IPC inspection/destructive calls","schema-valid supervisor-termination.json whose raw wait receipts cover the exact process_tree_pids and whose closed-log hashes match","durable RUN_SHUTDOWN_COMPLETE before normal_cleanup and before every cleanup intent"],"failure_safety_assertions":["host_inventory_preflight","pre_inventory_complete","candidate_keys_absent_pre","candidate_resources_reserved","process_blocks_verified","gateway_joined","output_worker_joined","target_erased_once","post_inventory_complete","candidate_resources_attributable","candidate_resources_removed","final_inventory_complete","candidate_keys_absent_final","final_inventory_matches_pre","finalization_complete","evidence_complete","wait_decision_correlated","scalar_run_identity_valid"],"failure_summary_consistency":"Finalizer computes all failure fields from validated assertions, events, artifacts and inventories; caller-supplied contradictions map to INCONCLUSIVE/EVIDENCE_INVALID.","inconclusive_precedence":["timeout/signal or ambiguous outer code","missing/invalid stage/final/artifact or duplicate artifact name","finalizer/schema/size/bundle failure","identity/sequence/correlation ambiguity or counter overflow","partial construction or blocked join","incomplete host inventory, failed exclusive reservation, incomplete journal, incorrect mode, libc name-mapping mismatch, or candidate identity mismatch","failed exact cleanup, residual candidate, or final inventory mismatch","contradictory observation/assertion or unavailable required field","any NOT_RUN/INCONCLUSIVE acceptance assertion","missing/unverified dedicated UID launcher or lease before any IPC creation","lease loss or second process entering the dedicated UID domain","sem_open failure path attempts sem_unlink in diagnostic build","raw /proc/sysvipc bytes absent, non-canonical, over-cap, digest-mismatched or parser-mismatched","reservation journal missing/partial/reordered/duplicated/unfsynced or crash between cleanup intent and outcome","returned sem_t* mapping missing/mismatched with exact libc/dev-shm identity","missing/unverified dedicated UID launcher/lease before IPC creation","lease loss or second process enters execution identity","diagnostic sem_open failure path calls sem_unlink","raw /proc/sysvipc bytes missing/noncanonical/over-cap/hash- or parse-mismatched","journal event absent/partial/reordered/duplicate/unfsynced","crash after cleanup intent without durable outcome","returned sem_t mapping absent or mismatched","missing/invalid supervisor-termination.json, PID-set mismatch, duplicate/missing wait receipt, undecodable wait status, open stdout/stderr log","abnormal_evidence_only attempts IPC inspection, cleanup, journal repair/close, claims PASS/FAIL or claims unavailable inventory is empty","normal_cleanup without exactly one durable RUN_SHUTDOWN_COMPLETE before any cleanup intent","missing/invalid supervisor receipt, PID-set mismatch, duplicate/missing wait receipt, undecodable raw wait status, or open logs","normal_cleanup without exactly one durable RUN_SHUTDOWN_COMPLETE before cleanup","abnormal mode attempts IPC/cleanup/journal mutation, claims PASS/FAIL, or reports unavailable inventories as empty","both modes require continuous lease and stable result-directory identity through final record; lease loss yields pending BLOCKED/INCONCLUSIVE","abnormal evidence-only may preserve malformed but safely readable non-control files without schema/replay; normal strict completeness rules do not gate this path","cleanup_outcome is the SPEC-039 §7.2 COUT-001..COUT-004 transition-valid journal result; it never implies PASS"],"journal_transition_model":{"authority_modes":{"common_requirements":["trusted_launcher","valid_supervisor_receipt","all_pids_reaped","logs_closed","stable_result_directory","continuous_lease"],"mode_names":{"abnormal":"abnormal_evidence_only","blocked":"blocked","normal":"normal_cleanup"},"normal_requirements":["durable_shutdown_complete","normal_waits_valid","no_timeout_or_signal"],"requirement_ids":{"abnormal":"AUTH-003","blocked":"AUTH-004","common":"AUTH-001","normal":"AUTH-002"}},"cleanup_outcomes":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"events":[{"event":"JOURNAL_OPENED","phase_from":["absent"],"phase_to":"open","requirement_id":"JRN-001","resource_from":null,"resource_to":null,"scope":"journal"},{"event":"CREATE_INTENT","phase_from":["open"],"phase_to":"open","requirement_id":"JRN-002","resource_from":"none","resource_to":"create_pending","scope":"resource"},{"event":"CREATED","phase_from":["open"],"phase_to":"open","requirement_id":"JRN-003","resource_from":"create_pending","resource_to":"created","scope":"resource"},{"event":"CREATE_FAILED","phase_from":["open"],"phase_to":"open","requirement_id":"JRN-004","resource_from":"create_pending","resource_to":"create_failed","scope":"resource"},{"event":"RUN_SHUTDOWN_COMPLETE","phase_from":["open"],"phase_to":"shutdown_complete","requirement_id":"JRN-005","requires_no_resource_states":["create_pending"],"resource_from":null,"resource_to":null,"scope":"journal"},{"event":"CLEANUP_INTENT","phase_from":["shutdown_complete"],"phase_to":"shutdown_complete","requirement_id":"JRN-006","resource_from":"created","resource_to":"cleanup_pending","scope":"resource"},{"event":"REMOVED","phase_from":["shutdown_complete"],"phase_to":"shutdown_complete","requirement_id":"JRN-007","resource_from":"cleanup_pending","resource_to":"removed","scope":"resource"},{"event":"CLEANUP_FAILED","phase_from":["shutdown_complete"],"phase_to":"shutdown_complete","requirement_id":"JRN-008","resource_from":"cleanup_pending","resource_to":"cleanup_failed","scope":"resource"},{"event":"JOURNAL_CLOSED","phase_from":["shutdown_complete"],"phase_to":"closed","requirement_id":"JRN-009","requires_no_resource_states":["create_pending","cleanup_pending"],"resource_from":null,"resource_to":null,"scope":"journal"}],"identity_binding":{"posix_semaphore":["source_name","device","inode"],"sysv_shm":["candidate_key","shmid"]},"journal_initial_state":"absent","journal_states":["absent","open","shutdown_complete","closed"],"journal_terminal_state":"closed","mode_effects":{"abnormal_evidence_only":{"forbidden":["live_ipc_inspection","cleanup","journal_mutation","retry","PASS","FAIL"],"requirement_id":"AUTH-003","requires":["common_authority_gates_true","strict_pending_record_supervisor_receipt","bounded_raw_evidence_preservation"],"status":["INCONCLUSIVE"]},"blocked":{"forbidden":["finalizer_entry","finalizer_reentry","cleanup","unsafe_record_write"],"requirement_id":"AUTH-004","requires":["preserve_pending_evidence"],"status":["BLOCKED","INCONCLUSIVE"]},"normal_cleanup":{"forbidden":["cleanup_before_shutdown_complete","broad_host_cleanup"],"requirement_id":"AUTH-002","requires":["full_bundle_schema_journal_replay","complete_inventory_verification","exact_journal_authorized_cleanup"],"status":["PASS","FAIL","INCONCLUSIVE"]}},"model_id":"ng039-journal-finalization-model","model_version":1,"normal_cleanup_failure":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"required_events":["JOURNAL_OPENED","CREATE_INTENT","CREATED","CREATE_FAILED","RUN_SHUTDOWN_COMPLETE","CLEANUP_INTENT","REMOVED","CLEANUP_FAILED","JOURNAL_CLOSED"],"resource_initial_state":"none","resource_kinds":{"candidates":["sysv_shm","posix_semaphore"],"journal":"journal"},"resource_states":["none","create_pending","create_failed","created","cleanup_pending","removed","cleanup_failed"],"schema_version":"ng039-reservation-journal-event/v2"},"local_fixture_coverage":{"invalid_count":14,"invalid_examples":["PASS assertion NOT_RUN","candidate key/name collision before reservation","partial exclusive reservation","incomplete reservation journal","mismatched candidate resource identity","residual candidate after cleanup","unexpected non-candidate change","final inventory differs from pre","incomplete final inventory","unmatched Q1","nonzero PASS exit","missing required artifact","FAIL without false assertion","pending with failure claim","missing dedicated UID/launcher lease","second process enters execution UID","diagnostic sem_open failure calls sem_unlink","raw sysvipc bytes/digest/parsed summary mismatch","partial or reordered reservation journal","crash after cleanup intent before durable outcome","returned sem_t pointer maps to wrong dev-shm inode","missing dedicated UID launcher/lease","second process enters exclusive run identity","sem_open failure path issues sem_unlink","raw sysvipc digest/parsed summary mismatch","missing/partial/reordered/unfsynced journal event","cleanup intent without outcome after crash","returned sem_t pointer maps to wrong inode","missing supervisor wait receipt for a recorded process PID","supervisor receipt PID set differs from execution_identity.process_tree_pids","stdout/stderr not closed before finalizer","normal cleanup without durable RUN_SHUTDOWN_COMPLETE","abnormal evidence-only mode attempts IPC_RMID/sem_unlink or journal repair","abnormal final record claims PASS/FAIL or empty post/final inventory","actually absent required evidence artifact omitted from failure.missing_artifacts","optional harness-diagnostics.txt listed in failure.missing_artifacts","missing supervisor-termination.json","waitpid receipt PID mismatch/duplicate/missing","closed-log hash mismatch","normal cleanup without RUN_SHUTDOWN_COMPLETE","abnormal mode performs cleanup or claims PASS/FAIL","lease loss blocks finalizer entry/re-entry and leaves pending evidence","malformed but safely readable non-control artifact is raw-preserved in abnormal mode","missing/unavailable evidence sets overlap or misclassify a present file","cleanup intent followed by failure reported as not_started","cleanup retry after ambiguous durable intent/outcome","empty, unknown, malformed or reordered journal classified as not_started, partial or complete"],"status":"historical v1.8 local result; detailed standalone fixtures were not retained in the current worktree","valid_count":4},"mode_effect_projection":{"abnormal_evidence_only":{"forbidden":["live_ipc_inspection","cleanup","journal_mutation","retry","PASS","FAIL"],"requirement_id":"AUTH-003","requires":["common_authority_gates_true","strict_pending_record_supervisor_receipt","bounded_raw_evidence_preservation"],"status":["INCONCLUSIVE"]},"blocked":{"forbidden":["finalizer_entry","finalizer_reentry","cleanup","unsafe_record_write"],"requirement_id":"AUTH-004","requires":["preserve_pending_evidence"],"status":["BLOCKED","INCONCLUSIVE"]},"normal_cleanup":{"forbidden":["cleanup_before_shutdown_complete","broad_host_cleanup"],"requirement_id":"AUTH-002","requires":["full_bundle_schema_journal_replay","complete_inventory_verification","exact_journal_authorized_cleanup"],"status":["PASS","FAIL","INCONCLUSIVE"]}},"pass_requires":["record_finalized=true; failure=null; outer_code=0; harness_code=0; signal=null; timeout_fired=false","every required assertion PASS; actual Q0/Q1 values are non-null and satisfy the frozen local conditions","complete host pre/post/final inventories; candidate keys/names absent in pre; all five SHM and semaphore candidates exclusively reserved, journaled, mode 0600, and mapped under the recorded libc","post candidate identities match exclusive reservations; exact run-created resources removed after stop/join; final complete inventory equals pre byte/semantic identity; no counter overflow; Q1 correlation MATCHED","verified dedicated UID, launcher identity and exclusive lease held from pre-inventory through finalizer; no concurrent process in the execution identity domain","all three diagnostic GW.cpp sem_open-failure paths are built with the no-sem_unlink guard and their injected failure tests pass","complete strictly ordered fsynced reservation journal, closed and hash-bound as reservation-journal.jsonl","raw /proc/sysvipc bytes retained in canonical base64; recomputed hashes and parsed normalized summaries match each inventory record","each returned sem_t* is proven to map to the exact recorded libc-backed /dev/shm device/inode for its decimal source name","verified dedicated non-login UID/launcher identity and exclusive lease continuously held through finalizer","all three diagnostic GW.cpp sem_open-failure branches are guarded; targeted failure tests show no sem_unlink","complete ordered fsynced reservation journal is closed and hash-bound as required artifact","raw /proc/sysvipc bytes retained; hashes and normalized summaries recomputed from exact bytes","each returned sem_t* is proven to map to exact recorded libc-backed /dev/shm inode","validated supervisor-termination.json receipt binds the exact process-tree PID set to raw waitpid statuses; stdout/stderr closed and available log hashes match","normal_cleanup has durable RUN_SHUTDOWN_COMPLETE after worker joins and Process/GW destruction; no timeout/signal/ambiguous wait","abnormal_evidence_only is INCONCLUSIVE, requires confirmed process reaping and closed logs, and performs zero IPC inspection/destructive calls","schema-valid supervisor-termination.json whose raw wait receipts cover the exact process_tree_pids and whose closed-log hashes match","durable RUN_SHUTDOWN_COMPLETE before normal_cleanup and before every cleanup intent"],"post_inventory":"Complete inventory after teardown; only the five exact resources created under successful exclusive reservations may differ from pre, and each must match its durable identity receipt before cleanup.","semantic_finalizer":"The finalizer recomputes evidence completeness, artifact hashes, inventory summaries, event sequence/counter consistency, Q0/Q1 correlations and overall status; schema-valid assertion labels alone are never acceptance.","staged_and_final_inconclusive":{"finalized":"status=INCONCLUSIVE and failure is a bounded object","not_finalized":"status=INCONCLUSIVE and failure=null; no failure claim before finalization"},"staging":"record_finalized=false => status INCONCLUSIVE; staging is never in final bundle.","status_values":["PASS","FAIL","INCONCLUSIVE"]},"local_validation_this_freeze":{"artifact_checker_receipt":"separate post-freeze sidecar; not embedded in SPEC/manifest/packet","astra_submitted":false,"d2_d3_measurement":false,"harness_execution":false,"interpretation":"Documentary and offline synthetic model only. This is not a production finalizer, schema meta-validation, cross-artifact PID-set validation, correctness runtime result or performance claim.","ipc_or_vm_activity":false,"json_schema_meta_validation":"separate post-freeze sidecar; r12 results are historical and not inherited","model_extraction_from_spec":"PASS: unique marked JSON block parsed strictly and equals the test fixture model","model_interpreter_unit_tests":"PASS: 58 test methods, 31 journal replay calls and 5 mode-selection calls; synthetic only","optimized_python_tests":"PASS: the same 58 test methods under PYTHONOPTIMIZE=1","owner_exact_sha_consent_for_r13":false,"projection_checker_unit_tests":"PASS: 11 structured projection comparisons and 13 in-memory artifact audits; synthetic only","runtime_finalizer_execution":false,"spec_sha256":"3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0"},"methodology_plan_only_review":{"followup_consent_for_r13":false,"one_call_consent_consumed":true,"packet_path":"Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-candidate-20261013.md","packet_sha256":"fdb16db91ba1e319e030868b121f6dcfc98b10b828b3ce896efa3c8a5c411037","raw_sse_path":"Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-only-20261013.raw.sse","raw_sse_sha256":"6b2e2367af5292b023391b7ff8351aa1eca3bbf8cac23a20a05663a65be34cb8","response_path":"Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-only-20261013.parsed.md","response_sha256":"c4bf76c6dffe9ed1bdfc02a03244f5b19e6ed288771cdc2c085837cf6aeeb50a","submission_receipt_path":"Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-only-20261013-submission.json","submission_receipt_sha256":"5268790ac22df6f31b572adac604147df22cf75a8928a1ddbc29f18da189bf50","verdict":"PLAN ONLY — no acceptance verdict and no operational authority"},"methodology_validation":{"live_spec_manifest_packet_checker":"Not claimed by this manifest; separately captured in the post-freeze validation receipt.","model_id":"ng039-journal-finalization-model","model_version":1,"normal_python":{"artifact_audits":13,"command":"PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker","journal_replay_calls":31,"mode_selection_calls":5,"model_extractions":3,"projection_comparisons":11,"status":"PASS","strict_json_parses":1},"optimized_python":{"command":"PYTHONDONTWRITEBYTECODE=1 PYTHONOPTIMIZE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker","status":"PASS","test_method_count":58},"production_finalizer_runtime_ipc":"NOT EXECUTED","requirement_coverage":[{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_missing_shutdown_or_events_after_close_are_unknown"],"positive_fixtures":["test_no_created_resources_is_not_started","test_successful_cleanup_is_complete"],"requirement_id":"JRN-001"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_create_intent_after_shutdown_is_unknown"],"positive_fixtures":["test_successful_cleanup_is_complete","test_failed_creation_without_cleanup_is_not_started"],"requirement_id":"JRN-002"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_created_without_create_intent_is_unknown","test_created_resource_requires_identity_evidence"],"positive_fixtures":["test_successful_cleanup_is_complete"],"requirement_id":"JRN-003"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_create_failed_without_create_intent_is_unknown"],"positive_fixtures":["test_failed_creation_without_cleanup_is_not_started"],"requirement_id":"JRN-004"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_shutdown_with_open_create_intent_is_unknown"],"positive_fixtures":["test_no_created_resources_is_not_started"],"requirement_id":"JRN-005"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_cleanup_intent_before_shutdown_is_unknown","test_cleanup_intent_identity_must_match_created_resource"],"positive_fixtures":["test_successful_cleanup_is_complete"],"requirement_id":"JRN-006"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_removed_without_cleanup_intent_is_unknown","test_cleanup_result_identity_must_match_created_resource"],"positive_fixtures":["test_successful_cleanup_is_complete"],"requirement_id":"JRN-007"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_cleanup_failed_without_cleanup_intent_is_unknown"],"positive_fixtures":["test_failed_cleanup_is_partial_only_when_all_created_resources_are_accounted"],"requirement_id":"JRN-008"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_missing_shutdown_or_events_after_close_are_unknown"],"positive_fixtures":["test_no_created_resources_is_not_started","test_successful_cleanup_is_complete"],"requirement_id":"JRN-009"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_lost_lease_blocks_instead_of_selecting_abnormal_mode","test_missing_supervisor_proof_blocks_both_modes"],"positive_fixtures":["test_all_common_and_normal_prerequisites_select_normal_cleanup","test_common_authority_without_normal_proof_selects_abnormal_evidence_only"],"requirement_id":"AUTH-001"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_common_authority_without_normal_proof_selects_abnormal_evidence_only"],"positive_fixtures":["test_all_common_and_normal_prerequisites_select_normal_cleanup"],"requirement_id":"AUTH-002"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_lost_lease_blocks_instead_of_selecting_abnormal_mode"],"positive_fixtures":["test_common_authority_without_normal_proof_selects_abnormal_evidence_only"],"requirement_id":"AUTH-003"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_invalid_authority_model_blocks_mode_selection"],"positive_fixtures":["test_lost_lease_blocks_instead_of_selecting_abnormal_mode","test_missing_supervisor_proof_blocks_both_modes"],"requirement_id":"AUTH-004"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_removed_without_cleanup_intent_is_unknown"],"positive_fixtures":["test_no_created_resources_is_not_started","test_failed_creation_without_cleanup_is_not_started"],"requirement_id":"COUT-001"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_uncovered_created_resource_is_unknown_even_if_another_was_removed"],"positive_fixtures":["test_failed_cleanup_is_partial_only_when_all_created_resources_are_accounted"],"requirement_id":"COUT-002"},{"evidence_class":"offline_synthetic_model","negative_fixtures":["test_created_resource_with_no_cleanup_is_unknown","test_cleanup_history_cannot_authorize_pass"],"positive_fixtures":["test_successful_cleanup_is_complete","test_posix_semaphore_identity_uses_name_not_key"],"requirement_id":"COUT-003"},{"evidence_class":"offline_synthetic_model","negative_fixtures":[],"positive_fixtures":["test_removed_without_cleanup_intent_is_unknown","test_cleanup_failed_without_cleanup_intent_is_unknown","test_cleanup_result_identity_must_match_created_resource"],"requirement_id":"COUT-004"},{"evidence_class":"contract_shape_only; destructive-stop/retry behavior NOT EXECUTED","negative_fixtures":[],"positive_fixtures":["test_cleanup_history_cannot_authorize_pass"],"requirement_id":"FIN-001"}],"schema_meta_validation":"Not claimed by this manifest; separately captured in the post-freeze validation receipt.","test_method_count":58,"test_methods":["test_abnormal_mode_cannot_allow_cleanup_or_ipc","test_all_common_and_normal_prerequisites_select_normal_cleanup","test_authority_mode_projection_matches_model","test_cleanup_failed_without_cleanup_intent_is_unknown","test_cleanup_history_cannot_authorize_pass","test_cleanup_intent_before_shutdown_is_unknown","test_cleanup_intent_identity_must_match_created_resource","test_cleanup_intent_without_terminal_outcome_is_unknown","test_cleanup_outcome_disposition_set_must_be_closed","test_cleanup_outcome_schema_enum_drift_is_reported","test_cleanup_result_identity_must_match_created_resource","test_common_authority_requirements_are_mandatory","test_common_authority_without_normal_proof_selects_abnormal_evidence_only","test_complete_artifact_bindings_are_accepted","test_create_failed_without_create_intent_is_unknown","test_create_intent_after_shutdown_is_unknown","test_created_resource_cannot_be_removed_without_cleanup_intent","test_created_resource_requires_identity_evidence","test_created_resource_with_no_cleanup_is_unknown","test_created_without_create_intent_is_unknown","test_duplicate_cleanup_intent_is_unknown","test_duplicate_cleanup_terminal_is_unknown","test_duplicate_json_keys_are_rejected","test_duplicate_model_blocks_are_rejected","test_duplicate_requirement_ids_are_reported","test_equal_projections_are_accepted","test_failed_cleanup_is_partial_only_when_all_created_resources_are_accounted","test_failed_creation_without_cleanup_is_not_started","test_identity_binding_fields_exist_in_journal_schema","test_identity_key_must_match_top_level_candidate_key","test_invalid_authority_model_blocks_mode_selection","test_journal_schema_event_enum_matches_model","test_lost_lease_blocks_instead_of_selecting_abnormal_mode","test_manifest_consent_or_submission_flag_is_rejected","test_manifest_projection_drift_is_reported","test_manifest_spec_digest_drift_is_reported","test_missing_model_block_is_rejected","test_missing_shutdown_or_events_after_close_are_unknown","test_missing_supervisor_proof_blocks_both_modes","test_mode_effect_projection_matches_model","test_model_block_is_extracted_as_structured_json","test_nested_cleanup_projection_drift_is_reported","test_no_created_resources_is_not_started","test_normal_mode_requires_closed_status_set","test_packet_manifest_pin_drift_is_reported","test_packet_projection_drift_is_reported","test_posix_inode_mismatch_is_unknown","test_posix_semaphore_identity_uses_name_not_key","test_removed_cannot_consume_create_intent_after_create_failed","test_removed_without_cleanup_intent_is_unknown","test_schema_spec_digest_drift_is_reported","test_sequence_time_and_run_identity_corruption_are_unknown","test_shutdown_with_open_create_intent_is_unknown","test_stale_review_revision_is_reported","test_successful_cleanup_is_complete","test_transition_table_cannot_reuse_creation_state_for_removal","test_uncovered_created_resource_is_unknown_even_if_another_was_removed","test_unknown_model_field_is_rejected"]},"owner_authorization":{"build_runtime_ipc_vm_commit_push_authorized":false,"date":"2026-10-13","new_astra_call_authorized":false,"scope":"bounded NG-068 methodology package: same-SPEC v1.15 corrections, offline synthetic model/tests, read-only checker and focused skill guidance"},"r12_review":{"findings":{"B1":"The r12 semantic classifier consumed a REMOVED record through the shared pending state and could label the invalid history not_started instead of unknown.","B2":"SPEC-039 §7.1 limited a post-cleanup failure outcome to partial/unknown, while the manifest also allowed complete for a complete journal followed by later evidence/finalization failure."},"manifest_sha256":"63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917","one_call_consent_consumed":true,"operational_authority":false,"packet_sha256":"a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd","raw_sse_path":"Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.raw.sse","raw_sse_sha256":"b6a6e0ded8ff307bc43a13177832436087f309e16c8ee47c2215c6fdf93caf19","response_path":"Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.md","response_sha256":"6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97","spec_sha256":"0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115","submission_receipt_path":"Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013-submission.json","submission_receipt_sha256":"1c7b5f6c15629087731b2cecc762665523f6983a4eb550e6ad3fc17f70cffa82","validation_receipt_path":"Specs/RESULTS-SPEC-039/precode-validation-v1.14-r12-20261012.json","validation_receipt_sha256":"481fb1dd8b5cad5951a5916a16e4e03481dc8fe70687923a3f60c7c77b5e4c73","verdict":"AMEND — documentary only; consent consumed"},"review_artifacts":{"manifest_path":"Specs/RESULTS-SPEC-039/precode-manifest-v1.15-r13.json","operational_authority":false,"packet_path":"Specs/RESULTS-SPEC-039/precode-packet-v1.15-amend-closure-20261013-sanitized-draft-r13.md","packet_sha256":"computed after packet freeze; not embedded","prior_r08_followup_response_sha256":"6ff9bd65cab5cadb535aeb428781ede9b17ab357a6cdf6121e358af70630ff7b","prior_r08_packet_sha256":"3295a1bffd234673aaa82e2e7e254f3d5bad6c1e747f4d18123f702510445272","prior_r09_packet_sha256":"560ee5654d9a8859e3e21aa916a1dca9f0e564fe1f8eac41fb4ee8f4bd3397a6","prior_r09_raw_sse_sha256":"93f78263662d085a45fde57ea4377c8420b381c958f556a0a80f6a70a089f80e","prior_r09_response_sha256":"4b52a1759768714492d4c2bc5099fc9a3626a334e1a33c65e627f1725494fd01","prior_r10_packet_sha256":"55141aab788839b0346d7ec1bda46c9e4cf86e9d33bc64ce67e242fcb2ff7146","prior_r10_raw_sse_sha256":"4c35170e7d37953daf9bbc7082e0e92cd73b6b45067521a151c3e7654d6f2704","prior_r10_response_sha256":"6aa0669c3cec1b11c2516d6c361d78460663cde9f097cc4c5de8264557e64c2e","prior_r10_submission_receipt_sha256":"046afc37a36e7441ee341d6c663f3718fa0bf8ca76717cc98791f58f95373ae8","prior_r11_packet_sha256":"feb69f164ec879e1b567c44f83e7e56811d2a347fbe904a16337a7a8e3bad829","prior_r11_raw_sse_sha256":"5c9ffcebbb2bd90535465bc04a54fa13155531c267bf9ab69b69f8e830174acb","prior_r11_response_sha256":"9ef48bdfafbfd9818613d9356f9b011972f6efc0af1d2433f7a039c3ba260ed7","prior_r11_submission_receipt_sha256":"4fa8e4828ea27ffd94185ff00d3a5d3364bdf152090b4d093569863991c6aafd","prior_r12_manifest_sha256":"63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917","prior_r12_packet_sha256":"a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd","prior_r12_response_sha256":"6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97","prior_r12_spec_sha256":"0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115","prior_r12_validation_receipt_sha256":"481fb1dd8b5cad5951a5916a16e4e03481dc8fe70687923a3f60c7c77b5e4c73","submission_authorized":false,"submission_state":"UNSUBMITTED_CONSENT_REQUIRED"},"review_revision":"r13","sandbox_active_paths":{"abnormal_evidence_preservation":"Open only allowlisted no-follow regular files after supervisor proof; hash raw bytes within per-file/aggregate limits. Missing required names and present-but-unavailable required names are disjoint arrays. Unsafe common authority/lease means pending BLOCKED/INCONCLUSIVE, not finalization.","abnormal_mode_live_inventory_capture":false,"cleanup_authority":"Destructive cleanup only in normal_cleanup after durable shutdown proof and full common gates. Abnormal evidence-only performs no IPC/cleanup/journal mutation; it requires the same continuous lease and result-directory authority through final-record closure.","direct_host_uid_launch_permitted":false,"finalizer_ipc_boundary":{"abnormal_evidence_only":{"allowed_file_operations":["read pending record and supervisor receipt for strict validation","enumerate allowlisted evidence names without following links","hash safely readable closed raw file bytes within per-file and aggregate read caps","write/fsync one final INCONCLUSIVE run record while continuous lease/result-directory authority holds"],"cleanup_outcome_classifier":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"forbidden":["read /proc/sysvipc or /dev/shm","IPC_STAT, IPC_RMID, sem_unlink or any IPC operation","append/repair/close reservation journal","strict-parse/replay non-control evidence schemas or require complete normal bundle","cleanup, retry, PASS/FAIL, infer joins/Process/GW destruction, or call unavailable inventories empty"],"missing_artifacts":"Exact required evidence names absent from result directory; excludes run-record.json and optional harness-diagnostics.txt.","required":["trusted dedicated non-login UID launcher and execution identity verified","valid supervisor-termination.json schema/hash; unique wait_receipts PID set equals execution_identity.process_tree_pids","every recorded PID reaped and stdout/stderr closed","result-directory device/inode/owner/mode remains bound; only no-follow allowlisted paths are opened","continuous dedicated-UID lease held through final-record closure","pending run record strictly valid","all opened non-control evidence paths are allowlisted and opened no-follow as regular closed files"],"result":"Final status INCONCLUSIVE; cleanup history is evidence-derived, no cleanup is performed/retried; present partial artifacts are preserved as raw bytes and never treated as verified inventories.","unavailable_artifacts":"Required names present but unsafe/unreadable/over-cap; disjoint from missing_artifacts and excludes optional diagnostics."},"allowed_operations":["read complete /proc/sysvipc/{shm,sem,msg} table bytes and /dev/shm inventory for the required pre/post/final phases","shmctl(exact_recorded_shmid, IPC_STAT, ...) to inspect the exact SysV shared-memory object identity","stat/equivalent metadata inspection of the exact journal-recorded /dev/shm semaphore object, including device/inode/UID/GID/mode/link count","shmctl(exact_recorded_shmid, IPC_RMID, ...) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass","sem_unlink(exact_recorded_name) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass"],"cleanup_outcome_classifier":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"failure_rule":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"forbidden_operations":["construct Process/GW","create/open candidate IPC resources or attach/use them for message traffic","invoke Gateway production IPC/send/receive paths","delete an object not exactly bound to its successful journal CREATE receipt","retry a removal whose durable outcome is ambiguous","broad/speculative host cleanup"],"mode_selection":{"authority_modes":{"common_requirements":["trusted_launcher","valid_supervisor_receipt","all_pids_reaped","logs_closed","stable_result_directory","continuous_lease"],"mode_names":{"abnormal":"abnormal_evidence_only","blocked":"blocked","normal":"normal_cleanup"},"normal_requirements":["durable_shutdown_complete","normal_waits_valid","no_timeout_or_signal"],"requirement_ids":{"abnormal":"AUTH-003","blocked":"AUTH-004","common":"AUTH-001","normal":"AUTH-002"}},"mode_effects":{"abnormal_evidence_only":{"forbidden":["live_ipc_inspection","cleanup","journal_mutation","retry","PASS","FAIL"],"requirement_id":"AUTH-003","requires":["common_authority_gates_true","strict_pending_record_supervisor_receipt","bounded_raw_evidence_preservation"],"status":["INCONCLUSIVE"]},"blocked":{"forbidden":["finalizer_entry","finalizer_reentry","cleanup","unsafe_record_write"],"requirement_id":"AUTH-004","requires":["preserve_pending_evidence"],"status":["BLOCKED","INCONCLUSIVE"]},"normal_cleanup":{"forbidden":["cleanup_before_shutdown_complete","broad_host_cleanup"],"requirement_id":"AUTH-002","requires":["full_bundle_schema_journal_replay","complete_inventory_verification","exact_journal_authorized_cleanup"],"status":["PASS","FAIL","INCONCLUSIVE"]}},"model_id":"ng039-journal-finalization-model"},"normal_cleanup":{"allowed":"Only the exact normal-mode operations in allowed_operations, using journal-proven resources and immediate lease/identity recheck.","required":["exactly one durable RUN_SHUTDOWN_COMPLETE after all worker joins and Process/GW destruction","supervisor-termination.json hash/schema valid; wait_receipts PID set exactly equals recorded process_tree_pids","all raw wait statuses decode as reaped normal exits; timeout_fired=false","stdout/stderr closed and present-file hashes match","continuous dedicated-UID lease"]},"normal_cleanup_failure":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"owner_and_sequence":"The launcher binds the result directory and process_tree_pids before execution and writes the supervisor receipt only after reaping every PID and closing logs. The finalizer checks common authority/lease/file-safety gates first. Normal mode strictly validates complete evidence and performs exact journal-authorized cleanup. Abnormal mode strictly validates only pending run-record and supervisor receipt, raw-preserves bounded allowlisted non-control evidence, writes INCONCLUSIVE and records historical cleanup outcome; it performs no IPC, cleanup, journal mutation or retry.","preconditions":{"abnormal_evidence_only":["normal shutdown proof may be absent, but every both_modes prerequisite remains true","pending run record and supervisor receipt strictly validate","no requirement for normal joins/destruction or complete evidence bundle"],"both_modes":["trusted dedicated non-login UID launcher and execution identity verified","valid supervisor-termination.json schema/hash; unique wait_receipts PID set equals execution_identity.process_tree_pids","every recorded PID reaped and stdout/stderr closed","result-directory device/inode/owner/mode remains bound; only no-follow allowlisted paths are opened","continuous dedicated-UID lease held through final-record closure"],"normal_cleanup":["exactly one durable RUN_SHUTDOWN_COMPLETE after Gateway/output joins and Process/GW destruction, before cleanup intents","no timeout/signal/ambiguous normal wait","complete strict normal evidence bundle and inventory/journal validation"]}},"finalizer_mode_selection":{"authority_modes":{"common_requirements":["trusted_launcher","valid_supervisor_receipt","all_pids_reaped","logs_closed","stable_result_directory","continuous_lease"],"mode_names":{"abnormal":"abnormal_evidence_only","blocked":"blocked","normal":"normal_cleanup"},"normal_requirements":["durable_shutdown_complete","normal_waits_valid","no_timeout_or_signal"],"requirement_ids":{"abnormal":"AUTH-003","blocked":"AUTH-004","common":"AUTH-001","normal":"AUTH-002"}},"mode_effects":{"abnormal_evidence_only":{"forbidden":["live_ipc_inspection","cleanup","journal_mutation","retry","PASS","FAIL"],"requirement_id":"AUTH-003","requires":["common_authority_gates_true","strict_pending_record_supervisor_receipt","bounded_raw_evidence_preservation"],"status":["INCONCLUSIVE"]},"blocked":{"forbidden":["finalizer_entry","finalizer_reentry","cleanup","unsafe_record_write"],"requirement_id":"AUTH-004","requires":["preserve_pending_evidence"],"status":["BLOCKED","INCONCLUSIVE"]},"normal_cleanup":{"forbidden":["cleanup_before_shutdown_complete","broad_host_cleanup"],"requirement_id":"AUTH-002","requires":["full_bundle_schema_journal_replay","complete_inventory_verification","exact_journal_authorized_cleanup"],"status":["PASS","FAIL","INCONCLUSIVE"]}},"model_id":"ng039-journal-finalization-model"},"host_controlled":true,"inventory_requirements_by_mode":{"abnormal_evidence_only":"No live post/final inventory capture; do not require complete artifact bundle or parse/replay non-control evidence. Raw-preserve safely readable closed files; report unavailable separately from absent.","normal_cleanup":"Complete pre/post/final inventories, strict journal/inventory parsing and full required artifact set are necessary for PASS/FAIL."},"launcher_requirement":{"dedicated_non_login_uid":true,"exclusive_run_lease":true,"launcher_in_five_file_code_allowlist":false,"lease_held_from_pre_inventory_through_finalizer":true,"owner_execution_authorization_required":true,"process_census_alone_proves_exclusivity":false,"trusted_root_assumption":"host root/administrator is trusted; otherwise shared-host execution remains prohibited"},"launcher_status":"NOT_PROVISIONED; no D2 configure/build/harness/finalizer or IPC action until separate owner authorization","no_broad_host_cleanup":true,"normal_cleanup_full_pre_post_final_inventory_required":true,"runtime_finalizer_cleanup":"normal_cleanup: strict complete bundle, journal replay, bounded exact identity inspection and journal-authorized cleanup under continuous lease. abnormal_evidence_only: bounded raw evidence preservation and one INCONCLUSIVE record only; no full bundle requirement, parsing/replay of non-control artifacts, IPC inspection, cleanup, journal mutation or retry.","supervisor_termination_receipt":"Required closed artifact supervisor-termination.json v1; contains run_id, pinned launcher/lease identity, exact process_tree_pids, one raw waitpid status per PID, stdout/stderr closure flags/hashes, timeout flag and capture monotonic time. Finalizer requires exact PID-set equality, decodes each wait status, and checks each present log digest."},"schema_projection":{"all_evidence_schema_entry_canonical_sha256":{"collection_responsibility":"1758b61f3c9c5f981dbca9ab786b0cfcc815d9aa0b42b7263b55ec80aefea0f9","ipc_inventory":"470718e3627322d2f95e5efe001927eab0eef7ca0dd638207f16f77aa5fdcace","observer_events":"9e3a3896f9942fb586a452ab878f6b634cfb55fe865796d7009ec1884667ed14","reservation_journal_event":"7e89fc75b79a6a23f40c5a2926090dc3e04c57c46ff8c16bb7f105753be9ebce","run_record":"5629609948c5ecce768f0c81e6bfe390b307e5940fc1627e0b6711d99c252cb6","supervisor_termination":"8ca608cff7b8a30cd2f93a9fb66fefac3475cb8f2b58fadd1cab12f5bad0ab8c"},"reservation_journal_event":{"$id":"urn:ng039:reservation-journal-event:v2","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"candidate_key":{"minimum":1,"type":["integer","null"]},"error_number":{"minimum":0,"type":["integer","null"]},"event":{"enum":["JOURNAL_OPENED","CREATE_INTENT","CREATED","CREATE_FAILED","RUN_SHUTDOWN_COMPLETE","CLEANUP_INTENT","REMOVED","CLEANUP_FAILED","JOURNAL_CLOSED"]},"identity":{"additionalProperties":false,"properties":{"candidate_key":{"minimum":1,"type":["integer","null"]},"creator_pid":{"minimum":2,"type":["integer","null"]},"creator_uid":{"minimum":0,"type":["integer","null"]},"device":{"minimum":0,"type":["integer","null"]},"gid":{"minimum":0,"type":["integer","null"]},"inode":{"minimum":0,"type":["integer","null"]},"libc_path":{"maxLength":1024,"type":["string","null"]},"libc_sha256":{"pattern":"^[0-9a-f]{64}$","type":["string","null"]},"libc_version":{"maxLength":64,"type":["string","null"]},"map_device_major":{"minimum":0,"type":["integer","null"]},"map_device_minor":{"minimum":0,"type":["integer","null"]},"map_end":{"minimum":0,"type":["integer","null"]},"map_inode":{"minimum":0,"type":["integer","null"]},"map_start":{"minimum":0,"type":["integer","null"]},"mapping_line":{"maxLength":4096,"type":["string","null"]},"mode":{"minimum":0,"type":["integer","null"]},"nlink":{"minimum":0,"type":["integer","null"]},"owner_uid":{"minimum":0,"type":["integer","null"]},"path":{"maxLength":512,"type":["string","null"]},"sem_t_address":{"minimum":0,"type":["integer","null"]},"shmid":{"minimum":0,"type":["integer","null"]},"size_bytes":{"minimum":0,"type":["integer","null"]},"source_name":{"maxLength":255,"type":["string","null"]},"uid":{"minimum":0,"type":["integer","null"]}},"type":["object","null"]},"monotonic_ns":{"minimum":0,"type":"integer"},"pid":{"minimum":2,"type":"integer"},"resource_type":{"enum":["sysv_shm","posix_semaphore","journal",null],"type":["string","null"]},"run_id":{"maxLength":64,"minLength":16,"type":"string"},"schema_version":{"const":"ng039-reservation-journal-event/v2"},"sequence":{"maximum":128,"minimum":1,"type":"integer"},"source_name":{"maxLength":255,"type":["string","null"]},"uid":{"minimum":0,"type":"integer"}},"required":["schema_version","run_id","sequence","event","monotonic_ns","pid","uid","resource_type","candidate_key","source_name","error_number","identity"],"type":"object"},"run_record_changed_contract":{"$id":"urn:ng039:run-record:v5","failure_schema":{"oneOf":[{"type":"null"},{"additionalProperties":false,"properties":{"cleanup_outcome":{"enum":["complete","partial","not_started","unknown"]},"code":{"enum":["ASSERTION_FAILED","HOST_INVENTORY_FAILED","PRE_INVENTORY_FAILED","PARTIAL_CONSTRUCTION","IDENTITY_MISMATCH","COUNTER_OVERFLOW","TIMEOUT","SIGNAL","JOIN_BLOCKED","OWNERSHIP_UNCERTAIN","INVENTORY_INCOMPLETE","EVIDENCE_MISSING","EVIDENCE_INVALID","RESOURCE_LIMIT","OTHER","CANDIDATE_IDENTITY_UNCERTAIN","CANDIDATE_CLEANUP_FAILED","FINALIZER_FAILED"]},"inventory_availability":{"additionalProperties":false,"properties":{"final":{"type":"boolean"},"post":{"type":"boolean"},"pre":{"type":"boolean"}},"required":["pre","post","final"],"type":"object"},"last_event_sequence":{"minimum":0,"type":["integer","null"]},"message":{"maxLength":1024,"type":"string"},"missing_artifacts":{"items":{"enum":["stdout.txt","stderr.txt","ipc-pre.json","ipc-post.json","ipc-final.json","observer-events.json","reservation-journal.jsonl","supervisor-termination.json"]},"maxItems":8,"type":"array","uniqueItems":true},"phase":{"enum":["preflight","reservation","pre_inventory","construction","q0","q1","shutdown","post_inventory","cleanup","final_inventory","capture","validation","unknown","finalize"]},"unavailable_artifacts":{"items":{"enum":["stdout.txt","stderr.txt","ipc-pre.json","ipc-post.json","ipc-final.json","observer-events.json","reservation-journal.jsonl","supervisor-termination.json"]},"maxItems":8,"type":"array","uniqueItems":true}},"required":["code","phase","message","last_event_sequence","inventory_availability","cleanup_outcome","missing_artifacts","unavailable_artifacts"],"type":"object"}]},"full_schema_canonical_sha256":"5629609948c5ecce768f0c81e6bfe390b307e5940fc1627e0b6711d99c252cb6","last_finalization_conditional":{"if":{"properties":{"finalization_mode":{"const":"abnormal_evidence_only"}},"required":["finalization_mode"]},"then":{"properties":{"cleanup":{"properties":{"candidate_resources_removed":{"enum":[false,null]},"complete":{"const":false},"final_inventory_complete":{"enum":[false,null]},"final_inventory_matches_pre":{"enum":[false,null]},"finalizer_complete":{"const":true},"gateway_joined":{"enum":[false,null]},"output_worker_joined":{"enum":[false,null]},"process_destroyed":{"enum":[false,null]}},"required":["complete","candidate_resources_removed","finalizer_complete","gateway_joined","output_worker_joined","process_destroyed","final_inventory_complete","final_inventory_matches_pre"],"type":"object"},"failure":{"properties":{"cleanup_outcome":{"enum":["not_started","partial","complete","unknown"]}},"required":["cleanup_outcome","missing_artifacts","unavailable_artifacts"],"type":"object"},"inventories":{"properties":{"final":{"properties":{"available":{"const":false},"complete":{"enum":[false,null]},"is_empty":{"type":"null"},"sha256":{"type":"null"}},"required":["available","complete","is_empty","sha256"],"type":"object"},"post":{"properties":{"available":{"const":false},"complete":{"enum":[false,null]},"is_empty":{"type":"null"},"sha256":{"type":"null"}},"required":["available","complete","is_empty","sha256"],"type":"object"}},"required":["post","final"],"type":"object"},"record_finalized":{"const":true},"status":{"const":"INCONCLUSIVE"}},"required":["record_finalized","status","failure","cleanup","inventories","artifacts"]}},"schema_version":{"const":"ng039-d2-run-record/v5"},"spec_sha256":{"const":"3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0"}}},"semantic_finalizer_active_paths":{"abnormal_evidence_only":{"cleanup_attempt":"Never retry; preserve the §7.2 COUT-001..COUT-004 historical result; abnormal run status remains INCONCLUSIVE.","cleanup_outcome":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"inventories":"post/final summaries unavailable and not empty; present raw files may be preserved; no live inventory capture","journal_mutation":false,"lease_loss":"do not invoke/re-enter finalizer or write a final record; preserve pending and report BLOCKED/INCONCLUSIVE","live_ipc_operations":false,"missing_artifacts":"exact actually absent required evidence-name set","non_control_validation":"raw bounded preservation only; no strict schema parsing/replay or full-bundle gate","status":"INCONCLUSIVE only","trigger":"partial construction, _Exit, blocked join, timeout/signal, absent/invalid RUN_SHUTDOWN_COMPLETE or other non-normal process termination, only while all common lease/supervisor/result-directory gates remain valid","unavailable_artifacts":"present but unsafe/unreadable/over-cap required names; disjoint from missing"},"artifact_checks_by_mode":{"abnormal_evidence_only":["strict pending-record and supervisor-receipt validation only","no completeness or schema/replay requirement for non-control evidence","raw hash safely readable closed allowlisted files within per-file and aggregate read caps","classify absent required names as missing and present unsafe/unreadable/over-cap required names as unavailable","optional diagnostics may be preserved but are never required or listed missing"],"normal_cleanup":["exact required artifact set","optional diagnostics at most once","strict JSON/JSONL/schema/order/run-ID/replay validation","full inventory parsing/recomputation","full bundle byte and count caps"]},"expected_outcome_rule":"Every negative fixture is rejected as a PASS/FAIL claim and finalized INCONCLUSIVE with the listed bounded reason; a finalizer error/no finalized record is also never PASS.","failure_summary_checks":["failure.code is recomputed from the highest-precedence observed condition; ASSERTION_FAILED is used only for a demonstrated correctness predicate failure after all evidence/safety gates pass.","failure.phase must be the phase mapped to the selected failed predicate or uncertainty condition.","failure.missing_artifacts equals the actually absent required evidence-name set; optional diagnostics and run-record.json are excluded.","failure.inventory_availability is derived from actual inventory-file presence and successful parsing, not caller-provided booleans.","failure.cleanup_outcome equals the §7.2 transition-valid closed-journal replay result; overall run status is derived separately and complete does not imply PASS.","failure.last_event_sequence equals the greatest validated event sequence, or null only when no valid event exists.","Any contradiction in code/phase/availability/cleanup/missing-artifact fields yields INCONCLUSIVE/EVIDENCE_INVALID.","failure.unavailable_artifacts equals required evidence names that are present but unsafe/unreadable/over-cap; it is disjoint from missing_artifacts, excludes optional diagnostics and run-record.json, and cannot block abnormal INCONCLUSIVE when safe raw preservation is possible."],"finalizer_ipc_boundary":{"abnormal_evidence_only":{"allowed_file_operations":["read pending record and supervisor receipt for strict validation","enumerate allowlisted evidence names without following links","hash safely readable closed raw file bytes within per-file and aggregate read caps","write/fsync one final INCONCLUSIVE run record while continuous lease/result-directory authority holds"],"cleanup_outcome_classifier":{"complete":{"all_created_removed":true,"cleanup_failed_count":0,"created_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-003","run_status_effect":"DOES_NOT_IMPLY_PASS"},"not_started":{"cleanup_intent_count":0,"create_failed_allowed":true,"created_count":0,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-001","run_status_effect":"NO_PASS_INFERENCE"},"partial":{"all_created_have_one_terminal_outcome":true,"cleanup_failed_count_min":1,"journal_required":"complete_transition_valid_closed","requirement_id":"COUT-002","run_status_effect":"INCONCLUSIVE"},"unknown":{"journal_required":"otherwise","requirement_id":"COUT-004","run_status_effect":"INCONCLUSIVE"}},"forbidden":["read /proc/sysvipc or /dev/shm","IPC_STAT, IPC_RMID, sem_unlink or any IPC operation","append/repair/close reservation journal","strict-parse/replay non-control evidence schemas or require complete normal bundle","cleanup, retry, PASS/FAIL, infer joins/Process/GW destruction, or call unavailable inventories empty"],"missing_artifacts":"Exact required evidence names absent from result directory; excludes run-record.json and optional harness-diagnostics.txt.","required":["trusted dedicated non-login UID launcher and execution identity verified","valid supervisor-termination.json schema/hash; unique wait_receipts PID set equals execution_identity.process_tree_pids","every recorded PID reaped and stdout/stderr closed","result-directory device/inode/owner/mode remains bound; only no-follow allowlisted paths are opened","continuous dedicated-UID lease held through final-record closure","pending run record strictly valid","all opened non-control evidence paths are allowlisted and opened no-follow as regular closed files"],"result":"Final status INCONCLUSIVE; cleanup history is evidence-derived, no cleanup is performed/retried; present partial artifacts are preserved as raw bytes and never treated as verified inventories.","unavailable_artifacts":"Required names present but unsafe/unreadable/over-cap; disjoint from missing_artifacts and excludes optional diagnostics."},"allowed_operations":["read complete /proc/sysvipc/{shm,sem,msg} table bytes and /dev/shm inventory for the required pre/post/final phases","shmctl(exact_recorded_shmid, IPC_STAT, ...) to inspect the exact SysV shared-memory object identity","stat/equivalent metadata inspection of the exact journal-recorded /dev/shm semaphore object, including device/inode/UID/GID/mode/link count","shmctl(exact_recorded_shmid, IPC_RMID, ...) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass","sem_unlink(exact_recorded_name) only for a complete successful CREATE receipt whose exact current identity and continuous lease recheck pass"],"failure_rule":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"forbidden_operations":["construct Process/GW","create/open candidate IPC resources or attach/use them for message traffic","invoke Gateway production IPC/send/receive paths","delete an object not exactly bound to its successful journal CREATE receipt","retry a removal whose durable outcome is ambiguous","broad/speculative host cleanup"],"mode_selection":{"authority_modes":{"common_requirements":["trusted_launcher","valid_supervisor_receipt","all_pids_reaped","logs_closed","stable_result_directory","continuous_lease"],"mode_names":{"abnormal":"abnormal_evidence_only","blocked":"blocked","normal":"normal_cleanup"},"normal_requirements":["durable_shutdown_complete","normal_waits_valid","no_timeout_or_signal"],"requirement_ids":{"abnormal":"AUTH-003","blocked":"AUTH-004","common":"AUTH-001","normal":"AUTH-002"}},"mode_effects":{"abnormal_evidence_only":{"forbidden":["live_ipc_inspection","cleanup","journal_mutation","retry","PASS","FAIL"],"requirement_id":"AUTH-003","requires":["common_authority_gates_true","strict_pending_record_supervisor_receipt","bounded_raw_evidence_preservation"],"status":["INCONCLUSIVE"]},"blocked":{"forbidden":["finalizer_entry","finalizer_reentry","cleanup","unsafe_record_write"],"requirement_id":"AUTH-004","requires":["preserve_pending_evidence"],"status":["BLOCKED","INCONCLUSIVE"]},"normal_cleanup":{"forbidden":["cleanup_before_shutdown_complete","broad_host_cleanup"],"requirement_id":"AUTH-002","requires":["full_bundle_schema_journal_replay","complete_inventory_verification","exact_journal_authorized_cleanup"],"status":["PASS","FAIL","INCONCLUSIVE"]}},"model_id":"ng039-journal-finalization-model"},"normal_cleanup":{"allowed":"Only the exact normal-mode operations in allowed_operations, using journal-proven resources and immediate lease/identity recheck.","required":["exactly one durable RUN_SHUTDOWN_COMPLETE after all worker joins and Process/GW destruction","supervisor-termination.json hash/schema valid; wait_receipts PID set exactly equals recorded process_tree_pids","all raw wait statuses decode as reaped normal exits; timeout_fired=false","stdout/stderr closed and present-file hashes match","continuous dedicated-UID lease"]},"normal_cleanup_failure":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"owner_and_sequence":"The launcher binds the result directory and process_tree_pids before execution and writes the supervisor receipt only after reaping every PID and closing logs. The finalizer checks common authority/lease/file-safety gates first. Normal mode strictly validates complete evidence and performs exact journal-authorized cleanup. Abnormal mode strictly validates only pending run-record and supervisor receipt, raw-preserves bounded allowlisted non-control evidence, writes INCONCLUSIVE and records historical cleanup outcome; it performs no IPC, cleanup, journal mutation or retry.","preconditions":{"abnormal_evidence_only":["normal shutdown proof may be absent, but every both_modes prerequisite remains true","pending run record and supervisor receipt strictly validate","no requirement for normal joins/destruction or complete evidence bundle"],"both_modes":["trusted dedicated non-login UID launcher and execution identity verified","valid supervisor-termination.json schema/hash; unique wait_receipts PID set equals execution_identity.process_tree_pids","every recorded PID reaped and stdout/stderr closed","result-directory device/inode/owner/mode remains bound; only no-follow allowlisted paths are opened","continuous dedicated-UID lease held through final-record closure"],"normal_cleanup":["exactly one durable RUN_SHUTDOWN_COMPLETE after Gateway/output joins and Process/GW destruction, before cleanup intents","no timeout/signal/ambiguous normal wait","complete strict normal evidence bundle and inventory/journal validation"]}},"inventory_checks":["schema, run_id and phase agree with record role","is_empty is recomputed but need not be true for host-wide pre/post/final inventories","candidate keys and semaphore names are absent from pre-inventory","post inventory contains no unexplained changes; exact run-created candidates may be present before cleanup","only exact run-created SHM IDs and semaphore names are removed; final inventory equals pre","each raw /proc/sysvipc table is present as canonical base64; finalizer recomputes SHA-256 from decoded bytes and reparses to independently derive normalized summaries","all candidate resources have successful exclusive-reservation journal events, effective mode 0600 and exact kernel/file identity","dedicated non-login UID and exclusive launcher lease verified continuously through finalizer; ordinary host UID is invalid","diagnostic sem_open failure paths cannot issue sem_unlink; all three pinned sites are guarded in the diagnostic build","returned sem_t* address lies in a shared mapping whose device/inode equals exact semaphore path identity under the recorded libc","only exact run-created SHM IDs/semaphore names are removed while lease remains valid; final raw/parsed inventories equal pre","each /proc/sysvipc table is retained as canonical base64; finalizer recomputes SHA-256 and reparses normalized rows/IDs","all candidates have successful journal events, effective mode 0600 and exact identity","dedicated UID and exclusive launcher lease verified continuously; ordinary host UID invalid","diagnostic sem_open failure paths cannot issue sem_unlink","returned sem_t* address lies in shared mapping whose device/inode equals exact semaphore file under recorded libc","only exact run-created SHM IDs/semaphore names removed while lease valid; final raw/parsed inventories equal pre","Finalizer IPC calls are limited exactly to finalizer_ipc_boundary.allowed_operations; every destructive call is preceded by the required continuous-lease and identity recheck.","normal_cleanup requires durable RUN_SHUTDOWN_COMPLETE and supervisor wait/log receipt; abnormal_evidence_only performs no live inventory/IPC read or destructive call and marks post/final summaries unavailable even when unverified artifact files are preserved"],"negative_fixtures":[{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"claimed PASS with null Q1 decision identity"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"claimed PASS with target_pop_count greater than zero"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"claimed FAIL with unknown/incomplete cleanup"},{"expected_failure_code":"EVIDENCE_MISSING","expected_final_status":"INCONCLUSIVE","input":"claimed FAIL with missing required artifact"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"failure summary code/phase/availability/cleanup disagrees with observed evidence"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"record/artifact run_id, hash or sequence mismatch"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"candidate key/name already present before reservation"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"exclusive SHM/semaphore reservation collision or partial reservation"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"reservation journal missing an object or creator/inode identity"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"candidate post resource identity differs from exclusive reservation receipt"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"failed exact cleanup or residual candidate resource"},{"expected_failure_code":"EVIDENCE_INVALID","expected_final_status":"INCONCLUSIVE","input":"final IPC inventory differs from pre-inventory"}],"normal_cleanup_failure":{"authority_loss":{"finalizer_entry":false,"finalizer_reentry":false,"preserve_pending":true,"status":"BLOCKED/INCONCLUSIVE"},"complete_history_after_journal_closed_later_evidence_failure":{"cleanup_outcome":"complete","run_status":"INCONCLUSIVE"},"outcome_source":"complete_transition_valid_closed_journal","requirement_id":"FIN-001","retry_after_intent":false,"stop_destructive_calls_after_failure":true},"positive_fixtures":["PASS","safe FAIL","finalized INCONCLUSIVE","non-finalized pending INCONCLUSIVE"],"reservation_journal":{"binding":"required runtime artifact for normal complete bundle; bytes/size/SHA-256 bound in final run-record when present; final run-record SHA stays in outer archive index","crash_rule":"Without RUN_SHUTDOWN_COMPLETE, never perform cleanup. Abnormal evidence-only mode preserves the journal byte-for-byte and never closes/repairs it.","event_order":["JOURNAL_OPENED","CREATE_INTENT","CREATED|CREATE_FAILED","RUN_SHUTDOWN_COMPLETE","CLEANUP_INTENT","REMOVED|CLEANUP_FAILED","JOURNAL_CLOSED"],"file_name":"reservation-journal.jsonl","max_bytes":262144,"max_events":128,"r12_cleanup_history":"RUN_SHUTDOWN_COMPLETE precedes every cleanup intent. In abnormal mode, classify cleanup history conservatively; malformed/truncated journal means unknown, never not_started. No journal repair/close or retry.","required_behavior":"exclusive mode 0600, append-only strict JSONL, monotone sequence, same run_id, fsync every event and parent directory after create","schema_id":"urn:ng039:reservation-journal-event:v2","schema_version":"ng039-reservation-journal-event/v2","shutdown_event":"Exactly one durable RUN_SHUTDOWN_COMPLETE after all Gateway/output workers joined and Process/GW destroyed; required before normal-cleanup intent."},"schema_boundary":"JSON Schema checks shape and simple local status/value implications; the finalizer owns cross-artifact/equality/ordering rules so they are not duplicated.","single_authority":"same allowlisted ng039_gw_q0_q1_d2 binary --finalize mode; no extra runner/helper file","status_precedence":["PASS only if all Q0/Q1 predicates, exclusive reservation, exact cleanup and final inventory equality pass","FAIL only on an observable correctness assertion failure with complete evidence and safe exact cleanup","otherwise INCONCLUSIVE; do not delete any resource lacking an exact reservation identity"]},"source_identity_and_worktree":{"baseline_file_sha256":{"CMakeLists.txt":"5f9cd0676b2dcdcd0a500d778f5d5baea312301d6abc382db5eab95f2bbb1d07","Common/src/GW.cpp":"7893766ab808473f53b66d8fb9e3804ae5c579bc37d700d90e78155a2ab2cc5e","Common/src/GW.h":"54a97c54fe75fd76e157afc1c70ebce370f3c6edab33233babab3f3fc68f0b44","Common/src/GWRunInitialization01.cpp":"1656b703c892831a05043a8bf82ae1bed73d701c8ffea7b95af5a02df0c978af","Common/src/Message.cpp":"96f718f16dfa34fb081c02df872a3959a4255180798e6022e61d198905035518","Common/src/Process.cpp":"bd45b77db19adf7a3c0f78bf5970996afce9720b77ea15519f5a4bcf703845d1","Common/src/Process.h":"62731b2736be95b451943336100b0eee6523e7f95b3c0b7a7c99ad518d5a44f4"},"document_checkout_branch":"AIOPT5","document_checkout_head":"756f493b7049434ab67cf2382486a48f606a470c","document_checkout_relation":"local HEAD is two commits ahead of origin/AIOPT5; review packet is a working-tree artifact, not checked-in","document_checkout_tracking":"origin/AIOPT5","document_checkout_tree":"9adf665c0eb06213a29a6c12d650451948c7a4ab","functional_baseline_commit":"1af604dad66148618cc0e578c28adb4a9829e607","functional_baseline_tree":"5a3ebb9fbdf61185f05b18e58b8799ced40eb60b","host_runtime_identity":{"architecture":"x86_64","kernel":"Linux 6.8.0-146-generic","libc":"glibc 2.39","scope":"read-only host identity; no D2 IPC operation"},"primary_checkout_relation":"AIOPT5 local HEAD is 2 commits ahead of origin/AIOPT5; working SPEC/manifest/packet files are uncommitted review artifacts; unrelated SPEC-062 changes excluded.","primary_checkout_status_at_freeze_input":{"spec039_modified":true,"spec062_modified_unrelated":true,"status_text":"snapshot recorded exactly; unrelated SPEC-062/RESULTS-SPEC-059 paths are excluded from this review","unrelated_changes_included_or_validated":false,"untracked_results_spec039_present":true,"untracked_results_spec059_unrelated":true},"r13_spec_model_sha256":"c9c587d130d63a82c247c100108d4cc5d10fa9eb39f495d61d856b82e9ed9e8c","r13_worktree_status_at_manifest_generation":"M Specs/SPEC-039-common-performance-measurement.md\n M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md\n?? Specs/RESULTS-SPEC-039/\n?? Specs/RESULTS-SPEC-059/","reviewed_spec_clean_in_primary_worktree":false,"source_for_code_claims":"immutable baseline Git objects only","unrelated_changes_included_or_validated":false,"unrelated_primary_worktree_changes_present":true,"working_tree_diff_sha256_for_spec039":"3d289989521551afd24cacf33bb55c0e6163817f3dd0f0f9348608a5b91313c8"},"spec":{"change_from_v1_11":"Same-SPEC documentary response to r08 B2/B3: block direct ordinary-UID execution; require dedicated single-run UID/launcher/lease; specify diagnostic no-unlink guards for all three GW.cpp sem_open-failure paths; define durable journal, raw inventory retention/recomputation, and returned-sem_t mapping evidence. No implementation/runtime authority.","change_from_v1_12":"Resolve the sole r09 B1 by consistently defining finalizer IPC authority: bounded inventory/current-identity inspection and exact journal-authorized removal under continuous dedicated-UID lease; prohibit Process/GW construction, resource creation, production message traffic, ambiguous retries and broad cleanup. Preserve r09 B2/B3 controls. Documentary only.","change_from_v1_13":"Same-SPEC r12 response to r11 AMEND: require common continuous lease/supervisor/file-authority for both modes and block finalization on loss; derive abnormal cleanup history as not_started/partial/complete/unknown without retry; add unavailable_artifacts; scope full strict evidence parsing/completeness to normal_cleanup and raw bounded preservation to abnormal evidence-only.","change_from_v1_14":"Same-SPEC response to r12 B1/B2: adds a canonical versioned lifecycle model with distinct create/cleanup transitions, stable SysV/POSIX resource identity bindings, common authority gates, normal/abnormal/blocked mode effects, and structured cleanup outcomes. `complete` is historical cleanup evidence only and does not imply PASS; all duplicated manifest policies are checked as exact structured projections. No operational authority.","path":"Specs/SPEC-039-common-performance-measurement.md","sha256":"3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0","status":"In Progress","version":"v1.15"}}
+```
+
+### Omitted manifest root/policy/schema subsection digests; bound to the full raw manifest SHA above
+```json
+{"evidence_schema_entries":{"collection_responsibility":{"canonical_bytes":2981,"canonical_sha256":"1758b61f3c9c5f981dbca9ab786b0cfcc815d9aa0b42b7263b55ec80aefea0f9"},"ipc_inventory":{"canonical_bytes":3130,"canonical_sha256":"470718e3627322d2f95e5efe001927eab0eef7ca0dd638207f16f77aa5fdcace"},"observer_events":{"canonical_bytes":3666,"canonical_sha256":"9e3a3896f9942fb586a452ab878f6b634cfb55fe865796d7009ec1884667ed14"},"supervisor_termination":{"canonical_bytes":1506,"canonical_sha256":"8ca608cff7b8a30cd2f93a9fb66fefac3475cb8f2b58fadd1cab12f5bad0ab8c"}},"policy_subsections":{"classification_rules":{"artifact_names_unique":{"canonical_bytes":362,"canonical_sha256":"ac8a9ad970eacaaea4eb52acc4464f746a240d0c03a208a1e109a957079ad393"},"assertion_values":{"canonical_bytes":40,"canonical_sha256":"9c14cc0748c902f5b964e5f47a6c8baea185b6fb2cfb41bb932041a50d10254b"},"dev_shm_bounds":{"canonical_bytes":166,"canonical_sha256":"ed9b5c27e58b530d278d635f5cfe365678f1cafe42e3f2f927a66c9566f8dc5a"},"observed_exit":{"canonical_bytes":424,"canonical_sha256":"67d1a070a8f2e6c6bb9af200b856bb52b216c2ec36445c677e5fc5ba4d659721"},"required_artifact_names":{"canonical_bytes":156,"canonical_sha256":"9f9152b780e7bcef98262f3a469c8bc0afaf50f98b36bb56f10b723a2c8cdf89"},"run_id_uniqueness":{"canonical_bytes":47,"canonical_sha256":"e558bafd2f263ace82084f47be21faf8d14197c5fd9838fb740017ddff4d2983"},"sysv_bounds":{"canonical_bytes":203,"canonical_sha256":"d0da0dd7f93d1afdd0078c8c46dd94e33855d5e34e9514f141e7532f1100f8a1"}},"sandbox":{"candidate_key_algorithm":{"canonical_bytes":256,"canonical_sha256":"0a0b7a3a0bdbe0270968760c475668c02bfc7e149b7390e2cb565563a55ef8f0"},"candidate_keys":{"canonical_bytes":48,"canonical_sha256":"18a4ab6323416a50e46cf4453be6eed2f8c2fea531bd180a11bb37383a6cfc76"},"candidate_keys_absent_pre_required":{"canonical_bytes":4,"canonical_sha256":"b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"},"candidate_object_mode":{"canonical_bytes":73,"canonical_sha256":"3f1f51132b3a6c7ae685f030bdf785d579c49d92e03b353331d8944f5baa1eff"},"candidate_posix_semaphores":{"canonical_bytes":150,"canonical_sha256":"f9646040aec2f32397dbd954f1929db9da4d81425a4beb0a9b1d0b8185365e47"},"candidate_sysv_shm":{"canonical_bytes":158,"canonical_sha256":"836d7312c4212559209a17131c44e830cd48290144185ec3f6fd421fdeb7713f"},"cwd":{"canonical_bytes":13,"canonical_sha256":"f082d5314a6179d055bc85f580bce1befec57106a6cd599cdc446109ae40f7a4"},"dev_shm_inventory_bounds":{"canonical_bytes":96,"canonical_sha256":"fc555223cb308cb39347defcff00d723fb1c7186e9d32f756e9009620458be58"},"diagnostic_sem_open_failure_paths":{"canonical_bytes":150,"canonical_sha256":"11260ae94c4d0c440f334f47afb9b688e53d3d3081de88d212d16cce086891a0"},"diagnostic_sem_open_failure_policy":{"canonical_bytes":242,"canonical_sha256":"c7c039f6ec9dfdefec4351828cefba225ed49ad142e92a47a8b6b5351d8230d7"},"environment_contract_ref":{"canonical_bytes":28,"canonical_sha256":"ee5b499fda1016a6e5aaca1737fd34716a63b6834faf99435799b695f1cdd2b1"},"exclusive_candidate_reservation_required":{"canonical_bytes":4,"canonical_sha256":"b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"},"execution_profile":{"canonical_bytes":146,"canonical_sha256":"8d589f23da14d633310561c4fd5073d98481611edbd827f2afa3aa04930ca26e"},"finalizer_command":{"canonical_bytes":95,"canonical_sha256":"2eaead4206847497d923fa358b86b0e11868c6188ab1255a57b2631d3149fdda"},"finalizer_kill_grace_s":{"canonical_bytes":1,"canonical_sha256":"ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"},"finalizer_rlimits":{"canonical_bytes":123,"canonical_sha256":"74048ec97d77bb55bcacd137eacc13a1064820e79c6a17be7e7fba459737d267"},"finalizer_timeout_s":{"canonical_bytes":2,"canonical_sha256":"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"},"harness_spawns_children":{"canonical_bytes":5,"canonical_sha256":"fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"},"host_inventory_may_be_nonempty":{"canonical_bytes":4,"canonical_sha256":"b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"},"kill_grace_s":{"canonical_bytes":1,"canonical_sha256":"ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"},"launch_command":{"canonical_bytes":111,"canonical_sha256":"0b602641131724bbc7153f606681fd2dc331e5f384cc4bf0f7ff9714d1dc2735"},"launch_stdout_stderr":{"canonical_bytes":103,"canonical_sha256":"e1bb39a5a0cf9bafc90035b97b1d268951950febd08eead3a93fe951b63f4c00"},"outer_status_capture":{"canonical_bytes":299,"canonical_sha256":"ef3e670eb8aabe0f8a4a0c1a5ab0d8ae3144edd0df7827919179bcb9bec404ff"},"reservation_umask":{"canonical_bytes":48,"canonical_sha256":"933802541403434ac7e603a727ed4da876ebb7362821259b793d706ab90a4383"},"rlimits":{"canonical_bytes":123,"canonical_sha256":"77adafba19db51932325ae5f46ea0e3ca6c7f5498bab7b9c3c8eb9076ac41117"},"semaphore_name_mapping":{"canonical_bytes":280,"canonical_sha256":"84eddccf5ed684a3f0b80d3d68a143e3eb73cc91252e568ab96e6b8a387245d3"},"sysv_inventory_bounds":{"canonical_bytes":71,"canonical_sha256":"9f567483bce6f9b679c7ecfe7f20cbbe6308bf8928fc88ccae93ad88d50740b0"},"timeout_s":{"canonical_bytes":2,"canonical_sha256":"f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b"}},"semantic_finalizer_contract":{"artifact_checks":{"canonical_bytes":743,"canonical_sha256":"46352abf2d0fedd49d5dd5f746ee3a51a12688b1e25d916d615492762dfcc81b"},"assertion_to_phase":{"canonical_bytes":1033,"canonical_sha256":"3328428c5b7bb6b427d6488a960ebcb514e14139ad100615b1fafa8f551f88a0"},"execution_identity":{"canonical_bytes":353,"canonical_sha256":"7a3df19455fc2c0a86ac22f86753baac25758816c09d73c44e2dba28ec5a0f8b"},"observer_checks":{"canonical_bytes":380,"canonical_sha256":"7827b20b0d526b1c72e289efcd10a838a2ebf2002a84471be0c7c78a923f543b"},"strict_json":{"canonical_bytes":118,"canonical_sha256":"1f956e2613ce1cc43f81856aff21ac2669d88a46caefe9263eb0080c3e905997"}}},"root_sections":{"amendment_response":{"canonical_bytes":5090,"canonical_sha256":"3ad2e6a3c4677a406e0044781957e049fac53e3af6784e94ce0df71f36a8ca65"},"changed_file_allowlist":{"canonical_bytes":127,"canonical_sha256":"4985f2d01799c8ae04636b972d53df703b8478288702de96ede626c60c02ae49"},"cmake":{"canonical_bytes":19232,"canonical_sha256":"f44d08dffe528b8a5f1a97278750975b5aa91fb02de027e8298d0418207ee9ce"},"evidence_recovery":{"canonical_bytes":2640,"canonical_sha256":"afd64c0fa2a979cc19ff26013177dff65173c12e6ee9ffdab7a3a666cd871fdf"},"fixture":{"canonical_bytes":729,"canonical_sha256":"d8faf9a00f0283df879bd7b681725b9943e01c36ac19989957fc5c6e7abb53c9"},"local_path_audit":{"canonical_bytes":844,"canonical_sha256":"624a8ff05d9c226c0b5ad9db9db83bf6c49d2b7ad601fec26ff4a49eae46e1ef"},"observer":{"canonical_bytes":2240,"canonical_sha256":"4baf6db318864d6783ac526bdfaa8161c3eb7c79afddce778a3a39ec26fb2a1e"},"parent_task_id":{"canonical_bytes":8,"canonical_sha256":"5d642ec4e94dab49acff80552a367432ca65acc75a9a3b84581636347d0693fd"},"path_aliases":{"canonical_bytes":794,"canonical_sha256":"8fd7ae1536e59cc4e2f5f193d31b3f7598fd9036203b9f335748751f765499f1"},"planned_results":{"canonical_bytes":274,"canonical_sha256":"02333964353d9cacad29bd883cdaf499ac979bdf040c70680cd478500327725b"},"prior_review":{"canonical_bytes":662,"canonical_sha256":"6373f58ee05cad1807a32bb2986aa3745065763262470ea58096d5a0166a9db6"},"r06_review":{"canonical_bytes":1075,"canonical_sha256":"591471347c4b9eef5cee1d05ca1aff397867fdbd5ccccf409b92b3fe7fd36079"},"r08_review":{"canonical_bytes":784,"canonical_sha256":"72511084724d92ab61e8dbdb6d1d39f09816e2ebcb445be194f6013e480983d8"},"r09_freeze_local_validation":{"canonical_bytes":1093,"canonical_sha256":"51474c5612c5265581733f4984652a3073327791888fe81690ffc43de795f996"},"r09_review":{"canonical_bytes":1219,"canonical_sha256":"4ad32adf1e303f26158546324a932f5ef139001db2574d79d5e58f5227075b56"},"r10_freeze_local_validation":{"canonical_bytes":1008,"canonical_sha256":"846fd95e4d2622da28696ac3aeee7f4533988792709ce8891afc2fa38103f4f8"},"r10_review":{"canonical_bytes":1235,"canonical_sha256":"d6d7c073a1c741b0ac0cde9eed066b5e08e31350b80a2dd0852f6bde164a64d2"},"r11_freeze_local_validation":{"canonical_bytes":1435,"canonical_sha256":"113ac375845a1f88b73d630eb2b013eaaf6ce9efd7d87daa7127e3c0e5477ea5"},"r11_review":{"canonical_bytes":1437,"canonical_sha256":"01ce75774f913a240c7ccf87f4ffb4818e6313eb127945d7161d264a49d723e2"},"r12_local_validation_history":{"canonical_bytes":1838,"canonical_sha256":"46f378bc1ad7ac196b1795cc39a68088da015c1f91a4c3efb91a52eb0b04ab64"},"review_date":{"canonical_bytes":12,"canonical_sha256":"ecec9f222b97b72671ced97d5131fd438fbd38c9aca2019b426d1c20fb90c5a5"},"review_scope":{"canonical_bytes":521,"canonical_sha256":"bfeed7dc20b1fa74be3e444fa51106683bcd7974c4dced58fe3e681ae6aa254a"},"runtime_bundle":{"canonical_bytes":3456,"canonical_sha256":"d3728a77633b4b89a841d75e7774f6df1750e7de78e302dc8e6f65b942854ac1"},"schema_version":{"canonical_bytes":49,"canonical_sha256":"d1e118e0c8c2bae5243b8b0e0169cccbcc332661be74a7d186890b70c6616a30"},"scope":{"canonical_bytes":240,"canonical_sha256":"b55ce69cc021e03045633b454db75e3b7d43c0976363e4a669014186c19ce332"},"source_snapshots_before_packet_freeze":{"canonical_bytes":723,"canonical_sha256":"dcc933128e00880370c00e1bce08294e667ea2c98cfebc90958af0761321929b"},"synthetic_validation":{"canonical_bytes":7340,"canonical_sha256":"b8aec104008728d97b2e36787216774d45064114752286f15db354e2327849cd"},"task_id":{"canonical_bytes":8,"canonical_sha256":"79e3cfda5c081d0cdb5122563b2826aa6494c99a9f82ab3d75eb7ea2e9dcf121"}}}
+```
+
+## Source-grounded classifier evidence
+
+The r12 helper and v1.15 interpreter are documentary/synthetic tooling, not the production finalizer. The excerpts show the prior shared-pending implementation and the new stable physical-identity binding. Full source files remain outside this packet and are hash-bound by the attached manifest/receipt where applicable.
+
+### `verify_spec039_v14_r12.py` — r12 classifier; file SHA-256 `6a29bd9b24c2c60440383edeb1c89a14af04ce19ea7e25d564bcb1b211f8948c`
+```python
+def classify(events: object, journal_schema: dict[str, object]) -> str:
+    """Classify only a complete, schema-valid, ordered journal stream."""
+    if not isinstance(events, list) or not events:
+        return "unknown"
+    validator = Draft202012Validator(journal_schema)
+    try:
+        for item in events:
+            validator.validate(item)
+    except Exception:
+        return "unknown"
+
+    if [item["sequence"] for item in events] != list(range(1, len(events) + 1)):
+        return "unknown"
+    if any(events[i]["monotonic_ns"] < events[i - 1]["monotonic_ns"] for i in range(1, len(events))):
+        return "unknown"
+    if len({item["run_id"] for item in events}) != 1:
+        return "unknown"
+
+    labels = [item["event"] for item in events]
+    if labels[0] != "JOURNAL_OPENED" or labels[-1] != "JOURNAL_CLOSED":
+        return "unknown"
+    if labels.count("JOURNAL_OPENED") != 1 or labels.count("JOURNAL_CLOSED") != 1:
+        return "unknown"
+    if labels.count("RUN_SHUTDOWN_COMPLETE") != 1:
+        return "unknown"
+    shutdown = labels.index("RUN_SHUTDOWN_COMPLETE")
+    if any(label in {"CLEANUP_INTENT", "REMOVED", "CLEANUP_FAILED"} for label in labels[:shutdown]):
+        return "unknown"
+
+    created: set[tuple[object, object, object]] = set()
+    pending: set[tuple[object, object, object]] = set()
+    outcomes: dict[tuple[object, object, object], str] = {}
+    for item in events[1:-1]:
+        label = item["event"]
+        resource = (item["resource_type"], item["candidate_key"], item["source_name"])
+        if label == "CREATE_INTENT":
+            if resource in created or resource in pending:
+                return "unknown"
+            pending.add(resource)
+        elif label == "CREATED":
+            if resource not in pending:
+                return "unknown"
+            pending.remove(resource)
+            created.add(resource)
+        elif label == "CREATE_FAILED":
+            if resource not in pending:
+                return "unknown"
+            pending.remove(resource)
+        elif label == "CLEANUP_INTENT":
+            if resource not in created or resource in pending or resource in outcomes:
+                return "unknown"
+            pending.add(resource)
+        elif label in {"REMOVED", "CLEANUP_FAILED"}:
+            if resource not in pending:
+                return "unknown"
+            pending.remove(resource)
+            outcomes[resource] = label
+        elif label != "RUN_SHUTDOWN_COMPLETE":
+            return "unknown"
+
+    if pending:
+        return "unknown"
+    intent_count = labels.count("CLEANUP_INTENT")
+    if intent_count == 0:
+        return "not_started" if not created else "unknown"
+    if len(outcomes) != intent_count or set(outcomes) != created:
+        return "unknown"
+    if any(outcome == "CLEANUP_FAILED" for outcome in outcomes.values()):
+        return "partial"
+    return "complete" if all(outcome == "REMOVED" for outcome in outcomes.values()) else "unknown"
+```
+
+### `spec039_methodology_v1.py` — v1.15 stable identity binding; file SHA-256 `1066196faf1484d646feaaa2b00fe2a1267d731fe42d93a03fb45488f75fd581`
+```python
+def _stable_resource_identity(item: dict[str, Any], model: dict[str, Any]) -> tuple[Any, ...]:
+    resource_type = item["resource_type"]
+    fields = model["identity_binding"].get(resource_type)
+    identity = item["identity"]
+    if not isinstance(fields, list) or not isinstance(identity, dict):
+        raise ValueError("resource event lacks bound identity evidence")
+    values: list[Any] = []
+    for field in fields:
+        if field not in identity or identity[field] is None:
+            raise ValueError(f"resource identity is missing {field}")
+        value = identity[field]
+        if field in {"candidate_key", "shmid", "device", "inode"}:
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"resource identity field {field} must be a non-negative integer")
+        elif field == "source_name" and (not isinstance(value, str) or not value):
+            raise ValueError("resource identity source_name must be non-empty")
+        values.append(value)
+    if resource_type == "sysv_shm" and identity["candidate_key"] != item["candidate_key"]:
+        raise ValueError("identity candidate_key differs from event resource key")
+    if resource_type == "posix_semaphore" and identity["source_name"] != item["source_name"]:
+        raise ValueError("identity source_name differs from event resource name")
+    return tuple(values)
+```
+
+## Targeted regression fixtures
+
+The following exact test methods are present in the hash-pinned transition suite; the full method bodies are not reproduced. The actual test counts/results and 18-row requirement-coverage map are in the attached methodology validation projection and pre-freeze receipt.
+
+```json
+{
+  "tests": [
+    "test_removed_without_cleanup_intent_is_unknown",
+    "test_cleanup_failed_without_cleanup_intent_is_unknown",
+    "test_cleanup_result_identity_must_match_created_resource",
+    "test_posix_inode_mismatch_is_unknown",
+    "test_failed_cleanup_is_partial_only_when_all_created_resources_are_accounted",
+    "test_uncovered_created_resource_is_unknown_even_if_another_was_removed"
+  ],
+  "transition_test_file_sha256": "41397e374e3a3e98f159334e606ad2c77b8136e0728dc314cd989079ebd36668"
+}
+```
+
+## Validation record and evidence boundary
+
+These tests are offline/synthetic. Five declared Draft 2020-12 schemas were meta-validated with Python 3.12.3/jsonschema 4.10.3; 61 unit tests passed in Python 3.14.7 under both normal and `PYTHONOPTIMIZE=1`; a schema-valid five-event r12 counterexample returned `not_started` under the old classifier and `unknown` under v1.15. Fixture coverage records 18 requirement rows and 24 unique method references.
+
+The pre-context-expansion receipt `Specs/RESULTS-SPEC-039/precode-validation-v1.15-r13-20261013.json` SHA-256 `506aedbc38f2a9b22167876c8377c607a00dcacc0a6323633a8a2f65a32a41c1` is attached verbatim as historical evidence; it binds the prior packet SHA `be4b82b90e0d170e65ef65c48dc9c4d6bbbde15f6bf531a3f6298d043ad8846f`, not this expanded packet. The final expanded packet's read-only CLI result will be captured in a new sidecar after this packet is frozen; that receipt is intentionally not embedded.
+
+```json
+{
+  "receipt_type": "ng039-methodology-validation/v1",
+  "date": "2026-10-13",
+  "status": "PASS_WITH_EXPLICIT_LIMITATIONS",
+  "review_state": "local r13 candidate; not submitted to Astra",
+  "identity": {
+    "repository": "/home/gandalf/workspace/novagenesis",
+    "branch": "AIOPT5",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_path": "Specs/SPEC-039-common-performance-measurement.md",
+    "spec_sha256": "3b24b4437de17ec6f92af93c675a09189f90aafc0b4f9502545bae7ee85963b0",
+    "manifest_path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.15-r13.json",
+    "manifest_sha256": "2f378565c90a10b4b08abcc9f0469993dd243cd73cd56c8477f4710408c5a8a5",
+    "packet_path": "Specs/RESULTS-SPEC-039/precode-packet-v1.15-amend-closure-20261013-sanitized-draft-r13.md",
+    "packet_sha256": "be4b82b90e0d170e65ef65c48dc9c4d6bbbde15f6bf531a3f6298d043ad8846f",
+    "methodology_checker_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/spec039_methodology_v1.py",
+    "methodology_checker_sha256": "1066196faf1484d646feaaa2b00fe2a1267d731fe42d93a03fb45488f75fd581",
+    "journal_tests_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_journal_transitions.py",
+    "journal_tests_sha256": "41397e374e3a3e98f159334e606ad2c77b8136e0728dc314cd989079ebd36668",
+    "projection_tests_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_projection_checker.py",
+    "projection_tests_sha256": "6a5af4a2927ce7bea5c8c7d7963a2e666721803473e8066cfc822206618304d5",
+    "cli_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_methodology_v1.py",
+    "cli_sha256": "3e77b92932695c589e6b7a227543a74564cff27186a4234576d835e0eaf3d569",
+    "cli_tests_path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_methodology_cli.py",
+    "cli_tests_sha256": "9e55a1a8dd79d3f784bdb6d9e350d0e35133c1d11034e2a2c311331b7c32a84d",
+    "manifest_generator_sha256": "f6bc950fe2ad6744fbe9278aaeb52774881e661179c2892788365c26d0a93533",
+    "packet_builder_sha256": "dd2e1f1769f592ae552e027f6f49c2822e034d34785e491b10cd549596ad16cb"
+  },
+  "tool_versions": {
+    "python3_tests": "Python 3.14.7",
+    "schema_validator_python": "Python 3.12.3",
+    "jsonschema": "4.10.3"
+  },
+  "validation": {
+    "unit_tests": {
+      "normal": {
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker test_spec039_methodology_cli",
+        "test_methods": 61,
+        "failures": 0,
+        "errors": 0,
+        "status": "PASS"
+      },
+      "optimized": {
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONOPTIMIZE=1 python3 -m unittest -q test_spec039_journal_transitions test_spec039_projection_checker test_spec039_methodology_cli",
+        "test_methods": 61,
+        "failures": 0,
+        "errors": 0,
+        "status": "PASS"
+      },
+      "cli_only": {
+        "normal": {"command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_spec039_methodology_cli.py", "test_methods": 3, "status": "PASS"},
+        "optimized": {"command": "PYTHONDONTWRITEBYTECODE=1 PYTHONOPTIMIZE=1 python3 -m unittest -v test_spec039_methodology_cli.py", "test_methods": 3, "status": "PASS"}
+      }
+    },
+    "canonical_spec_model": {
+      "status": "PASS",
+      "spec_equals_synthetic_fixture": true,
+      "event_rules": 9,
+      "cleanup_outcomes": 4,
+      "authority_modes": 3
+    },
+    "r12_counterexample_replay": {
+      "status": "PASS",
+      "fixture": "schema-valid JOURNAL_OPENED, CREATE_INTENT(sysv_shm, 11), RUN_SHUTDOWN_COMPLETE, orphan REMOVED(sysv_shm, 11), JOURNAL_CLOSED",
+      "event_instances_validated_against": "immutable r12 reservation_journal_event schema",
+      "events_schema_validated": 5,
+      "r12_classifier_result": "not_started",
+      "v1_15_model_result": "unknown",
+      "expected_v1_15_result": "unknown",
+      "interpretation": "The old classifier misclassified the orphan terminal event; the new model rejects it as uncertain. This is a synthetic replay only."
+    },
+    "coverage_reference_integrity": {
+      "status": "PASS",
+      "requirement_rows": 18,
+      "unique_test_method_references": 24,
+      "unresolved_test_method_names": []
+    },
+    "json_schema_meta_validation": {
+      "status": "PASS",
+      "draft": "2020-12",
+      "declared_schema_objects_checked": 5,
+      "method": "Draft202012Validator.check_schema",
+      "policy_metadata_not_counted_as_schema": true
+    },
+    "live_artifact_checker": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 verify_spec039_methodology_v1.py --repo-root /home/gandalf/workspace/novagenesis --spec Specs/SPEC-039-common-performance-measurement.md --manifest Specs/RESULTS-SPEC-039/precode-manifest-v1.15-r13.json --packet Specs/RESULTS-SPEC-039/precode-packet-v1.15-amend-closure-20261013-sanitized-draft-r13.md --expected-head 756f493b7049434ab67cf2382486a48f606a470c",
+      "status": "PASS",
+      "errors": [],
+      "writes_performed": false,
+      "schema_meta_validation_by_cli": "NOT_EXECUTED; checked separately above",
+      "cross_artifact_pid_set": "NOT_EXECUTED",
+      "runtime_finalizer": "NOT_EXECUTED",
+      "Astra": "NOT_SUBMITTED"
+    },
+    "stale_r12_negative_probe": {
+      "inputs": "live v1.15 SPEC with immutable r12 manifest and packet",
+      "expected_status": "FAIL",
+      "observed_status": "FAIL",
+      "stale_spec_digest_detected": true,
+      "writes_performed": false,
+      "Astra": "NOT_SUBMITTED"
+    },
+    "r12_archived_artifacts": {
+      "status": "PASS",
+      "files_verified_against_frozen_sha256": 6,
+      "note": "Verified r12 manifest, packet, validation receipt, response, raw SSE and submission receipt. The live SPEC path now contains v1.15; its former r12 digest remains recorded in the immutable r12 manifest."
+    },
+    "git_diff_check": "PASS",
+    "working_tree_head": "756f493b7049434ab67cf2382486a48f606a470c"
+  },
+  "limitations": [
+    "The journal and authority model are offline synthetic/documentary evidence, not a production finalizer implementation or runtime result.",
+    "No cross-artifact PID-set validation, correctness runtime, IPC/VM activity, D2/D3 measurement, build, Astra consultation, commit or push was performed.",
+    "The local candidate is unsubmitted; fresh owner consent bound to the exact r13 packet SHA is required before any Astra call."
+  ]
+}
+```
+
+## Authority and limitations
+
+No production finalizer was implemented or executed. No runtime/correctness/performance run, build, IPC/VM action, commit or push occurred. Cross-artifact PID-set validation is `NOT EXECUTED`. The checker validates its stated model/hash/projection boundary only; it is not proof of every prose requirement or runtime behavior. D2 remains blocked by the unprovisioned launcher/lease and separate owner gates; D3 remains unauthorized. This is one documentary review request only.

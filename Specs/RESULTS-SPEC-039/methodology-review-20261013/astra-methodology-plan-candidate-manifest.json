@@ -1,0 +1,114 @@
+{
+  "schema_version": "ng039-methodology-plan-packet-manifest/v1",
+  "purpose": "Plan-only Astra consultation candidate; not submitted; exact-SHA owner consent pending.",
+  "repo": {
+    "branch": "AIOPT5",
+    "head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "head_tree": "9adf665c0eb06213a29a6c12d650451948c7a4ab",
+    "baseline": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+    "git_status": "## AIOPT5...origin/AIOPT5 [ahead 2]\n M Specs/SPEC-039-common-performance-measurement.md\n M Specs/SPEC-062-ng-elc-aiopt5-cross-vm-lifecycle-oracle.md\n?? Specs/RESULTS-SPEC-039/\n?? Specs/RESULTS-SPEC-059/"
+  },
+  "r12_identity": {
+    "r12_packet": "a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd",
+    "r12_spec": "0cda2743e797cfbed952a1bad7c30e8e0f15d37c57e51d70e3388b9453103115",
+    "r12_manifest": "63ccf50e6ecd19940f0c0b5e98d438ae6e34f5b2dbf0304faef97b5eca7c0917",
+    "r12_receipt": "481fb1dd8b5cad5951a5916a16e4e03481dc8fe70687923a3f60c7c77b5e4c73",
+    "r12_response": "6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97",
+    "r12_raw": "b6a6e0ded8ff307bc43a13177832436087f309e16c8ee47c2215c6fdf93caf19"
+  },
+  "task_hashes": {
+    "NG-039": "1f697cb85c44f1ca46e87b1a12c8b071099381c82e5cff2ce7e407e20393748f",
+    "NG-040": "af054c533c83f70935e5128fc15cf9f6c27ae8300a7fbeca9eb7b92223b0ec14",
+    "Dashboard": "fe24a1785d6ef0d4fe0006c22edfbce48c777a4d76a5a9b2e2e6be4956822796"
+  },
+  "included_files": {
+    "r06_review": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r06-20261010.md",
+      "sha256": "9058bc8a6490b1774d0bd0fb8f185dbaa8669c73353faffffd87d8ba2cd75a2e",
+      "bytes": 7321
+    },
+    "r07_first_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r07-20261010.md",
+      "sha256": "9aebba801166f875b9c6e030923450a4e28122852fb8d4e0cc13fe7a198088ab",
+      "bytes": 4852
+    },
+    "r07_identity_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r07-b1b2-20261011.md",
+      "sha256": "edd29c9967af7c91778f028cf7405c46ee06ef68875c1ebd95042d044a1bb212",
+      "bytes": 2332
+    },
+    "r07_limited_approve": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r07-b1b2b3-20261011-derived.md",
+      "sha256": "43425d2dff3c639667edf50d01deed5e3e789cad04223ba09a0852276e597852",
+      "bytes": 3227
+    },
+    "r08_first_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r08-host-controlled-20261012.md",
+      "sha256": "32ab51a41285516ec725462e14bd9c9bec11ffc215b113bc588c2cd1c13d5a85",
+      "bytes": 6180
+    },
+    "r08_followup": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-r08-followup-agent-reconciliation-20261012.md",
+      "sha256": "6ff9bd65cab5cadb535aeb428781ede9b17ab357a6cdf6121e358af70630ff7b",
+      "bytes": 5173
+    },
+    "r09_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012.md",
+      "sha256": "4b52a1759768714492d4c2bc5099fc9a3626a334e1a33c65e627f1725494fd01",
+      "bytes": 4413
+    },
+    "r10_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-v1.13-r10-20261012.md",
+      "sha256": "6aa0669c3cec1b11c2516d6c361d78460663cde9f097cc4c5de8264557e64c2e",
+      "bytes": 3701
+    },
+    "r11_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-v1.14-r11-20261012.md",
+      "sha256": "9ef48bdfafbfd9818613d9356f9b011972f6efc0af1d2433f7a039c3ba260ed7",
+      "bytes": 4981
+    },
+    "r12_amend": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013.md",
+      "sha256": "6f7228f955475d5fbad6cc2c3508c960c86e264f49c1037f82f4096b769d4e97",
+      "bytes": 4804
+    },
+    "r12_packet": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/precode-packet-v1.14-amend-closure-20261012-sanitized-draft-r12.md",
+      "sha256": "a88434f223c3b66635d2589140477c01c5142ae94ba0bb839d026c3fde8013bd",
+      "bytes": 70789
+    },
+    "r12_receipt": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/precode-validation-v1.14-r12-20261012.json",
+      "sha256": "481fb1dd8b5cad5951a5916a16e4e03481dc8fe70687923a3f60c7c77b5e4c73",
+      "bytes": 3909
+    },
+    "r12_verifier": {
+      "path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/verify_spec039_v14_r12.py",
+      "sha256": "6a29bd9b24c2c60440383edeb1c89a14af04ce19ea7e25d564bcb1b211f8948c",
+      "bytes": 9986
+    },
+    "r12_classifier_tests": {
+      "path": "/home/gandalf/CodeRepository/infra-novagenesis-tools/test_spec039_v14_r12_classifier.py",
+      "sha256": "b68c4299be7416aa26289d4d7c6628831b021294072d3091c81b10cc4984f80c",
+      "bytes": 3700
+    },
+    "r12_submission_receipt": {
+      "path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-review-v1.14-r12-20261013-submission.json",
+      "sha256": "1c7b5f6c15629087731b2cecc762665523f6983a4eb550e6ad3fc17f70cffa82",
+      "bytes": 13588
+    }
+  },
+  "packet": {
+    "path": "Specs/RESULTS-SPEC-039/methodology-review-20261013/astra-methodology-plan-candidate-20261013.md",
+    "sha256": "fdb16db91ba1e319e030868b121f6dcfc98b10b828b3ce896efa3c8a5c411037",
+    "bytes": 217803
+  },
+  "authorization": {
+    "astra_calls": 0,
+    "owner_exact_packet_sha_consent": false,
+    "implementation": false,
+    "build_runtime_ipc_vm": false,
+    "spec_amendment": false
+  }
+}

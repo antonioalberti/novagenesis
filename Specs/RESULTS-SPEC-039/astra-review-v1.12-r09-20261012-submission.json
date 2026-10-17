@@ -1,0 +1,66 @@
+{
+  "derived_response": {
+    "normalization": "Exact duplicated final-answer block deduplicated only in derived Markdown; raw SSE and transcript retained byte-for-byte.",
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012.md",
+    "sha256": "4b52a1759768714492d4c2bc5099fc9a3626a334e1a33c65e627f1725494fd01"
+  },
+  "envelope_prompt_sha256": "3379af72c927d6864dc639c813d9fb05810705a8dc4944d737cee488cba562b2",
+  "owner_consent": "One exact-SHA documentary review authorized by the user after the packet hash was shown; no operational authority.",
+  "packet_embedded_byte_for_byte": true,
+  "raw_sse": {
+    "path": "Specs/RESULTS-SPEC-039/astra-review-v1.12-r09-20261012.raw.sse",
+    "sha256": "93f78263662d085a45fde57ea4377c8420b381c958f556a0a80f6a70a089f80e"
+  },
+  "result": {
+    "latency_s": 38.339,
+    "quota": {
+      "active-limit": "premium",
+      "credits-balance": "0",
+      "credits-has-credits": "False",
+      "credits-unlimited": "False",
+      "plan-type": "plus",
+      "primary-over-secondary-limit-percent": "0",
+      "primary-reset-after-seconds": "17544",
+      "primary-reset-at": "1791824446",
+      "primary-used-percent": "2",
+      "primary-window-minutes": "300",
+      "safety-buffering-enabled": "true",
+      "safety-buffering-faster-model": "gpt-6-luna",
+      "secondary-reset-after-seconds": "503504",
+      "secondary-reset-at": "1792310406",
+      "secondary-used-percent": "37",
+      "secondary-window-minutes": "10080"
+    },
+    "session_path": "/home/gandalf/workspace/novagenesis/Specs/RESULTS-SPEC-039/astra-session-v1.12-r09-20261012/ng039-v112-r09-b2b3-documentary-review.jsonl",
+    "turn": 1,
+    "usage": {
+      "cached_tokens": 0,
+      "input_tokens": 22832,
+      "output_tokens": 1092,
+      "total_tokens": 23924
+    }
+  },
+  "reviewed_identities": {
+    "functional_baseline": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "manifest_sha256": "613c5843f503ff75f704aef6fd9c7b68fb994029d5f822691223212bfbf7bc9a",
+    "packet_sha256": "560ee5654d9a8859e3e21aa916a1dca9f0e564fe1f8eac41fb4ee8f4bd3397a6",
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "a2feea01cb80b60256da3a7abd5e8c2196954d6e008d6f488cd4fb37f2058af1"
+  },
+  "schema_version": "ng039-astra-documentary-review-submission/v1",
+  "session_transcript": "Specs/RESULTS-SPEC-039/astra-session-v1.12-r09-20261012/ng039-v112-r09-b2b3-documentary-review.jsonl",
+  "usage_record": {
+    "cached_tokens": 0,
+    "credits": 7.346,
+    "input_tokens": 22832,
+    "label": "NG-039 SPEC-039 v1.12/r09 B2/B3 documentary review",
+    "latency_s": 38.339,
+    "model": "gpt-6-astra",
+    "output_tokens": 1092,
+    "plan": "plus",
+    "primary_used_percent": 2.0,
+    "secondary_used_percent": 37.0,
+    "total_tokens": 23924,
+    "ts": "2026-10-12T12:09:00Z"
+  }
+}

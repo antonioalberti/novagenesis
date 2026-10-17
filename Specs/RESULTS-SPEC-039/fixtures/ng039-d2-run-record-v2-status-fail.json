@@ -1,0 +1,219 @@
+{
+  "schema_version": "ng039-d2-run-record/v2",
+  "task_id": "NG-039",
+  "run_id": "NG039-D2-000000000002",
+  "spec_sha256": "80713abc89f0b945f0c752f56f58cbfaa2c847c71b79fbb453fa219450c701c1",
+  "baseline_commit": "1af604dad66148618cc0e578c28adb4a9829e607",
+  "baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+  "document_head": "a9d6a8c28f5ef3b32e0c01d652b61526cdf76343",
+  "configured_targets": [
+    "Common",
+    "ng039_gw_q0_q1_d2"
+  ],
+  "process_identity": {
+    "name": "NG039TestProcess",
+    "ipc_key": 11
+  },
+  "status": "FAIL",
+  "exit": {
+    "outer_code": 1,
+    "harness_code": 1,
+    "signal": null,
+    "timeout_fired": false
+  },
+  "assertions": {
+    "q0_admission": "PASS",
+    "q0_idle_floor": "PASS",
+    "q0_no_spurious_wakeup": "FAIL",
+    "q0_strict_due": "PASS",
+    "q1_admission": "PASS",
+    "q1_future_head_admitted": "PASS",
+    "q1_strict_due": "PASS",
+    "q1_no_spurious_wakeup": "PASS"
+  },
+  "observations": {
+    "target_message_id": null,
+    "q0": {
+      "cycles": 1000,
+      "wait_calls": 500,
+      "immediate_returns": 400,
+      "blocked_duration": 100,
+      "wake_reasons": [
+        "false_wakeup"
+      ],
+      "process_cpu_time": 800,
+      "peak_rss": 10240,
+      "shm_poll_attempts": 100,
+      "max_inter_poll_gap": 10
+    },
+    "q1": {
+      "cycles": 1000,
+      "wait_calls": 500,
+      "immediate_returns": 400,
+      "blocked_duration": 100,
+      "wake_reasons": [
+        "timeout"
+      ],
+      "process_cpu_time": 800,
+      "peak_rss": 10240,
+      "shm_poll_attempts": 100,
+      "max_inter_poll_gap": 10,
+      "future_message_offered": 1,
+      "future_message_admitted": 1,
+      "future_message_pending": 1,
+      "future_message_executed": 0
+    },
+    "counter_overflow": false
+  },
+  "inventories": {
+    "pre": {
+      "available": true,
+      "complete": true,
+      "is_empty": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": null
+    },
+    "post": {
+      "available": true,
+      "complete": true,
+      "is_empty": false,
+      "sha256": "a865eb197fbe3ce3f71609f0e5e2fa17f7388b785ee6655d61542ac447a6e387",
+      "reason": null
+    },
+    "final": {
+      "available": true,
+      "complete": true,
+      "is_empty": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": null
+    }
+  },
+  "cleanup": {
+    "complete": true,
+    "candidate_resources_removed": true,
+    "finalizer_complete": true,
+    "gateway_joined": true,
+    "output_worker_joined": true,
+    "process_destroyed": true,
+    "final_inventory_complete": true,
+    "final_inventory_matches_pre": true
+  },
+  "failure": {
+    "code": "ASSERTION_FAILED",
+    "phase": "q0_observation",
+    "message": "q0_no_spurious_wakeup assertion failed: detected spurious wakeup",
+    "last_event_sequence": 5,
+    "inventory_availability": {
+      "pre": true,
+      "post": true,
+      "final": true
+    },
+    "missing_artifacts": [],
+    "cleanup_outcome": "complete"
+  },
+  "artifacts": [
+    {
+      "name": "stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ipc-pre.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ipc-post.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ipc-final.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "observer-events.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "reservation-journal.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "record_finalized": true,
+  "execution_identity": {
+    "dedicated_uid_verified": true,
+    "uid": 1000,
+    "gid": 1000,
+    "interactive_login_disabled": true,
+    "launcher_verified": true,
+    "launcher_path": "/usr/local/libexec/ng039-d2-launcher",
+    "launcher_sha256": "b99f34149f4f1b489f8ac47ef5b7996604805359513ebb4955b9062875f0f33f",
+    "launcher_device": 1,
+    "launcher_inode": 2,
+    "lease_path": "/run/lock/ng039-d2/lease.lock",
+    "lease_device": 1,
+    "lease_inode": 2,
+    "lease_acquired": true,
+    "lease_held_through_finalizer": true,
+    "no_concurrent_uid_process": true,
+    "process_tree_pids": [
+      1234,
+      1235
+    ]
+  },
+  "reservations": {
+    "run_id": "NG039-D2-000000000002",
+    "harness_pid": 1234,
+    "d2_process_key": null,
+    "selected_attempt": null,
+    "candidate_keys": [],
+    "exclusive_reservation_complete": true,
+    "journal_fsynced": true,
+    "libc_version": "2.35",
+    "semaphore_name_mapping_verified": true,
+    "reservation_umask": "0022",
+    "sysv_shm": [
+      {
+        "id": 11,
+        "size": 33554432,
+        "attached": true,
+        "detached": false
+      }
+    ],
+    "posix_semaphores": [
+      {
+        "sem_t_address": 140735000000000,
+        "map_start": 140735000000000,
+        "map_end": 140735000004096,
+        "map_device_major": 0,
+        "map_device_minor": 1,
+        "map_inode": 12345,
+        "mapping_line": "/dev/shm/sem.12345 00007f8b4c00d000-00007f8b4c011000 rw-s 0000000 00:05 12345 /dev/shm/sem.12345"
+      }
+    ],
+    "journal_artifact_name": "reservation-journal.jsonl",
+    "journal_event_count": 0,
+    "journal_closed": true,
+    "journal_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "libc_identity": {
+      "provider_path": "/lib/x86_64-linux-gnu/libc.so.6",
+      "device": 8,
+      "inode": 1234567,
+      "build_id": "abcdef123456",
+      "sha256": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "version": "2.35"
+    }
+  },
+  "common_authority_validated": true,
+  "reservation_state": "complete",
+  "cleanup_outcome": "complete"
+}

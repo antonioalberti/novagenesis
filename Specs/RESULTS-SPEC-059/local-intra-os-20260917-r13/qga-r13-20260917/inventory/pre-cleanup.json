@@ -1,0 +1,46 @@
+{
+  "ipc": {
+    "baseline": {
+      "posix_semaphores": [
+        "/dev/shm/sem.1089430878",
+        "/dev/shm/sem.1089430879",
+        "/dev/shm/sem.1089430880",
+        "/dev/shm/sem.1089430881",
+        "/dev/shm/sem.11",
+        "/dev/shm/sem.12",
+        "/dev/shm/sem.13",
+        "/dev/shm/sem.14",
+        "/dev/shm/sem.1881993749",
+        "/dev/shm/sem.1881993750",
+        "/dev/shm/sem.1881993751",
+        "/dev/shm/sem.1881993752",
+        "/dev/shm/sem.2120632923",
+        "/dev/shm/sem.2120632924",
+        "/dev/shm/sem.2120632925",
+        "/dev/shm/sem.2120632926"
+      ],
+      "queues": [],
+      "semaphores": [],
+      "shm": [
+        "0",
+        "1",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ]
+    }
+  },
+  "processes": [],
+  "schema_version": 2
+}

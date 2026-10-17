@@ -1,0 +1,80 @@
+{
+  "compile_checker": {
+    "cases": [
+      "source escape",
+      "output escape",
+      "metadata mismatch",
+      "duplicate -c",
+      "wrong compiler",
+      "-Wp forwarding",
+      "-Xpreprocessor forwarding",
+      "observer undef",
+      "-ansi",
+      "alternate standard",
+      "optimization override",
+      "target census",
+      "function-like observer",
+      "joined -include override",
+      "joined -imacros override"
+    ],
+    "modes": [
+      "normal",
+      "PYTHONOPTIMIZE=1"
+    ],
+    "negative_cases_per_mode": 15,
+    "negative_rejections_total": 30,
+    "positive_profiles_per_mode": 2
+  },
+  "date": "2026-10-11",
+  "entrypoint_arguments": {
+    "cases": [
+      "compile missing build root",
+      "link missing target"
+    ],
+    "command_separator": "No unconsumed -- follows python3 -c checker; checker inputs begin at sys.argv[1].",
+    "missing_operand_rejections_per_mode": 2,
+    "result": "Both literal checker entrypoints reject missing required input in normal Python and PYTHONOPTIMIZE=1."
+  },
+  "execution_method": "Inline temporary synthetic driver loaded checker_logic from the working manifest and invoked it through the literal python3 -c argument shape. Each mode used an isolated TemporaryDirectory under workspace; temporary directories were removed.",
+  "identity_at_execution": {
+    "manifest_sha256": "1a90346598f5799565bf1f39610ccb45f43afdb8c7acba08d82616e747a6a70d",
+    "packet_sha256": "ffc71bf48dd0f2c2bea7a3448923a9e11ba5d3a16ebbea19ff81a9725e8f46af",
+    "repository_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "f7742629a6069810bade1df295277dfcb2c0ff6c47d614236b4b1e29ca630f26"
+  },
+  "link_checker": {
+    "cases": [
+      "wrong link path",
+      "missing static",
+      "duplicate static",
+      "wrong compiler",
+      "response file",
+      "-Wl,-shared",
+      "split -Xlinker dynamic override",
+      "symlinked link.txt"
+    ],
+    "modes": [
+      "normal",
+      "PYTHONOPTIMIZE=1"
+    ],
+    "negative_cases_per_mode": 8,
+    "negative_rejections_total": 16,
+    "positive_link_file_per_mode": 1,
+    "stdin_binding_control_per_mode": 1
+  },
+  "review_revision": "r07-working-amendment-b1b2-b3",
+  "schema_version": "ng039-r07-synthetic-validation-receipt/v1",
+  "schemas": {
+    "draft_2020_12_meta_valid": "not rerun after B1/B2; schema definitions unchanged",
+    "run_record_status_fixtures": "not rerun after B1/B2; schema definitions unchanged"
+  },
+  "scope": "In-place B1/B2/B3 amendment only. B3 aligns manifest source-plan and run-record schema SPEC identity to the final frozen SPEC. This receipt binds the same working filenames after final packet freeze; it is not embedded, avoiding a packet/receipt hash cycle.",
+  "scope_limit": "Synthetic checker-entrypoint probes only. No real compile database, D2 configure/build, harness or semantic-finalizer execution, IPC/namespace, VM/SSH, D3, performance, Astra, commit or push.",
+  "semantic_finalizer": "Specified but not implemented or executed; cross-artifact results are not claimed.",
+  "totals": {
+    "checks_both_modes": 56,
+    "checks_per_mode": 28,
+    "negative_checks_per_mode": 25,
+    "positive_checks_per_mode": 3
+  }
+}

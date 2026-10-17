@@ -1,0 +1,75 @@
+{
+  "astra_calls": 0,
+  "created_date": "2026-10-13",
+  "integrity_checks": {
+    "d1h_harness_embedded": true,
+    "d1h_manifest_sanitized_embedded": true,
+    "hold_response_embedded": true,
+    "host_preflight_projection_nonempty": "PASS",
+    "manifest_embedded_exactly": "PASS",
+    "manifest_exact": true,
+    "manifest_json_valid": true,
+    "packet_and_manifest_hashes_match_header": "PASS",
+    "private_home_paths_absent": "PASS",
+    "proposal_exact": true,
+    "r13_response_embedded": true,
+    "r14_response_embedded": true,
+    "source_excerpt_groups_embedded": true,
+    "spec_exact": true
+  },
+  "launcher_proposal": {
+    "path": "Specs/RESULTS-SPEC-039/d2-launcher-lease-proposal-v1-20261013.md",
+    "sha256": "ab386f6a94228ab9312efa4526e68b67ab43fc0f7936b789a9ebc459b59f67e6",
+    "status": "draft; not installed or tested"
+  },
+  "manifest": {
+    "bytes": 15731,
+    "path": "Specs/RESULTS-SPEC-039/precode-manifest-v1.16-d2a-r15.json",
+    "sha256": "4ed5646dcaab8af74344f3acba22c962fef8703b2d4d0fddd463c0381b9e3827"
+  },
+  "operations_not_performed": [
+    "D2 code edit",
+    "configure/build",
+    "harness/finalizer",
+    "runtime",
+    "IPC",
+    "UID/launcher/lease provisioning",
+    "VM/SSH",
+    "cleanup/retry",
+    "commit",
+    "push"
+  ],
+  "owner_exact_sha_consent": false,
+  "packet": {
+    "bytes": 194163,
+    "path": "Specs/RESULTS-SPEC-039/precode-packet-v1.16-d2a-precode-20261013-sanitized-draft-r15.md",
+    "sha256": "ab4855bdc79c81ad637903abc4071a892d64224a17519a60d0992a160226b7c1",
+    "submitted": false
+  },
+  "parallel_review_batch": {
+    "contract_source_pins_matched": true,
+    "current_launcher_differs_from_reviewed_snapshot": true,
+    "current_launcher_sha256": "ab386f6a94228ab9312efa4526e68b67ab43fc0f7936b789a9ebc459b59f67e6",
+    "current_packet_reviewed_by_subagents": false,
+    "delegation_id": "deleg_467bf700",
+    "interpretation": "The three reports informed revisions; they do not approve the revised launcher proposal or this assembled packet.",
+    "launcher_reviewed_sha256": "0ec971b93ccc662b6000d65162af18a9a66bf9567355e2cc45476f5b4a1190fd",
+    "reviewers": 3
+  },
+  "receipt_type": "ng039-spec039-d2a-precode-local-freeze/v1",
+  "remaining_review_questions": [
+    "Q0 bootstrap-drain and observation event point",
+    "Q0/Q1 two-process cardinality and per-run finalizer sequence",
+    "workspace-root resolution and unit sandbox/IPC visibility",
+    "byte-applicable observer/CMake diff readiness",
+    "root-supervisor/lease FD continuity and receipt protection"
+  ],
+  "source_identity": {
+    "baseline_tree": "5a3ebb9fbdf61185f05b18e58b8799ced40eb60b",
+    "functional_baseline": "1af604dad66148618cc0e578c28adb4a9829e607",
+    "main_branch": "AIOPT5",
+    "main_head": "756f493b7049434ab67cf2382486a48f606a470c",
+    "spec_sha256": "f3f467b85e8d53e32035b7c842be45ddbf0467a6c98051e2132bed48bbff8025"
+  },
+  "status": "LOCAL_DRAFT_FROZEN_UNSUBMITTED"
+}
