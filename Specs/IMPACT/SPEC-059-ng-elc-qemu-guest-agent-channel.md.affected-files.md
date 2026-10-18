@@ -1,0 +1,861 @@
+# Affected-file record: `SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+
+SPEC title: SPEC-059: Canal privilegiado via QEMU Guest Agent para o NG-ELC
+
+## Snapshot coverage and applicability
+
+| Snapshot | Pinned HEAD | Present | Declared Branch | Version | Status | Baseline | Implementation commit | Applicability |
+|---|---|---|---|---|---|---|---|---|
+| `AIOPT3` | `24a3851e1d5a90f039b9e148a1af38dd03c4d925` | yes | AIOPT3 | (not declared) | In Progress | (not declared) | `4f206eb` | AIOPT3-origin; historical line; status/gates apply to this snapshot only |
+| `AIOPT4` | `0dd0dd4b2fd0a9d416aff232ad07672fe39746b6` | yes | AIOPT3 | (not declared) | In Progress | (not declared) | `4f206eb` | Archived snapshot; no current AIOPT4 authority |
+| `AIOPT5` | `8d2386dcb10d2b37f133d4b24c2cb96761753d82` | no | — | — | — | — | — | — |
+
+## Files named in explicit file/scope sections
+
+These are literal file/path strings found in file-, scope-, or allowlist-related headings/tables. They represent declared or proposed scope, not proof of a change.
+
+### `AIOPT3` — source `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- path: `clean.sh` — source SPEC line 35.
+
+### `AIOPT4` — source `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- path: `clean.sh` — source SPEC line 35.
+
+## Files changed in linked Git commits
+
+Paths below come from commits that either changed this SPEC file itself or explicitly named its identifier in the subject/body. This is evidence of co-change or a declared commit link, not proof that every path was caused solely by this SPEC.
+
+### `AIOPT3`
+- Commit `24a3851e1d5a90f039b9e148a1af38dd03c4d925` — docs(SPEC-059): persist 2026-09-19 closure handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/session-closeout-20260919.md`
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `aa5621b83ad6fc86d8b8a50cf772be7c8fcd081d` — SPEC-059: terminalize QGA transport timeout with raw evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `06c60ba5b0283da513fda5289270cf0fe9cc3387` — docs(session): persist SPEC-059 closure handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/session-closeout-20260918.md`
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `77476afdbe7edb731758ca99aac6caaf4cdb0051` — docs(SPEC-059): reconcile r17 PTY closeout (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `ce5a7869ff61733362553b3a8d5bb3a0a627cc3e` — SPEC-059: stabilize PTY process-group identity (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Scripts/AlpineVMs/tests/test_spec058_red_profile.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/qga-r17-pty-race-review.md`
+- Commit `243416dbc1889710d87a192a60141a780c08e444` — SPEC-059: preserve r17 QGA loss diagnostic (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance/build-manifest.raw.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Repository/exit.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Source/exit.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/workload.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-diagnostic.md`
+  - `Specs/RESULTS-SPEC-059/qga-r17-qga-response.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-recovery-response.json`
+- Commit `68f0678694ed6a79fdb9b5818d211932c9e88e96` — SPEC-059: preserve raw build manifest evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+- Commit `aafcb32e9bc6f27440956ddc40c348dd8e17bb48` — SPEC-059: record current-head linkage preflight (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/README.md`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/compile_commands.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/configure.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/configure.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/provenance/summary.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/qga-preflight.json`
+- Commit `4268fda748d09a09cd50dcc8b73b1b436b0d3f9d` — SPEC-059: preserve r16 setup rejection evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/oracle.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/ownership.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/preservation.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/result.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/workload.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-diagnostic.md`
+  - `Specs/RESULTS-SPEC-059/qga-r16-preflight-response.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-qga-response.json`
+- Commit `81acedfa68cb7989b78edb67515ffafa9b55aa85` — docs: retain SPEC-059 build receipts and logs (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/compile_commands.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/configure.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/configure.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/manual-build.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/sanitizer/manual-build.log`
+- Commit `c5ca6fc0e29ecb41ce0349f4ae57324785fc14e4` — SPEC-059: record QGA build and preflight evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/README.md`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/artifact-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/preflight/nonroot-direct.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/qga-channel.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/qga-preflight.json`
+- Commit `3eb46c78ff89604687147c2be23244c3140396ff` — SPEC-059: make teardown fixtures reap children (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `eef38fd1fb5d760668893c1b4663d968fadc450b` — docs: add SPEC-059 Hermes handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `474a86dda3512891cfa55ba50c98a29ba33d50ec` — SPEC-059: record real QGA reconciliation gate (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `00be34c9215733ae1b9c8e49d6fb2c68d35846f8` — SPEC-059: add transport loss reconciliation fixture (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `cd6de5dd1aa949fd65341c117ef9cfdd8cf05e84` — SPEC-059: characterize QGA transport loss (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `d16c57eb916e5d10d87ee30d8d5fb664ec8fd63e` — SPEC-059: characterize selective IPC cleanup gap (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `946bc8b41a12e1aa4655d2dbbb5949abc0646045` — SPEC-059: characterize process-tree teardown (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8de1a92222edbec929c075ccb775c8cf4953b3b4` — SPEC-059: add teardown identity fixtures (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `a6f1f2091b4ab0cd5a2273d6671266e195496141` — SPEC-059: preserve r15 teardown diagnostic (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `4e27404ac310d03c035349bf5d4017fc65fb2a3e` — SPEC-059: record Astra QGA diagnostic go (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `fc78d84f47f6b3ff7d3aa02c18179a72dba39b1e` — SPEC-059: preserve QGA argv across SSH shell (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `660367b7fe67d9ffa10bee516248a5e270883d4e` — SPEC-059: make QGA guest exec wait synchronously (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `411fee446b73332aff6ae09c034fcc320e9fca99` — SPEC-059: preserve r14 QGA protocol diagnostic (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `cc4f511cf8ba55ad8ff548332aa17d264170f99e` — SPEC-059: preserve r13 contamination and cleanup evidence (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8c2dfb0376c95a55fdf8675fc2540d43b6807873` — SPEC-059: preserve r10 runtime diagnostic bundle (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `a8598e8294c8c1a5d641c52622dcf8ce25fb2c7a` — SPEC-059: serialize set values in evidence records (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `ede086cd653c615cd86803bfd902ba820b78cd20` — SPEC-059: preserve evidence exclusion in identity recheck (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `daa78d9782915cc92dabcba242384e2c73de5615` — SPEC-059: ignore Python cache in source status (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `dd05a15e798353758c3c394515d877cc9f69b005` — SPEC-059: expose role aliases in manifest identities (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8b3defd0fd536088e709265c5010b82b786c5cc0` — SPEC-059: cover runtime identity role aliases (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `855c0393ea762c82f471b3df77b3a9ecbd3a2eaa` — SPEC-059: ignore Python cache in source linkage (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `58f99c296a7448fae8605b5ff5655d4a9ad28e92` — SPEC-059: exclude evidence from source content hash (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `74dace18aad8bcf26494cda0a31e696b6b526813` — SPEC-059: repair root provenance and build role coverage (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `0a8e1da4912ea42c031c61953c3c2a1a5f196936` — SPEC-059: fix root provenance and preserve diagnostic trial (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `dff17c9b0b8442944c91d97057008f9a88bce42d` — SPEC-059: reconcile release evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RELEASE-MASTER-PLAN-v1.0.0.md`
+- Commit `344e8445596e576c69c2dc6cf20c2f71111a958c` — SPEC-059: record implementation commit (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `4f206eb30ea8cfc34a4ac009e553900b88b5e83e` — SPEC-059: add Proxmox QGA execution channel (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `README.md`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RELEASE-MASTER-PLAN-v1.0.0.md`
+  - `Specs/RESULTS-SPEC-059/qga-channel-check-20260917.json`
+  - `Specs/SPEC-058-ng-elc-privileged-local-profile.md`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+
+### `AIOPT4`
+- Commit `1b21ae7f492066b8b7859fec29a3f3bdb06bee8b` — docs(SPEC-059): record refined QGA seam adjudication (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/astra-qga-seam-adjudication-cd-20260920.md`
+- Commit `9dba393e95883fa2a4c3f8d97cf610fbd4796cf2` — docs(SPEC-059): record Astra QGA seam review (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/astra-qga-loss-reconciliation-seam-review-20260920.md`
+- Commit `6c03bc380ee5c596b7c2c7a3e282e98c4a049fb7` — docs(SPEC-059): preserve Astra verifier reviews (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/astra-6e5123d-review-20260920.md`
+  - `Specs/RESULTS-SPEC-059/astra-b9396e6-review-20260920.md`
+  - `Specs/RESULTS-SPEC-059/astra-ba782c7-review-20260920.md`
+  - `Specs/RESULTS-SPEC-059/astra-bc72435-review-20260920.md`
+- Commit `42485ed6fe38ad4f2d807cc197a4814898d7e92c` — Revert "test(SPEC-059): expose QGA lifecycle integration seam" (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_lifecycle_integration.py`
+- Commit `e1abcd38e76ce87ee67968b4cd6d0fbd2b87ec38` — test(SPEC-059): expose QGA lifecycle integration seam (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_lifecycle_integration.py`
+- Commit `24a3851e1d5a90f039b9e148a1af38dd03c4d925` — docs(SPEC-059): persist 2026-09-19 closure handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/session-closeout-20260919.md`
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `aa5621b83ad6fc86d8b8a50cf772be7c8fcd081d` — SPEC-059: terminalize QGA transport timeout with raw evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `06c60ba5b0283da513fda5289270cf0fe9cc3387` — docs(session): persist SPEC-059 closure handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/session-closeout-20260918.md`
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `77476afdbe7edb731758ca99aac6caaf4cdb0051` — docs(SPEC-059): reconcile r17 PTY closeout (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `ce5a7869ff61733362553b3a8d5bb3a0a627cc3e` — SPEC-059: stabilize PTY process-group identity (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Scripts/AlpineVMs/tests/test_spec058_red_profile.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/qga-r17-pty-race-review.md`
+- Commit `243416dbc1889710d87a192a60141a780c08e444` — SPEC-059: preserve r17 QGA loss diagnostic (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/provenance/build-manifest.raw.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Repository/exit.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Source/exit.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/qga-r17-20260918/workload.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-diagnostic.md`
+  - `Specs/RESULTS-SPEC-059/qga-r17-qga-response.json`
+  - `Specs/RESULTS-SPEC-059/qga-r17-recovery-response.json`
+- Commit `68f0678694ed6a79fdb9b5818d211932c9e88e96` — SPEC-059: preserve raw build manifest evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+- Commit `aafcb32e9bc6f27440956ddc40c348dd8e17bb48` — SPEC-059: record current-head linkage preflight (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/README.md`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/build.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/compile_commands.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/configure.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/build/debug/configure.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/provenance/summary.json`
+  - `Specs/RESULTS-SPEC-059/preflight-4268fda/qga-preflight.json`
+- Commit `4268fda748d09a09cd50dcc8b73b1b436b0d3f9d` — SPEC-059: preserve r16 setup rejection evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/oracle.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/ownership.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/preservation.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/result.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-20260918/workload.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-diagnostic.md`
+  - `Specs/RESULTS-SPEC-059/qga-r16-preflight-response.json`
+  - `Specs/RESULTS-SPEC-059/qga-r16-qga-response.json`
+- Commit `81acedfa68cb7989b78edb67515ffafa9b55aa85` — docs: retain SPEC-059 build receipts and logs (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/build.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/compile_commands.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/configure.stderr.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/configure.stdout.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/debug/manual-build.log`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/build/sanitizer/manual-build.log`
+- Commit `c5ca6fc0e29ecb41ce0349f4ae57324785fc14e4` — SPEC-059: record QGA build and preflight evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/README.md`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/artifact-manifest.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/preflight/nonroot-direct.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/qga-channel.json`
+  - `Specs/RESULTS-SPEC-059/preflight-3eb46c7/qga-preflight.json`
+- Commit `3eb46c78ff89604687147c2be23244c3140396ff` — SPEC-059: make teardown fixtures reap children (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `eef38fd1fb5d760668893c1b4663d968fadc450b` — docs: add SPEC-059 Hermes handoff (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/SESSION-HANDOFF-SPEC-059.md`
+- Commit `474a86dda3512891cfa55ba50c98a29ba33d50ec` — SPEC-059: record real QGA reconciliation gate (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `00be34c9215733ae1b9c8e49d6fb2c68d35846f8` — SPEC-059: add transport loss reconciliation fixture (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `cd6de5dd1aa949fd65341c117ef9cfdd8cf05e84` — SPEC-059: characterize QGA transport loss (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `d16c57eb916e5d10d87ee30d8d5fb664ec8fd63e` — SPEC-059: characterize selective IPC cleanup gap (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `946bc8b41a12e1aa4655d2dbbb5949abc0646045` — SPEC-059: characterize process-tree teardown (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8de1a92222edbec929c075ccb775c8cf4953b3b4` — SPEC-059: add teardown identity fixtures (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `a6f1f2091b4ab0cd5a2273d6671266e195496141` — SPEC-059: preserve r15 teardown diagnostic (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260918-r15/qga-r15-20260918/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `4e27404ac310d03c035349bf5d4017fc65fb2a3e` — SPEC-059: record Astra QGA diagnostic go (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `fc78d84f47f6b3ff7d3aa02c18179a72dba39b1e` — SPEC-059: preserve QGA argv across SSH shell (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+- Commit `660367b7fe67d9ffa10bee516248a5e270883d4e` — SPEC-059: make QGA guest exec wait synchronously (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `411fee446b73332aff6ae09c034fcc320e9fca99` — SPEC-059: preserve r14 QGA protocol diagnostic (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r14/qga-r14-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `cc4f511cf8ba55ad8ff548332aa17d264170f99e` — SPEC-059: preserve r13 contamination and cleanup evidence (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r13/qga-r13-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8c2dfb0376c95a55fdf8675fc2540d43b6807873` — SPEC-059: preserve r10 runtime diagnostic bundle (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/native-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/NRNCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/PGCS/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/Repository/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/roles/Source/launch.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/staging/io/PGCS/StressTest_Stats.txt`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r10/qga-r10-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `a8598e8294c8c1a5d641c52622dcf8ce25fb2c7a` — SPEC-059: serialize set values in evidence records (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r9/qga-r9-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `ede086cd653c615cd86803bfd902ba820b78cd20` — SPEC-059: preserve evidence exclusion in identity recheck (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r8/qga-r8-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `daa78d9782915cc92dabcba242384e2c73de5615` — SPEC-059: ignore Python cache in source status (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r7/qga-r7-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `dd05a15e798353758c3c394515d877cc9f69b005` — SPEC-059: expose role aliases in manifest identities (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r6/qga-r6-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `8b3defd0fd536088e709265c5010b82b786c5cc0` — SPEC-059: cover runtime identity role aliases (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r5/qga-r5-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `855c0393ea762c82f471b3df77b3a9ecbd3a2eaa` — SPEC-059: ignore Python cache in source linkage (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r4/qga-r4-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `58f99c296a7448fae8605b5ff5655d4a9ad28e92` — SPEC-059: exclude evidence from source content hash (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r3/qga-r3-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `74dace18aad8bcf26494cda0a31e696b6b526813` — SPEC-059: repair root provenance and build role coverage (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/ng_observability.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/provenance/build-manifest.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917-r2/qga-r2-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `0a8e1da4912ea42c031c61953c3c2a1a5f196936` — SPEC-059: fix root provenance and preserve diagnostic trial (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/local_provenance.py`
+  - `Scripts/AlpineVMs/tests/test_local_provenance.py`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/controller-events.jsonl`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/baseline.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/final.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/inventory/pre-cleanup.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/oracle.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/ownership.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/effective-config.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/expanded.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/observability.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/original.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/plan/scenario.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/preservation.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/provenance.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/result.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/roles/_not-launched.json`
+  - `Specs/RESULTS-SPEC-059/local-intra-os-20260917/qga-r1-20260917/workload.json`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `dff17c9b0b8442944c91d97057008f9a88bce42d` — SPEC-059: reconcile release evidence (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RELEASE-MASTER-PLAN-v1.0.0.md`
+- Commit `344e8445596e576c69c2dc6cf20c2f71111a958c` — SPEC-059: record implementation commit (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+- Commit `4f206eb30ea8cfc34a4ac009e553900b88b5e83e` — SPEC-059: add Proxmox QGA execution channel (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `README.md`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/ng_remote_executor.py`
+  - `Scripts/AlpineVMs/proxmox_qga_channel.py`
+  - `Scripts/AlpineVMs/tests/test_spec059_qga_channel.py`
+  - `Specs/RELEASE-MASTER-PLAN-v1.0.0.md`
+  - `Specs/RESULTS-SPEC-059/qga-channel-check-20260917.json`
+  - `Specs/SPEC-058-ng-elc-privileged-local-profile.md`
+  - `Specs/SPEC-059-ng-elc-qemu-guest-agent-channel.md`
+
+## Interpretation and limits
+
+- A declared path, a path present in the tree, a source citation, and a path changed in a SPEC-linked commit are different evidence types; this record keeps declared scope separate from observed commit diffs.
+- `git ls-tree`/`git show` at the pinned HEAD can establish presence and exact contents, but not that a SPEC caused a change or that its acceptance criteria passed.
+- Commit-message linkage is incomplete by nature. Absence of a linked commit does not prove that no files were affected; ambiguous duplicate SPEC IDs are left unattributed.
+- Branch-specific absence means the SPEC file is not in that pinned branch tree; it does not imply the branch never contained it historically.
+
+Generated from pinned Git objects; do not treat this sidecar as implementation authorization or acceptance evidence.

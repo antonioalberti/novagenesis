@@ -1,0 +1,727 @@
+# Affected-file record: `SPEC-008-ht-bid-raw-socket-discovery.md`
+
+SPEC title: SPEC-008: Raw Socket Discovery — Inter-PGCS Exposition Failure
+
+## Snapshot coverage and applicability
+
+| Snapshot | Pinned HEAD | Present | Declared Branch | Version | Status | Baseline | Implementation commit | Applicability |
+|---|---|---|---|---|---|---|---|---|
+| `AIOPT3` | `24a3851e1d5a90f039b9e148a1af38dd03c4d925` | yes | AIOPT3 | (not declared) | Draft — Rev2 proposed in section 11 | (not declared) | (not declared) | AIOPT3-origin; historical line; status/gates apply to this snapshot only |
+| `AIOPT4` | `0dd0dd4b2fd0a9d416aff232ad07672fe39746b6` | yes | AIOPT3 | (not declared) | Draft — Rev2 proposed in section 11 | (not declared) | (not declared) | Archived snapshot; no current AIOPT4 authority |
+| `AIOPT5` | `8d2386dcb10d2b37f133d4b24c2cb96761753d82` | yes | AIOPT3 | (not declared) | Draft — Rev2 proposed in section 11 | (not declared) | (not declared) | AIOPT3-origin copy; not authority for AIOPT5 |
+
+## Files named in explicit file/scope sections
+
+These are literal file/path strings found in file-, scope-, or allowlist-related headings/tables. They represent declared or proposed scope, not proof of a change.
+
+### `AIOPT3` — source `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- path: `PGRunExposition01.cpp` — source SPEC line 188.
+- path: `PGHelloIHC01.cpp` — source SPEC line 189.
+- path: `PGRunHello01.cpp` — source SPEC line 190.
+- path: `HTStoreBind01.cpp` — source SPEC line 191.
+- path: `Process.cpp` — source SPEC line 192.
+- path: `HT.cpp` — source SPEC line 193.
+- path: `GW.cpp` — source SPEC line 194.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 257.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 386.
+- path: `PGCS/src/PGRunExposition01.cpp` — source SPEC line 387.
+
+### `AIOPT4` — source `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- path: `PGRunExposition01.cpp` — source SPEC line 188.
+- path: `PGHelloIHC01.cpp` — source SPEC line 189.
+- path: `PGRunHello01.cpp` — source SPEC line 190.
+- path: `HTStoreBind01.cpp` — source SPEC line 191.
+- path: `Process.cpp` — source SPEC line 192.
+- path: `HT.cpp` — source SPEC line 193.
+- path: `GW.cpp` — source SPEC line 194.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 257.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 386.
+- path: `PGCS/src/PGRunExposition01.cpp` — source SPEC line 387.
+
+### `AIOPT5` — source `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- path: `PGRunExposition01.cpp` — source SPEC line 188.
+- path: `PGHelloIHC01.cpp` — source SPEC line 189.
+- path: `PGRunHello01.cpp` — source SPEC line 190.
+- path: `HTStoreBind01.cpp` — source SPEC line 191.
+- path: `Process.cpp` — source SPEC line 192.
+- path: `HT.cpp` — source SPEC line 193.
+- path: `GW.cpp` — source SPEC line 194.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 257.
+- path: `PGCS/src/PGHelloIHC01.cpp` — source SPEC line 386.
+- path: `PGCS/src/PGRunExposition01.cpp` — source SPEC line 387.
+
+## Files changed in linked Git commits
+
+Paths below come from commits that either changed this SPEC file itself or explicitly named its identifier in the subject/body. This is evidence of co-change or a declared commit link, not proof that every path was caused solely by this SPEC.
+
+### `AIOPT3`
+- Commit `d4e640af785dcffdb5b394237b7a2d563387d559` — SPEC-009: clean Alpine VM script workflows (link basis: the SPEC file changed in this commit)
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/diag.sh`
+  - `Scripts/AlpineVMs/run-diag.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/simple-diag.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `97341f40459e8f32ccc737e23eb494afc336ae8a` — SPEC-036: classify legacy references in active docs (link basis: the SPEC file changed in this commit)
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- Commit `fb87f5da0b249e61d3b38fb35eb94d4127405c1d` — Consolidate documentation: SPECs, Docs, Issues, validation scripts (link basis: the SPEC file changed in this commit)
+  - `Docs/ARCHITECTURE/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/ARCHITECTURE/NGAL-ARCHITECTURE.md`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC-STATUS-REGISTER.md`
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/DIAGNOSTICS/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/REVERT.md`
+  - `Issues/CLOSED/ISSUE-002-NGAL-Hash-Mismatch.md`
+  - `Issues/CLOSED/ISSUE-003-GCC15-Thread-Ambiguity.md`
+  - `Issues/CLOSED/ISSUE-004-NRNCS-Debug-Logging.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Issues/TEMPLATE.md`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/Simple/validate-skills.sh`
+  - `Scripts/Simple/validate-specs.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/SPEC-001-NRNCS-debug-logging.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-023-contentpublish-burst-throttling.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `887e9693f090bfb934447d2aafd0c5adcf1e5db7` — docs: restore Specs/ and Docs/ from git history + HT debug log (link basis: the SPEC file changed in this commit)
+  - `Common/src/Block.cpp`
+  - `Common/src/GWSCNSeq01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `NRNCS/src/NRInfoPayload01.cpp`
+  - `NRNCS/src/NRMsgCl01.cpp`
+  - `NRNCS/src/NRSCNSeq01.cpp`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `7106c4e509becbe2cdaedeb84d325ab347a78b48` — Returning previous NRNS version (link basis: the SPEC file changed in this commit)
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+  - `docs/SPEC-015-hash-mismatch-root-cause-analysis.md`
+  - `docs/SPEC-016-hash-verification-post-spec015.md`
+  - `docs/clang-format-report-2026-07-06.md`
+- Commit `f4af5e0771244266bc2a8e5d83dcce613096eac9` — Correcting intra e inter OS ContentApp life cycle after changes on GW hello 0.2 (link basis: the SPEC file changed in this commit)
+  - `PGCS/src/PGHelloIHC01.cpp`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `8c093ec6d13fc77b0bb3aaa3fd6e999fb2f6d9a2` — Changing message forward after discovering NRNCS (link basis: the SPEC file changed in this commit)
+  - `ContentApp/src/CoreNotifyS01.cpp`
+  - `ContentApp/src/CoreRunDiscover01.cpp`
+  - `ContentApp/src/CoreRunEvaluate01.cpp`
+  - `ContentApp/src/CoreRunPeriodic01.cpp`
+  - `ContentApp/src/CoreRunSubscribe01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `IoTTestApp/src/Core.h`
+  - `IoTTestApp/src/CoreNotifyS01.cpp`
+  - `IoTTestApp/src/CoreRunDiscover01.cpp`
+  - `IoTTestApp/src/CoreRunEvaluate01.cpp`
+  - `IoTTestApp/src/CoreRunExpose01.cpp`
+  - `IoTTestApp/src/CoreSCNAck01.cpp`
+  - `NBTestApp/src/CoreRunDiscover01.cpp`
+  - `NBTestApp/src/CoreRunEvaluate01.cpp`
+  - `NBTestApp/src/CoreRunPeriodic01.cpp`
+  - `PGCS/src/Core.h`
+  - `PGCS/src/CoreNotifyS01.cpp`
+  - `PGCS/src/CoreRunDiscover01.cpp`
+  - `PGCS/src/CoreRunEvaluate01.cpp`
+  - `PGCS/src/PG.h`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunPeriodic01.h`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `14aff2b50cab24a3af59db6a762469855046339e` — docs(spec): consolidate and correct SPEC-008 + update SPEC-001 (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+
+### `AIOPT4`
+- Commit `d4e640af785dcffdb5b394237b7a2d563387d559` — SPEC-009: clean Alpine VM script workflows (link basis: the SPEC file changed in this commit)
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/diag.sh`
+  - `Scripts/AlpineVMs/run-diag.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/simple-diag.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `97341f40459e8f32ccc737e23eb494afc336ae8a` — SPEC-036: classify legacy references in active docs (link basis: the SPEC file changed in this commit)
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- Commit `fb87f5da0b249e61d3b38fb35eb94d4127405c1d` — Consolidate documentation: SPECs, Docs, Issues, validation scripts (link basis: the SPEC file changed in this commit)
+  - `Docs/ARCHITECTURE/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/ARCHITECTURE/NGAL-ARCHITECTURE.md`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC-STATUS-REGISTER.md`
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/DIAGNOSTICS/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/REVERT.md`
+  - `Issues/CLOSED/ISSUE-002-NGAL-Hash-Mismatch.md`
+  - `Issues/CLOSED/ISSUE-003-GCC15-Thread-Ambiguity.md`
+  - `Issues/CLOSED/ISSUE-004-NRNCS-Debug-Logging.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Issues/TEMPLATE.md`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/Simple/validate-skills.sh`
+  - `Scripts/Simple/validate-specs.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/SPEC-001-NRNCS-debug-logging.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-023-contentpublish-burst-throttling.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `887e9693f090bfb934447d2aafd0c5adcf1e5db7` — docs: restore Specs/ and Docs/ from git history + HT debug log (link basis: the SPEC file changed in this commit)
+  - `Common/src/Block.cpp`
+  - `Common/src/GWSCNSeq01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `NRNCS/src/NRInfoPayload01.cpp`
+  - `NRNCS/src/NRMsgCl01.cpp`
+  - `NRNCS/src/NRSCNSeq01.cpp`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `7106c4e509becbe2cdaedeb84d325ab347a78b48` — Returning previous NRNS version (link basis: the SPEC file changed in this commit)
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+  - `docs/SPEC-015-hash-mismatch-root-cause-analysis.md`
+  - `docs/SPEC-016-hash-verification-post-spec015.md`
+  - `docs/clang-format-report-2026-07-06.md`
+- Commit `f4af5e0771244266bc2a8e5d83dcce613096eac9` — Correcting intra e inter OS ContentApp life cycle after changes on GW hello 0.2 (link basis: the SPEC file changed in this commit)
+  - `PGCS/src/PGHelloIHC01.cpp`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `8c093ec6d13fc77b0bb3aaa3fd6e999fb2f6d9a2` — Changing message forward after discovering NRNCS (link basis: the SPEC file changed in this commit)
+  - `ContentApp/src/CoreNotifyS01.cpp`
+  - `ContentApp/src/CoreRunDiscover01.cpp`
+  - `ContentApp/src/CoreRunEvaluate01.cpp`
+  - `ContentApp/src/CoreRunPeriodic01.cpp`
+  - `ContentApp/src/CoreRunSubscribe01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `IoTTestApp/src/Core.h`
+  - `IoTTestApp/src/CoreNotifyS01.cpp`
+  - `IoTTestApp/src/CoreRunDiscover01.cpp`
+  - `IoTTestApp/src/CoreRunEvaluate01.cpp`
+  - `IoTTestApp/src/CoreRunExpose01.cpp`
+  - `IoTTestApp/src/CoreSCNAck01.cpp`
+  - `NBTestApp/src/CoreRunDiscover01.cpp`
+  - `NBTestApp/src/CoreRunEvaluate01.cpp`
+  - `NBTestApp/src/CoreRunPeriodic01.cpp`
+  - `PGCS/src/Core.h`
+  - `PGCS/src/CoreNotifyS01.cpp`
+  - `PGCS/src/CoreRunDiscover01.cpp`
+  - `PGCS/src/CoreRunEvaluate01.cpp`
+  - `PGCS/src/PG.h`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunPeriodic01.h`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `14aff2b50cab24a3af59db6a762469855046339e` — docs(spec): consolidate and correct SPEC-008 + update SPEC-001 (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+
+### `AIOPT5`
+- Commit `d4e640af785dcffdb5b394237b7a2d563387d559` — SPEC-009: clean Alpine VM script workflows (link basis: the SPEC file changed in this commit)
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/diag.sh`
+  - `Scripts/AlpineVMs/run-diag.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/simple-diag.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `97341f40459e8f32ccc737e23eb494afc336ae8a` — SPEC-036: classify legacy references in active docs (link basis: the SPEC file changed in this commit)
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+- Commit `fb87f5da0b249e61d3b38fb35eb94d4127405c1d` — Consolidate documentation: SPECs, Docs, Issues, validation scripts (link basis: the SPEC file changed in this commit)
+  - `Docs/ARCHITECTURE/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/ARCHITECTURE/NGAL-ARCHITECTURE.md`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC-STATUS-REGISTER.md`
+  - `Docs/DIAGNOSTICS/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/DIAGNOSTICS/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/NG-INVERTED-PUB-SUB-MODEL.md`
+  - `Docs/PGCS-RELAY-CONGESTION-BURST-SPLIT-2026-07-12.md`
+  - `Docs/REVERT.md`
+  - `Issues/CLOSED/ISSUE-002-NGAL-Hash-Mismatch.md`
+  - `Issues/CLOSED/ISSUE-003-GCC15-Thread-Ambiguity.md`
+  - `Issues/CLOSED/ISSUE-004-NRNCS-Debug-Logging.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Issues/TEMPLATE.md`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/Simple/validate-skills.sh`
+  - `Scripts/Simple/validate-specs.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/SPEC-001-NRNCS-debug-logging.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-023-contentpublish-burst-throttling.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `887e9693f090bfb934447d2aafd0c5adcf1e5db7` — docs: restore Specs/ and Docs/ from git history + HT debug log (link basis: the SPEC file changed in this commit)
+  - `Common/src/Block.cpp`
+  - `Common/src/GWSCNSeq01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `NRNCS/src/NRInfoPayload01.cpp`
+  - `NRNCS/src/NRMsgCl01.cpp`
+  - `NRNCS/src/NRSCNSeq01.cpp`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+- Commit `7106c4e509becbe2cdaedeb84d325ab347a78b48` — Returning previous NRNS version (link basis: the SPEC file changed in this commit)
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `Docs/REVERT.md`
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-002-message-leak-fix.md`
+  - `Specs/SPEC-003-fix-use-after-free-and-scheduled-messages.md`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-005-gw-shm-poll-interval-reduction.md`
+  - `Specs/SPEC-006-output-queue-semaphore-contention.md`
+  - `Specs/SPEC-007-output-queue-lock-decoupling.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-010-contentapp-hello-ipc20-bindings.md`
+  - `Specs/SPEC-011-periodic-exposition-contentapp.md`
+  - `Specs/SPEC-012-hash-abstraction.md`
+  - `Specs/SPEC-013-ngal-adaptation-layer.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-017-content-name-correlation.md`
+  - `Specs/SPEC-018-payload-sticks-on-reused-inline-response.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-MUSL-001-gcc15-thread-ambiguity.md`
+  - `docs/SPEC-015-hash-mismatch-root-cause-analysis.md`
+  - `docs/SPEC-016-hash-verification-post-spec015.md`
+  - `docs/clang-format-report-2026-07-06.md`
+- Commit `f4af5e0771244266bc2a8e5d83dcce613096eac9` — Correcting intra e inter OS ContentApp life cycle after changes on GW hello 0.2 (link basis: the SPEC file changed in this commit)
+  - `PGCS/src/PGHelloIHC01.cpp`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `8c093ec6d13fc77b0bb3aaa3fd6e999fb2f6d9a2` — Changing message forward after discovering NRNCS (link basis: the SPEC file changed in this commit)
+  - `ContentApp/src/CoreNotifyS01.cpp`
+  - `ContentApp/src/CoreRunDiscover01.cpp`
+  - `ContentApp/src/CoreRunEvaluate01.cpp`
+  - `ContentApp/src/CoreRunPeriodic01.cpp`
+  - `ContentApp/src/CoreRunSubscribe01.cpp`
+  - `Docs/CONTENTAPP-TIMERS-INVESTIGATION-2026-06-04.md`
+  - `IoTTestApp/src/Core.h`
+  - `IoTTestApp/src/CoreNotifyS01.cpp`
+  - `IoTTestApp/src/CoreRunDiscover01.cpp`
+  - `IoTTestApp/src/CoreRunEvaluate01.cpp`
+  - `IoTTestApp/src/CoreRunExpose01.cpp`
+  - `IoTTestApp/src/CoreSCNAck01.cpp`
+  - `NBTestApp/src/CoreRunDiscover01.cpp`
+  - `NBTestApp/src/CoreRunEvaluate01.cpp`
+  - `NBTestApp/src/CoreRunPeriodic01.cpp`
+  - `PGCS/src/Core.h`
+  - `PGCS/src/CoreNotifyS01.cpp`
+  - `PGCS/src/CoreRunDiscover01.cpp`
+  - `PGCS/src/CoreRunEvaluate01.cpp`
+  - `PGCS/src/PG.h`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunPeriodic01.h`
+  - `Specs/SPEC-004-contentapp-performance-optimisation.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `cmake-build-debug/ContentApp`
+  - `cmake-build-debug/PGCS`
+- Commit `14aff2b50cab24a3af59db6a762469855046339e` — docs(spec): consolidate and correct SPEC-008 + update SPEC-001 (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-001-hello-ipc-ht-bid.md`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+
+## Interpretation and limits
+
+- A declared path, a path present in the tree, a source citation, and a path changed in a SPEC-linked commit are different evidence types; this record keeps declared scope separate from observed commit diffs.
+- `git ls-tree`/`git show` at the pinned HEAD can establish presence and exact contents, but not that a SPEC caused a change or that its acceptance criteria passed.
+- Commit-message linkage is incomplete by nature. Absence of a linked commit does not prove that no files were affected; ambiguous duplicate SPEC IDs are left unattributed.
+- Branch-specific absence means the SPEC file is not in that pinned branch tree; it does not imply the branch never contained it historically.
+
+Generated from pinned Git objects; do not treat this sidecar as implementation authorization or acceptance evidence.

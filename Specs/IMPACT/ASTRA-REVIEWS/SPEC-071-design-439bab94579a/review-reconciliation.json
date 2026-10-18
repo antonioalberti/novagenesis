@@ -1,0 +1,24 @@
+{
+  "review_id": "SPEC-071-design-439bab94579a",
+  "packet_sha256": "439bab94579ad33c174afde2612031c9d0f1afbc593ebb903524c38ec1e246b7",
+  "instructions_sha256": "34ee329e2cdd2b0a6154cf534f081cb4811aac021882537fb8395252ff0f32b5",
+  "owner_consent": "Authorize one design-only Astra review using exactly these packet and instruction SHAs, subscription allowance only; stop if a paid overage would be required.",
+  "astra_verdict": "AMEND",
+  "astra_requested_implementation_authorization": "NO",
+  "astra_returned_implementation_authorization": "missing_or_ambiguous; response begins with literal header `**implementation authorization: ***` and contains no explicit `NO` value.",
+  "authority_interpretation": "No implementation authorization is granted; keep code changes blocked.",
+  "review_scope": "Design-only review of SPEC-071 v0.12-draft; not tool/code/test/runtime validation.",
+  "response_artifacts": {
+    "raw_sse": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response.raw.sse",
+    "raw_sse_sha256": "4b7c8ef26f69ab73c3996cc57d28fa4a89dcc6c3c50395839415ab70ef549e5c",
+    "transcript": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/session/SPEC-071-design-439bab94579a.jsonl",
+    "parsed_response": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response.parsed.txt",
+    "parsed_response_sha256": "42b5987bed86f1753154d1db3f4cb201999e47e604d2c2b49e9f08ac6cbf9365",
+    "derived_deduplicated_response": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response.derived-deduped.txt",
+    "derived_sha256": "c22184d7ba17a1cbf3ca2cfff267d6afebf6ef6f03f307aee13a0ce148b7b77f",
+    "normalization_receipt": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response-normalization.json"
+  },
+  "usage_record": "SPEC-071-design-439bab94579a; tracker record verified; estimated 13.4185 ratecard credits are not a money charge.",
+  "call_count": 1,
+  "no_retry": true
+}

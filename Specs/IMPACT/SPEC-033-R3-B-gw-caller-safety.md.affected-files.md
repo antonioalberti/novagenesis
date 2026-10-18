@@ -1,0 +1,465 @@
+# Affected-file record: `SPEC-033-R3-B-gw-caller-safety.md`
+
+SPEC title: SPEC-033-R3-B: GW caller-safety amendments
+
+## Snapshot coverage and applicability
+
+| Snapshot | Pinned HEAD | Present | Declared Branch | Version | Status | Baseline | Implementation commit | Applicability |
+|---|---|---|---|---|---|---|---|---|
+| `AIOPT3` | `24a3851e1d5a90f039b9e148a1af38dd03c4d925` | yes | (none) | (not declared) | (not declared in header) | (not declared) | (not declared) | Indeterminate: no Branch header establishes applicability |
+| `AIOPT4` | `0dd0dd4b2fd0a9d416aff232ad07672fe39746b6` | yes | (none) | (not declared) | (not declared in header) | (not declared) | (not declared) | Archived snapshot; no current AIOPT4 authority |
+| `AIOPT5` | `8d2386dcb10d2b37f133d4b24c2cb96761753d82` | yes | (none) | (not declared) | (not declared in header) | (not declared) | (not declared) | Indeterminate: no Branch header establishes applicability |
+
+## Files named in explicit file/scope sections
+
+These are literal file/path strings found in file-, scope-, or allowlist-related headings/tables. They represent declared or proposed scope, not proof of a change.
+
+### `AIOPT3` — source `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- No literal file paths were detected in the recognized scope/file sections.
+
+### `AIOPT4` — source `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- No literal file paths were detected in the recognized scope/file sections.
+
+### `AIOPT5` — source `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- No literal file paths were detected in the recognized scope/file sections.
+
+No explicit file paths found in the recognized sections for this SPEC. This is an inventory gap, not evidence that no files were affected.
+
+## Files changed in linked Git commits
+
+Paths below come from commits that either changed this SPEC file itself or explicitly named its identifier in the subject/body. This is evidence of co-change or a declared commit link, not proof that every path was caused solely by this SPEC.
+
+### `AIOPT3`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `0dc2b38e1d95e09877a4b3e7c90cf2d3bce282b9` — docs(SPEC-033): record B3 audit disposition (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/NG-020-B3-network-receive-audit-20260910.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Commit `c38eb081558292971c89df6f16134ecf0bc257c5` — docs(SPEC-033): record B1 final acceptance (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `e086868beaeb128f1134721583dda66548a77c30` — fix(SPEC-033): guard gateway message allocation failure (link basis: the SPEC file changed in this commit)
+  - `Common/src/GW.cpp`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `2b9925e8bb939854c97786d3fc2d68fe0d9de9d2` — test(SPEC-033): harden B1 evidence oracles (link basis: the SPEC file changed in this commit)
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `a9be6dbfba1e561a44febf1cbff8a77f01cb3a7a` — test(SPEC-033): strengthen B1 assertions (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `4e878ebaf934df00ed9c188320bbb90800a3f8ee` — docs(SPEC-033): record scope review no-go (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `bc7882747e1f9f8c9f0a8f7dafeed7e34f4af8b2` — test(SPEC-033): add B1 safety controls (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `b1a5ebafed850eff10d6cf01a8eace08ac7c5fa9` — test(SPEC-033): bound B1 fixture characterization (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `6134c330834acf0c0bd47424eb881ba8618d658b` — SPEC-033-R3: specify GW caller safety gates (link basis: the SPEC file changed in this commit)
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Ambiguous generic-ID commits were not assigned to this SPEC variant:
+  - `4ff9ec9419a3c4bd9511f1d0dfb61fc2591b68e2` — docs(SPEC-033): defer C1 without test seam
+  - `2a6eaadc6b3f79056b0d77bbcd4ebfe5e10e5cb6` — docs(SPEC-033): define C1 test-only failure policy
+  - `57f2c3d30a1b54f3cc48b90d8efcb6839979b85b` — docs(SPEC-033): split C caller compatibility risks
+  - `b215720316a86c207869790650cd93b9cd0eda18` — docs(SPEC-033): reconcile C caller classifications
+  - `37e912b6ce0bfde813892f3e0a8ae14603daad8c` — docs(SPEC-033): qualify C caller audit evidence
+  - `845ada1f5d1c4f87e03493e504945e3f8a8c1a40` — docs(SPEC-033): record C caller audit matrix
+  - `1ecac1af5844b2b78cbea4de5ae82ca81fa72905` — docs(SPEC-033): define C output contract audit
+  - `b2440422a36cd5cdbec0f3dce31d9bdf5d18e99b` — docs(SPEC-033): finalize B2 commit reference
+  - `53f06ff02060bb9c3c35e0ded30e167ec23f6595` — fix(SPEC-033): guard GW input queue null message
+  - `f4f8f8f57fa5e30498783cc01df9280a653d9dfc` — docs(SPEC-033): record conditional B1 go
+  - `0c2d61e01e1ba310205e09cbf4b7332e3625e690` — test(SPEC-033): validate serialized B1 control
+  - `1f89c314ac180e78af916e90f4ce6bb13dfbf83e` — SPEC-033-R3: guard GW startup message allocation
+  - `67149261caee682b276be01f1e4f7e10ad75dd4a` — SPEC-033-R3: document wrapper safety gates
+  - `8b4aeafa139463eae64c5332a7cd0a9817807298` — SPEC-033-R3: make MessageBuilder allocation failures safe
+  - `71df07ea1ebd63e6506d2959d70302e6c9e1573f` — SPEC-033: archive withdrawn attempt and draft controlled restart
+  - `77efe27fafbd7483507ed1448cbeedf04782bff4` — SPEC-032/033: restore exact pre-SPEC-032 baseline tree
+  - `c6ffcf7ce71f09d8124f346f94ede915093f4769` — SPEC-033: instrument NRNCS cache write boundary
+  - `d1cb0d622989f5ac5e159e83a6cea12b9f9b9c83` — SPEC-033: fix gateway deadline wait and shutdown retention
+  - `ac12d91064028eddf656cfea2ab10d0dc3161fc4` — SPEC-033 B-3 FIX (runtime-confirmed): NRNCS DelayBeforeRunPeriodic never initialized. NR.cpp constructor set 6 of 7 delays; DelayBeforeRunPeriodic was left uninitialized — with no NRNCS.ini (wiped during cache cleanup) NRRunPeriodic01 rescheduled at +garbage, flooding the GW queue with 180k+ instantiations (slot 29997/30000, generation 4.0e9), starving the VM102 process: Source app got zero delivery binds, Repository binds never crossed, photo publish chain dead. Fix: initialize to 5s (PGCS default) + fail-fast clamp in NRRunPeriodic01 if <= 0.
+  - `954ac5f4a2008b643133a5b9540d50e34949ec0e` — SPEC-033 B-3 FIX (gdb-confirmed): FreeSlot must NOT dereference Messages[_Index]. DeleteMarkedMessages deletes the message BEFORE calling FreeSlot — the gate-1 retention check inside FreeSlot then read freed memory (UAF segfault at Process.cpp:286, VM101 bootstrap, gdb backtrace: FreeSlot <- DeleteMarkedMessages <- Gateway). The retention check stays in the CALLERS before the delete; FreeSlot is now deref-free reclaim bookkeeping.
+  - `44032be033c27fdb5dd2796b818e4348fa8188e2` — SPEC-033 B-3 FIX: remove per-batch-element RunFlag reset that silently skipped batch elements after the first. Pre-existing bug from the SPEC-032 diagnostic batching era, exposed by the clean-VM restart procedure: when two bootstrap messages (GW + PG StoringInitialBinds) landed due in the same batch, only batch[0] ran; PG-block StoringInitialBinds never executed, cat13/PG-SCN binding was never stored, RunPeriodic routing failed, and the whole periodic/hello/discovery/photo chain died at startup. Found via PRELOOP/POP instrumentation per Astra method.
+  - `244f8b2352727c6a484b490b4256d53542f39a39` — SPEC-033 Phase B step 6 (B-3): GW queues migrate to QEntry with retention ownership. InputQueue and OutputQueues are now priority_queue<QEntry> with QEntryCompare (copied Time/Tag keys — comparator never dereferences the Message, closing the SPEC-032 cross-thread sort UAF class). Ownership: PushToInput/OutputQueue FindHandle+TryRetain before queue lock (failure = not queueable, mark, return); pop transfers the retention to the consumer; Gateway Run enters via the adopt overload (Run(msg,irm,handle)) — count unchanged through pop->Run; output path WriteToSharedMemory3 success = Release + MarkToDelete, SHM-busy retry TRANSFERS the retention back to the queue without release/re-acquire; stale entry while retained = contract violation, logged and discarded without dereference. nextTime reads use copied entry keys. TryRetain/Release are public on Process (queue API), LifecycleMutex private. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f9f3b52000c60f9f0c7643bb75b21bb6db1929bf` — SPEC-033 Phase B gates 1+2 (Astra conditional-go review). Gate 1: FreeSlot is the universal retention-aware reclaim boundary — refuses (ERROR) while Retentions > 0, all deletion/erase paths inherit the rule; EraseMessage reports deferred reclamation as ERROR under LifecycleMutex; DeleteMessages (destructor, post-quiesce) zeroes retentions in a pre-pass then reclaims everything. Gate 2: identity via handle, not pointer — new Block::Run(msg, irm, MsgHandle) overload ADOPTS the caller-owned queue retention (no double count); OkToRun runs only after handle validation on the adopt path; legacy pointer path keeps FindHandle+TryRetain for non-queued entries. MsgHandle/QEntry moved to shared MsgHandle.h to break the Process.h<->Block.h include cycle. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f3eaec91512a042b5a9cbeb2cb4863327d8857e3` — SPEC-033 Phase B: Astra conditional-go review for B-3. Two gates before queue migration: (1) EraseMessage must also respect Retentions (enforce at common reclaim boundary under LifecycleMutex), (2) Run entry via FindHandle(pointer) cannot guarantee intended identity — queued path must enter with original handle + already-owned retention. B-3 rules: enqueue=TryRetain (no mark-on-fail), pop/retry transfer ownership without release, snapshot key semantics documented (no assert in setters), QEntry comparator direction tested, ownership accounting on drain/shutdown/retry/drop.
+  - `3adb1635dbaf00658afc746855df117e71109aa5` — SPEC-033 Phase B step 5: fix factually wrong SPEC-003 comment (D4). The comment claimed no Action pushes to ScheduledMessages anymore; 5 still do (CoreMsgCl01 x4 modules, IRMsgCl02). Corrected: the cleanup loop stays removed because pushed messages belong to the Process container (sole owner) — deletion here would be a double-ownership bug; disposition is the later PushToInputQueue transfer. Added NDEBUG-gated invariant: each scheduled message must still be a live Process-owned slot at end of the CL loop.
+  - `293329b2af2fcdcc6139d5f990bad71b10b666c4` — SPEC-033 Phase B step 4: lifecycle mutex + retention (Astra review D3). Message::Retentions counter (init 0 in all 4 ctors); Process::LifecycleMutex guards TryRetain (atomic handle-validate + increment) and Release (underflow-guarded); FindHandle for pointer->handle; DeleteMessage/DeleteMessages/DeleteMarkedMessages defer destruction while Retentions > 0 (reclaimed on a later pass); Block::Run acquires the Run retention after OkToRun and releases at a single exit point. Full build clean, 9 targets; both harnesses still ALL PASS.
+  - `c83297d10237bc283ec30535e2438c647bf4d576` — SPEC-033 Phase B step 3: unified slot allocator/reclaimer (Astra review finding 1). AllocSlot/FreeSlot are the single bookkeeping path; legacy NewMessage x4, EraseMessage, DeleteMessage, DeleteMessages, DeleteMarkedMessages and the handle API all delegate. EraseMessage now returns ERROR when the pointer is absent (was always OK). New mixed-API test harness (5 tests, ALL PASS): interleaved legacy/handle alloc never double-allocates; legacy delete invalidates issued handles; stale erase is a no-op on counters; handle erase of legacy messages works; exhaustion leaves counters clean. BUG the harness caught: AllocSlot returned ERROR (=1) which collides with valid slot 1 — now returns -1, all 5 call sites fixed.
+  - `05faeb5d23dfddaa53e0983ba25e36ae8caf6904` — SPEC-033 Phase B: Astra review of handle integration (D1-D5). Blockers before B-3: (1) one shared allocator/reclaimer behind legacy+handle APIs, (2) queue residence = retention, (3) retention acquisition atomic vs destruction (Process lifecycle mutex, TryRetain/Release). D1 keep ERROR contract; D2 B-2 after retention; sentinel OK with uint32_t.
+  - `c4718bef0812afe649f392ad8c0662ad763eeeae` — SPEC-033: remove build artifacts from tests dir, ignore them
+  - `4824037807dc60d02e9b7c939cb42476fdaceec6` — SPEC-033 Phase B step 2: Process container gains generational handles. MsgHandle{Slot,Generation} + QEntry{Time,Tag,H} (copied sort keys, comparator never dereferences), FreeList + NoFreeSlots + SlotsGeneration[]; NewMessageHandle (O(1) alloc, invalid handle on exhaustion), ResolveMessage (stale gen -> NULL), EraseMessageHandle (O(1), bumps gen). Legacy pointer API untouched. Full build clean, all 9 targets.
+  - `7606a5a5a69a31e67d3b0d999bd839947faee73b` — SPEC-033 Phase B step 1: slot-container + generational-handle contract harness. 9 tests, standalone g++ build, ALL PASS. Pins: O(1) free-list alloc, stale-gen resolve -> NULL (T2), live-count invariant on success/failure (T3), retention blocks delete (T5), shutdown clears all (T6), queue entries carry copied sort keys (comparator never dereferences), pop skips stale handles, exhaustion yields invalid handle.
+  - `977856c2b9610c431e93319204a95f742c8fc62e` — SPEC-033 Phase C.2 COMPLETE: all 5 lifecycle-script questions answered by code sweep of Common/PGCS/NRNCS/ContentApp. P1: Actions use APIs only (no wire parsing). P2: no cardinality lookahead. P3: ScheduledMessages is the only intra-Run retention, dies with Run; no Message* members anywhere. P4: Type is live and semantic (0=core, 1=app), keep it. P5: no new wire fields needed. Finding: SPEC-003 comment in Block.cpp is factually wrong (5 Actions still push to ScheduledMessages)
+  - `3c234406b7285db202160dcfeffc3467ac557e92` — SPEC-033 Phase A: CommandLineParser round-trip test harness (12 cases, standalone g++ build)
+  - `17d424f05aa57b31fe5f9b6032e2b71f88623b47` — SPEC-033 Phase A: single CommandLine parser (CommandLineParser.{h,cpp}) with formal error contract. Both legacy readers (operator>>, ConvertCommandLineFromCharArray) now delegate to it. Includes: strict cardinality validation (P4/P8/P10), closed-marker enforcement (P6), marker-char rejection in elements (P7), NoA==0 divergence closed (P9), 64KiB line limit. Bonus fixes found by the new parser: CommandLine deep copy operator= (implicit one double-freed), Message off-by-one exposing uninitialized byte to parser (2 sites). 12/12 round-trip tests pass; full build clean
+  - `454b66f45621a96fde23d1843a8c58de690b84b9` — SPEC-033 Phase C: message lifecycle inventory + target ownership contract (Process sole owner, generational handles, queue comparators must not dereference)
+  - `6c7c1e503991cf641cf6ccfbb129385e29b34a8e` — SPEC-033 urgent safety patches per Astra review: P3 white-space array bounds + dynamic alloc (stack corruption), P2 Words[l+1] bounds check, M4 delete[] mismatch, C1 GetMessage stale/out-of-range, C2 NewMessage null output, HasMessage/EraseMessage/DeleteMessage null-safety (Astra findings 1-4). Build clean, all targets OK
+  - `a77a438cb8730bae686c031ae3ae02a774df31c6` — SPEC-033: Message/CommandLine lifecycle refactor draft + Astra review (APROVO COM AMENDAS)
+
+### `AIOPT4`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `0dc2b38e1d95e09877a4b3e7c90cf2d3bce282b9` — docs(SPEC-033): record B3 audit disposition (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/NG-020-B3-network-receive-audit-20260910.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Commit `c38eb081558292971c89df6f16134ecf0bc257c5` — docs(SPEC-033): record B1 final acceptance (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `e086868beaeb128f1134721583dda66548a77c30` — fix(SPEC-033): guard gateway message allocation failure (link basis: the SPEC file changed in this commit)
+  - `Common/src/GW.cpp`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `2b9925e8bb939854c97786d3fc2d68fe0d9de9d2` — test(SPEC-033): harden B1 evidence oracles (link basis: the SPEC file changed in this commit)
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `a9be6dbfba1e561a44febf1cbff8a77f01cb3a7a` — test(SPEC-033): strengthen B1 assertions (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `4e878ebaf934df00ed9c188320bbb90800a3f8ee` — docs(SPEC-033): record scope review no-go (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `bc7882747e1f9f8c9f0a8f7dafeed7e34f4af8b2` — test(SPEC-033): add B1 safety controls (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `b1a5ebafed850eff10d6cf01a8eace08ac7c5fa9` — test(SPEC-033): bound B1 fixture characterization (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `6134c330834acf0c0bd47424eb881ba8618d658b` — SPEC-033-R3: specify GW caller safety gates (link basis: the SPEC file changed in this commit)
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Ambiguous generic-ID commits were not assigned to this SPEC variant:
+  - `4ff9ec9419a3c4bd9511f1d0dfb61fc2591b68e2` — docs(SPEC-033): defer C1 without test seam
+  - `2a6eaadc6b3f79056b0d77bbcd4ebfe5e10e5cb6` — docs(SPEC-033): define C1 test-only failure policy
+  - `57f2c3d30a1b54f3cc48b90d8efcb6839979b85b` — docs(SPEC-033): split C caller compatibility risks
+  - `b215720316a86c207869790650cd93b9cd0eda18` — docs(SPEC-033): reconcile C caller classifications
+  - `37e912b6ce0bfde813892f3e0a8ae14603daad8c` — docs(SPEC-033): qualify C caller audit evidence
+  - `845ada1f5d1c4f87e03493e504945e3f8a8c1a40` — docs(SPEC-033): record C caller audit matrix
+  - `1ecac1af5844b2b78cbea4de5ae82ca81fa72905` — docs(SPEC-033): define C output contract audit
+  - `b2440422a36cd5cdbec0f3dce31d9bdf5d18e99b` — docs(SPEC-033): finalize B2 commit reference
+  - `53f06ff02060bb9c3c35e0ded30e167ec23f6595` — fix(SPEC-033): guard GW input queue null message
+  - `f4f8f8f57fa5e30498783cc01df9280a653d9dfc` — docs(SPEC-033): record conditional B1 go
+  - `0c2d61e01e1ba310205e09cbf4b7332e3625e690` — test(SPEC-033): validate serialized B1 control
+  - `1f89c314ac180e78af916e90f4ce6bb13dfbf83e` — SPEC-033-R3: guard GW startup message allocation
+  - `67149261caee682b276be01f1e4f7e10ad75dd4a` — SPEC-033-R3: document wrapper safety gates
+  - `8b4aeafa139463eae64c5332a7cd0a9817807298` — SPEC-033-R3: make MessageBuilder allocation failures safe
+  - `71df07ea1ebd63e6506d2959d70302e6c9e1573f` — SPEC-033: archive withdrawn attempt and draft controlled restart
+  - `77efe27fafbd7483507ed1448cbeedf04782bff4` — SPEC-032/033: restore exact pre-SPEC-032 baseline tree
+  - `c6ffcf7ce71f09d8124f346f94ede915093f4769` — SPEC-033: instrument NRNCS cache write boundary
+  - `d1cb0d622989f5ac5e159e83a6cea12b9f9b9c83` — SPEC-033: fix gateway deadline wait and shutdown retention
+  - `ac12d91064028eddf656cfea2ab10d0dc3161fc4` — SPEC-033 B-3 FIX (runtime-confirmed): NRNCS DelayBeforeRunPeriodic never initialized. NR.cpp constructor set 6 of 7 delays; DelayBeforeRunPeriodic was left uninitialized — with no NRNCS.ini (wiped during cache cleanup) NRRunPeriodic01 rescheduled at +garbage, flooding the GW queue with 180k+ instantiations (slot 29997/30000, generation 4.0e9), starving the VM102 process: Source app got zero delivery binds, Repository binds never crossed, photo publish chain dead. Fix: initialize to 5s (PGCS default) + fail-fast clamp in NRRunPeriodic01 if <= 0.
+  - `954ac5f4a2008b643133a5b9540d50e34949ec0e` — SPEC-033 B-3 FIX (gdb-confirmed): FreeSlot must NOT dereference Messages[_Index]. DeleteMarkedMessages deletes the message BEFORE calling FreeSlot — the gate-1 retention check inside FreeSlot then read freed memory (UAF segfault at Process.cpp:286, VM101 bootstrap, gdb backtrace: FreeSlot <- DeleteMarkedMessages <- Gateway). The retention check stays in the CALLERS before the delete; FreeSlot is now deref-free reclaim bookkeeping.
+  - `44032be033c27fdb5dd2796b818e4348fa8188e2` — SPEC-033 B-3 FIX: remove per-batch-element RunFlag reset that silently skipped batch elements after the first. Pre-existing bug from the SPEC-032 diagnostic batching era, exposed by the clean-VM restart procedure: when two bootstrap messages (GW + PG StoringInitialBinds) landed due in the same batch, only batch[0] ran; PG-block StoringInitialBinds never executed, cat13/PG-SCN binding was never stored, RunPeriodic routing failed, and the whole periodic/hello/discovery/photo chain died at startup. Found via PRELOOP/POP instrumentation per Astra method.
+  - `244f8b2352727c6a484b490b4256d53542f39a39` — SPEC-033 Phase B step 6 (B-3): GW queues migrate to QEntry with retention ownership. InputQueue and OutputQueues are now priority_queue<QEntry> with QEntryCompare (copied Time/Tag keys — comparator never dereferences the Message, closing the SPEC-032 cross-thread sort UAF class). Ownership: PushToInput/OutputQueue FindHandle+TryRetain before queue lock (failure = not queueable, mark, return); pop transfers the retention to the consumer; Gateway Run enters via the adopt overload (Run(msg,irm,handle)) — count unchanged through pop->Run; output path WriteToSharedMemory3 success = Release + MarkToDelete, SHM-busy retry TRANSFERS the retention back to the queue without release/re-acquire; stale entry while retained = contract violation, logged and discarded without dereference. nextTime reads use copied entry keys. TryRetain/Release are public on Process (queue API), LifecycleMutex private. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f9f3b52000c60f9f0c7643bb75b21bb6db1929bf` — SPEC-033 Phase B gates 1+2 (Astra conditional-go review). Gate 1: FreeSlot is the universal retention-aware reclaim boundary — refuses (ERROR) while Retentions > 0, all deletion/erase paths inherit the rule; EraseMessage reports deferred reclamation as ERROR under LifecycleMutex; DeleteMessages (destructor, post-quiesce) zeroes retentions in a pre-pass then reclaims everything. Gate 2: identity via handle, not pointer — new Block::Run(msg, irm, MsgHandle) overload ADOPTS the caller-owned queue retention (no double count); OkToRun runs only after handle validation on the adopt path; legacy pointer path keeps FindHandle+TryRetain for non-queued entries. MsgHandle/QEntry moved to shared MsgHandle.h to break the Process.h<->Block.h include cycle. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f3eaec91512a042b5a9cbeb2cb4863327d8857e3` — SPEC-033 Phase B: Astra conditional-go review for B-3. Two gates before queue migration: (1) EraseMessage must also respect Retentions (enforce at common reclaim boundary under LifecycleMutex), (2) Run entry via FindHandle(pointer) cannot guarantee intended identity — queued path must enter with original handle + already-owned retention. B-3 rules: enqueue=TryRetain (no mark-on-fail), pop/retry transfer ownership without release, snapshot key semantics documented (no assert in setters), QEntry comparator direction tested, ownership accounting on drain/shutdown/retry/drop.
+  - `3adb1635dbaf00658afc746855df117e71109aa5` — SPEC-033 Phase B step 5: fix factually wrong SPEC-003 comment (D4). The comment claimed no Action pushes to ScheduledMessages anymore; 5 still do (CoreMsgCl01 x4 modules, IRMsgCl02). Corrected: the cleanup loop stays removed because pushed messages belong to the Process container (sole owner) — deletion here would be a double-ownership bug; disposition is the later PushToInputQueue transfer. Added NDEBUG-gated invariant: each scheduled message must still be a live Process-owned slot at end of the CL loop.
+  - `293329b2af2fcdcc6139d5f990bad71b10b666c4` — SPEC-033 Phase B step 4: lifecycle mutex + retention (Astra review D3). Message::Retentions counter (init 0 in all 4 ctors); Process::LifecycleMutex guards TryRetain (atomic handle-validate + increment) and Release (underflow-guarded); FindHandle for pointer->handle; DeleteMessage/DeleteMessages/DeleteMarkedMessages defer destruction while Retentions > 0 (reclaimed on a later pass); Block::Run acquires the Run retention after OkToRun and releases at a single exit point. Full build clean, 9 targets; both harnesses still ALL PASS.
+  - `c83297d10237bc283ec30535e2438c647bf4d576` — SPEC-033 Phase B step 3: unified slot allocator/reclaimer (Astra review finding 1). AllocSlot/FreeSlot are the single bookkeeping path; legacy NewMessage x4, EraseMessage, DeleteMessage, DeleteMessages, DeleteMarkedMessages and the handle API all delegate. EraseMessage now returns ERROR when the pointer is absent (was always OK). New mixed-API test harness (5 tests, ALL PASS): interleaved legacy/handle alloc never double-allocates; legacy delete invalidates issued handles; stale erase is a no-op on counters; handle erase of legacy messages works; exhaustion leaves counters clean. BUG the harness caught: AllocSlot returned ERROR (=1) which collides with valid slot 1 — now returns -1, all 5 call sites fixed.
+  - `05faeb5d23dfddaa53e0983ba25e36ae8caf6904` — SPEC-033 Phase B: Astra review of handle integration (D1-D5). Blockers before B-3: (1) one shared allocator/reclaimer behind legacy+handle APIs, (2) queue residence = retention, (3) retention acquisition atomic vs destruction (Process lifecycle mutex, TryRetain/Release). D1 keep ERROR contract; D2 B-2 after retention; sentinel OK with uint32_t.
+  - `c4718bef0812afe649f392ad8c0662ad763eeeae` — SPEC-033: remove build artifacts from tests dir, ignore them
+  - `4824037807dc60d02e9b7c939cb42476fdaceec6` — SPEC-033 Phase B step 2: Process container gains generational handles. MsgHandle{Slot,Generation} + QEntry{Time,Tag,H} (copied sort keys, comparator never dereferences), FreeList + NoFreeSlots + SlotsGeneration[]; NewMessageHandle (O(1) alloc, invalid handle on exhaustion), ResolveMessage (stale gen -> NULL), EraseMessageHandle (O(1), bumps gen). Legacy pointer API untouched. Full build clean, all 9 targets.
+  - `7606a5a5a69a31e67d3b0d999bd839947faee73b` — SPEC-033 Phase B step 1: slot-container + generational-handle contract harness. 9 tests, standalone g++ build, ALL PASS. Pins: O(1) free-list alloc, stale-gen resolve -> NULL (T2), live-count invariant on success/failure (T3), retention blocks delete (T5), shutdown clears all (T6), queue entries carry copied sort keys (comparator never dereferences), pop skips stale handles, exhaustion yields invalid handle.
+  - `977856c2b9610c431e93319204a95f742c8fc62e` — SPEC-033 Phase C.2 COMPLETE: all 5 lifecycle-script questions answered by code sweep of Common/PGCS/NRNCS/ContentApp. P1: Actions use APIs only (no wire parsing). P2: no cardinality lookahead. P3: ScheduledMessages is the only intra-Run retention, dies with Run; no Message* members anywhere. P4: Type is live and semantic (0=core, 1=app), keep it. P5: no new wire fields needed. Finding: SPEC-003 comment in Block.cpp is factually wrong (5 Actions still push to ScheduledMessages)
+  - `3c234406b7285db202160dcfeffc3467ac557e92` — SPEC-033 Phase A: CommandLineParser round-trip test harness (12 cases, standalone g++ build)
+  - `17d424f05aa57b31fe5f9b6032e2b71f88623b47` — SPEC-033 Phase A: single CommandLine parser (CommandLineParser.{h,cpp}) with formal error contract. Both legacy readers (operator>>, ConvertCommandLineFromCharArray) now delegate to it. Includes: strict cardinality validation (P4/P8/P10), closed-marker enforcement (P6), marker-char rejection in elements (P7), NoA==0 divergence closed (P9), 64KiB line limit. Bonus fixes found by the new parser: CommandLine deep copy operator= (implicit one double-freed), Message off-by-one exposing uninitialized byte to parser (2 sites). 12/12 round-trip tests pass; full build clean
+  - `454b66f45621a96fde23d1843a8c58de690b84b9` — SPEC-033 Phase C: message lifecycle inventory + target ownership contract (Process sole owner, generational handles, queue comparators must not dereference)
+  - `6c7c1e503991cf641cf6ccfbb129385e29b34a8e` — SPEC-033 urgent safety patches per Astra review: P3 white-space array bounds + dynamic alloc (stack corruption), P2 Words[l+1] bounds check, M4 delete[] mismatch, C1 GetMessage stale/out-of-range, C2 NewMessage null output, HasMessage/EraseMessage/DeleteMessage null-safety (Astra findings 1-4). Build clean, all targets OK
+  - `a77a438cb8730bae686c031ae3ae02a774df31c6` — SPEC-033: Message/CommandLine lifecycle refactor draft + Astra review (APROVO COM AMENDAS)
+
+### `AIOPT5`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `0dc2b38e1d95e09877a4b3e7c90cf2d3bce282b9` — docs(SPEC-033): record B3 audit disposition (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/NG-020-B3-network-receive-audit-20260910.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Commit `c38eb081558292971c89df6f16134ecf0bc257c5` — docs(SPEC-033): record B1 final acceptance (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `e086868beaeb128f1134721583dda66548a77c30` — fix(SPEC-033): guard gateway message allocation failure (link basis: the SPEC file changed in this commit)
+  - `Common/src/GW.cpp`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `2b9925e8bb939854c97786d3fc2d68fe0d9de9d2` — test(SPEC-033): harden B1 evidence oracles (link basis: the SPEC file changed in this commit)
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `a9be6dbfba1e561a44febf1cbff8a77f01cb3a7a` — test(SPEC-033): strengthen B1 assertions (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `4e878ebaf934df00ed9c188320bbb90800a3f8ee` — docs(SPEC-033): record scope review no-go (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `bc7882747e1f9f8c9f0a8f7dafeed7e34f4af8b2` — test(SPEC-033): add B1 safety controls (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `b1a5ebafed850eff10d6cf01a8eace08ac7c5fa9` — test(SPEC-033): bound B1 fixture characterization (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+- Commit `6134c330834acf0c0bd47424eb881ba8618d658b` — SPEC-033-R3: specify GW caller safety gates (link basis: the SPEC file changed in this commit)
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+- Ambiguous generic-ID commits were not assigned to this SPEC variant:
+  - `4ff9ec9419a3c4bd9511f1d0dfb61fc2591b68e2` — docs(SPEC-033): defer C1 without test seam
+  - `2a6eaadc6b3f79056b0d77bbcd4ebfe5e10e5cb6` — docs(SPEC-033): define C1 test-only failure policy
+  - `57f2c3d30a1b54f3cc48b90d8efcb6839979b85b` — docs(SPEC-033): split C caller compatibility risks
+  - `b215720316a86c207869790650cd93b9cd0eda18` — docs(SPEC-033): reconcile C caller classifications
+  - `37e912b6ce0bfde813892f3e0a8ae14603daad8c` — docs(SPEC-033): qualify C caller audit evidence
+  - `845ada1f5d1c4f87e03493e504945e3f8a8c1a40` — docs(SPEC-033): record C caller audit matrix
+  - `1ecac1af5844b2b78cbea4de5ae82ca81fa72905` — docs(SPEC-033): define C output contract audit
+  - `b2440422a36cd5cdbec0f3dce31d9bdf5d18e99b` — docs(SPEC-033): finalize B2 commit reference
+  - `53f06ff02060bb9c3c35e0ded30e167ec23f6595` — fix(SPEC-033): guard GW input queue null message
+  - `f4f8f8f57fa5e30498783cc01df9280a653d9dfc` — docs(SPEC-033): record conditional B1 go
+  - `0c2d61e01e1ba310205e09cbf4b7332e3625e690` — test(SPEC-033): validate serialized B1 control
+  - `1f89c314ac180e78af916e90f4ce6bb13dfbf83e` — SPEC-033-R3: guard GW startup message allocation
+  - `67149261caee682b276be01f1e4f7e10ad75dd4a` — SPEC-033-R3: document wrapper safety gates
+  - `8b4aeafa139463eae64c5332a7cd0a9817807298` — SPEC-033-R3: make MessageBuilder allocation failures safe
+  - `71df07ea1ebd63e6506d2959d70302e6c9e1573f` — SPEC-033: archive withdrawn attempt and draft controlled restart
+  - `77efe27fafbd7483507ed1448cbeedf04782bff4` — SPEC-032/033: restore exact pre-SPEC-032 baseline tree
+  - `c6ffcf7ce71f09d8124f346f94ede915093f4769` — SPEC-033: instrument NRNCS cache write boundary
+  - `d1cb0d622989f5ac5e159e83a6cea12b9f9b9c83` — SPEC-033: fix gateway deadline wait and shutdown retention
+  - `ac12d91064028eddf656cfea2ab10d0dc3161fc4` — SPEC-033 B-3 FIX (runtime-confirmed): NRNCS DelayBeforeRunPeriodic never initialized. NR.cpp constructor set 6 of 7 delays; DelayBeforeRunPeriodic was left uninitialized — with no NRNCS.ini (wiped during cache cleanup) NRRunPeriodic01 rescheduled at +garbage, flooding the GW queue with 180k+ instantiations (slot 29997/30000, generation 4.0e9), starving the VM102 process: Source app got zero delivery binds, Repository binds never crossed, photo publish chain dead. Fix: initialize to 5s (PGCS default) + fail-fast clamp in NRRunPeriodic01 if <= 0.
+  - `954ac5f4a2008b643133a5b9540d50e34949ec0e` — SPEC-033 B-3 FIX (gdb-confirmed): FreeSlot must NOT dereference Messages[_Index]. DeleteMarkedMessages deletes the message BEFORE calling FreeSlot — the gate-1 retention check inside FreeSlot then read freed memory (UAF segfault at Process.cpp:286, VM101 bootstrap, gdb backtrace: FreeSlot <- DeleteMarkedMessages <- Gateway). The retention check stays in the CALLERS before the delete; FreeSlot is now deref-free reclaim bookkeeping.
+  - `44032be033c27fdb5dd2796b818e4348fa8188e2` — SPEC-033 B-3 FIX: remove per-batch-element RunFlag reset that silently skipped batch elements after the first. Pre-existing bug from the SPEC-032 diagnostic batching era, exposed by the clean-VM restart procedure: when two bootstrap messages (GW + PG StoringInitialBinds) landed due in the same batch, only batch[0] ran; PG-block StoringInitialBinds never executed, cat13/PG-SCN binding was never stored, RunPeriodic routing failed, and the whole periodic/hello/discovery/photo chain died at startup. Found via PRELOOP/POP instrumentation per Astra method.
+  - `244f8b2352727c6a484b490b4256d53542f39a39` — SPEC-033 Phase B step 6 (B-3): GW queues migrate to QEntry with retention ownership. InputQueue and OutputQueues are now priority_queue<QEntry> with QEntryCompare (copied Time/Tag keys — comparator never dereferences the Message, closing the SPEC-032 cross-thread sort UAF class). Ownership: PushToInput/OutputQueue FindHandle+TryRetain before queue lock (failure = not queueable, mark, return); pop transfers the retention to the consumer; Gateway Run enters via the adopt overload (Run(msg,irm,handle)) — count unchanged through pop->Run; output path WriteToSharedMemory3 success = Release + MarkToDelete, SHM-busy retry TRANSFERS the retention back to the queue without release/re-acquire; stale entry while retained = contract violation, logged and discarded without dereference. nextTime reads use copied entry keys. TryRetain/Release are public on Process (queue API), LifecycleMutex private. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f9f3b52000c60f9f0c7643bb75b21bb6db1929bf` — SPEC-033 Phase B gates 1+2 (Astra conditional-go review). Gate 1: FreeSlot is the universal retention-aware reclaim boundary — refuses (ERROR) while Retentions > 0, all deletion/erase paths inherit the rule; EraseMessage reports deferred reclamation as ERROR under LifecycleMutex; DeleteMessages (destructor, post-quiesce) zeroes retentions in a pre-pass then reclaims everything. Gate 2: identity via handle, not pointer — new Block::Run(msg, irm, MsgHandle) overload ADOPTS the caller-owned queue retention (no double count); OkToRun runs only after handle validation on the adopt path; legacy pointer path keeps FindHandle+TryRetain for non-queued entries. MsgHandle/QEntry moved to shared MsgHandle.h to break the Process.h<->Block.h include cycle. Build clean 9 targets, harnesses 14/14 PASS.
+  - `f3eaec91512a042b5a9cbeb2cb4863327d8857e3` — SPEC-033 Phase B: Astra conditional-go review for B-3. Two gates before queue migration: (1) EraseMessage must also respect Retentions (enforce at common reclaim boundary under LifecycleMutex), (2) Run entry via FindHandle(pointer) cannot guarantee intended identity — queued path must enter with original handle + already-owned retention. B-3 rules: enqueue=TryRetain (no mark-on-fail), pop/retry transfer ownership without release, snapshot key semantics documented (no assert in setters), QEntry comparator direction tested, ownership accounting on drain/shutdown/retry/drop.
+  - `3adb1635dbaf00658afc746855df117e71109aa5` — SPEC-033 Phase B step 5: fix factually wrong SPEC-003 comment (D4). The comment claimed no Action pushes to ScheduledMessages anymore; 5 still do (CoreMsgCl01 x4 modules, IRMsgCl02). Corrected: the cleanup loop stays removed because pushed messages belong to the Process container (sole owner) — deletion here would be a double-ownership bug; disposition is the later PushToInputQueue transfer. Added NDEBUG-gated invariant: each scheduled message must still be a live Process-owned slot at end of the CL loop.
+  - `293329b2af2fcdcc6139d5f990bad71b10b666c4` — SPEC-033 Phase B step 4: lifecycle mutex + retention (Astra review D3). Message::Retentions counter (init 0 in all 4 ctors); Process::LifecycleMutex guards TryRetain (atomic handle-validate + increment) and Release (underflow-guarded); FindHandle for pointer->handle; DeleteMessage/DeleteMessages/DeleteMarkedMessages defer destruction while Retentions > 0 (reclaimed on a later pass); Block::Run acquires the Run retention after OkToRun and releases at a single exit point. Full build clean, 9 targets; both harnesses still ALL PASS.
+  - `c83297d10237bc283ec30535e2438c647bf4d576` — SPEC-033 Phase B step 3: unified slot allocator/reclaimer (Astra review finding 1). AllocSlot/FreeSlot are the single bookkeeping path; legacy NewMessage x4, EraseMessage, DeleteMessage, DeleteMessages, DeleteMarkedMessages and the handle API all delegate. EraseMessage now returns ERROR when the pointer is absent (was always OK). New mixed-API test harness (5 tests, ALL PASS): interleaved legacy/handle alloc never double-allocates; legacy delete invalidates issued handles; stale erase is a no-op on counters; handle erase of legacy messages works; exhaustion leaves counters clean. BUG the harness caught: AllocSlot returned ERROR (=1) which collides with valid slot 1 — now returns -1, all 5 call sites fixed.
+  - `05faeb5d23dfddaa53e0983ba25e36ae8caf6904` — SPEC-033 Phase B: Astra review of handle integration (D1-D5). Blockers before B-3: (1) one shared allocator/reclaimer behind legacy+handle APIs, (2) queue residence = retention, (3) retention acquisition atomic vs destruction (Process lifecycle mutex, TryRetain/Release). D1 keep ERROR contract; D2 B-2 after retention; sentinel OK with uint32_t.
+  - `c4718bef0812afe649f392ad8c0662ad763eeeae` — SPEC-033: remove build artifacts from tests dir, ignore them
+  - `4824037807dc60d02e9b7c939cb42476fdaceec6` — SPEC-033 Phase B step 2: Process container gains generational handles. MsgHandle{Slot,Generation} + QEntry{Time,Tag,H} (copied sort keys, comparator never dereferences), FreeList + NoFreeSlots + SlotsGeneration[]; NewMessageHandle (O(1) alloc, invalid handle on exhaustion), ResolveMessage (stale gen -> NULL), EraseMessageHandle (O(1), bumps gen). Legacy pointer API untouched. Full build clean, all 9 targets.
+  - `7606a5a5a69a31e67d3b0d999bd839947faee73b` — SPEC-033 Phase B step 1: slot-container + generational-handle contract harness. 9 tests, standalone g++ build, ALL PASS. Pins: O(1) free-list alloc, stale-gen resolve -> NULL (T2), live-count invariant on success/failure (T3), retention blocks delete (T5), shutdown clears all (T6), queue entries carry copied sort keys (comparator never dereferences), pop skips stale handles, exhaustion yields invalid handle.
+  - `977856c2b9610c431e93319204a95f742c8fc62e` — SPEC-033 Phase C.2 COMPLETE: all 5 lifecycle-script questions answered by code sweep of Common/PGCS/NRNCS/ContentApp. P1: Actions use APIs only (no wire parsing). P2: no cardinality lookahead. P3: ScheduledMessages is the only intra-Run retention, dies with Run; no Message* members anywhere. P4: Type is live and semantic (0=core, 1=app), keep it. P5: no new wire fields needed. Finding: SPEC-003 comment in Block.cpp is factually wrong (5 Actions still push to ScheduledMessages)
+  - `3c234406b7285db202160dcfeffc3467ac557e92` — SPEC-033 Phase A: CommandLineParser round-trip test harness (12 cases, standalone g++ build)
+  - `17d424f05aa57b31fe5f9b6032e2b71f88623b47` — SPEC-033 Phase A: single CommandLine parser (CommandLineParser.{h,cpp}) with formal error contract. Both legacy readers (operator>>, ConvertCommandLineFromCharArray) now delegate to it. Includes: strict cardinality validation (P4/P8/P10), closed-marker enforcement (P6), marker-char rejection in elements (P7), NoA==0 divergence closed (P9), 64KiB line limit. Bonus fixes found by the new parser: CommandLine deep copy operator= (implicit one double-freed), Message off-by-one exposing uninitialized byte to parser (2 sites). 12/12 round-trip tests pass; full build clean
+  - `454b66f45621a96fde23d1843a8c58de690b84b9` — SPEC-033 Phase C: message lifecycle inventory + target ownership contract (Process sole owner, generational handles, queue comparators must not dereference)
+  - `6c7c1e503991cf641cf6ccfbb129385e29b34a8e` — SPEC-033 urgent safety patches per Astra review: P3 white-space array bounds + dynamic alloc (stack corruption), P2 Words[l+1] bounds check, M4 delete[] mismatch, C1 GetMessage stale/out-of-range, C2 NewMessage null output, HasMessage/EraseMessage/DeleteMessage null-safety (Astra findings 1-4). Build clean, all targets OK
+  - `a77a438cb8730bae686c031ae3ae02a774df31c6` — SPEC-033: Message/CommandLine lifecycle refactor draft + Astra review (APROVO COM AMENDAS)
+
+## Interpretation and limits
+
+- A declared path, a path present in the tree, a source citation, and a path changed in a SPEC-linked commit are different evidence types; this record keeps declared scope separate from observed commit diffs.
+- `git ls-tree`/`git show` at the pinned HEAD can establish presence and exact contents, but not that a SPEC caused a change or that its acceptance criteria passed.
+- Commit-message linkage is incomplete by nature. Absence of a linked commit does not prove that no files were affected; ambiguous duplicate SPEC IDs are left unattributed.
+- Branch-specific absence means the SPEC file is not in that pinned branch tree; it does not imply the branch never contained it historically.
+
+Generated from pinned Git objects; do not treat this sidecar as implementation authorization or acceptance evidence.

@@ -1,0 +1,442 @@
+# Affected-file record: `SPEC-027-pgcs-multithreading.md`
+
+SPEC title: SPEC-027 — PGCS Multithreading
+
+## Snapshot coverage and applicability
+
+| Snapshot | Pinned HEAD | Present | Declared Branch | Version | Status | Baseline | Implementation commit | Applicability |
+|---|---|---|---|---|---|---|---|---|
+| `AIOPT3` | `24a3851e1d5a90f039b9e148a1af38dd03c4d925` | yes | (none) | (not declared) | Implemented (Phase 1) — **TEST SIGNED OFF by Astra 2026-09-07** (commit faa6c4e, guard tests 6/6 PASS). Perda ~2% = baseline best-effort. SPEC-030 (staging+manifest) e SPEC-028-B (heartbeat) seguem em paralelo. Link-interruption guard: deferred para próximo soak. | (not declared) | (not declared) | Deferred/abandoned per header; not active authority |
+| `AIOPT4` | `0dd0dd4b2fd0a9d416aff232ad07672fe39746b6` | yes | (none) | (not declared) | Implemented (Phase 1) — **TEST SIGNED OFF by Astra 2026-09-07** (commit faa6c4e, guard tests 6/6 PASS). Perda ~2% = baseline best-effort. SPEC-030 (staging+manifest) e SPEC-028-B (heartbeat) seguem em paralelo. Link-interruption guard: deferred para próximo soak. | (not declared) | (not declared) | Archived snapshot; no current AIOPT4 authority |
+| `AIOPT5` | `8d2386dcb10d2b37f133d4b24c2cb96761753d82` | yes | (none) | (not declared) | In Progress | (not declared) | (not declared) | AIOPT5-linked; phases OPEN/PARTIAL and work paused; no execution authorization |
+
+## Files named in explicit file/scope sections
+
+These are literal file/path strings found in file-, scope-, or allowlist-related headings/tables. They represent declared or proposed scope, not proof of a change.
+
+### `AIOPT3` — source `Specs/SPEC-027-pgcs-multithreading.md`
+- path: `PGCS/src/PG.h` — source SPEC line 324.
+- path: `PGCS/src/PG.cpp` — source SPEC line 325.
+- path: `PGCS/src/PGRunInitialization01.cpp` — source SPEC line 326.
+- path: `Common/src/Process.h` — source SPEC line 333.
+- path: `PGCS/src/PGRunStresstest01.cpp` — source SPEC line 335.
+- path: `PGStresstestPing01.cpp` — source SPEC line 335.
+- path: `Scripts/AlpineVMs/pull-and-build-vms.sh` — source SPEC line 337.
+- path: `Scripts/AlpineVMs/benchmark-pgcs-mt.sh` — source SPEC line 338.
+
+### `AIOPT4` — source `Specs/SPEC-027-pgcs-multithreading.md`
+- path: `PGCS/src/PG.h` — source SPEC line 324.
+- path: `PGCS/src/PG.cpp` — source SPEC line 325.
+- path: `PGCS/src/PGRunInitialization01.cpp` — source SPEC line 326.
+- path: `Common/src/Process.h` — source SPEC line 333.
+- path: `PGCS/src/PGRunStresstest01.cpp` — source SPEC line 335.
+- path: `PGStresstestPing01.cpp` — source SPEC line 335.
+- path: `Scripts/AlpineVMs/pull-and-build-vms.sh` — source SPEC line 337.
+- path: `Scripts/AlpineVMs/benchmark-pgcs-mt.sh` — source SPEC line 338.
+
+### `AIOPT5` — source `Specs/SPEC-027-pgcs-multithreading.md`
+- path: `PGCS/src/PG.h` — source SPEC line 343.
+- path: `PGCS/src/PG.cpp` — source SPEC line 344.
+- path: `PGCS/src/PGRunInitialization01.cpp` — source SPEC line 345.
+- path: `Common/src/Process.h` — source SPEC line 352.
+- path: `PGCS/src/PGRunStresstest01.cpp` — source SPEC line 354.
+- path: `PGStresstestPing01.cpp` — source SPEC line 354.
+- path: `Scripts/AlpineVMs/pull-and-build-vms.sh` — source SPEC line 356.
+- path: `Scripts/AlpineVMs/benchmark-pgcs-mt.sh` — source SPEC line 357.
+
+## Files changed in linked Git commits
+
+Paths below come from commits that either changed this SPEC file itself or explicitly named its identifier in the subject/body. This is evidence of co-change or a declared commit link, not proof that every path was caused solely by this SPEC.
+
+### `AIOPT3`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `50e351c9f0ed7aea5658df42902e055dac848843` — SPEC-027: Phase 1 TEST SIGNED OFF by Astra (guard tests 6/6, commit faa6c4e) (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `bcb7e74f9234b12e21f9207881c88d72c9114dc9` — SPEC-027 AMEND-3 v2: 1000-photo payload delivery PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-photos-1000.json`
+- Commit `39bad89c0cc7ccb6a81e93593039da3809393fe1` — SPEC-027: run record reconciled per Astra — duration by counter delta, delay units clarified (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e45cb10544c126158f1a56a7ae76bb021b288189` — SPEC-027 AMEND-3 v2: real-load run @500 msg/s bidirectional PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e75b112387a6cc5a38a5cae62150311ced7f8745` — SPEC-029: fail-fast validation of self-MAC peer configuration (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunInitialization01.cpp`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+- Commit `576a0189169a3a5d7d5193d2a27623430d780c85` — SPEC-027 AMEND-3 v2: full NGAL_SAR rewrite per Astra review (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `b257b7e5771b5fa401849ba33b193f3ad2321d48` — SPEC-027: status transition — Phase 1 Implemented-Pending Test per Astra verdict (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `4e741bf8646f8c17417a62057102b4493c8e7094` — SPEC-027: soak record amended per Astra verdict — status IMPLEMENTED-Pending Test (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `7265a87daedddec16a7bf1fc3d1a3fd055dc02cc` — SPEC-027: 30-min soak results at 500 msg/s — stability PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `b358abba402f4782a00cbf55dd8d5c20f6e9e595` — SPEC-027: add soak-monitor.sh — hardened 30-min soak monitor (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+- Commit `8a9d2bf916c62131a789fd33c866b37eadf77bd6` — SPEC-027: disable verbose DEBUG logging for high-load stress tests (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+  - `Common/src/GW.cpp`
+  - `Common/src/GWMsgCl01.cpp`
+  - `Common/src/NGAL_SAR.cpp`
+  - `PGCS/src/PG.cpp`
+  - `PGCS/src/PGMsgCl01.cpp`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `PGCS/src/PGStresstestPing01.cpp`
+  - `Specs/RESULTS-SPEC-027/baseline-summary.json`
+  - `Specs/RESULTS-SPEC-027/baseline.json`
+  - `Specs/RESULTS-SPEC-027/probe100-120s.json`
+  - `Specs/RESULTS-SPEC-027/probe100.json`
+- Commit `1396c62670e60f9f992bba1fc26f7a4d74178945` — SPEC-027 AMEND-3: NGAL_SAR safety fixes (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `d4e9128b363f25bc8dd9b90fe4e1d9d6a3dfaf2f` — SPEC-027 baseline: DEBUG on PGStresstestPing01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGStresstestPing01.cpp`
+- Commit `aab3e280e0336284600bdd34a023f112f2e4835f` — SPEC-027 baseline: DEBUG on Block::Run (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+- Commit `53f55d183b570da91b9e9ea4a4dbf743ac07c7fd` — SPEC-027 baseline: DEBUG on GWMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/GWMsgCl01.cpp`
+- Commit `3680c439cb8d77da1fff35c751119cfdada8e48a` — SPEC-027 baseline: DEBUG on PGMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGMsgCl01.cpp`
+- Commit `bca1b20c79c3cf53df6b5ea51e3cc6ee50a448f5` — SPEC-027 baseline instrumentation: DEBUG on Periodic/Stresstest (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+
+### `AIOPT4`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `50e351c9f0ed7aea5658df42902e055dac848843` — SPEC-027: Phase 1 TEST SIGNED OFF by Astra (guard tests 6/6, commit faa6c4e) (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `bcb7e74f9234b12e21f9207881c88d72c9114dc9` — SPEC-027 AMEND-3 v2: 1000-photo payload delivery PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-photos-1000.json`
+- Commit `39bad89c0cc7ccb6a81e93593039da3809393fe1` — SPEC-027: run record reconciled per Astra — duration by counter delta, delay units clarified (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e45cb10544c126158f1a56a7ae76bb021b288189` — SPEC-027 AMEND-3 v2: real-load run @500 msg/s bidirectional PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e75b112387a6cc5a38a5cae62150311ced7f8745` — SPEC-029: fail-fast validation of self-MAC peer configuration (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunInitialization01.cpp`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+- Commit `576a0189169a3a5d7d5193d2a27623430d780c85` — SPEC-027 AMEND-3 v2: full NGAL_SAR rewrite per Astra review (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `b257b7e5771b5fa401849ba33b193f3ad2321d48` — SPEC-027: status transition — Phase 1 Implemented-Pending Test per Astra verdict (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `4e741bf8646f8c17417a62057102b4493c8e7094` — SPEC-027: soak record amended per Astra verdict — status IMPLEMENTED-Pending Test (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `7265a87daedddec16a7bf1fc3d1a3fd055dc02cc` — SPEC-027: 30-min soak results at 500 msg/s — stability PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `b358abba402f4782a00cbf55dd8d5c20f6e9e595` — SPEC-027: add soak-monitor.sh — hardened 30-min soak monitor (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+- Commit `8a9d2bf916c62131a789fd33c866b37eadf77bd6` — SPEC-027: disable verbose DEBUG logging for high-load stress tests (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+  - `Common/src/GW.cpp`
+  - `Common/src/GWMsgCl01.cpp`
+  - `Common/src/NGAL_SAR.cpp`
+  - `PGCS/src/PG.cpp`
+  - `PGCS/src/PGMsgCl01.cpp`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `PGCS/src/PGStresstestPing01.cpp`
+  - `Specs/RESULTS-SPEC-027/baseline-summary.json`
+  - `Specs/RESULTS-SPEC-027/baseline.json`
+  - `Specs/RESULTS-SPEC-027/probe100-120s.json`
+  - `Specs/RESULTS-SPEC-027/probe100.json`
+- Commit `1396c62670e60f9f992bba1fc26f7a4d74178945` — SPEC-027 AMEND-3: NGAL_SAR safety fixes (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `d4e9128b363f25bc8dd9b90fe4e1d9d6a3dfaf2f` — SPEC-027 baseline: DEBUG on PGStresstestPing01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGStresstestPing01.cpp`
+- Commit `aab3e280e0336284600bdd34a023f112f2e4835f` — SPEC-027 baseline: DEBUG on Block::Run (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+- Commit `53f55d183b570da91b9e9ea4a4dbf743ac07c7fd` — SPEC-027 baseline: DEBUG on GWMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/GWMsgCl01.cpp`
+- Commit `3680c439cb8d77da1fff35c751119cfdada8e48a` — SPEC-027 baseline: DEBUG on PGMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGMsgCl01.cpp`
+- Commit `bca1b20c79c3cf53df6b5ea51e3cc6ee50a448f5` — SPEC-027 baseline instrumentation: DEBUG on Periodic/Stresstest (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+
+### `AIOPT5`
+- Commit `707a3a29e43741f148753fbdc55ca6679e0bf406` — SPEC-027: Preserve AIOPT5 diagnostic telemetry checkpoint (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `CMakeLists.txt`
+  - `Common/src/GW.cpp`
+  - `Common/src/GW.h`
+  - `Common/src/NGAL_CS.cpp`
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_StageTelemetry.h`
+  - `PGCS/src/NGAL_Transport_RAW.cpp`
+  - `PGCS/src/PG.cpp`
+  - `PGCS/src/PG.h`
+  - `PGCS/src/PGHelloIHC01.cpp`
+  - `PGCS/src/PGRunExposition01.cpp`
+  - `PGCS/src/PGRunHello01.cpp`
+  - `PGCS/src/PGRunInitialization01.cpp`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `tests/NGALStageTelemetryTest.cpp`
+  - `tests/test_spec027_stage_wiring.py`
+- Commit `4f83b38176bc6db3162876379fa6b61c7489ccae` — SPEC-038: anonymize public deployment data (link basis: the SPEC file changed in this commit)
+  - `Docs/DECISIONS/BASELINE-RESTORATION-2026-09-09.md`
+  - `Docs/DECISIONS/DOCUMENTATION-ARCHITECTURE.md`
+  - `Docs/DECISIONS/NG-020-C1-test-only-manifest-20260910.md`
+  - `Docs/DECISIONS/NG-037-BRANCH-COMPARISON-20260911.md`
+  - `Docs/DECISIONS/NG-037-DEFAULT-BRANCH-PROMOTION-20260911.md`
+  - `Docs/DECISIONS/REVERT.md`
+  - `Docs/DECISIONS/SPEC033-R3-B1-FIXTURE-REDESIGN-20260909.md`
+  - `Docs/DIAGNOSTICS/NGAL-HASH-MISMATCH-ROOT-CAUSE.md`
+  - `Docs/HISTORICAL/SPEC032-033-withdrawn-attempt/Specs/SPEC-032-gw-input-queue-batching.md`
+  - `Issues/OPEN/ISSUE-001-NRInfoPayload01-Cache-Miss.md`
+  - `Make/compile-parallel.sh`
+  - `Make/compile.sh`
+  - `Scripts/AlpineVMs/alpine-phase4-ng.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-repo.sh`
+  - `Scripts/AlpineVMs/alpine-phase5-source.sh`
+  - `Scripts/AlpineVMs/check-run-scripts.sh`
+  - `Scripts/AlpineVMs/fix-network.sh`
+  - `Scripts/AlpineVMs/ng-vm.env.example`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_NRNCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_PGCS_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/run_Repository_on_Repo_VM.sh`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Scripts/AlpineVMs/setup-ng-repo.sh`
+  - `Scripts/AlpineVMs/setup-ng-source.sh`
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+  - `Scripts/AlpineVMs/start-ng-repo.sh`
+  - `Scripts/AlpineVMs/start-ng-source.sh`
+  - `Scripts/AlpineVMs/stop-ng.sh`
+  - `Scripts/Python/zmq_client.py`
+  - `Scripts/Simple/Inter_OS_Content_Test_NRNCS.sh`
+  - `Scripts/Simple/Intra_OS_NBTest.sh`
+  - `Scripts/Simple/run_IoTTestApp.sh`
+  - `Scripts/Simple/run_NRNCS.sh`
+  - `Scripts/Simple/run_PGCS.sh`
+  - `Scripts/Simple/run_Repository.sh`
+  - `Scripts/Simple/run_Source.sh`
+  - `Specs/PLAN-CONSOLIDATION-2026-07-16.md`
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+  - `Specs/RESULTS-SPEC-027/guard-tests-20260907.json`
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+  - `Specs/RESULTS-SPEC-027/spec028b-heartbeat-validation.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-2000.json`
+  - `Specs/RESULTS-SPEC-027/spec031-after-500.json`
+  - `Specs/RESULTS-SPEC-027/spec031-before-baseline.json`
+  - `Specs/RESULTS-SPEC-027/spec033-r3-b1-controls-20260910.json`
+  - `Specs/SPEC-008-ht-bid-raw-socket-discovery.md`
+  - `Specs/SPEC-009-alpine-vm-ssh-run-scripts.md`
+  - `Specs/SPEC-014-ngal-hash-mismatch-diagnosis.md`
+  - `Specs/SPEC-019-payload-hash-logging.md`
+  - `Specs/SPEC-020-subscription-redelivery-fix.md`
+  - `Specs/SPEC-021-one-message-per-file.md`
+  - `Specs/SPEC-022-nrinfopayload01-separate-messages.md`
+  - `Specs/SPEC-022-one-file-per-message-nrinfopayload01.md`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+  - `Specs/SPEC-033-R2-newmessage-exhaustion-output.md`
+  - `Specs/SPEC-033-R3-B-gw-caller-safety.md`
+  - `Specs/SPEC-033-R3-B2-gw-input-queue-null-safety.md`
+  - `Specs/SPEC-033-R3-C-process-output-safety.md`
+  - `Specs/SPEC-033-R3-caller-safety-amendment.md`
+  - `Specs/SPEC-034-pgcs-low-rate-diagnostic.md`
+  - `Specs/SPEC-035-nbtestapp-nrncs-intermediate.md`
+  - `Specs/SPEC-036-deprecate-standalone-pss-girs-hts.md`
+  - `Specs/SPEC-037-promote-aiopt3-default-branch.md`
+  - `Specs/SPEC-038-public-repository-hygiene.md`
+- Commit `50e351c9f0ed7aea5658df42902e055dac848843` — SPEC-027: Phase 1 TEST SIGNED OFF by Astra (guard tests 6/6, commit faa6c4e) (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `bcb7e74f9234b12e21f9207881c88d72c9114dc9` — SPEC-027 AMEND-3 v2: 1000-photo payload delivery PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-photos-1000.json`
+- Commit `39bad89c0cc7ccb6a81e93593039da3809393fe1` — SPEC-027: run record reconciled per Astra — duration by counter delta, delay units clarified (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e45cb10544c126158f1a56a7ae76bb021b288189` — SPEC-027 AMEND-3 v2: real-load run @500 msg/s bidirectional PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/amend3v2-500-run.json`
+- Commit `e75b112387a6cc5a38a5cae62150311ced7f8745` — SPEC-029: fail-fast validation of self-MAC peer configuration (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunInitialization01.cpp`
+  - `Specs/SPEC-029-pgcs-self-mac-failfast.md`
+- Commit `576a0189169a3a5d7d5193d2a27623430d780c85` — SPEC-027 AMEND-3 v2: full NGAL_SAR rewrite per Astra review (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `b257b7e5771b5fa401849ba33b193f3ad2321d48` — SPEC-027: status transition — Phase 1 Implemented-Pending Test per Astra verdict (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+- Commit `4e741bf8646f8c17417a62057102b4493c8e7094` — SPEC-027: soak record amended per Astra verdict — status IMPLEMENTED-Pending Test (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `7265a87daedddec16a7bf1fc3d1a3fd055dc02cc` — SPEC-027: 30-min soak results at 500 msg/s — stability PASSED (link basis: commit subject/body names this SPEC identifier)
+  - `Specs/RESULTS-SPEC-027/soak30min-20260906.json`
+- Commit `b358abba402f4782a00cbf55dd8d5c20f6e9e595` — SPEC-027: add soak-monitor.sh — hardened 30-min soak monitor (link basis: commit subject/body names this SPEC identifier)
+  - `Scripts/AlpineVMs/soak-monitor.sh`
+- Commit `8a9d2bf916c62131a789fd33c866b37eadf77bd6` — SPEC-027: disable verbose DEBUG logging for high-load stress tests (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+  - `Common/src/GW.cpp`
+  - `Common/src/GWMsgCl01.cpp`
+  - `Common/src/NGAL_SAR.cpp`
+  - `PGCS/src/PG.cpp`
+  - `PGCS/src/PGMsgCl01.cpp`
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `PGCS/src/PGStresstestPing01.cpp`
+  - `Specs/RESULTS-SPEC-027/baseline-summary.json`
+  - `Specs/RESULTS-SPEC-027/baseline.json`
+  - `Specs/RESULTS-SPEC-027/probe100-120s.json`
+  - `Specs/RESULTS-SPEC-027/probe100.json`
+- Commit `1396c62670e60f9f992bba1fc26f7a4d74178945` — SPEC-027 AMEND-3: NGAL_SAR safety fixes (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/NGAL_SAR.cpp`
+  - `Common/src/NGAL_SAR.h`
+- Commit `d4e9128b363f25bc8dd9b90fe4e1d9d6a3dfaf2f` — SPEC-027 baseline: DEBUG on PGStresstestPing01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGStresstestPing01.cpp`
+- Commit `aab3e280e0336284600bdd34a023f112f2e4835f` — SPEC-027 baseline: DEBUG on Block::Run (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/Block.cpp`
+- Commit `53f55d183b570da91b9e9ea4a4dbf743ac07c7fd` — SPEC-027 baseline: DEBUG on GWMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `Common/src/GWMsgCl01.cpp`
+- Commit `3680c439cb8d77da1fff35c751119cfdada8e48a` — SPEC-027 baseline: DEBUG on PGMsgCl01 (link basis: commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGMsgCl01.cpp`
+- Commit `bca1b20c79c3cf53df6b5ea51e3cc6ee50a448f5` — SPEC-027 baseline instrumentation: DEBUG on Periodic/Stresstest (link basis: the SPEC file changed in this commit; commit subject/body names this SPEC identifier)
+  - `PGCS/src/PGRunPeriodic01.cpp`
+  - `PGCS/src/PGRunStresstest01.cpp`
+  - `Scripts/AlpineVMs/run_Source_on_Source_VM.sh`
+  - `Specs/SPEC-027-pgcs-multithreading.md`
+
+## Interpretation and limits
+
+- A declared path, a path present in the tree, a source citation, and a path changed in a SPEC-linked commit are different evidence types; this record keeps declared scope separate from observed commit diffs.
+- `git ls-tree`/`git show` at the pinned HEAD can establish presence and exact contents, but not that a SPEC caused a change or that its acceptance criteria passed.
+- Commit-message linkage is incomplete by nature. Absence of a linked commit does not prove that no files were affected; ambiguous duplicate SPEC IDs are left unattributed.
+- Branch-specific absence means the SPEC file is not in that pinned branch tree; it does not imply the branch never contained it historically.
+
+Generated from pinned Git objects; do not treat this sidecar as implementation authorization or acceptance evidence.

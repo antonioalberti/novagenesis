@@ -1,8 +1,8 @@
 [
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/diagnostic/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -DNG_GW_QUEUE_TEST_OBSERVATION=1 -MD -MT CMakeFiles/Common.dir/GW.c.o -MF CMakeFiles/Common.dir/GW.c.o.d -o CMakeFiles/Common.dir/GW.c.o -c ../src/GW.c",
-    "file": "../src/GW.c",
+    "directory": "Scripts/test_checkers/diagnostic-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -DNG_GW_QUEUE_TEST_OBSERVATION=1 -MD -MT CMakeFiles/Common.dir/GW.c.o -MF CMakeFiles/Common.dir/GW.c.o.d -o CMakeFiles/Common.dir/GW.c.o -c ../diagnostic/src/GW.c",
+    "file": "../diagnostic/src/GW.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -25,14 +25,14 @@
       "-o",
       "CMakeFiles/Common.dir/GW.c.o",
       "-c",
-      "../src/GW.c"
+      "../diagnostic/src/GW.c"
     ],
     "output": "CMakeFiles/Common.dir/GW.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/diagnostic/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -DNG_GW_QUEUE_TEST_OBSERVATION=1 -MD -MT CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o -MF CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o.d -o CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o -c ../src/test.c",
-    "file": "../src/test.c",
+    "directory": "Scripts/test_checkers/diagnostic-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -DNG_GW_QUEUE_TEST_OBSERVATION=1 -MD -MT CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o -MF CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o.d -o CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o -c ../diagnostic/src/test.c",
+    "file": "../diagnostic/src/test.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -55,7 +55,7 @@
       "-o",
       "CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o",
       "-c",
-      "../src/test.c"
+      "../diagnostic/src/test.c"
     ],
     "output": "CMakeFiles/ng039_gw_q0_q1_d2.dir/test.o"
   }

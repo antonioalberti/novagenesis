@@ -1,0 +1,9 @@
+GPT-6 Astra design-only review request
+
+This request is limited to the exact SPEC-071 design packet below. Review the packet bytes with SHA-256 439bab94579ad33c174afde2612031c9d0f1afbc593ebb903524c38ec1e246b7 (149350 bytes). Do not infer that unprovided files or omitted Dashboard content were reviewed.
+
+Requested outcome: return exactly one top-level verdict: APPROVE (design readiness only), AMEND, or NO-GO. State explicitly: implementation authorization: NO.
+
+Assess only whether SPEC-071 v0.12-draft is coherent, sufficiently bounded, testable, privacy-safe, and suitable to proceed to final SPEC review. The tool has not been implemented. Do not claim code, test, runtime, or output validation. Give numbered findings with exact supplied file/section references. Separate must-fix design blockers from optional hardening. Preserve the owner’s decisions and authority; do not modify files or authorize implementation.
+
+Consider the five NG-070 drift cases and the selected controls. Identify missing acceptance criteria, false-clean/false-progress risks, unresolved schema/CLI contract issues, packet-evidence limitations, and any contradiction in the use of Hermes decision_query. If evidence is insufficient, say so and bound the verdict rather than infer.

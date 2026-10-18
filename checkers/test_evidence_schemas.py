@@ -8,7 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from validate_schemas import load, unique_object, reject_constant
+from Scripts.Python.validate_schemas import load, unique_object, reject_constant
 from jsonschema import Draft202012Validator
 
 BASE = ROOT / 'Specs/RESULTS-SPEC-039'

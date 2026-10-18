@@ -1,5 +1,7 @@
 # SPEC-STATUS-REGISTER.md — Mestra de todas as SPECs NovaGenesis
 
+> **HISTORICAL SNAPSHOT — 2026-10-17:** The inventory below is based on AIOPT3 commit `cd804a7` (2026-07-16) and counted 24 SPEC files. It is retained as history, not a current cross-branch register. Pinned inventories on 2026-10-17: AIOPT3 `24a3851e1d5a90f039b9e148a1af38dd03c4d925` (58); AIOPT4 `0dd0dd4b2fd0a9d416aff232ad07672fe39746b6` (60); AIOPT5 `8d2386dcb10d2b37f133d4b24c2cb96761753d82` (48). These are Git-tree counts, not counts of active or approved SPECs. A `Branch:` field records stated origin/scope; it does not make a copied SPEC authoritative for every branch containing it.
+
 **Base:** Commit `cd804a7` (branch AIOPT3) — 2026-07-16  
 **Total:** 24 SPECs em `Specs/`
 

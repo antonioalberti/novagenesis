@@ -1,0 +1,45 @@
+{
+  "candidate_directory": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-v013-followup-candidate",
+  "candidate_status": "BUILT_UNVERIFIED_NO_DISPATCH",
+  "created_at_utc": "2026-10-18T07:27:18+00:00",
+  "review_type": "design-only SPEC-071 v0.13 readiness follow-up",
+  "model": "gpt-6-astra",
+  "requested_verdict": [
+    "APPROVE",
+    "AMEND",
+    "NO-GO"
+  ],
+  "included_artifact_count": 41,
+  "packet_path": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-v013-followup-candidate/reviewed-packet.md",
+  "packet_bytes": 421687,
+  "packet_sha256": "3ce8565c2a9d61f69aa6de574845a4eba81677158480f2bdea130731a627edd5",
+  "instructions_path": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-v013-followup-candidate/submission-instructions.txt",
+  "instructions_bytes": 980,
+  "instructions_sha256": "8d73fe5de959cf425063a588ee824b3eca751042fdf343ae456423fa10551d2a",
+  "request_envelope_definition": {
+    "model": "gpt-6-astra",
+    "instructions_sha256": "8d73fe5de959cf425063a588ee824b3eca751042fdf343ae456423fa10551d2a",
+    "prompt_sha256": "3ce8565c2a9d61f69aa6de574845a4eba81677158480f2bdea130731a627edd5",
+    "instructions_bytes": 980,
+    "prompt_bytes": 421687
+  },
+  "request_envelope_sha256": "defc6dbcc8d7f09faff0656d66bc3ddabbdb132469fc058411313bd94db2d6f3",
+  "source_manifest_sha256": "8e15466f4fe6c61fe991e4fae0f658ee326fe325487c8f43e320c249fa06f1e6",
+  "branch_heads": {
+    "AIOPT3": "24a3851e1d5a90f039b9e148a1af38dd03c4d925",
+    "AIOPT4": "0dd0dd4b2fd0a9d416aff232ad07672fe39746b6",
+    "AIOPT5": "8d2386dcb10d2b37f133d4b24c2cb96761753d82"
+  },
+  "task_sha256_after_status_update": "1355e3748f3ed6ce5e30cea3ae1d9e56b8d2d2d219ca33b4230ae412c21127f5",
+  "dashboard_sha256_after_status_update": "dd15b1d1d1b5199d4cb533eac72eb7419971533f89e8c610261ec79498106d21",
+  "prior_owner_consent_packet_sha256": "879462d065784a00e2125491b2efdfe38efefde457779b4a3041bd97fd22cafa",
+  "prior_consent_dispatch_status": "not_sent; prior consent does not cover this rebuilt packet",
+  "previous_unsubmitted_candidate_packet_sha256": "ccff49278911273510c2c7bcb3f3fe40cbbd8fa490c26ae6590dc072305544b9",
+  "superseded_reason": "Rebuilt in place because the prior candidate embedded stale task/Dashboard bytes and had malformed authorization wording. No Astra dispatch occurred.",
+  "estimated_input_tokens": 111358,
+  "estimated_output_tokens": 2388,
+  "estimated_gpt6_astra_ratecard_credits": 31.4215,
+  "ratecard_basis": "Approximate input estimate scaled from the prior candidate (110,768 tokens / 419,452 bytes); output estimate and rate-card basis are historical planning values. Tokenization, caching and output vary. Credits are not money or a quota forecast.",
+  "dispatch_authorized": false,
+  "implementation_authorized": false
+}

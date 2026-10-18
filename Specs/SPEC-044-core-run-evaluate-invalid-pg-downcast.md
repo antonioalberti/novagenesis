@@ -5,7 +5,8 @@
 **Status:** In Progress
 **Branch:** AIOPT3
 **Implementation commit:** —
-**Related:** SPEC-041-gw-deadline-aware-wait.md, SPEC-040-common-performance-build-profiles.md
+**Related:** No verifiable SPEC-040/SPEC-041 file is present in the pinned repository snapshots.
+**Historical references:** `SPEC-040-common-performance-build-profiles.md` and `SPEC-041-gw-deadline-aware-wait.md` are absent from the pinned trees and reachable history. References below explain historical diagnostic context only; they are not active dependencies.
 
 ## 1. Problema e evidência
 
@@ -26,7 +27,7 @@ PPGB = (PG*)PB;
 
 A função `CheckSubscriptions()` recebe a acção criada para um objecto `Core`; `PB` é o owner da acção e o diagnóstico confirma que o objecto dinâmico é `Core`, não `PG`. O cast viola o contrato de tipos C++ e torna o acesso subsequente a `PPGB->PGCSTuples` comportamento indefinido.
 
-O relatório foi observado durante o smoke Sanitizer de SPEC-041. O defeito é independente da alteração de espera do Gateway e deve ser tratado separadamente.
+O relatório foi observado durante um smoke Sanitizer histórico da alteração de espera do Gateway. O documento SPEC-041 não está disponível nos snapshots ou no histórico alcançável; esta menção explica a origem do diagnóstico, não uma dependência activa.
 
 ## 2. Objectivo
 
@@ -81,7 +82,7 @@ Explicitamente excluído:
 
 ## 7. Rollback
 
-Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture, o log RED e a evidência de revisão. Não reverter nem misturar as alterações de SPEC-040/041.
+Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture, o log RED e a evidência de revisão. Não reverter nem misturar alterações históricas de perfil de build ou espera do Gateway; os documentos SPEC-040/041 estão indisponíveis nos snapshots e histórico alcançável.
 
 ## 8. Riscos
 
@@ -103,11 +104,11 @@ Reverter apenas a alteração em `CoreRunEvaluate01.cpp`, preservando a fixture,
 - `Specs/RESULTS-SPEC-044/preliminary-red-20260912.md` — baseline RED e análise de ownership.
 - `Specs/RESULTS-SPEC-044/post-fix-20260912.md` — qualificação pós-correção e hashes.
 - `Specs/RESULTS-SPEC-044/vm-101-102-100-photo-20260912.md` — runtime multi-VM normal-path no commit rebuilt; não substitui a matriz de subscriptions.
-- SPEC relacionada: `Specs/SPEC-041-gw-deadline-aware-wait.md`.
+- Contexto histórico: `SPEC-041-gw-deadline-aware-wait.md` (documento indisponível nos snapshots/histórico; não é uma dependência activa).
 
 ## 10. Estado
 
-Esta SPEC separa formalmente o diagnóstico UBSan de SPEC-041. A alteração allowlisted foi implementada após revisão Astra e autorização do utilizador. Builds e smoke Sanitizer passaram; a aceitação funcional permanece aberta até à execução da matriz da SPEC-045 e à revisão Astra pós-correção.
+Esta SPEC separa formalmente o diagnóstico UBSan do trabalho histórico de espera do Gateway. O documento SPEC-041 está indisponível nos snapshots/histórico e não é uma dependência activa. A alteração allowlisted foi implementada após revisão Astra e autorização do utilizador. Builds e smoke Sanitizer passaram; a aceitação funcional permanece aberta até à execução da matriz da SPEC-045 e à revisão Astra pós-correção.
 
 ## 11. Gate histórico de release
 

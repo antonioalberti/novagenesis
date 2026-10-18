@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novagenesis:spec-implementation-drift-report:v1",
+  "title": "NovaGenesis SPEC Implementation Drift Report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "generated_at_utc", "tool_version",
+    "parser_version", "rule_set_version", "run_status", "exit_code",
+    "input_manifest_sha256", "sources", "summary", "specs", "task", "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "spec_implementation_drift_report.v1"},
+    "run_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "generated_at_utc": {"type": "string", "format": "date-time"},
+    "tool_version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "parser_version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "rule_set_version": {"const": "spec-drift-rules.v1"},
+    "run_status": {"enum": ["COMPLETE_NO_DRIFT", "COMPLETE_WITH_DRIFT", "INCOMPLETE"]},
+    "exit_code": {"enum": [0, 1, 2]},
+    "input_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "sources": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/source"},
+      "allOf": [
+        {"contains": {"properties": {"branch": {"const": "AIOPT3"}}, "required": ["branch"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"branch": {"const": "AIOPT4"}}, "required": ["branch"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"branch": {"const": "AIOPT5"}}, "required": ["branch"]}, "minContains": 1, "maxContains": 1}
+      ]
+    },
+    "summary": {"$ref": "#/$defs/summary"},
+    "specs": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 30000,
+      "items": {"$ref": "#/$defs/spec_record"},
+      "allOf": [
+        {"contains": {"properties": {"branch": {"const": "AIOPT3"}}, "required": ["branch"]}, "minContains": 1},
+        {"contains": {"properties": {"branch": {"const": "AIOPT4"}}, "required": ["branch"]}, "minContains": 1},
+        {"contains": {"properties": {"branch": {"const": "AIOPT5"}}, "required": ["branch"]}, "minContains": 1}
+      ]
+    },
+    "task": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/task_record"}]},
+    "limitations": {"type": "array", "maxItems": 10000, "items": {"type": "string", "minLength": 1, "maxLength": 2000}}
+  },
+  "allOf": [
+    {"if": {"properties": {"run_status": {"const": "COMPLETE_NO_DRIFT"}}, "required": ["run_status"]}, "then": {"properties": {"exit_code": {"const": 0}}}},
+    {"if": {"properties": {"run_status": {"const": "COMPLETE_WITH_DRIFT"}}, "required": ["run_status"]}, "then": {"properties": {"exit_code": {"const": 1}}}},
+    {"if": {"properties": {"run_status": {"const": "INCOMPLETE"}}, "required": ["run_status"]}, "then": {"properties": {"exit_code": {"const": 2}}}}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "git_sha": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "branch": {"enum": ["AIOPT3", "AIOPT4", "AIOPT5"]},
+    "applicability": {"enum": ["CURRENT", "HISTORICAL", "NOT_APPLICABLE", "UNKNOWN"]},
+    "execution": {"enum": ["COMPLETED", "PARTIAL", "SKIPPED", "UNSUPPORTED", "FAILED"]},
+    "outcome": {"enum": ["CONFIRMED_DRIFT", "POSSIBLE_DRIFT", "NO_DRIFT_DETECTED", "INDETERMINATE"]},
+    "rule_id": {"enum": ["STATUS_IMPL", "CURRENT_SOURCE", "REFERENCE_APPLICABILITY", "DECLARED_SCOPE_DIFF", "ACCEPTANCE_EVIDENCE", "PROCEDURE_ORDER", "DATED_INVENTORY"]},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "actual_branch", "head_sha", "tree_sha", "snapshot_layer", "worktree_state", "dirty_count", "untracked_count", "dirty_census_sha256", "untracked_census_sha256", "git_shallow", "history_complete"],
+      "properties": {
+        "branch": {"$ref": "#/$defs/branch"},
+        "actual_branch": {"$ref": "#/$defs/branch"},
+        "source_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "head_sha": {"$ref": "#/$defs/git_sha"},
+        "tree_sha": {"$ref": "#/$defs/git_sha"},
+        "snapshot_layer": {"enum": ["committed", "worktree"]},
+        "worktree_state": {"enum": ["clean", "dirty"]},
+        "dirty_count": {"type": "integer", "minimum": 0},
+        "untracked_count": {"type": "integer", "minimum": 0},
+        "dirty_census_sha256": {"$ref": "#/$defs/sha256"},
+        "untracked_census_sha256": {"$ref": "#/$defs/sha256"},
+        "git_shallow": {"type": "boolean"},
+        "history_complete": {"type": "boolean"},
+        "source_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "limitations": {"type": "array", "items": {"type": "string", "maxLength": 1000}}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_count", "spec_record_count", "checks_planned", "checks_completed", "checks_partial", "checks_skipped", "checks_unsupported", "checks_failed", "findings_by_outcome", "applicability_counts"],
+      "properties": {
+        "source_count": {"const": 3},
+        "spec_record_count": {"type": "integer", "minimum": 0},
+        "checks_planned": {"type": "integer", "minimum": 0},
+        "checks_completed": {"type": "integer", "minimum": 0},
+        "checks_partial": {"type": "integer", "minimum": 0},
+        "checks_skipped": {"type": "integer", "minimum": 0},
+        "checks_unsupported": {"type": "integer", "minimum": 0},
+        "checks_failed": {"type": "integer", "minimum": 0},
+        "findings_by_outcome": {"$ref": "#/$defs/finding_counts"},
+        "applicability_counts": {"$ref": "#/$defs/applicability_counts"}
+      }
+    },
+    "finding_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["CONFIRMED_DRIFT", "POSSIBLE_DRIFT", "NO_DRIFT_DETECTED", "INDETERMINATE"],
+      "properties": {
+        "CONFIRMED_DRIFT": {"type": "integer", "minimum": 0},
+        "POSSIBLE_DRIFT": {"type": "integer", "minimum": 0},
+        "NO_DRIFT_DETECTED": {"type": "integer", "minimum": 0},
+        "INDETERMINATE": {"type": "integer", "minimum": 0}
+      }
+    },
+    "applicability_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["CURRENT", "HISTORICAL", "NOT_APPLICABLE", "UNKNOWN"],
+      "properties": {
+        "CURRENT": {"type": "integer", "minimum": 0},
+        "HISTORICAL": {"type": "integer", "minimum": 0},
+        "NOT_APPLICABLE": {"type": "integer", "minimum": 0},
+        "UNKNOWN": {"type": "integer", "minimum": 0}
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_kind", "snapshot_id", "path", "effective_head_sha", "content_sha256", "location"],
+      "properties": {
+        "source_kind": {"enum": ["spec_file", "task_file", "source_file", "git_commit", "test_result", "manifest", "receipt"]},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!~)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "effective_head_sha": {"$ref": "#/$defs/git_sha"},
+        "content_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "location": {"type": "string", "minLength": 1, "maxLength": 512}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "rule_id", "branch", "snapshot_id", "spec_filename", "spec_sha256", "outcome", "applicability", "execution", "spec_section", "reason", "evidence_refs", "limitations"],
+      "properties": {
+        "finding_id": {"type": "string", "pattern": "^[0-9a-f]{24}$"},
+        "rule_id": {"$ref": "#/$defs/rule_id"},
+        "branch": {"$ref": "#/$defs/branch"},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "spec_filename": {"type": "string", "pattern": "^SPEC-.+\\.md$", "maxLength": 256},
+        "spec_sha256": {"$ref": "#/$defs/sha256"},
+        "outcome": {"$ref": "#/$defs/outcome"},
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "execution": {"$ref": "#/$defs/execution"},
+        "spec_section": {"type": "string", "minLength": 1, "maxLength": 256},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "evidence_refs": {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/evidence_ref"}},
+        "limitations": {"type": "array", "maxItems": 100, "items": {"type": "string", "maxLength": 2000}}
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "execution", "outcome", "applicability", "finding_ids", "limitations"],
+      "properties": {
+        "rule_id": {"$ref": "#/$defs/rule_id"},
+        "execution": {"$ref": "#/$defs/execution"},
+        "outcome": {"$ref": "#/$defs/outcome"},
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "finding_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{24}$"}},
+        "limitations": {"type": "array", "items": {"type": "string", "maxLength": 2000}}
+      }
+    },
+    "progress_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "scope_id", "snapshot_id", "source_identity", "criteria_count", "declared_state_counts", "ledger_status", "percentage_available", "percentage", "unavailable_reasons"],
+      "properties": {
+        "schema_version": {"const": "spec_drift_progress_summary.v1"},
+        "scope_id": {"enum": ["task_overall", "spec_implementation"]},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "source_identity": {"type": "object", "additionalProperties": false, "required": ["kind", "source_id", "source_sha256"], "properties": {"kind": {"enum": ["task", "spec"]}, "source_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}, "source_sha256": {"$ref": "#/$defs/sha256"}}},
+        "criteria_count": {"type": "integer", "minimum": 0},
+        "declared_state_counts": {"type": "object", "additionalProperties": false, "required": ["declared_met", "declared_not_met", "declared_blocked", "declared_unknown", "owner_deferred", "unclassified"], "properties": {"declared_met": {"type": "integer", "minimum": 0}, "declared_not_met": {"type": "integer", "minimum": 0}, "declared_blocked": {"type": "integer", "minimum": 0}, "declared_unknown": {"type": "integer", "minimum": 0}, "owner_deferred": {"type": "integer", "minimum": 0}, "unclassified": {"type": "integer", "minimum": 0}}},
+        "ledger_status": {"enum": ["candidate_present", "not_available", "not_requested", "no_criteria"]},
+        "percentage_available": {"const": false},
+        "percentage": {"type": "null"},
+        "unavailable_reasons": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 512}}
+      }
+    },
+    "progress_ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "scope_id", "snapshot_id", "source_identity", "scope_complete", "mapping_complete", "weights_approved", "weight_approval_ref", "gates"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "scope_id": {"enum": ["task_overall", "spec_implementation"]},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "source_identity": {"type": "object", "additionalProperties": false, "required": ["kind", "source_id", "source_sha256"], "properties": {"kind": {"enum": ["task", "spec"]}, "source_id": {"type": "string", "minLength": 1, "maxLength": 128}, "source_sha256": {"$ref": "#/$defs/sha256"}}},
+        "scope_complete": {"type": "boolean"},
+        "mapping_complete": {"type": "boolean"},
+        "weights_approved": {"type": "boolean"},
+        "weight_approval_ref": {"oneOf": [{"type": "string", "minLength": 1, "maxLength": 256}, {"type": "null"}]},
+        "gates": {"type": "array", "maxItems": 10000, "items": {"type": "object", "additionalProperties": false, "required": ["gate_id", "parent_id", "requirement_ref", "included", "state", "weight", "weight_source_ref", "decision_ref", "evidence"], "properties": {"gate_id": {"type": "string", "minLength": 1, "maxLength": 128}, "parent_id": {"oneOf": [{"type": "string", "maxLength": 128}, {"type": "null"}]}, "requirement_ref": {"type": "string", "minLength": 1, "maxLength": 512}, "included": {"type": "boolean"}, "state": {"oneOf": [{"enum": ["met", "not_met", "blocked", "unknown", "owner_deferred"]}, {"type": "null"}]}, "weight": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "string", "pattern": "^[1-9][0-9]*(?:\\\\.[0-9]+)?$"}, {"type": "null"}]}, "weight_source_ref": {"oneOf": [{"type": "string", "maxLength": 256}, {"type": "null"}]}, "decision_ref": {"oneOf": [{"type": "string", "maxLength": 256}, {"type": "null"}]}, "evidence": {"oneOf": [{"type": "object", "additionalProperties": false, "required": ["snapshot_id", "artifact_sha256", "verifier_id", "verifier_receipt_sha256"], "properties": {"snapshot_id": {"$ref": "#/$defs/sha256"}, "artifact_sha256": {"$ref": "#/$defs/sha256"}, "verifier_id": {"type": "string", "minLength": 1, "maxLength": 256}, "verifier_receipt_sha256": {"$ref": "#/$defs/sha256"}}}, {"type": "null"}]}}}}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "gates": {
+                "contains": {
+                  "properties": {"included": {"const": true}},
+                  "required": ["included"]
+                }
+              }
+            },
+            "required": ["gates"]
+          },
+          "then": {"properties": {"weight_approval_ref": {"type": "string", "minLength": 1}}}
+        }
+      ]
+    },
+    "query_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "candidate_reason", "consent_required", "query"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$"},
+        "candidate_reason": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "consent_required": {"const": true},
+        "query": {"$ref": "#/$defs/direct_typesafe_handler_query"}
+      }
+    },
+    "query_evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_kind", "snapshot_id", "path", "repository", "effective_head_sha", "content_digest", "location"],
+      "properties": {
+        "source_kind": {"enum": ["file", "git", "task", "report", "index"]},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!~)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "repository": {"$ref": "#/$defs/branch"},
+        "effective_head_sha": {"$ref": "#/$defs/git_sha"},
+        "content_digest": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "location": {"oneOf": [{"type": "string", "maxLength": 512}, {"type": "null"}]}
+      }
+    },
+    "direct_typesafe_handler_query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "task_id", "operation", "risk_level", "backend", "constraints", "policy_id", "limits", "claims", "evidence_refs", "source_revision", "options"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$"},
+        "task_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "operation": {"const": "verify"},
+        "risk_level": {"enum": ["low", "medium", "high", "critical"]},
+        "backend": {"const": "typesafe_jev_direct"},
+        "policy_id": {"const": "hermes_local_decision_stack.typesafe_jev_direct@1"},
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["privacy", "egress", "cost", "latency", "device"],
+          "properties": {
+            "privacy": {"const": "approved_remote"},
+            "egress": {"const": "approved_only"},
+            "cost": {"const": "metered"},
+            "latency": {"enum": ["low", "medium", "high"]},
+            "device": {"enum": ["cpu", "gpu", "auto"]}
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_context_chars", "max_evidence_items", "timeout_ms"],
+          "properties": {
+            "max_context_chars": {"const": 20000},
+            "max_evidence_items": {"const": 20},
+            "timeout_ms": {"const": 30000}
+          }
+        },
+        "context": {"const": ""},
+        "claims": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "minLength": 1, "maxLength": 1000}},
+        "evidence_refs": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"$ref": "#/$defs/query_evidence_ref"}},
+        "source_revision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["snapshot_id", "dirty", "untracked"],
+          "properties": {
+            "snapshot_id": {"$ref": "#/$defs/sha256"},
+            "dirty": {"type": "boolean"},
+            "untracked": {"type": "boolean"}
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_language", "request_language", "typesafe_evidence_summary"],
+          "properties": {
+            "source_language": {"type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"},
+            "request_language": {"type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"},
+            "typesafe_evidence_summary": {"type": "string", "minLength": 1, "maxLength": 8000}
+          }
+        }
+      }
+    },
+    "spec_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "snapshot_layer", "snapshot_id", "spec_filename", "spec_id", "spec_sha256", "declared_status", "declared_branch", "applicability", "checks", "findings", "progress_summary", "progress_ledger", "decision_query_handoffs", "limitations"],
+      "properties": {
+        "branch": {"$ref": "#/$defs/branch"},
+        "snapshot_layer": {"enum": ["committed", "worktree"]},
+        "snapshot_id": {"$ref": "#/$defs/sha256"},
+        "spec_filename": {"type": "string", "pattern": "^SPEC-.+\\.md$", "maxLength": 256},
+        "spec_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "spec_sha256": {"$ref": "#/$defs/sha256"},
+        "declared_status": {"oneOf": [{"type": "string", "maxLength": 512}, {"type": "null"}]},
+        "declared_branch": {"oneOf": [{"type": "string", "maxLength": 256}, {"type": "null"}]},
+        "applicability": {"$ref": "#/$defs/applicability"},
+        "checks": {"type": "array", "items": {"$ref": "#/$defs/check"}},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+        "progress_summary": {"$ref": "#/$defs/progress_summary"},
+        "progress_ledger": {"oneOf": [{"$ref": "#/$defs/progress_ledger"}, {"type": "null"}]},
+        "decision_query_handoffs": {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/query_handoff"}},
+        "limitations": {"type": "array", "items": {"type": "string", "maxLength": 2000}}
+      }
+    },
+    "input_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_id", "inputs"],
+      "properties": {
+        "schema_version": {"const": "spec_implementation_drift_input_manifest.v1"},
+        "run_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "inputs": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifact_id", "artifact_kind", "branch", "snapshot_layer", "relative_path", "content_sha256", "size_bytes", "inclusion_reason"],
+            "properties": {
+              "artifact_id": {"type": "string", "minLength": 1, "maxLength": 128},
+              "artifact_kind": {"enum": ["branch_tree", "spec", "task", "source_evidence", "test_evidence", "reference", "rule_catalog", "report_schema", "host_contract"]},
+              "branch": {"oneOf": [{"$ref": "#/$defs/branch"}, {"type": "null"}]},
+              "snapshot_layer": {"enum": ["committed", "worktree", "external_pinned"]},
+              "relative_path": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!~)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+              "content_sha256": {"$ref": "#/$defs/sha256"},
+              "size_bytes": {"type": "integer", "minimum": 0},
+              "inclusion_reason": {"type": "string", "minLength": 1, "maxLength": 512}
+            }
+          }
+        }
+      }
+    },
+    "output_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_id", "files"],
+      "properties": {
+        "schema_version": {"const": "spec_implementation_drift_output_manifest.v1"},
+        "run_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "files": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 100000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["relative_path", "content_sha256", "size_bytes", "media_type"],
+            "properties": {
+              "relative_path": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!~)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+              "content_sha256": {"$ref": "#/$defs/sha256"},
+              "size_bytes": {"type": "integer", "minimum": 0},
+              "media_type": {"enum": ["application/json", "text/markdown", "text/plain"]}
+            }
+          }
+        }
+      }
+    },
+    "task_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "task_sha256", "declared_status", "depends_on", "branch_mappings", "progress_summary", "progress_ledger", "limitations"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "task_sha256": {"$ref": "#/$defs/sha256"},
+        "declared_status": {"type": "string", "minLength": 1, "maxLength": 128},
+        "depends_on": {"type": "array", "items": {"type": "string", "pattern": "^SPEC-.+\\.md$", "maxLength": 256}},
+        "branch_mappings": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["branch", "spec_filename", "snapshot_id", "applicability"], "properties": {"branch": {"$ref": "#/$defs/branch"}, "spec_filename": {"type": "string", "maxLength": 256}, "snapshot_id": {"$ref": "#/$defs/sha256"}, "applicability": {"$ref": "#/$defs/applicability"}}}},
+        "progress_summary": {"$ref": "#/$defs/progress_summary"},
+        "progress_ledger": {"oneOf": [{"$ref": "#/$defs/progress_ledger"}, {"type": "null"}]},
+        "limitations": {"type": "array", "items": {"type": "string", "maxLength": 2000}}
+      }
+    }
+  }
+}

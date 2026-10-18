@@ -1,14 +1,18 @@
 # SPEC-031 — Batched RAW Receive with `recvmmsg()`
 
-**Status:** Draft — approval required before implementation
+**Status:** Implemented — Pending Test (performance/benchmark acceptance remains unverified)
+**Branch:** AIOPT3
+**Implementation commit:** `c638292fcf9ceef1a23e0cdbd6a41af4c44e780f`
 **Scope:** One performance change: receive-side syscall batching.
-**Sequence:** User approves → implementation → Hermes verifies → Hermes benchmarks.
+**Sequence:** Implementation committed; verify the acceptance criteria and publish BEFORE/AFTER evidence before deployment.
+
+> **Implementation notice:** Commit `c638292fcf9ceef1a23e0cdbd6a41af4c44e780f` implemented this receive-side change and is an ancestor of all three branch heads pinned by the 2026-10-17 audit. The `recvfrom()` path below is the pre-implementation baseline; the pinned `ReceiveDispatcher` source uses `recvmmsg()`. Source presence and implementation commit do not establish the performance acceptance criteria in §§3–6.
 
 ## 1. Context and non-goals
 
 - Phase 1 signed off; SPEC-028-B heartbeat and SPEC-030 verified.
 - Reference: 500 msg/s bidirectional, measured zero loss, one-way delay 0.13/0.64 ms, RSS ~2.8 MB, PGCS ~1 busy core per VM.
-- Current path: `NGAL_Transport_RAW::ReceiveDispatcher` polls the SSID collection, calls one `recvfrom()` per ready socket, strips the 14-byte Ethernet header, calls `SAR.ReceiveFragment`, and invokes `DeliverToGateway` on completion.
+- Pre-implementation baseline: `NGAL_Transport_RAW::ReceiveDispatcher` polled the SSID collection, called one `recvfrom()` per ready socket, stripped the 14-byte Ethernet header, called `SAR.ReceiveFragment`, and invoked `DeliverToGateway` on completion. This is historical baseline context, not the current path at the pinned heads.
 - Change only reception mechanics. Preserve framing, SAR, delivery, socket configuration, and wire format.
 - No send batching, affinity changes, socket-buffer tuning, SAR changes, or NRNCS stale-cache fix in this benchmark.
 

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from jsonschema import Draft202012Validator
 
-BASE = Path(__file__).resolve().parent / "Specs/RESULTS-SPEC-039"
+BASE = Path(__file__).resolve().parents[2] / "Specs/RESULTS-SPEC-039"
 
 
 def unique_object(pairs):

@@ -1,0 +1,241 @@
+# AMEND
+
+**implementation authorization: NO**
+
+The local-first architecture and owner-selected boundaries are sound in principle. However, SPEC-071 v0.12-draft is not yet sufficiently specified to advance as a final-review-ready design. Amendments are needed beyond the acknowledged CLI/schema freeze, particularly for rule coverage, false-clean prevention, progress accounting, and the Hermes handoff.
+
+**Review boundary:** This assessment covers only the supplied packet, identified as SHA-256 `439bab94579ad33c174afde2612031c9d0f1afbc593ebb903524c38ec1e246b7` (149350 bytes). I have not independently recomputed that byte-stream digest. No code, tests, runtime behavior, generated auditor reports, or live integration were validated. Supplied historical audit statements are documentary evidence, not independently reproduced findings.
+
+## Must-fix design blockers
+
+1. **Define a rule-and-acceptance matrix covering both the five motivating cases and all five selected drift classes.**
+
+   **Evidence:** `Specs/SPEC-071-spec-implementation-drift-auditor.md` §§2, 3 “Drift finding model,” 6, 7; `Specs/IMPACT/SPEC-071-ASTRA-REVIEW-CONTEXT.md` §4.
+
+   The five examples in §2 are not equivalent to the five coverage classes selected in §7. In particular, procedure ordering and dated inventory claims need explicit treatment, while declared-path-versus-commit-change coverage needs additional fixtures.
+
+   Require rule IDs, supported input forms, prerequisites, expected classifications, exclusions, and positive/negative/insufficient-evidence acceptance cases:
+
+   | NG-070 case | Required design distinction |
+   |---|---|
+   | SPEC-031 | Status/source contradiction versus historical baseline; implementation ancestry must not establish benchmark acceptance. |
+   | SPEC-069 | Post-deletion dependency contradiction versus valid pre-deletion verification; semantic uncertainty must remain review-needed. |
+   | SPEC-044/045 | Missing active reference versus explicitly unavailable historical reference; tree absence must not imply absence throughout history. |
+   | Status register | Dated 24-file inventory versus a claim of current inventory; a changed count alone is not drift. |
+   | AIOPT3-origin copies | Document origin versus current branch authority; a branch-label mismatch alone establishes neither invalidity nor applicability. |
+
+   Also specify attribution rules for changed paths, including duplicate IDs, co-change-only evidence, renames, and incomplete commit linkage. `Specs/SPEC-070-branch-spec-sanitization-and-impact-sidecars.md` §4 already supplies conservative constraints worth preserving.
+
+2. **Separate finding outcome, applicability, and check coverage to prevent false clean results.**
+
+   **Evidence:** SPEC-071 §3 “Drift finding model,” §§5–6; SPEC-070 §3.
+
+   `HISTORICAL` is an applicability/context classification, whereas `CONFIRMED_DRIFT` and `NO_DRIFT_DETECTED` are check outcomes. These can coexist: a historical document may contain an unresolved reference without imposing a current dependency.
+
+   The design also lacks explicit outcomes for unsupported parsing, checks not attempted, partial scans, and absent rule coverage. Without them, an empty findings list could misleadingly resemble a clean scan.
+
+   **Required amendment:** Define independent applicability and check-execution fields, aggregation rules, and the conditions for a clean summary. Require planned/completed/skipped/unsupported/indeterminate counts. A failed optional advisory request must not overwrite an established deterministic result; a disabled advisory route must not make an otherwise complete local check indeterminate.
+
+3. **Freeze snapshot and evidence-admissibility semantics, not merely SHA fields.**
+
+   **Evidence:** SPEC-071 §3 “Local evidence layer,” §§5–7; `Specs/IMPACT/BRANCH-APPLICABILITY-REVIEW.md` §§1, 4; supplied SPEC-031 excerpts lines 3–15.
+
+   The packet correctly distinguishes historical committed snapshots from corrected dirty documents. The future tool’s input behavior remains unspecified: committed-only by default, optional worktree overlay, separate worktree scan, or another owner-selected policy.
+
+   **Required amendment:** Specify:
+   - Input discovery and inclusion/exclusion rules.
+   - Separate identities for committed objects and dirty/untracked bytes.
+   - Behavior for unreadable objects, shallow/incomplete history, unresolved refs, and files changing during capture.
+   - Whether a stale evidence item is rejected or retained solely as historical evidence.
+   - Exact requirements for accepting externally produced test evidence against a criterion and snapshot.
+
+   Unrelated worktree dirtiness should not automatically invalidate a pinned-object check. Conversely, corrected worktree text must never silently replace the committed text under the same HEAD identity.
+
+4. **The acknowledged CLI/schema gap includes safety-critical behavior.**
+
+   **Evidence:** SPEC-071 §§4, 6, 7 “Remaining specification work”; review context §7, later-review question 5.
+
+   Leaving these details open is legitimate during drafting, but they must be resolved before final SPEC review readiness.
+
+   **Required amendment:** Freeze command arguments, input selection, stdout/stderr behavior, exit statuses, schema version, required fields, enum semantics, report filenames, and summary/per-SPEC reconciliation. Use full SPEC filenames and branch/snapshot identity to avoid duplicate-ID and cross-branch collisions.
+
+   Define `--out-dir` creation, existing-file handling, symlink/path containment, partial-write behavior, and failure reporting. Add explicit acceptance criteria for default no-write behavior and refusal to overwrite protected inputs. An explicit destination is not by itself a complete write-safety contract.
+
+5. **Resolve the Hermes handoff contradiction and missing typed-response contract.**
+
+   **Evidence:** SPEC-071 §§1, 3 “Optional `decision_query` support,” 7, 9; supplied `references/typesafe-direct-payload.md`, “Required callback interface,” “Payload structure,” and “Common validation failures”; supplied “TOOL DESCRIPTOR CAPTURE.”
+
+   There are two unresolved interface issues:
+
+   - Sections 1 and 3 suggest the tool may call `decision_query`, while the recorded owner decision in §7 assigns calls to Hermes and the CLI to local bundle production. Preserve that owner-selected separation explicitly.
+   - SPEC-071 proposes asking whether evidence supports or **contradicts** a claim. The supplied payload guidance says claims must align with evidence and identifies a contradictory claim as a validation failure. The design must explain how a hypothesis under review is represented without violating that precondition.
+
+   The registered descriptor exposes only `request_id`, `operation`, and `backend`; the supplied helper example contains a richer payload and host-injected callbacks. These are not interchangeable interfaces.
+
+   **Required amendment:** Specify the CLI-to-Hermes handoff, host-side payload binding, typed question/response schema, receipt correlation, and failure states. Supply a non-live sanitized example demonstrating the intended mapping. Do not substitute helper imports or a direct HTTP client. The packet does not establish that the proposed Choice interaction is supported by the registered route as described.
+
+6. **Progress accounting lacks a sufficiently strict evidence contract.**
+
+   **Evidence:** SPEC-071 §3 “Progress reporting,” §§6–7; supplied `assess_progress` descriptor; `NG-070-saneamento-specs-branches-v1-20261017.md` §11.
+
+   The prohibition on Jev-generated percentages is appropriate. But criteria and weights alone do not define legitimate numerator evidence, unknown handling, exclusions, partial credit, or acceptance authority. NG-070’s grouping of “Implemented — Pending Test” with “Implemented” illustrates why status counts cannot become completion evidence.
+
+   **Required amendment:** Define criterion states, admissible evidence, owner-approved denominator identity, weighting validation, rounding, and unknown/excluded handling. Unknown criteria must not silently disappear from the denominator. Keep declared-status distributions separate from verified gate counts.
+
+   Resolve reuse versus adaptation of `assess_progress`; its supplied descriptor requires trusted host approval and an evidence verifier. Do not assume merely reproducing its arithmetic reproduces its trust boundary.
+
+7. **Turn privacy intentions into enforceable data-boundary acceptance criteria.**
+
+   **Evidence:** SPEC-071 §§3, 5, 5.1, 7, 9; `NG-071-detector-drift-spec-implementation-v1-20261017.md` §2 “Excluído”; payload reference “Runtime gates.”
+
+   “Sanitized” summaries and hash/path references are not intrinsically non-sensitive. Absolute paths, claim text, filenames, and receipts can disclose protected metadata. The task also broadly excludes transmitting full SPECs remotely, while the Astra design packet explicitly requires the full SPEC—an exception needing clear scope.
+
+   **Required amendment:** Distinguish the expressly approved Astra packet from routine Jev egress; define allowed remote fields, minimization/redaction rules, bounded sizes, local-only provenance, and receipt/log handling. Require digest binding after sanitization and fresh consent after payload changes. Define refusal behavior for uncertain classification.
+
+   Specify bounded local reads so referenced paths cannot lead to credential or unrelated protected-file collection. Add negative acceptance cases for prohibited payload fields, stale consent, timeout/unknown dispatch, and accidental automatic retry. Current provider terms and active host behavior remain unverified.
+
+## Packet-evidence limitations
+
+8. **The packet supports this design assessment, not independent confirmation of the historical cases or integration compatibility.**
+
+   **Evidence:** packet “Input SHA-256 manifest” and “Evidence boundary”; branch applicability report §§2–5; Dashboard excerpt line 18.
+
+   The supplied SPEC-031/044/045/069 excerpts are corrected worktree text, not the original committed clauses that motivated the audit. Implementation source, original Git-object extracts, the full register, most sidecar contents, and active Hermes registration/hooks are absent. Their digests or narrative descriptions do not substitute for their contents.
+
+   This does not require importing production code into the present design review. It does require future fixture provenance to distinguish documentary observations from independently established facts. Only Dashboard line 18 was reviewed; no conclusion covers omitted Dashboard content. The supplied records also leave dispatch consent pending, so this review does not certify the consent/cost process.
+
+## Optional hardening
+
+9. **Reconcile stale contextual labels without rewriting historical evidence.**
+
+   **Evidence:** review context §1 says v0.11-draft while §2 specifies v0.12-draft; branch applicability report opening status conflicts with its later §4 account of applied edits.
+
+   Label these as preparation-stage or historical statements and identify the governing revision clearly. Preserve historical 64-sidecar counts rather than silently refreshing them into a different inventory.
+
+10. **Add reproducibility and resource-bound details.**
+
+   **Evidence:** SPEC-071 §7 promises a bounded JSON/Markdown bundle, but does not define bounds.
+
+   Consider deterministic ordering, stable finding identifiers, explicit truncation markers, parser/version provenance, and read-size/history limits. Limit exhaustion should produce incomplete coverage, never a clean result.
+
+**Disposition:** Retain the owner’s selected branch scope, local-first design, registered Hermes route, advisory-only semantics, stdout default, explicit persistence, and separate review gates. Resolve findings 1–7 in the same SPEC-071 lineage before presenting the design as final-review-ready. No files are modified, and all specification changes and subsequent implementation decisions remain with the owner.# AMEND
+
+**implementation authorization: NO**
+
+The local-first architecture and owner-selected boundaries are sound in principle. However, SPEC-071 v0.12-draft is not yet sufficiently specified to advance as a final-review-ready design. Amendments are needed beyond the acknowledged CLI/schema freeze, particularly for rule coverage, false-clean prevention, progress accounting, and the Hermes handoff.
+
+**Review boundary:** This assessment covers only the supplied packet, identified as SHA-256 `439bab94579ad33c174afde2612031c9d0f1afbc593ebb903524c38ec1e246b7` (149350 bytes). I have not independently recomputed that byte-stream digest. No code, tests, runtime behavior, generated auditor reports, or live integration were validated. Supplied historical audit statements are documentary evidence, not independently reproduced findings.
+
+## Must-fix design blockers
+
+1. **Define a rule-and-acceptance matrix covering both the five motivating cases and all five selected drift classes.**
+
+   **Evidence:** `Specs/SPEC-071-spec-implementation-drift-auditor.md` §§2, 3 “Drift finding model,” 6, 7; `Specs/IMPACT/SPEC-071-ASTRA-REVIEW-CONTEXT.md` §4.
+
+   The five examples in §2 are not equivalent to the five coverage classes selected in §7. In particular, procedure ordering and dated inventory claims need explicit treatment, while declared-path-versus-commit-change coverage needs additional fixtures.
+
+   Require rule IDs, supported input forms, prerequisites, expected classifications, exclusions, and positive/negative/insufficient-evidence acceptance cases:
+
+   | NG-070 case | Required design distinction |
+   |---|---|
+   | SPEC-031 | Status/source contradiction versus historical baseline; implementation ancestry must not establish benchmark acceptance. |
+   | SPEC-069 | Post-deletion dependency contradiction versus valid pre-deletion verification; semantic uncertainty must remain review-needed. |
+   | SPEC-044/045 | Missing active reference versus explicitly unavailable historical reference; tree absence must not imply absence throughout history. |
+   | Status register | Dated 24-file inventory versus a claim of current inventory; a changed count alone is not drift. |
+   | AIOPT3-origin copies | Document origin versus current branch authority; a branch-label mismatch alone establishes neither invalidity nor applicability. |
+
+   Also specify attribution rules for changed paths, including duplicate IDs, co-change-only evidence, renames, and incomplete commit linkage. `Specs/SPEC-070-branch-spec-sanitization-and-impact-sidecars.md` §4 already supplies conservative constraints worth preserving.
+
+2. **Separate finding outcome, applicability, and check coverage to prevent false clean results.**
+
+   **Evidence:** SPEC-071 §3 “Drift finding model,” §§5–6; SPEC-070 §3.
+
+   `HISTORICAL` is an applicability/context classification, whereas `CONFIRMED_DRIFT` and `NO_DRIFT_DETECTED` are check outcomes. These can coexist: a historical document may contain an unresolved reference without imposing a current dependency.
+
+   The design also lacks explicit outcomes for unsupported parsing, checks not attempted, partial scans, and absent rule coverage. Without them, an empty findings list could misleadingly resemble a clean scan.
+
+   **Required amendment:** Define independent applicability and check-execution fields, aggregation rules, and the conditions for a clean summary. Require planned/completed/skipped/unsupported/indeterminate counts. A failed optional advisory request must not overwrite an established deterministic result; a disabled advisory route must not make an otherwise complete local check indeterminate.
+
+3. **Freeze snapshot and evidence-admissibility semantics, not merely SHA fields.**
+
+   **Evidence:** SPEC-071 §3 “Local evidence layer,” §§5–7; `Specs/IMPACT/BRANCH-APPLICABILITY-REVIEW.md` §§1, 4; supplied SPEC-031 excerpts lines 3–15.
+
+   The packet correctly distinguishes historical committed snapshots from corrected dirty documents. The future tool’s input behavior remains unspecified: committed-only by default, optional worktree overlay, separate worktree scan, or another owner-selected policy.
+
+   **Required amendment:** Specify:
+   - Input discovery and inclusion/exclusion rules.
+   - Separate identities for committed objects and dirty/untracked bytes.
+   - Behavior for unreadable objects, shallow/incomplete history, unresolved refs, and files changing during capture.
+   - Whether a stale evidence item is rejected or retained solely as historical evidence.
+   - Exact requirements for accepting externally produced test evidence against a criterion and snapshot.
+
+   Unrelated worktree dirtiness should not automatically invalidate a pinned-object check. Conversely, corrected worktree text must never silently replace the committed text under the same HEAD identity.
+
+4. **The acknowledged CLI/schema gap includes safety-critical behavior.**
+
+   **Evidence:** SPEC-071 §§4, 6, 7 “Remaining specification work”; review context §7, later-review question 5.
+
+   Leaving these details open is legitimate during drafting, but they must be resolved before final SPEC review readiness.
+
+   **Required amendment:** Freeze command arguments, input selection, stdout/stderr behavior, exit statuses, schema version, required fields, enum semantics, report filenames, and summary/per-SPEC reconciliation. Use full SPEC filenames and branch/snapshot identity to avoid duplicate-ID and cross-branch collisions.
+
+   Define `--out-dir` creation, existing-file handling, symlink/path containment, partial-write behavior, and failure reporting. Add explicit acceptance criteria for default no-write behavior and refusal to overwrite protected inputs. An explicit destination is not by itself a complete write-safety contract.
+
+5. **Resolve the Hermes handoff contradiction and missing typed-response contract.**
+
+   **Evidence:** SPEC-071 §§1, 3 “Optional `decision_query` support,” 7, 9; supplied `references/typesafe-direct-payload.md`, “Required callback interface,” “Payload structure,” and “Common validation failures”; supplied “TOOL DESCRIPTOR CAPTURE.”
+
+   There are two unresolved interface issues:
+
+   - Sections 1 and 3 suggest the tool may call `decision_query`, while the recorded owner decision in §7 assigns calls to Hermes and the CLI to local bundle production. Preserve that owner-selected separation explicitly.
+   - SPEC-071 proposes asking whether evidence supports or **contradicts** a claim. The supplied payload guidance says claims must align with evidence and identifies a contradictory claim as a validation failure. The design must explain how a hypothesis under review is represented without violating that precondition.
+
+   The registered descriptor exposes only `request_id`, `operation`, and `backend`; the supplied helper example contains a richer payload and host-injected callbacks. These are not interchangeable interfaces.
+
+   **Required amendment:** Specify the CLI-to-Hermes handoff, host-side payload binding, typed question/response schema, receipt correlation, and failure states. Supply a non-live sanitized example demonstrating the intended mapping. Do not substitute helper imports or a direct HTTP client. The packet does not establish that the proposed Choice interaction is supported by the registered route as described.
+
+6. **Progress accounting lacks a sufficiently strict evidence contract.**
+
+   **Evidence:** SPEC-071 §3 “Progress reporting,” §§6–7; supplied `assess_progress` descriptor; `NG-070-saneamento-specs-branches-v1-20261017.md` §11.
+
+   The prohibition on Jev-generated percentages is appropriate. But criteria and weights alone do not define legitimate numerator evidence, unknown handling, exclusions, partial credit, or acceptance authority. NG-070’s grouping of “Implemented — Pending Test” with “Implemented” illustrates why status counts cannot become completion evidence.
+
+   **Required amendment:** Define criterion states, admissible evidence, owner-approved denominator identity, weighting validation, rounding, and unknown/excluded handling. Unknown criteria must not silently disappear from the denominator. Keep declared-status distributions separate from verified gate counts.
+
+   Resolve reuse versus adaptation of `assess_progress`; its supplied descriptor requires trusted host approval and an evidence verifier. Do not assume merely reproducing its arithmetic reproduces its trust boundary.
+
+7. **Turn privacy intentions into enforceable data-boundary acceptance criteria.**
+
+   **Evidence:** SPEC-071 §§3, 5, 5.1, 7, 9; `NG-071-detector-drift-spec-implementation-v1-20261017.md` §2 “Excluído”; payload reference “Runtime gates.”
+
+   “Sanitized” summaries and hash/path references are not intrinsically non-sensitive. Absolute paths, claim text, filenames, and receipts can disclose protected metadata. The task also broadly excludes transmitting full SPECs remotely, while the Astra design packet explicitly requires the full SPEC—an exception needing clear scope.
+
+   **Required amendment:** Distinguish the expressly approved Astra packet from routine Jev egress; define allowed remote fields, minimization/redaction rules, bounded sizes, local-only provenance, and receipt/log handling. Require digest binding after sanitization and fresh consent after payload changes. Define refusal behavior for uncertain classification.
+
+   Specify bounded local reads so referenced paths cannot lead to credential or unrelated protected-file collection. Add negative acceptance cases for prohibited payload fields, stale consent, timeout/unknown dispatch, and accidental automatic retry. Current provider terms and active host behavior remain unverified.
+
+## Packet-evidence limitations
+
+8. **The packet supports this design assessment, not independent confirmation of the historical cases or integration compatibility.**
+
+   **Evidence:** packet “Input SHA-256 manifest” and “Evidence boundary”; branch applicability report §§2–5; Dashboard excerpt line 18.
+
+   The supplied SPEC-031/044/045/069 excerpts are corrected worktree text, not the original committed clauses that motivated the audit. Implementation source, original Git-object extracts, the full register, most sidecar contents, and active Hermes registration/hooks are absent. Their digests or narrative descriptions do not substitute for their contents.
+
+   This does not require importing production code into the present design review. It does require future fixture provenance to distinguish documentary observations from independently established facts. Only Dashboard line 18 was reviewed; no conclusion covers omitted Dashboard content. The supplied records also leave dispatch consent pending, so this review does not certify the consent/cost process.
+
+## Optional hardening
+
+9. **Reconcile stale contextual labels without rewriting historical evidence.**
+
+   **Evidence:** review context §1 says v0.11-draft while §2 specifies v0.12-draft; branch applicability report opening status conflicts with its later §4 account of applied edits.
+
+   Label these as preparation-stage or historical statements and identify the governing revision clearly. Preserve historical 64-sidecar counts rather than silently refreshing them into a different inventory.
+
+10. **Add reproducibility and resource-bound details.**
+
+   **Evidence:** SPEC-071 §7 promises a bounded JSON/Markdown bundle, but does not define bounds.
+
+   Consider deterministic ordering, stable finding identifiers, explicit truncation markers, parser/version provenance, and read-size/history limits. Limit exhaustion should produce incomplete coverage, never a clean result.
+
+**Disposition:** Retain the owner’s selected branch scope, local-first design, registered Hermes route, advisory-only semantics, stdout default, explicit persistence, and separate review gates. Resolve findings 1–7 in the same SPEC-071 lineage before presenting the design as final-review-ready. No files are modified, and all specification changes and subsequent implementation decisions remain with the owner.

@@ -10,6 +10,8 @@
 
 ## 1. Problem / Objective
 
+> **Historical problem statement:** The following sentence records the remote state before the AIOPT3 promotion on 2026-09-11; it is not a claim about the current remote default setting.
+
 The NovaGenesis repository still advertises `master` as its remote default branch, while current development, integration, deployment scripts, SPECs and validated work use `AIOPT3`. The repository must make `AIOPT3` the principal/default branch and retain `master` as a secondary historical and compatibility branch.
 
 The promotion is allowed to proceed with explicitly accepted imperfections. Acceptance is not an assertion that AIOPT3 is perfect; every accepted imperfection must be classified, evidenced, assigned a follow-up or re-evaluation condition, and excluded from the blocking set only when its impact is understood.

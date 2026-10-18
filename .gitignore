@@ -31,4 +31,6 @@ Scripts/AlpineVMs/ng-vm.env
 Temp/
 Make/out.txt
 **/*.bak
+**/__pycache__/
+*.py[cod]
 IO/NG-*/

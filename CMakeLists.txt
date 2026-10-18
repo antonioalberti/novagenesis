@@ -507,7 +507,7 @@ target_link_libraries(NRNCS LINK_PRIVATE Common)
 
 if(NG_ENABLE_SPEC027_STAGE_DIAGNOSTICS)
     enable_testing()
-    add_executable(NGALStageTelemetryTest tests/NGALStageTelemetryTest.cpp)
+    add_executable(NGALStageTelemetryTest Scripts/tests/NGALStageTelemetryTest.cpp)
     target_include_directories(NGALStageTelemetryTest PRIVATE Common/src)
     target_compile_definitions(NGALStageTelemetryTest PRIVATE
         SPEC027_STAGE_DIAGNOSTICS=1)

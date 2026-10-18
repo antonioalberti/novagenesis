@@ -1,0 +1,36 @@
+{
+  "review_id": "SPEC-071-design-439bab94579a",
+  "review_type": "design-only SPEC review",
+  "implementation_authorization": "NO",
+  "packet_path": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/reviewed-packet.md",
+  "packet_sha256": "439bab94579ad33c174afde2612031c9d0f1afbc593ebb903524c38ec1e246b7",
+  "instructions_path": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/request-instructions.txt",
+  "instructions_sha256": "34ee329e2cdd2b0a6154cf534f081cb4811aac021882537fb8395252ff0f32b5",
+  "repository_HEADs": {
+    "AIOPT3": "24a3851e1d5a90f039b9e148a1af38dd03c4d925",
+    "AIOPT4": "0dd0dd4b2fd0a9d416aff232ad07672fe39746b6",
+    "AIOPT5": "8d2386dcb10d2b37f133d4b24c2cb96761753d82"
+  },
+  "session_transcript": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/session/SPEC-071-design-439bab94579a.jsonl",
+  "raw_sse": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response.raw.sse",
+  "raw_sse_sha256": "4b7c8ef26f69ab73c3996cc57d28fa4a89dcc6c3c50395839415ab70ef549e5c",
+  "parsed_response": "/home/gandalf/workspace/novagenesis/Specs/IMPACT/ASTRA-REVIEWS/SPEC-071-design-439bab94579a/response.parsed.txt",
+  "parsed_response_sha256": "42b5987bed86f1753154d1db3f4cb201999e47e604d2c2b49e9f08ac6cbf9365",
+  "usage_record": {
+    "ts": "2026-10-17T12:25:26Z",
+    "label": "SPEC-071-design-439bab94579a",
+    "model": "gpt-6-astra",
+    "input_tokens": 39346,
+    "cached_tokens": 0,
+    "output_tokens": 2388,
+    "total_tokens": 41734,
+    "credits": 13.418499999999998,
+    "primary_used_percent": "56",
+    "secondary_used_percent": "24",
+    "latency_s": 64.851,
+    "plan": "plus"
+  },
+  "source_manifest_inputs_checked": 26,
+  "dispatch_count": 1,
+  "no_retry": true
+}

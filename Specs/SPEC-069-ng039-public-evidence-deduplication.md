@@ -59,7 +59,7 @@ For each row, the retained raw file and deletion candidate must have the listed 
 
 ## 6. Verification and rollback
 
-Use a read-only Python probe to verify the pair hashes, sizes, and byte equality immediately before removal. After removal, rerun the same allowlist/hash check, scan for path references, count the results directory, inspect `git diff --name-status`, and run `git diff --check`.
+Before removal, use a read-only Python probe to verify each listed pair exists, matches the exact size/SHA-256, and is byte-identical. After removal, use a separate read-only check: verify each retained `.raw.sse` path and hash, confirm the 11 allowlisted `.last.sse` paths are absent (while preserving the r12 exception), scan for references to deleted paths, verify the results-directory counts/bytes, inspect `git diff --name-status`, and run `git diff --check`. Do not rerun a pair-equality check against deleted candidates.
 
 Rollback is limited to restoring a deleted duplicate from its retained byte-identical raw counterpart if an acceptance check fails. Do not use `git restore` on unrelated dirty files. Stop if any pair differs or a reference is discovered.
 

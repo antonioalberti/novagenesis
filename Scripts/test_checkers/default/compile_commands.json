@@ -1,8 +1,8 @@
 [
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/Common.dir/GW.c.o -MF CMakeFiles/Common.dir/GW.c.o.d -o CMakeFiles/Common.dir/GW.c.o -c ../src/GW.c",
-    "file": "../src/GW.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/Common.dir/GW.c.o -MF CMakeFiles/Common.dir/GW.c.o.d -o CMakeFiles/Common.dir/GW.c.o -c ../default/src/GW.c",
+    "file": "../default/src/GW.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -24,14 +24,14 @@
       "-o",
       "CMakeFiles/Common.dir/GW.c.o",
       "-c",
-      "../src/GW.c"
+      "../default/src/GW.c"
     ],
     "output": "CMakeFiles/Common.dir/GW.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/ContentApp.dir/main.c.o -MF CMakeFiles/ContentApp.dir/main.c.o.d -o CMakeFiles/ContentApp.dir/main.c.o -c ../src/main.c",
-    "file": "../src/main.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/ContentApp.dir/main.c.o -MF CMakeFiles/ContentApp.dir/main.c.o.d -o CMakeFiles/ContentApp.dir/main.c.o -c ../default/src/main.c",
+    "file": "../default/src/main.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -53,14 +53,14 @@
       "-o",
       "CMakeFiles/ContentApp.dir/main.c.o",
       "-c",
-      "../src/main.c"
+      "../default/src/main.c"
     ],
     "output": "CMakeFiles/ContentApp.dir/main.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o -MF CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o.d -o CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o -c ../src/IoTTestApp.c",
-    "file": "../src/IoTTestApp.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o -MF CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o.d -o CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o -c ../default/src/IoTTestApp.c",
+    "file": "../default/src/IoTTestApp.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -82,14 +82,14 @@
       "-o",
       "CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o",
       "-c",
-      "../src/IoTTestApp.c"
+      "../default/src/IoTTestApp.c"
     ],
     "output": "CMakeFiles/IoTTestApp.dir/IoTTestApp.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/NBTestApp.dir/NBTestApp.c.o -MF CMakeFiles/NBTestApp.dir/NBTestApp.c.o.d -o CMakeFiles/NBTestApp.dir/NBTestApp.c.o -c ../src/NBTestApp.c",
-    "file": "../src/NBTestApp.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/NBTestApp.dir/NBTestApp.c.o -MF CMakeFiles/NBTestApp.dir/NBTestApp.c.o.d -o CMakeFiles/NBTestApp.dir/NBTestApp.c.o -c ../default/src/NBTestApp.c",
+    "file": "../default/src/NBTestApp.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -111,14 +111,14 @@
       "-o",
       "CMakeFiles/NBTestApp.dir/NBTestApp.c.o",
       "-c",
-      "../src/NBTestApp.c"
+      "../default/src/NBTestApp.c"
     ],
     "output": "CMakeFiles/NBTestApp.dir/NBTestApp.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/PGCS.dir/PGCS.c.o -MF CMakeFiles/PGCS.dir/PGCS.c.o.d -o CMakeFiles/PGCS.dir/PGCS.c.o -c ../src/PGCS.c",
-    "file": "../src/PGCS.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/PGCS.dir/PGCS.c.o -MF CMakeFiles/PGCS.dir/PGCS.c.o.d -o CMakeFiles/PGCS.dir/PGCS.c.o -c ../default/src/PGCS.c",
+    "file": "../default/src/PGCS.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -140,14 +140,14 @@
       "-o",
       "CMakeFiles/PGCS.dir/PGCS.c.o",
       "-c",
-      "../src/PGCS.c"
+      "../default/src/PGCS.c"
     ],
     "output": "CMakeFiles/PGCS.dir/PGCS.c.o"
   },
   {
-    "directory": "/home/gandalf/workspace/novagenesis/test_checkers/default/build",
-    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/NRNCS.dir/NRNCS.c.o -MF CMakeFiles/NRNCS.dir/NRNCS.c.o.d -o CMakeFiles/NRNCS.dir/NRNCS.c.o -c ../src/NRNCS.c",
-    "file": "../src/NRNCS.c",
+    "directory": "Scripts/test_checkers/default-build",
+    "command": "/usr/bin/x86_64-linux-gnu-g++-13 -O0 -g -g3 -Wall -fmessage-length=0 -pthread -Wno-deprecated -lpthread -lrt -fno-omit-frame-pointer -std=gnu++20 -MD -MT CMakeFiles/NRNCS.dir/NRNCS.c.o -MF CMakeFiles/NRNCS.dir/NRNCS.c.o.d -o CMakeFiles/NRNCS.dir/NRNCS.c.o -c ../default/src/NRNCS.c",
+    "file": "../default/src/NRNCS.c",
     "arguments": [
       "/usr/bin/x86_64-linux-gnu-g++-13",
       "-O0",
@@ -169,7 +169,7 @@
       "-o",
       "CMakeFiles/NRNCS.dir/NRNCS.c.o",
       "-c",
-      "../src/NRNCS.c"
+      "../default/src/NRNCS.c"
     ],
     "output": "CMakeFiles/NRNCS.dir/NRNCS.c.o"
   }

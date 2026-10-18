@@ -5,7 +5,8 @@
 **Status:** In Progress
 **Branch:** AIOPT3
 **Implementation commit:** —
-**Related:** SPEC-044-core-run-evaluate-invalid-pg-downcast.md, SPEC-041-gw-deadline-aware-wait.md
+**Related:** `SPEC-044-core-run-evaluate-invalid-pg-downcast.md`
+**Historical reference:** `SPEC-041-gw-deadline-aware-wait.md` is absent from the pinned repository snapshots and reachable history; it is not an active dependency.
 
 ## 1. Problema
 
