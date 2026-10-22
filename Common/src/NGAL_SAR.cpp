@@ -30,17 +30,26 @@
 #include "Process.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cstring>
-#include <ctime>
 #include <limits>
 #include <memory>
 #include <new>
+#include "NGAL_StageTelemetry.h"
 
 #define DEBUG
 
 using namespace std;
 
-#include "NGAL_StageTelemetry.h"
+namespace
+{
+const std::chrono::milliseconds SAR_CLEANUP_INTERVAL(400);
+
+NGAL_SAR::TimePoint SteadyNow()
+{
+  return NGAL_SAR::Clock::now();
+}
+}
 
 const size_t NGAL_SAR::MAX_REASSEMBLY_BUFFERS;
 const size_t NGAL_SAR::MAX_REASSEMBLY_BYTES;
@@ -52,7 +61,10 @@ NGAL_SAR::Telemetry& NGAL_SAR::Stats()
   return counters;
 }
 
-NGAL_SAR::NGAL_SAR() : ReassemblyBytes(0)
+NGAL_SAR::NGAL_SAR(ClockSource clock_source)
+  : Now(clock_source ? clock_source : &SteadyNow),
+    NextCleanupAt(Now() + SAR_CLEANUP_INTERVAL),
+    ReassemblyBytes(0)
 {
 }
 
@@ -301,6 +313,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
     return 1;
   }
 
+  const TimePoint CurrentTime = Now();
+
   FragmentBuffer* FB = 0;
   size_t BufferIndex = 0;
   for (size_t c = 0; c < ReassemblyBuffers.size(); ++c)
@@ -311,6 +325,16 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       BufferIndex = c;
       break;
     }
+  }
+
+  // Expire a matching assembly before a fragment can extend it. This uses
+  // the existing message-number lookup and does not scan all buffers.
+  if (FB && IsExpired(FB, CurrentTime))
+  {
+    if (FB->SegmentsSoFar < FB->NoS)
+      Stats().Count(TimeoutAbandoned);
+    RemoveBuffer(BufferIndex);
+    FB = 0;
   }
 
   if (!FB && SN != 0)
@@ -456,6 +480,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
       NewBuffer->MessageSize = MessageSize;
       NewBuffer->BlockSize = BlockSize;
       NewBuffer->ChargedBytes = Charge;
+      NewBuffer->CreatedAt = CurrentTime;
+      NewBuffer->LastAcceptedAt = CurrentTime;
       NewBuffer->ReceivedSN.assign(static_cast<size_t>(LocalNoS), false);
       NewBuffer->Buffer = new char[static_cast<size_t>(MessageSize)];
 
@@ -485,7 +511,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   FB->ReceivedSoFar += Expected;
   ++FB->SegmentsSoFar;
   FB->ReceivedSN[SN] = true;
-  FB->Timestamp = static_cast<double>(time(0));
+  FB->LastAcceptedAt = CurrentTime;
 #ifdef SPEC027_STAGE_DIAGNOSTICS
   outcome.MarkAccepted();
 #endif
@@ -523,7 +549,36 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
   return 1;
 }
 
-void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
+bool NGAL_SAR::IsExpired(const FragmentBuffer* buffer, TimePoint now) const
+{
+  return now - buffer->LastAcceptedAt >= std::chrono::seconds(30) ||
+         now - buffer->CreatedAt >= std::chrono::seconds(150);
+}
+
+bool NGAL_SAR::MaybeCleanup()
+{
+  const TimePoint now = Now();
+  if (now < NextCleanupAt)
+    return false;
+
+  CleanupTimedOut(now);
+  // Preserve the scheduled phase; skip elapsed slots rather than catching up.
+  NextCleanupAt += SAR_CLEANUP_INTERVAL;
+  if (NextCleanupAt <= now)
+  {
+    const auto missed_periods =
+        (now - NextCleanupAt) / SAR_CLEANUP_INTERVAL + 1;
+    NextCleanupAt += SAR_CLEANUP_INTERVAL * missed_periods;
+  }
+  return true;
+}
+
+void NGAL_SAR::CleanupTimedOut()
+{
+  CleanupTimedOut(Now());
+}
+
+void NGAL_SAR::CleanupTimedOut(TimePoint now)
 {
   for (size_t i = 0; i < ReassemblyBuffers.size();)
   {
@@ -537,8 +592,7 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
 #endif
       RemoveBuffer(i);
     }
-    else if (FB->Timestamp > 0 &&
-             (timeout_threshold - FB->Timestamp) > 30.0)
+    else if (IsExpired(FB, now))
     {
       if (FB->SegmentsSoFar < FB->NoS)
         Stats().Count(TimeoutAbandoned);
@@ -546,7 +600,10 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
       cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber
            << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS
            << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize
-           << " age=" << (timeout_threshold - FB->Timestamp)
+           << " idle_age="
+           << std::chrono::duration<double>(now - FB->LastAcceptedAt).count()
+           << "s total_age="
+           << std::chrono::duration<double>(now - FB->CreatedAt).count()
            << "s - discarding" << endl;
 #endif
       RemoveBuffer(i);

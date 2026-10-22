@@ -29,6 +29,7 @@
 #define _NGAL_SAR_H
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
@@ -44,7 +45,11 @@ class Message;
 class NGAL_SAR
 {
 public:
-  NGAL_SAR();
+  using Clock = std::chrono::steady_clock;
+  using TimePoint = Clock::time_point;
+  using ClockSource = TimePoint (*)();
+
+  explicit NGAL_SAR(ClockSource clock_source = ClockSource());
   ~NGAL_SAR();
 
   // Process-wide accounting across ALL SAR instances, not stress-only traffic.
@@ -88,7 +93,7 @@ public:
   // and must eventually delete[] it. No NewMessage/ConvertMessage is performed.
   //
   // Synchronization is unchanged: no internal mutex is acquired. When shared,
-  // ReceiveFragment and CleanupTimedOut must use the SAME external SAR mutex.
+  // all methods that mutate reassembly state use the SAME external SAR mutex.
   // Destruction requires all users to have stopped.
   int ReceiveFragment(unsigned char* TempBuffer,
                       unsigned int numbytes,
@@ -106,8 +111,12 @@ public:
                                            unsigned int MessageNumber,
                                            unsigned int SequenceNumber);
 
-  // timeout_threshold is the current absolute time in seconds, not an age.
-  void CleanupTimedOut(double timeout_threshold);
+  // With calls at most 600 ms apart, the phase-anchored 400 ms target
+  // keeps observed sweep gaps within one second.
+  // Sweeps still require cooperative dispatcher progress; this is not real-time.
+  // The injected clock source must be monotonic; the default uses steady_clock.
+  bool MaybeCleanup();
+  void CleanupTimedOut();
 
 private:
   struct FragmentBuffer
@@ -118,7 +127,8 @@ private:
     long long ReceivedSoFar;
     unsigned int SegmentsSoFar;
     char* Buffer;
-    double Timestamp;
+    TimePoint CreatedAt;
+    TimePoint LastAcceptedAt;
     bool ContinueReceiving;
     unsigned int BlockSize;
     std::vector<bool> ReceivedSN;
@@ -126,7 +136,8 @@ private:
 
     FragmentBuffer()
       : MessageNumber(0), NoS(0), MessageSize(0), ReceivedSoFar(0),
-        SegmentsSoFar(0), Buffer(0), Timestamp(0), ContinueReceiving(true),
+        SegmentsSoFar(0), Buffer(0), CreatedAt(), LastAcceptedAt(),
+        ContinueReceiving(true),
         BlockSize(0), ChargedBytes(0)
     {
     }
@@ -140,6 +151,8 @@ private:
     FragmentBuffer& operator=(const FragmentBuffer&) = delete;
   };
 
+  ClockSource Now;
+  TimePoint NextCleanupAt;
   std::vector<FragmentBuffer*> ReassemblyBuffers;
   size_t ReassemblyBytes;
 
@@ -149,6 +162,8 @@ private:
   static const size_t MAX_REASSEMBLY_BYTES = 384ULL * 1024 * 1024;
 
   void RemoveBuffer(size_t index);
+  bool IsExpired(const FragmentBuffer* buffer, TimePoint now) const;
+  void CleanupTimedOut(TimePoint now);
   static void LogProgress(const FragmentBuffer* FB);
 };
 

@@ -256,6 +256,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
 
   while (1)
   {
+    SAR.MaybeCleanup();
     // Use poll() to check all SSIDs for readability
     if (PPGCS->SSIDs != 0 && PPGCS->SSIDs->size() > 0)
     {
@@ -289,8 +290,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
 
       if (poll_result == 0)
       {
-        // Timeout — cleanup timed-out reassembly buffers and continue
-        SAR.CleanupTimedOut(PPGCS->GetTime());
+        // Timeout — periodic cleanup has already run above when due.
         continue;
       }
 
@@ -337,6 +337,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
 
           for (int slot = 0; slot < nrec; ++slot)
           {
+            SAR.MaybeCleanup();
             const unsigned int receivedbytes = static_cast<unsigned int>(pool->messages[slot].msg_len);
             const struct sockaddr_ll* from = &pool->addresses[slot];
 #ifdef SPEC027_STAGE_DIAGNOSTICS

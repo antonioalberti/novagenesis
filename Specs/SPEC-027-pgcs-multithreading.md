@@ -775,3 +775,37 @@ Startup shall print requested and effective topology, receive socket ownership, 
 Rollback shall disable fan-out and the writer pool through configuration and restart PGCS without changing peer software or SHM layout. Retain the safety repairs and instrumentation.
 
 SPEC-027 is complete only when the implementation, compatibility tests, two-VM build logs, measured before/after results, and selected deployment configuration are committed together.
+
+## 12. Owner-selected local ASE pilot — REQ-027-015
+
+**Owner decision (2026-10-20):** proceed with REQ-027-015 as a narrow local AIOPT5 ASE pilot after the Common problem inventory. This decision opens only the SAR-expiration correctness slice described here. It does not reopen the suspended NG-062 RAW multi-worker programme, accept Phase 0 or Phase 3, waive any full-SPEC-027 acceptance criterion, or authorize VM/IPC, cross-VM runtime, a full product build, commit, push, or paid external review.
+
+### 12.1 Rebaseline and current evidence
+
+The pilot source baseline is AIOPT5 `603d304b1413aa885fa405b2fe556cefc323674a`. The prior reviewed source snapshot remains `1af604dad66148618cc0e578c28adb4a9829e607`; it is historical review evidence, not the current pilot source identity.
+
+At the pilot baseline:
+
+- `Common/src/NGAL_SAR.cpp` records `time(0)` in `FragmentBuffer::Timestamp` and compares it with the caller-supplied threshold in `CleanupTimedOut`.
+- `Common/src/Block.cpp::GetTime()` uses `CLOCK_MONOTONIC` and returns seconds since that clock's epoch; `PGCS/src/NGAL_Transport_RAW.cpp` passes that value to `CleanupTimedOut`.
+- The current dispatcher owns one stack-local `NGAL_SAR`. It calls cleanup only when `poll()` returns timeout, so continuous readability can postpone the sweep.
+- The current `FragmentBuffer` has no absolute-creation timestamp for `T_max`. Duplicate fragments return before refreshing the current timestamp; accepted fragments refresh it after payload validation/copy.
+- The current source and tests do not prove the required expiry boundaries or cleanup cadence. These are source findings, not runtime results.
+
+### 12.2 Pilot boundary
+
+The pilot exercises the existing single-dispatcher path only. It shall preserve the wire format and the full requirement semantics: one monotonic time domain; `T_idle=30 s`; absolute `T_max=150 s` from the first accepted SN=0; only a newly accepted, nonduplicate fragment refreshes idle age; and expiry occurs before another fragment can extend an already-expired assembly. Cleanup shall be scheduled at least once per second under continuous traffic.
+
+The pilot does not implement or claim shared-shard locking, cross-worker fragment safety, fan-out, N=2/N=4, memory-budget acceptance, Phase 3 exit, Phase 0 completion, or overall SPEC-027 acceptance. The full SPEC-027 phase order and acceptance gates remain unchanged. The single-dispatcher ownership assumption applies only to this local pilot and must not be carried forward as a concurrency guarantee.
+
+### 12.3 Test-first and file boundary
+
+Use a local test-first cycle with an injectable monotonic time source. The RED test must fail on the pinned baseline for the expected timebase/cleanup defect, not because of a harness error. Cover just-before, exact-boundary, and just-after cases for both expiry limits; accepted progress, duplicate and malformed/rejected fragments; expiry-before-extension; and cleanup scheduling under continuous traffic.
+
+The proposed production allowlist is `Common/src/NGAL_SAR.h`, `Common/src/NGAL_SAR.cpp`, and only if required for the one-second scheduling rule, `PGCS/src/NGAL_Transport_RAW.cpp`. Add the focused test under `Tools/tests/`. Do not change CMake, the `DEBUG` macros, other SPEC-027 phases, or unrelated source under this pilot. If the test cannot be built/executed within this boundary, stop and request a scope decision rather than expanding the allowlist implicitly.
+
+Run a reproducible, local before/after comparison of the expiry-sweep cost with the same number of incomplete buffers, build flags, and measurement window. This is an ASE cycle measurement only: do not infer end-to-end throughput or system performance from it. If the baseline and candidate cannot be compared with equivalent work, record `INCONCLUSIVE` and do not claim the ASE performance criterion passed.
+
+### 12.4 Acceptance and authority boundary
+
+This pilot may be reported as accepted only for its local REQ-027-015 correctness slice after the RED→GREEN tests, applicable local regressions, the bounded comparison, and a read-only diff review pass. Its result must remain explicitly separate from full SPEC-027 acceptance and the suspended NG-062 task. No Astra/Codex/JEV egress is authorized by this decision; a new external review requires separate exact-SHA consent. Update NG-075, HERMES-006, the default Kanban card, and Dashboard with the exact source/SPEC identities and results.

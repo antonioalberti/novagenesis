@@ -1,0 +1,673 @@
+diff --git a/Common/src/NGAL_SAR.cpp b/Common/src/NGAL_SAR.cpp
+index f1a279a44bbb7ffb9d8490c67f4212d9ca0d5e1d..6631356a5b2406e5b16e64e1d33f73b2cac7dea9 100644
+--- a/Common/src/NGAL_SAR.cpp
++++ b/Common/src/NGAL_SAR.cpp
+@@ -30,17 +30,26 @@
+ #include "Process.h"
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <cstring>
+-#include <ctime>
+ #include <limits>
+ #include <memory>
+ #include <new>
++#include "NGAL_StageTelemetry.h"
+ 
+ #define DEBUG
+ 
+ using namespace std;
+ 
+-#include "NGAL_StageTelemetry.h"
++namespace
++{
++const std::chrono::milliseconds SAR_CLEANUP_INTERVAL(400);
++
++NGAL_SAR::TimePoint SteadyNow()
++{
++  return NGAL_SAR::Clock::now();
++}
++}
+ 
+ const size_t NGAL_SAR::MAX_REASSEMBLY_BUFFERS;
+ const size_t NGAL_SAR::MAX_REASSEMBLY_BYTES;
+@@ -52,7 +61,10 @@ NGAL_SAR::Telemetry& NGAL_SAR::Stats()
+   return counters;
+ }
+ 
+-NGAL_SAR::NGAL_SAR() : ReassemblyBytes(0)
++NGAL_SAR::NGAL_SAR(ClockSource clock_source)
++  : Now(clock_source ? clock_source : &SteadyNow),
++    NextCleanupAt(Now() + SAR_CLEANUP_INTERVAL),
++    ReassemblyBytes(0)
+ {
+ }
+ 
+@@ -301,6 +313,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
+     return 1;
+   }
+ 
++  const TimePoint CurrentTime = Now();
++
+   FragmentBuffer* FB = 0;
+   size_t BufferIndex = 0;
+   for (size_t c = 0; c < ReassemblyBuffers.size(); ++c)
+@@ -313,6 +327,16 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
+     }
+   }
+ 
++  // Expire a matching assembly before a fragment can extend it. This uses
++  // the existing message-number lookup and does not scan all buffers.
++  if (FB && IsExpired(FB, CurrentTime))
++  {
++    if (FB->SegmentsSoFar < FB->NoS)
++      Stats().Count(TimeoutAbandoned);
++    RemoveBuffer(BufferIndex);
++    FB = 0;
++  }
++
+   if (!FB && SN != 0)
+   {
+     Stats().Count(OutOfOrder);
+@@ -456,6 +480,8 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
+       NewBuffer->MessageSize = MessageSize;
+       NewBuffer->BlockSize = BlockSize;
+       NewBuffer->ChargedBytes = Charge;
++      NewBuffer->CreatedAt = CurrentTime;
++      NewBuffer->LastAcceptedAt = CurrentTime;
+       NewBuffer->ReceivedSN.assign(static_cast<size_t>(LocalNoS), false);
+       NewBuffer->Buffer = new char[static_cast<size_t>(MessageSize)];
+ 
+@@ -485,7 +511,7 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
+   FB->ReceivedSoFar += Expected;
+   ++FB->SegmentsSoFar;
+   FB->ReceivedSN[SN] = true;
+-  FB->Timestamp = static_cast<double>(time(0));
++  FB->LastAcceptedAt = CurrentTime;
+ #ifdef SPEC027_STAGE_DIAGNOSTICS
+   outcome.MarkAccepted();
+ #endif
+@@ -523,7 +549,36 @@ int NGAL_SAR::ReceiveFragment(unsigned char* TempBuffer,
+   return 1;
+ }
+ 
+-void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
++bool NGAL_SAR::IsExpired(const FragmentBuffer* buffer, TimePoint now) const
++{
++  return now - buffer->LastAcceptedAt >= std::chrono::seconds(30) ||
++         now - buffer->CreatedAt >= std::chrono::seconds(150);
++}
++
++bool NGAL_SAR::MaybeCleanup()
++{
++  const TimePoint now = Now();
++  if (now < NextCleanupAt)
++    return false;
++
++  CleanupTimedOut(now);
++  // Preserve the scheduled phase; skip elapsed slots rather than catching up.
++  NextCleanupAt += SAR_CLEANUP_INTERVAL;
++  if (NextCleanupAt <= now)
++  {
++    const auto missed_periods =
++        (now - NextCleanupAt) / SAR_CLEANUP_INTERVAL + 1;
++    NextCleanupAt += SAR_CLEANUP_INTERVAL * missed_periods;
++  }
++  return true;
++}
++
++void NGAL_SAR::CleanupTimedOut()
++{
++  CleanupTimedOut(Now());
++}
++
++void NGAL_SAR::CleanupTimedOut(TimePoint now)
+ {
+   for (size_t i = 0; i < ReassemblyBuffers.size();)
+   {
+@@ -537,8 +592,7 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
+ #endif
+       RemoveBuffer(i);
+     }
+-    else if (FB->Timestamp > 0 &&
+-             (timeout_threshold - FB->Timestamp) > 30.0)
++    else if (IsExpired(FB, now))
+     {
+       if (FB->SegmentsSoFar < FB->NoS)
+         Stats().Count(TimeoutAbandoned);
+@@ -546,7 +600,10 @@ void NGAL_SAR::CleanupTimedOut(double timeout_threshold)
+       cerr << "[ERROR] NGAL_SAR::CleanupTimedOut: TIMEOUT MN=" << FB->MessageNumber
+            << " seg_received=" << FB->SegmentsSoFar << "/" << FB->NoS
+            << " bytes=" << FB->ReceivedSoFar << "/" << FB->MessageSize
+-           << " age=" << (timeout_threshold - FB->Timestamp)
++           << " idle_age="
++           << std::chrono::duration<double>(now - FB->LastAcceptedAt).count()
++           << "s total_age="
++           << std::chrono::duration<double>(now - FB->CreatedAt).count()
+            << "s - discarding" << endl;
+ #endif
+       RemoveBuffer(i);
+diff --git a/Common/src/NGAL_SAR.h b/Common/src/NGAL_SAR.h
+index ba1a80d44752edcdc48188529a53b643fb2ecfd7..c1140ebb8a812a1045de67f4784ca170d2196dc7 100644
+--- a/Common/src/NGAL_SAR.h
++++ b/Common/src/NGAL_SAR.h
+@@ -29,6 +29,7 @@
+ #define _NGAL_SAR_H
+ 
+ #include <atomic>
++#include <chrono>
+ #include <cstddef>
+ #include <cstdlib>
+ #include <functional>
+@@ -44,7 +45,11 @@ class Message;
+ class NGAL_SAR
+ {
+ public:
+-  NGAL_SAR();
++  using Clock = std::chrono::steady_clock;
++  using TimePoint = Clock::time_point;
++  using ClockSource = TimePoint (*)();
++
++  explicit NGAL_SAR(ClockSource clock_source = ClockSource());
+   ~NGAL_SAR();
+ 
+   // Process-wide accounting across ALL SAR instances, not stress-only traffic.
+@@ -88,7 +93,7 @@ public:
+   // and must eventually delete[] it. No NewMessage/ConvertMessage is performed.
+   //
+   // Synchronization is unchanged: no internal mutex is acquired. When shared,
+-  // ReceiveFragment and CleanupTimedOut must use the SAME external SAR mutex.
++  // all methods that mutate reassembly state use the SAME external SAR mutex.
+   // Destruction requires all users to have stopped.
+   int ReceiveFragment(unsigned char* TempBuffer,
+                       unsigned int numbytes,
+@@ -106,8 +111,12 @@ public:
+                                            unsigned int MessageNumber,
+                                            unsigned int SequenceNumber);
+ 
+-  // timeout_threshold is the current absolute time in seconds, not an age.
+-  void CleanupTimedOut(double timeout_threshold);
++  // With calls at most 600 ms apart, the phase-anchored 400 ms target
++  // keeps observed sweep gaps within one second.
++  // Sweeps still require cooperative dispatcher progress; this is not real-time.
++  // The injected clock source must be monotonic; the default uses steady_clock.
++  bool MaybeCleanup();
++  void CleanupTimedOut();
+ 
+ private:
+   struct FragmentBuffer
+@@ -118,7 +127,8 @@ private:
+     long long ReceivedSoFar;
+     unsigned int SegmentsSoFar;
+     char* Buffer;
+-    double Timestamp;
++    TimePoint CreatedAt;
++    TimePoint LastAcceptedAt;
+     bool ContinueReceiving;
+     unsigned int BlockSize;
+     std::vector<bool> ReceivedSN;
+@@ -126,7 +136,8 @@ private:
+ 
+     FragmentBuffer()
+       : MessageNumber(0), NoS(0), MessageSize(0), ReceivedSoFar(0),
+-        SegmentsSoFar(0), Buffer(0), Timestamp(0), ContinueReceiving(true),
++        SegmentsSoFar(0), Buffer(0), CreatedAt(), LastAcceptedAt(),
++        ContinueReceiving(true),
+         BlockSize(0), ChargedBytes(0)
+     {
+     }
+@@ -140,6 +151,8 @@ private:
+     FragmentBuffer& operator=(const FragmentBuffer&) = delete;
+   };
+ 
++  ClockSource Now;
++  TimePoint NextCleanupAt;
+   std::vector<FragmentBuffer*> ReassemblyBuffers;
+   size_t ReassemblyBytes;
+ 
+@@ -149,6 +162,8 @@ private:
+   static const size_t MAX_REASSEMBLY_BYTES = 384ULL * 1024 * 1024;
+ 
+   void RemoveBuffer(size_t index);
++  bool IsExpired(const FragmentBuffer* buffer, TimePoint now) const;
++  void CleanupTimedOut(TimePoint now);
+   static void LogProgress(const FragmentBuffer* FB);
+ };
+ 
+diff --git a/PGCS/src/NGAL_Transport_RAW.cpp b/PGCS/src/NGAL_Transport_RAW.cpp
+index 02520e37da6237c5a785df513362021c53dea41a..916cae0d083d8b0f99ba97b16aabf637b2e6f70e 100644
+--- a/PGCS/src/NGAL_Transport_RAW.cpp
++++ b/PGCS/src/NGAL_Transport_RAW.cpp
+@@ -256,6 +256,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
+ 
+   while (1)
+   {
++    SAR.MaybeCleanup();
+     // Use poll() to check all SSIDs for readability
+     if (PPGCS->SSIDs != 0 && PPGCS->SSIDs->size() > 0)
+     {
+@@ -289,8 +290,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
+ 
+       if (poll_result == 0)
+       {
+-        // Timeout — cleanup timed-out reassembly buffers and continue
+-        SAR.CleanupTimedOut(PPGCS->GetTime());
++        // Timeout — periodic cleanup has already run above when due.
+         continue;
+       }
+ 
+@@ -337,6 +337,7 @@ void NGAL_Transport_RAW::ReceiveDispatcher(PG* PPG)
+ 
+           for (int slot = 0; slot < nrec; ++slot)
+           {
++            SAR.MaybeCleanup();
+             const unsigned int receivedbytes = static_cast<unsigned int>(pool->messages[slot].msg_len);
+             const struct sockaddr_ll* from = &pool->addresses[slot];
+ #ifdef SPEC027_STAGE_DIAGNOSTICS
+diff --git a/Specs/SPEC-027-pgcs-multithreading.md b/Specs/SPEC-027-pgcs-multithreading.md
+index c168329ff9199014d6eab08806a0e98d3a762956..9867e1a31c93bbee93995872fbf4e33f5eb85b41 100644
+--- a/Specs/SPEC-027-pgcs-multithreading.md
++++ b/Specs/SPEC-027-pgcs-multithreading.md
+@@ -774,4 +774,38 @@ Startup shall print requested and effective topology, receive socket ownership,
+ 
+ Rollback shall disable fan-out and the writer pool through configuration and restart PGCS without changing peer software or SHM layout. Retain the safety repairs and instrumentation.
+ 
+-SPEC-027 is complete only when the implementation, compatibility tests, two-VM build logs, measured before/after results, and selected deployment configuration are committed together.
+\ No newline at end of file
++SPEC-027 is complete only when the implementation, compatibility tests, two-VM build logs, measured before/after results, and selected deployment configuration are committed together.
++
++## 12. Owner-selected local ASE pilot — REQ-027-015
++
++**Owner decision (2026-10-20):** proceed with REQ-027-015 as a narrow local AIOPT5 ASE pilot after the Common problem inventory. This decision opens only the SAR-expiration correctness slice described here. It does not reopen the suspended NG-062 RAW multi-worker programme, accept Phase 0 or Phase 3, waive any full-SPEC-027 acceptance criterion, or authorize VM/IPC, cross-VM runtime, a full product build, commit, push, or paid external review.
++
++### 12.1 Rebaseline and current evidence
++
++The pilot source baseline is AIOPT5 `603d304b1413aa885fa405b2fe556cefc323674a`. The prior reviewed source snapshot remains `1af604dad66148618cc0e578c28adb4a9829e607`; it is historical review evidence, not the current pilot source identity.
++
++At the pilot baseline:
++
++- `Common/src/NGAL_SAR.cpp` records `time(0)` in `FragmentBuffer::Timestamp` and compares it with the caller-supplied threshold in `CleanupTimedOut`.
++- `Common/src/Block.cpp::GetTime()` uses `CLOCK_MONOTONIC` and returns seconds since that clock's epoch; `PGCS/src/NGAL_Transport_RAW.cpp` passes that value to `CleanupTimedOut`.
++- The current dispatcher owns one stack-local `NGAL_SAR`. It calls cleanup only when `poll()` returns timeout, so continuous readability can postpone the sweep.
++- The current `FragmentBuffer` has no absolute-creation timestamp for `T_max`. Duplicate fragments return before refreshing the current timestamp; accepted fragments refresh it after payload validation/copy.
++- The current source and tests do not prove the required expiry boundaries or cleanup cadence. These are source findings, not runtime results.
++
++### 12.2 Pilot boundary
++
++The pilot exercises the existing single-dispatcher path only. It shall preserve the wire format and the full requirement semantics: one monotonic time domain; `T_idle=30 s`; absolute `T_max=150 s` from the first accepted SN=0; only a newly accepted, nonduplicate fragment refreshes idle age; and expiry occurs before another fragment can extend an already-expired assembly. Cleanup shall be scheduled at least once per second under continuous traffic.
++
++The pilot does not implement or claim shared-shard locking, cross-worker fragment safety, fan-out, N=2/N=4, memory-budget acceptance, Phase 3 exit, Phase 0 completion, or overall SPEC-027 acceptance. The full SPEC-027 phase order and acceptance gates remain unchanged. The single-dispatcher ownership assumption applies only to this local pilot and must not be carried forward as a concurrency guarantee.
++
++### 12.3 Test-first and file boundary
++
++Use a local test-first cycle with an injectable monotonic time source. The RED test must fail on the pinned baseline for the expected timebase/cleanup defect, not because of a harness error. Cover just-before, exact-boundary, and just-after cases for both expiry limits; accepted progress, duplicate and malformed/rejected fragments; expiry-before-extension; and cleanup scheduling under continuous traffic.
++
++The proposed production allowlist is `Common/src/NGAL_SAR.h`, `Common/src/NGAL_SAR.cpp`, and only if required for the one-second scheduling rule, `PGCS/src/NGAL_Transport_RAW.cpp`. Add the focused test under `Tools/tests/`. Do not change CMake, the `DEBUG` macros, other SPEC-027 phases, or unrelated source under this pilot. If the test cannot be built/executed within this boundary, stop and request a scope decision rather than expanding the allowlist implicitly.
++
++Run a reproducible, local before/after comparison of the expiry-sweep cost with the same number of incomplete buffers, build flags, and measurement window. This is an ASE cycle measurement only: do not infer end-to-end throughput or system performance from it. If the baseline and candidate cannot be compared with equivalent work, record `INCONCLUSIVE` and do not claim the ASE performance criterion passed.
++
++### 12.4 Acceptance and authority boundary
++
++This pilot may be reported as accepted only for its local REQ-027-015 correctness slice after the RED→GREEN tests, applicable local regressions, the bounded comparison, and a read-only diff review pass. Its result must remain explicitly separate from full SPEC-027 acceptance and the suspended NG-062 task. No Astra/Codex/JEV egress is authorized by this decision; a new external review requires separate exact-SHA consent. Update NG-075, HERMES-006, the default Kanban card, and Dashboard with the exact source/SPEC identities and results.
+diff --git a/Tools/tests/NGALSARExpirationTest.cpp b/Tools/tests/NGALSARExpirationTest.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..a648427357897864928fa64f40b4eb89fa947db7
+--- /dev/null
++++ b/Tools/tests/NGALSARExpirationTest.cpp
+@@ -0,0 +1,356 @@
++#include "NGAL_SAR.h"
++
++#include <chrono>
++#include <iostream>
++#include <sstream>
++#include <vector>
++
++namespace
++{
++using Clock = NGAL_SAR::Clock;
++using TimePoint = NGAL_SAR::TimePoint;
++
++struct FakeClock
++{
++  static TimePoint Current;
++
++  static TimePoint Now()
++  {
++    return Current;
++  }
++};
++
++TimePoint FakeClock::Current;
++const char* ScheduledCleanupFailure = 0;
++
++TimePoint AtSeconds(long long seconds)
++{
++  return TimePoint(std::chrono::seconds(seconds));
++}
++
++std::vector<unsigned char> MakeFragment(unsigned int message_number,
++                                        unsigned int sequence_number,
++                                        long long message_size,
++                                        unsigned int payload_size)
++{
++  const unsigned int header_size = sequence_number == 0 ? 16 : 8;
++  std::vector<unsigned char> fragment(header_size + payload_size, 0);
++  NGAL_SAR::BuildHeaderSegmentationField(fragment.data(), message_number,
++                                         sequence_number);
++  if (sequence_number == 0)
++    NGAL_SAR::BuildHeaderSizeField(fragment.data() + 8, message_size);
++  return fragment;
++}
++
++int Submit(NGAL_SAR& sar,
++           const std::vector<unsigned char>& fragment,
++           long long& completed_size)
++{
++  char* completed_buffer = 0;
++  completed_size = 0;
++  const int status = sar.ReceiveFragment(
++      const_cast<unsigned char*>(fragment.data()),
++      static_cast<unsigned int>(fragment.size()), 16,
++      completed_buffer, completed_size);
++  delete[] completed_buffer;
++  return status;
++}
++
++bool StartPartial(NGAL_SAR& sar,
++                  unsigned int message_number,
++                  long long message_size)
++{
++  long long completed_size = 0;
++  return Submit(sar, MakeFragment(message_number, 0, message_size, 8),
++                completed_size) == 1 && completed_size == 0;
++}
++
++bool TestIdleExpiryBoundary()
++{
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(1000);
++  NGAL_SAR before(&FakeClock::Now);
++  if (!StartPartial(before, 7, 24))
++    return false;
++  FakeClock::Current += std::chrono::milliseconds(29999);
++  before.CleanupTimedOut();
++  if (Submit(before, MakeFragment(7, 1, 24, 16), completed_size) != 0 ||
++      completed_size != 24)
++    return false;
++
++  FakeClock::Current = AtSeconds(2000);
++  NGAL_SAR at_boundary(&FakeClock::Now);
++  if (!StartPartial(at_boundary, 8, 24))
++    return false;
++  FakeClock::Current += std::chrono::seconds(30);
++  at_boundary.CleanupTimedOut();
++  return Submit(at_boundary, MakeFragment(8, 1, 24, 16), completed_size) == 1 &&
++         completed_size == 0;
++}
++
++bool TestExpiryBeforeContinuation()
++{
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(3000);
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 9, 24))
++    return false;
++
++  FakeClock::Current += std::chrono::milliseconds(30001);
++  return Submit(sar, MakeFragment(9, 1, 24, 16), completed_size) == 1 &&
++         completed_size == 0;
++}
++
++bool TestDuplicateAndRejectedFragmentsDoNotRefreshIdle()
++{
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(4000);
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 10, 24))
++    return false;
++
++  const unsigned long long duplicates_before =
++      NGAL_SAR::Stats().Values[NGAL_SAR::DuplicateSN].load(
++          std::memory_order_relaxed);
++  FakeClock::Current += std::chrono::seconds(29);
++  Submit(sar, MakeFragment(10, 0, 24, 8), completed_size);
++  const unsigned long long duplicates_after =
++      NGAL_SAR::Stats().Values[NGAL_SAR::DuplicateSN].load(
++          std::memory_order_relaxed);
++  if (duplicates_after != duplicates_before + 1)
++    return false;
++
++  Submit(sar, MakeFragment(10, 1, 24, 1), completed_size);
++  FakeClock::Current += std::chrono::seconds(1);
++  return Submit(sar, MakeFragment(10, 1, 24, 16), completed_size) == 1 &&
++         completed_size == 0;
++}
++
++bool TestAcceptedProgressRefreshesIdle()
++{
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(5000);
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 11, 40))
++    return false;
++
++  FakeClock::Current += std::chrono::seconds(29);
++  if (Submit(sar, MakeFragment(11, 1, 40, 16), completed_size) != 1)
++    return false;
++
++  FakeClock::Current += std::chrono::seconds(29);
++  sar.CleanupTimedOut();
++  return Submit(sar, MakeFragment(11, 2, 40, 16), completed_size) == 0 &&
++         completed_size == 40;
++}
++
++bool TestAbsoluteMaximumAge()
++{
++  const long long message_size = 104;
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(6000);
++  const TimePoint created = FakeClock::Current;
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 12, message_size))
++    return false;
++
++  for (unsigned int sequence = 1; sequence <= 5; ++sequence)
++  {
++    FakeClock::Current = created + std::chrono::seconds(sequence * 29);
++    if (Submit(sar, MakeFragment(12, sequence, message_size, 16),
++               completed_size) != 1)
++      return false;
++  }
++
++  const unsigned long long duplicates_before =
++      NGAL_SAR::Stats().Values[NGAL_SAR::DuplicateSN].load(
++          std::memory_order_relaxed);
++  FakeClock::Current = created + std::chrono::milliseconds(149999);
++  sar.CleanupTimedOut();
++  Submit(sar, MakeFragment(12, 5, message_size, 16), completed_size);
++  const unsigned long long duplicates_after =
++      NGAL_SAR::Stats().Values[NGAL_SAR::DuplicateSN].load(
++          std::memory_order_relaxed);
++  if (duplicates_after != duplicates_before + 1)
++    return false;
++
++  FakeClock::Current = created + std::chrono::seconds(150);
++  return Submit(sar, MakeFragment(12, 6, message_size, 16), completed_size) == 1 &&
++         completed_size == 0;
++}
++
++bool TestAbsoluteMaximumAgeAfterBoundary()
++{
++  const long long message_size = 104;
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(6500);
++  const TimePoint created = FakeClock::Current;
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 14, message_size))
++    return false;
++
++  for (unsigned int sequence = 1; sequence <= 5; ++sequence)
++  {
++    FakeClock::Current = created + std::chrono::seconds(sequence * 29);
++    if (Submit(sar, MakeFragment(14, sequence, message_size, 16),
++               completed_size) != 1)
++      return false;
++  }
++
++  FakeClock::Current = created + std::chrono::milliseconds(150001);
++  sar.CleanupTimedOut();
++  return Submit(sar, MakeFragment(14, 6, message_size, 16), completed_size) == 1 &&
++         completed_size == 0;
++}
++
++bool TestScheduledCleanupDuringContinuousTraffic()
++{
++  long long completed_size = 0;
++  FakeClock::Current = AtSeconds(7000);
++  NGAL_SAR sar(&FakeClock::Now);
++  if (!StartPartial(sar, 13, 24))
++    return false;
++
++  const unsigned long long abandoned_before =
++      NGAL_SAR::Stats().Values[NGAL_SAR::TimeoutAbandoned].load(
++          std::memory_order_relaxed);
++  unsigned int cleanup_calls = 0;
++  for (unsigned int tick = 1; tick <= 60; ++tick)
++  {
++    FakeClock::Current += std::chrono::milliseconds(500);
++    if (sar.MaybeCleanup())
++      ++cleanup_calls;
++    const unsigned int message_number = 100 + tick;
++    if (Submit(sar, MakeFragment(message_number, 0, 8, 8),
++               completed_size) != 0 || completed_size != 8)
++      return false;
++  }
++
++  const unsigned long long abandoned_after =
++      NGAL_SAR::Stats().Values[NGAL_SAR::TimeoutAbandoned].load(
++          std::memory_order_relaxed);
++  // A shorter schedule is compliant; assert the one-second upper bound only.
++  return cleanup_calls >= 30 && abandoned_after == abandoned_before + 1;
++}
++
++bool TestScheduledCleanupWithUnalignedCalls()
++{
++  FakeClock::Current = AtSeconds(8000);
++  const TimePoint schedule_start = FakeClock::Current;
++  TimePoint last_sweep = schedule_start;
++  NGAL_SAR sar(&FakeClock::Now);
++  unsigned int cleanup_calls = 0;
++
++  for (unsigned int tick = 1; tick <= 20; ++tick)
++  {
++    FakeClock::Current += std::chrono::milliseconds(600);
++    if (!sar.MaybeCleanup())
++      continue;
++
++    if (FakeClock::Current - last_sweep > std::chrono::seconds(1))
++    {
++      ScheduledCleanupFailure =
++          "scheduled cleanup interval exceeded one second at 600 ms call cadence";
++      return false;
++    }
++    last_sweep = FakeClock::Current;
++    ++cleanup_calls;
++  }
++
++  if (cleanup_calls < 2)
++  {
++    ScheduledCleanupFailure = "scheduled cleanup did not recur";
++    return false;
++  }
++  return true;
++}
++
++bool TestScheduledCleanupWithIrregularCalls()
++{
++  const std::chrono::milliseconds counterexample_calls[] = {
++      std::chrono::milliseconds(600),
++      std::chrono::milliseconds(490),
++      std::chrono::milliseconds(600)};
++
++  FakeClock::Current = AtSeconds(9000);
++  TimePoint last_sweep = FakeClock::Current;
++  NGAL_SAR sar(&FakeClock::Now);
++  unsigned int cleanup_calls = 0;
++  for (const auto interval : counterexample_calls)
++  {
++    FakeClock::Current += interval;
++    if (!sar.MaybeCleanup())
++      continue;
++    if (FakeClock::Current - last_sweep > std::chrono::seconds(1))
++    {
++      ScheduledCleanupFailure =
++          "irregular 600/490/600 ms calls allowed a sweep gap over one second";
++      return false;
++    }
++    last_sweep = FakeClock::Current;
++    ++cleanup_calls;
++  }
++  if (cleanup_calls < 2)
++  {
++    ScheduledCleanupFailure = "irregular calls did not produce recurring sweeps";
++    return false;
++  }
++
++  const std::chrono::milliseconds deadline_straddling_calls[] = {
++      std::chrono::milliseconds(400),
++      std::chrono::milliseconds(390),
++      std::chrono::milliseconds(600)};
++  FakeClock::Current = AtSeconds(9100);
++  last_sweep = FakeClock::Current;
++  NGAL_SAR straddling_sar(&FakeClock::Now);
++  cleanup_calls = 0;
++  for (const auto interval : deadline_straddling_calls)
++  {
++    FakeClock::Current += interval;
++    if (!straddling_sar.MaybeCleanup())
++      continue;
++    if (FakeClock::Current - last_sweep > std::chrono::seconds(1))
++    {
++      ScheduledCleanupFailure =
++          "deadline-straddling calls with a 600 ms maximum gap exceeded one second";
++      return false;
++    }
++    last_sweep = FakeClock::Current;
++    ++cleanup_calls;
++  }
++  if (cleanup_calls < 2)
++  {
++    ScheduledCleanupFailure = "deadline-straddling calls did not produce recurring sweeps";
++    return false;
++  }
++  return true;
++}
++}
++
++int main()
++{
++  std::ostringstream debug_output;
++  std::streambuf* original_stderr = std::cerr.rdbuf(debug_output.rdbuf());
++  const bool pass = TestIdleExpiryBoundary() &&
++                    TestExpiryBeforeContinuation() &&
++                    TestDuplicateAndRejectedFragmentsDoNotRefreshIdle() &&
++                    TestAcceptedProgressRefreshesIdle() &&
++                    TestAbsoluteMaximumAge() &&
++                    TestAbsoluteMaximumAgeAfterBoundary() &&
++                    TestScheduledCleanupDuringContinuousTraffic() &&
++                    TestScheduledCleanupWithUnalignedCalls() &&
++                    TestScheduledCleanupWithIrregularCalls();
++  std::cerr.rdbuf(original_stderr);
++  if (!pass)
++  {
++    if (ScheduledCleanupFailure != 0)
++      std::cerr << "FAIL: " << ScheduledCleanupFailure << std::endl;
++    else
++      std::cerr << "FAIL: NGAL_SAR expiration contract" << std::endl;
++    return 1;
++  }
++  std::cout << "PASS: SAR idle/max expiry, refresh semantics, continuation guard, "
++               "and scheduled cleanup"
++            << std::endl;
++  return 0;
++}
