@@ -1929,8 +1929,9 @@ int Message::ConvertMessageFromCharArrayToCommandLinesandPayloadCharArray2()
            << "Jumping to position = " << t << endl;
 #endif
 
-      // Search for a ng command line
-      if (Msg[t] == 'n' && Msg[t + 1] == 'g' && Msg[t + 2] == ' ' && Msg[t + 3] == '-')
+      // Search for a ng command line. The four-byte prefix must fit.
+      if ((MessageSize - t) >= 4 && Msg[t] == 'n' && Msg[t + 1] == 'g' &&
+          Msg[t + 2] == ' ' && Msg[t + 3] == '-')
       {
 #ifdef DEBUG
         cout << "A command line was found" << endl;
